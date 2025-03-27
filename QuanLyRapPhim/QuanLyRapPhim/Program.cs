@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
 using QuanLyRapPhim.Data;
@@ -13,11 +13,15 @@ builder.Services.AddDbContext<DBContext>(options => options.UseSqlServer(builder
 
 //builder.Services.AddDefaultIdentity<User>(options => options.SignIn.RequireConfirmedAccount = true).AddEntityFrameworkStores<DBContext>();
 
+//builder.Services.AddDefaultIdentity<User>(options => options.SignIn.RequireConfirmedAccount = true).AddEntityFrameworkStores<DBContext>();
+
 builder.Services.AddIdentity<User, IdentityRole>()
     .AddRoles<IdentityRole>()
+    .AddDefaultTokenProviders()
     .AddEntityFrameworkStores<DBContext>();
 
 builder.Services.AddTransient<IEmailSender, EmailSender>();
+
 
 
 builder.Services.AddRazorPages();
