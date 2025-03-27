@@ -55,15 +55,15 @@ namespace QuanLyRapPhim.Areas.Identity.Pages.Account
 
         public class InputModel
         {
-            [Required]
-            [DataType(DataType.Text)]
-            [Display(Name = "Full name")]
-            public string Name { get; set; }
+                [Required]
+                [DataType(DataType.Text)]
+                [Display(Name = "Full name")]
+                public string Name { get; set; }
 
-            [Required]
-            [Display(Name = "Birth Date")]
-            [DataType(DataType.Date)]
-            public DateTime DOB { get; set; }
+                [Required]
+                [Display(Name = "Birth Date")]
+                [DataType(DataType.Date)]
+                public DateTime DOB { get; set; }
 
             [Required]
             [EmailAddress]

@@ -345,6 +345,10 @@ namespace QuanLyRapPhim.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.HasKey("ShowtimeId");
 
                     b.HasIndex("MovieId");

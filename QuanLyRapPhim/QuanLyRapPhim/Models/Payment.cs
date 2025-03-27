@@ -1,7 +1,10 @@
-﻿namespace QuanLyRapPhim.Models
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace QuanLyRapPhim.Models
 {
     public class Payment
     {
+        [Key]
         public int PaymentId { get; set; }
         public int BookingId { get; set; }
         public decimal Amount { get; set; }
