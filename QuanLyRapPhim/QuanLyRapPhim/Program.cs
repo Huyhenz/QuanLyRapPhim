@@ -1,7 +1,20 @@
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using QuanLyRapPhim.Data;
+using QuanLyRapPhim.Models;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+
+builder.Services.AddDbContext<DBContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DB")));
+
+//builder.Services.AddIdentity<IdentityUser, IdentityRole>()
+//    .AddRoles<IdentityRole>()
+//    .AddEntityFrameworkStores<DBContext>();
+
+builder.Services.AddRazorPages();
 
 var app = builder.Build();
 
@@ -18,6 +31,8 @@ app.UseRouting();
 
 app.UseAuthorization();
 
+app.MapRazorPages();
+
 app.MapStaticAssets();
 
 app.MapControllerRoute(
@@ -25,5 +40,19 @@ app.MapControllerRoute(
     pattern: "{controller=Home}/{action=Index}/{id?}")
     .WithStaticAssets();
 
+
+//using (var scope = app.Services.CreateScope())
+//{
+//    var roleManager =
+//    scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+//    string[] roles = { "Admin", "User", "Manager" };
+//    foreach (var role in roles)
+//    {
+//        if (!await roleManager.RoleExistsAsync(role))
+//        {
+//            await roleManager.CreateAsync(new IdentityRole(role));
+//        }
+//    }
+//}
 
 app.Run();
