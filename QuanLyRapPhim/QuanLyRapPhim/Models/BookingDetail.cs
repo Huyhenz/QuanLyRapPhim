@@ -9,7 +9,7 @@ namespace QuanLyRapPhim.Models
         public int BookingId { get; set; }
         public int SeatId { get; set; }
         public decimal Price { get; set; }
-        public Booking Booking { get; set; }
-        public Seat Seat { get; set; }
+        public Booking? Booking { get; set; }
+        public Seat? Seat { get; set; }
     }
 }

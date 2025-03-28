@@ -13,7 +13,7 @@ namespace QuanLyRapPhim.Models
         public string StartTime { get; set; }
         public DateTime Date { get; set; }
 
-        public Movie Movie { get; set; }
+        public Movie? Movie { get; set; }
         public ICollection<Booking>? Bookings { get; set; }
     }
 }

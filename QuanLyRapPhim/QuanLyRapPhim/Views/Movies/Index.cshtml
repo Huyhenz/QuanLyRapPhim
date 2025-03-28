@@ -1,72 +1,126 @@
 ﻿@model IEnumerable<QuanLyRapPhim.Models.Movie>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Danh sách phim";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h1>Index</h1>
+<!-- Tiêu đề và nút "Thêm phim mới" -->
+<div class="container my-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="text-light">Danh sách phim</h1>
+        @if (User.IsInRole("Admin"))
+        {
+            <a asp-action="Create" class="btn btn-primary btn-lg">Thêm phim mới</a>
+        }
+    </div>
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Title)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Description)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Duration)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Poster)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Genre)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Director)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Actors)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Title)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Description)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Duration)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Poster)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Genre)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Director)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Actors)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.MovieId">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.MovieId">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.MovieId">Delete</a>
-            </td>
-        </tr>
-}
-    </tbody>
-</table>
+    <!-- Danh sách phim dạng thẻ -->
+    <div class="row">
+        @foreach (var item in Model)
+        {
+            <div class="col-md-4 col-lg-3 mb-4">
+                <div class="card movie-card h-100 shadow-sm">
+                    <div class="poster-container">
+                        <img src="@item.Poster" class="card-img-top movie-poster" alt="@item.Title" />
+                    </div>
+                    <div class="card-body">
+                        <h5 class="card-title">@item.Title</h5>
+                        <p class="card-text description">
+                            @if (string.IsNullOrEmpty(item.Description))
+                            {
+                                <span>Chưa có mô tả</span>
+                            }
+                            else if (item.Description.Length > 100)
+                            {
+                                @(item.Description.Substring(0, 100) + "...")
+                            }
+                            else
+                            {
+                                @item.Description
+                            }
+                        </p>
+                        <p class="card-text"><strong>Thể loại:</strong> @item.Genre</p>
+                        <p class="card-text"><strong>Thời lượng:</strong> @item.Duration phút</p>
+                    </div>
+                    <div class="card-footer d-flex justify-content-between">
+                        <a asp-action="Details" asp-route-id="@item.MovieId" class="btn btn-info btn-sm">Chi tiết</a>
+                        @if (User.IsInRole("Admin"))
+                        {
+                            <div>
+                                <a asp-action="Edit" asp-route-id="@item.MovieId" class="btn btn-warning btn-sm">Sửa</a>
+                                <a asp-action="Delete" asp-route-id="@item.MovieId" class="btn btn-danger btn-sm">Xóa</a>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+<!-- CSS tùy chỉnh -->
+<style>
+    body {
+        background-color: #1a1a1a;
+        color: #fff;
+    }
+
+    .movie-card {
+        background-color: #2a2a2a;
+        border: none;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+        .movie-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3) !important;
+        }
+
+    .card-img-top {
+        border-top-left-radius: 0.5rem;
+        border-top-right-radius: 0.5rem;
+        height: 350px;
+        object-fit: cover;
+    }
+
+    .card-title {
+        color: #fff;
+        font-weight: bold;
+    }
+
+    .card-text {
+        color: #ccc;
+        font-size: 0.9rem;
+    }
+
+        .card-text.description {
+            color: #e0e0e0;
+            font-size: 1rem;
+            line-height: 1.5;
+        }
+
+    .card-footer {
+        background-color: #2a2a2a;
+        border-top: none;
+    }
+
+    .btn-sm {
+        margin: 0 2px;
+    }
+
+    /* Hiệu ứng động cho ảnh phim */
+    .poster-container {
+        position: relative;
+        overflow: hidden;
+    }
+
+    .movie-poster {
+        transition: transform 0.3s ease, filter 0.3s ease;
+    }
+
+        .movie-poster:hover {
+            transform: scale(1.05); /* Phóng to ảnh 5% */
+            filter: brightness(1.2); /* Tăng độ sáng */
+        }
+</style>

@@ -9,7 +9,7 @@ namespace QuanLyRapPhim.Models
         public int ShowtimeId { get; set; }
         public DateTime BookingDate { get; set; }
         public decimal TotalPrice { get; set; }
-        public Showtime Showtime { get; set; }
-        public ICollection<BookingDetail> BookingDetails { get; set; }
+        public Showtime? Showtime { get; set; }
+        public ICollection<BookingDetail>? BookingDetails { get; set; }
     }
 }

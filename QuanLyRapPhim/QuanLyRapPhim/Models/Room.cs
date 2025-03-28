@@ -10,6 +10,6 @@ namespace QuanLyRapPhim.Models
         public string RoomName { get; set; }
 
         public int Capacity { get; set; }
-        public ICollection<Seat> Seats { get; set; }
+        public ICollection<Seat>? Seats { get; set; }
     }
 }
