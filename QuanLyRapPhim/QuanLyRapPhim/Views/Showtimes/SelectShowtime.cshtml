@@ -41,7 +41,8 @@
                             </p>
                         </div>
                         <div class="card-footer d-flex justify-content-between">
-                            <a asp-controller="Tickets" asp-action="Create" asp-route-showtimeId="@showtime.ShowtimeId" class="btn btn-primary btn-sm">
+                            <!-- Sửa asp-action từ "Create" thành "SelectRoomAndSeat" -->
+                            <a asp-controller="Tickets" asp-action="SelectRoomAndSeat" asp-route-showtimeId="@showtime.ShowtimeId" class="btn btn-primary btn-sm">
                                 <i class="fas fa-ticket-alt me-1"></i> Chọn lịch này
                             </a>
                         </div>

@@ -1,0 +1,310 @@
+﻿@model QuanLyRapPhim.Models.Showtime
+
+@{
+    ViewData["Title"] = "Chọn ghế";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container my-5">
+    <!-- Thông tin phim và lịch chiếu -->
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1 class="text-light mb-2">Chọn ghế xem phim</h1>
+            <h4 class="text-muted mb-3">Phim: @Model.Movie.Title</h4>
+            <div class="d-flex flex-wrap text-light">
+                <p class="me-4">
+                    <i class="fas fa-door-open text-primary me-2"></i>
+                    <strong>Phòng:</strong> @Model.Room.RoomName
+                </p>
+                <p class="me-4">
+                    <i class="fas fa-calendar-alt text-primary me-2"></i>
+                    <strong>Ngày chiếu:</strong> @Model.Date.ToString("dd/MM/yyyy")
+                </p>
+                <p>
+                    <i class="fas fa-clock text-primary me-2"></i>
+                    <strong>Giờ chiếu:</strong> @Model.StartTime
+                </p>
+            </div>
+        </div>
+        <div class="col-md-4 text-end">
+            <a asp-controller="Showtimes" asp-action="SelectShowtime" asp-route-movieId="@Model.MovieId" class="btn btn-secondary">
+                <i class="fas fa-arrow-left me-1"></i> Quay lại chọn lịch chiếu
+            </a>
+        </div>
+    </div>
+
+    <!-- Thông báo lỗi hoặc thành công -->
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger" role="alert">
+            @TempData["ErrorMessage"]
+        </div>
+    }
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success" role="alert">
+            @TempData["SuccessMessage"]
+        </div>
+    }
+
+    <!-- Form chọn ghế -->
+    <form asp-action="ConfirmBooking" method="post">
+        <input type="hidden" name="showtimeId" value="@Model.ShowtimeId" />
+
+        <!-- Màn hình chiếu -->
+        <div class="screen-container text-center mb-4">
+            <div class="screen">
+                <span class="screen-label">Màn hình chiếu</span>
+            </div>
+        </div>
+
+        <!-- Sơ đồ ghế -->
+        <div class="seating-chart mb-4">
+            @{
+                var seats = Model.Room.Seats.OrderBy(s => s.SeatNumber).ToList(); // Sắp xếp ghế theo SeatNumber
+                int seatsPerRow = 10; // Số ghế mỗi hàng
+                int totalSeats = seats.Count;
+                int totalRows = (int)Math.Ceiling((double)totalSeats / seatsPerRow);
+                char lastRowLabel = (char)('A' + totalRows - 1); // Xác định hàng cuối cùng
+
+                for (int row = 0; row < totalRows; row++)
+                {
+                    var rowSeats = seats.Skip(row * seatsPerRow).Take(seatsPerRow);
+                    char rowLabel = (char)('A' + row); // A, B, C, ...
+                    bool isLastRow = (rowLabel == lastRowLabel); // Kiểm tra hàng cuối cùng
+                    <div class="seat-row d-flex align-items-center mb-2">
+                        <span class="row-label text-light me-3">Hàng @rowLabel</span>
+                        <div class="d-flex justify-content-center flex-grow-1">
+                            @foreach (var seat in rowSeats)
+                            {
+                                bool isCoupleSeat = isLastRow; // Ghế đôi ở hàng cuối
+                                <div class="seat @(seat.Status == "Taken" ? "seat-taken" : "seat-available") @(isCoupleSeat ? "seat-couple" : "") mx-1">
+                                    <input type="checkbox" name="selectedSeats" value="@seat.SeatId" id="seat-@seat.SeatId" @(seat.Status == "Taken" ? "disabled" : "") />
+                                    <label for="seat-@seat.SeatId" class="seat-label">@seat.SeatNumber</label>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                }
+            }
+        </div>
+
+        <!-- Chú thích trạng thái ghế -->
+        <div class="seat-legend text-center mb-4">
+            <p class="text-light">
+                <span class="badge bg-success me-2"><i class="fas fa-chair me-1"></i> Ghế trống</span>
+                <span class="badge bg-danger me-2"><i class="fas fa-chair me-1"></i> Ghế đã đặt</span>
+                <span class="badge bg-primary me-2"><i class="fas fa-chair me-1"></i> Ghế đang chọn</span>
+                <span class="badge bg-warning text-dark"><i class="fas fa-chair me-1"></i> Ghế đôi</span>
+            </p>
+        </div>
+
+        <!-- Danh sách ghế đã chọn và tổng tiền -->
+        <div class="selected-seats-info text-light mb-4">
+            <h5>Ghế đã chọn: <span id="selected-seats-list"></span></h5>
+            <h5>Tổng tiền: <span id="total-price">0</span> VNĐ</h5>
+        </div>
+
+        <!-- Nút xác nhận -->
+        <div class="text-center">
+            <button type="submit" class="btn btn-primary btn-lg">
+                <i class="fas fa-ticket-alt me-1"></i> Xác nhận đặt vé
+            </button>
+        </div>
+    </form>
+</div>
+
+<!-- CSS tùy chỉnh -->
+<style>
+    body {
+        background-color: #1a1a1a;
+    }
+
+    /* Màn hình chiếu */
+    .screen-container {
+        margin: 0 auto;
+        max-width: 600px;
+    }
+
+    .screen {
+        background: linear-gradient(90deg, #444, #666, #444);
+        height: 30px;
+        border-radius: 5px;
+        position: relative;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+    }
+
+    .screen-label {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        color: #fff;
+        font-weight: bold;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+    }
+
+    /* Sơ đồ ghế */
+    .seating-chart {
+        max-width: 600px;
+        margin: 0 auto;
+    }
+
+    .seat-row {
+        display: flex;
+        align-items: center;
+    }
+
+    .row-label {
+        width: 50px;
+        font-weight: bold;
+        line-height: 40px;
+    }
+
+    .seat {
+        width: 40px;
+        height: 40px;
+        margin: 5px;
+        border-radius: 5px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: transform 0.2s ease;
+    }
+
+    .seat-available {
+        background-color: #28a745;
+        cursor: pointer;
+    }
+
+    .seat-taken {
+        background-color: #dc3545;
+        cursor: not-allowed;
+    }
+
+    .seat-couple {
+        width: 80px; /* Ghế đôi rộng gấp đôi */
+        background-color: #ffc107; /* Màu vàng cho ghế đôi */
+        border: 2px solid #fff; /* Viền trắng để nổi bật */
+    }
+
+        .seat-couple input:checked + .seat-label {
+            background-color: #ffca2c; /* Màu khi ghế đôi được chọn */
+        }
+
+    .seat input {
+        display: none;
+    }
+
+    .seat-label {
+        color: #fff;
+        font-size: 0.9rem;
+        font-weight: bold;
+        display: block;
+        margin: 0;
+        text-align: center;
+        width: 100%;
+    }
+
+    .seat input:checked + .seat-label {
+        background-color: #007bff;
+        border-radius: 5px;
+        transform: scale(1.1);
+    }
+
+    .seat input:disabled + .seat-label {
+        opacity: 0.5;
+    }
+
+    .seat:hover:not(.seat-taken) {
+        transform: scale(1.1);
+    }
+
+    /* Chú thích trạng thái ghế */
+    .seat-legend .badge {
+        font-size: 1rem;
+        padding: 8px 12px;
+    }
+
+    /* Thông tin ghế đã chọn và tổng tiền */
+    .selected-seats-info {
+        max-width: 600px;
+        margin: 0 auto;
+        padding: 15px;
+        background-color: #2a2a2a;
+        border-radius: 5px;
+    }
+
+        .selected-seats-info h5 {
+            margin: 0;
+            font-size: 1.1rem;
+        }
+
+    /* Nút */
+    .btn-primary {
+        background-color: #007bff;
+        border: none;
+        padding: 10px 20px;
+        transition: background-color 0.3s ease;
+    }
+
+        .btn-primary:hover {
+            background-color: #0056b3;
+        }
+
+    .btn-secondary {
+        background-color: #6c757d;
+        border: none;
+        padding: 10px 20px;
+        transition: background-color 0.3s ease;
+    }
+
+        .btn-secondary:hover {
+            background-color: #5a6268;
+        }
+
+    .text-muted {
+        color: #a0a0a0 !important;
+    }
+</style>
+
+<!-- Thêm Font Awesome để sử dụng icon -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+
+<!-- JavaScript để cập nhật danh sách ghế đã chọn và tổng tiền -->
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const seatCheckboxes = document.querySelectorAll('input[name="selectedSeats"]');
+        const selectedSeatsList = document.getElementById('selected-seats-list');
+        const totalPriceElement = document.getElementById('total-price');
+        const normalPrice = 50000; // Giá ghế thường
+        const couplePrice = 100000; // Giá ghế đôi (giả sử cao hơn ghế thường)
+
+        function updateSelectedSeats() {
+            const selectedSeats = Array.from(seatCheckboxes)
+                .filter(checkbox => checkbox.checked)
+                .map(checkbox => {
+                    const label = checkbox.nextElementSibling;
+                    const isCouple = checkbox.closest('.seat').classList.contains('seat-couple');
+                    return { number: label.textContent, isCouple };
+                });
+
+            selectedSeatsList.textContent = selectedSeats.length > 0
+                ? selectedSeats.map(s => s.number).join(', ')
+                : 'Chưa chọn ghế';
+
+            const totalPrice = selectedSeats.reduce((total, seat) => {
+                return total + (seat.isCouple ? couplePrice : normalPrice);
+            }, 0);
+
+            totalPriceElement.textContent = totalPrice.toLocaleString();
+        }
+
+        seatCheckboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', updateSelectedSeats);
+        });
+
+        updateSelectedSeats();
+    });
+</script>

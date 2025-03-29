@@ -64,7 +64,8 @@ namespace QuanLyRapPhim.Controllers
         // GET: Showtimes/Create
         public IActionResult Create()
         {
-            ViewData["MovieId"] = new SelectList(_context.Movies, "MovieId", "MovieId");
+            ViewData["MovieId"] = new SelectList(_context.Movies, "MovieId", "Title");
+            ViewData["RoomId"] = new SelectList(_context.Rooms, "RoomId", "RoomName");
             return View();
         }
 
@@ -73,15 +74,40 @@ namespace QuanLyRapPhim.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("ShowtimeId,Title,MovieId,Poster,StartTime,Date")] Showtime showtime)
+        public async Task<IActionResult> Create([Bind("ShowtimeId,Title,MovieId,Poster,StartTime,Date,RoomId")] Showtime showtime)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(showtime);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                try
+                {
+                    // Kiểm tra MovieId có tồn tại không
+                    if (!_context.Movies.Any(m => m.MovieId == showtime.MovieId))
+                    {
+                        ModelState.AddModelError("MovieId", "Phim không tồn tại.");
+                        ViewData["MovieId"] = new SelectList(_context.Movies, "MovieId", "Title", showtime.MovieId);
+                        return View(showtime);
+                    }
+
+                    // Kiểm tra RoomId có tồn tại không
+                    if (!_context.Rooms.Any(r => r.RoomId == showtime.RoomId))
+                    {
+                        ModelState.AddModelError("RoomId", "Phòng không tồn tại.");
+                        ViewData["MovieId"] = new SelectList(_context.Movies, "MovieId", "Title", showtime.MovieId);
+                        ViewData["RoomId"] = new SelectList(_context.Rooms, "RoomId", "RoomName", showtime.RoomId);
+                        return View(showtime);
+                    }
+
+                    _context.Add(showtime);
+                    await _context.SaveChangesAsync();
+                    return RedirectToAction(nameof(Index));
+                }
+                catch (Exception ex)
+                {
+                    ModelState.AddModelError("", $"Lỗi khi tạo lịch chiếu: {ex.Message}");
+                }
             }
-            ViewData["MovieId"] = new SelectList(_context.Movies, "MovieId", "MovieId", showtime.MovieId);
+            ViewData["MovieId"] = new SelectList(_context.Movies, "MovieId", "Title", showtime.MovieId);
+            ViewData["RoomId"] = new SelectList(_context.Rooms, "RoomId", "RoomName", showtime.RoomId);
             return View(showtime);
         }
 
@@ -98,16 +124,16 @@ namespace QuanLyRapPhim.Controllers
             {
                 return NotFound();
             }
-            ViewData["MovieId"] = new SelectList(_context.Movies, "MovieId", "MovieId", showtime.MovieId);
+            ViewData["MovieId"] = new SelectList(_context.Movies, "MovieId", "Title", showtime.MovieId);
+            ViewData["RoomId"] = new SelectList(_context.Rooms, "RoomId", "RoomName", showtime.RoomId);
             return View(showtime);
         }
 
         // POST: Showtimes/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("ShowtimeId,Title,MovieId,Poster,StartTime,Date")] Showtime showtime)
+        public async Task<IActionResult> Edit(int id, [Bind("ShowtimeId,Title,MovieId,Poster,StartTime,Date,RoomId")] Showtime showtime)
         {
             if (id != showtime.ShowtimeId)
             {
@@ -118,8 +144,26 @@ namespace QuanLyRapPhim.Controllers
             {
                 try
                 {
+                    // Kiểm tra MovieId có tồn tại không
+                    if (!_context.Movies.Any(m => m.MovieId == showtime.MovieId))
+                    {
+                        ModelState.AddModelError("MovieId", "Phim không tồn tại.");
+                        ViewData["MovieId"] = new SelectList(_context.Movies, "MovieId", "Title", showtime.MovieId);
+                        return View(showtime);
+                    }
+
+                    // Kiểm tra RoomId có tồn tại không
+                    if (!_context.Rooms.Any(r => r.RoomId == showtime.RoomId))
+                    {
+                        ModelState.AddModelError("RoomId", "Phòng không tồn tại.");
+                        ViewData["MovieId"] = new SelectList(_context.Movies, "MovieId", "Title", showtime.MovieId);
+                        ViewData["RoomId"] = new SelectList(_context.Rooms, "RoomId", "RoomName", showtime.RoomId);
+                        return View(showtime);
+                    }
+
                     _context.Update(showtime);
                     await _context.SaveChangesAsync();
+                    return RedirectToAction(nameof(Index));
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -132,9 +176,13 @@ namespace QuanLyRapPhim.Controllers
                         throw;
                     }
                 }
-                return RedirectToAction(nameof(Index));
+                catch (Exception ex)
+                {
+                    ModelState.AddModelError("", $"Lỗi khi cập nhật lịch chiếu: {ex.Message}");
+                }
             }
-            ViewData["MovieId"] = new SelectList(_context.Movies, "MovieId", "MovieId", showtime.MovieId);
+            ViewData["MovieId"] = new SelectList(_context.Movies, "MovieId", "Title", showtime.MovieId);
+            ViewData["RoomId"] = new SelectList(_context.Rooms, "RoomId", "RoomName", showtime.RoomId);
             return View(showtime);
         }
 
@@ -163,13 +211,30 @@ namespace QuanLyRapPhim.Controllers
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var showtime = await _context.Showtimes.FindAsync(id);
-            if (showtime != null)
+            if (showtime == null)
             {
-                _context.Showtimes.Remove(showtime);
+                return NotFound();
             }
 
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            try
+            {
+                // Kiểm tra xem Showtime có Booking liên quan không
+                if (_context.Bookings.Any(b => b.ShowtimeId == id))
+                {
+                    TempData["ErrorMessage"] = "Không thể xóa lịch chiếu này vì đã có vé được đặt.";
+                    return RedirectToAction(nameof(Index));
+                }
+
+                _context.Showtimes.Remove(showtime);
+                await _context.SaveChangesAsync();
+                TempData["SuccessMessage"] = "Xóa lịch chiếu thành công!";
+                return RedirectToAction(nameof(Index));
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = $"Lỗi khi xóa lịch chiếu: {ex.Message}";
+                return RedirectToAction(nameof(Index));
+            }
         }
 
         private bool ShowtimeExists(int id)
