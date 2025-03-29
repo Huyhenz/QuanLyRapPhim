@@ -1,5 +1,7 @@
 using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using QuanLyRapPhim.Data;
 using QuanLyRapPhim.Models;
 
 namespace QuanLyRapPhim.Controllers
@@ -7,23 +9,17 @@ namespace QuanLyRapPhim.Controllers
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
-
-        public HomeController(ILogger<HomeController> logger)
+        private readonly DBContext _context;
+        public HomeController(ILogger<HomeController> logger, DBContext context)
         {
             _logger = logger;
+            _context = context ?? throw new ArgumentNullException(nameof(context));
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-
-            if (User.Identity.IsAuthenticated)
-            {
-
-                return RedirectToAction("Index", "Movies");
-            }
-
-
-            return View();
+            var movies = await _context.Movies.ToListAsync();
+            return View(movies ?? new List<Movie>());
         }
 
         public IActionResult Privacy()

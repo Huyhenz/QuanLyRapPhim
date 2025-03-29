@@ -1,76 +1,208 @@
 ﻿@page
 @model RegisterModel
+
 @{
-    ViewData["Title"] = "Register";
+    ViewData["Title"] = "Đăng ký";
 }
 
-<h1>@ViewData["Title"]</h1>
+<!-- Đăng ký -->
+<div class="container-fluid vh-100 d-flex align-items-center justify-content-center position-relative overflow-hidden">
+    <!-- Các hình tròn gradient trang trí -->
+    <div class="circle circle-1"></div>
+    <div class="circle circle-2"></div>
+    <div class="circle circle-3"></div>
 
-<div class="row">
-    <div class="col-md-4">
+    <!-- Form đăng ký -->
+    <div class="card shadow-lg border-0 register-card p-4">
+        <h2 class="mb-3">Đăng ký</h2>
         <form id="registerForm" asp-route-returnUrl="@Model.ReturnUrl" method="post">
-            <h2>Create a new account.</h2>
-            <hr />
             <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
-            <div class="form-floating">
-                <input asp-for="Input.Name" class="form-control" />
-                <label asp-for="Input.Name"></label>
+
+            <!-- Name -->
+            <div class="mb-3">
+                <label asp-for="Input.Name" class="form-label">Họ và tên</label>
+                <input asp-for="Input.Name" class="form-control" placeholder="Họ và tên" />
                 <span asp-validation-for="Input.Name" class="text-danger"></span>
             </div>
-            <div class="form-floating">
-                <input asp-for="Input.DOB" class="form-control" />
-                <label asp-for="Input.DOB"></label>
+
+            <!-- Date of Birth -->
+            <div class="mb-3">
+                <label asp-for="Input.DOB" class="form-label">Ngày sinh</label>
+                <input asp-for="Input.DOB" type="date" class="form-control" placeholder="Ngày sinh" />
                 <span asp-validation-for="Input.DOB" class="text-danger"></span>
             </div>
-            <div class="form-floating mb-3">
-                <input asp-for="Input.Email" class="form-control" autocomplete="username" aria-required="true" placeholder="name@example.com" />
-                <label asp-for="Input.Email">Email</label>
+
+            <!-- Email -->
+            <div class="mb-3">
+                <label asp-for="Input.Email" class="form-label">Email</label>
+                <input asp-for="Input.Email" class="form-control" autocomplete="username" aria-required="true" placeholder="username@gmail.com" />
                 <span asp-validation-for="Input.Email" class="text-danger"></span>
             </div>
-            <div class="form-floating mb-3">
-                <input asp-for="Input.Password" class="form-control" autocomplete="new-password" aria-required="true" placeholder="password" />
-                <label asp-for="Input.Password">Password</label>
+
+            <!-- Password -->
+            <div class="mb-3">
+                <label asp-for="Input.Password" class="form-label">Mật khẩu</label>
+                <input asp-for="Input.Password" class="form-control" autocomplete="new-password" aria-required="true" placeholder="********" />
                 <span asp-validation-for="Input.Password" class="text-danger"></span>
             </div>
-            <div class="form-floating mb-3">
-                <input asp-for="Input.ConfirmPassword" class="form-control" autocomplete="new-password" aria-required="true" placeholder="password" />
-                <label asp-for="Input.ConfirmPassword">Confirm Password</label>
+
+            <!-- Confirm Password -->
+            <div class="mb-3">
+                <label asp-for="Input.ConfirmPassword" class="form-label">Xác nhận mật khẩu</label>
+                <input asp-for="Input.ConfirmPassword" class="form-control" autocomplete="new-password" aria-required="true" placeholder="********" />
                 <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
             </div>
-            <button id="registerSubmit" type="submit" class="w-100 btn btn-lg btn-primary">Register</button>
+
+            <!-- Nút Đăng ký -->
+            <div class="d-grid mb-4">
+                <button id="registerSubmit" type="submit" class="btn btn-primary btn-lg">Đăng ký</button>
+            </div>
+
+            <!-- Liên kết đăng nhập -->
+            <div class="text-center">
+                <p class="text-muted">
+                    Đã có tài khoản? <a asp-page="./Login" asp-route-returnUrl="@Model.ReturnUrl" class="text-primary">Đăng nhập</a>
+                </p>
+            </div>
         </form>
-    </div>
-    <div class="col-md-6 col-md-offset-2">
-        <section>
-            <h3>Use another service to register.</h3>
-            <hr />
-            @{
-                if ((Model.ExternalLogins?.Count ?? 0) == 0)
-                {
-                    <div>
-                        <p>
-                            There are no external authentication services configured. See this <a href="https://go.microsoft.com/fwlink/?LinkID=532715">article
-                            about setting up this ASP.NET application to support logging in via external services</a>.
-                        </p>
-                    </div>
-                }
-                else
-                {
-                    <form id="external-account" asp-page="./ExternalLogin" asp-route-returnUrl="@Model.ReturnUrl" method="post" class="form-horizontal">
-                        <div>
-                            <p>
-                                @foreach (var provider in Model.ExternalLogins!)
-                                {
-                                    <button type="submit" class="btn btn-primary" name="provider" value="@provider.Name" title="Log in using your @provider.DisplayName account">@provider.DisplayName</button>
-                                }
-                            </p>
-                        </div>
-                    </form>
-                }
-            }
-        </section>
+
+        <!-- Đăng ký bằng dịch vụ bên ngoài -->
+        @if ((Model.ExternalLogins?.Count ?? 0) > 0)
+        {
+            <hr class="my-4" />
+            <h5 class="text-center text-muted mb-3">Hoặc đăng ký bằng</h5>
+            <form id="external-account" asp-page="./ExternalLogin" asp-route-returnUrl="@Model.ReturnUrl" method="post" class="form-horizontal">
+                <div class="d-flex justify-content-center gap-3">
+                    @foreach (var provider in Model.ExternalLogins!)
+                    {
+                        <button type="submit" class="btn btn-outline-secondary" name="provider" value="@provider.Name" title="Đăng ký bằng tài khoản @provider.DisplayName">
+                            <i class="fab fa-@provider.Name.ToLower()"></i>
+                        </button>
+                    }
+                </div>
+            </form>
+        }
     </div>
 </div>
+
+<!-- CSS tùy chỉnh -->
+<style>
+    body {
+        background: linear-gradient(135deg, #ff9a8b 0%, #ff6a88 50%, #6b48ff 100%);
+        margin: 0;
+        font-family: 'Arial', sans-serif;
+    }
+
+    .vh-100 {
+        height: 100vh;
+    }
+
+    /* Các hình tròn gradient trang trí */
+    .circle {
+        position: absolute;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #ff9a8b 0%, #ff6a88 50%, #6b48ff 100%);
+        opacity: 0.3;
+    }
+
+    .circle-1 {
+        width: 300px;
+        height: 300px;
+        top: -50px;
+        left: -50px;
+    }
+
+    .circle-2 {
+        width: 200px;
+        height: 200px;
+        bottom: -50px;
+        left: 50px;
+    }
+
+    .circle-3 {
+        width: 150px;
+        height: 150px;
+        top: 50%;
+        left: 20%;
+    }
+
+    /* Form đăng ký */
+    .register-card {
+        max-width: 400px;
+        width: 100%;
+        background-color: #fff;
+        border-radius: 15px;
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    .form-control {
+        border-radius: 8px;
+        padding: 12px;
+        font-size: 16px;
+        border: 1px solid #ddd;
+        background-color: #f5f5f5;
+    }
+
+        .form-control:focus {
+            border-color: #6b48ff;
+            box-shadow: 0 0 5px rgba(107, 72, 255, 0.3);
+            background-color: #fff;
+        }
+
+    .form-label {
+        font-size: 14px;
+        color: #333;
+    }
+
+    .btn-primary {
+        background: linear-gradient(90deg, #ff6a88 0%, #6b48ff 100%);
+        border: none;
+        border-radius: 8px;
+        padding: 12px;
+        font-size: 16px;
+        transition: background 0.3s ease;
+    }
+
+        .btn-primary:hover {
+            background: linear-gradient(90deg, #ff6a88 50%, #6b48ff 100%);
+        }
+
+    .btn-outline-secondary {
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: background-color 0.3s ease;
+    }
+
+        .btn-outline-secondary:hover {
+            background-color: #f0f0f0;
+        }
+
+    .text-primary {
+        color: #6b48ff !important;
+        text-decoration: none;
+    }
+
+        .text-primary:hover {
+            text-decoration: underline;
+        }
+
+    .text-muted a {
+        color: #6b48ff;
+        text-decoration: none;
+    }
+
+        .text-muted a:hover {
+            text-decoration: underline;
+        }
+
+    hr {
+        border-color: #ddd;
+    }
+</style>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />

@@ -24,9 +24,23 @@ namespace QuanLyRapPhim.Controllers
         // GET: Movies
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Movies.ToListAsync());
+            var movies = await _context.Movies.ToListAsync();
+            return View(movies);
         }
 
+        // Action để tìm kiếm phim
+        public async Task<IActionResult> Search(string searchString)
+        {
+            var movies = from m in _context.Movies
+                         select m;
+
+            if (!string.IsNullOrEmpty(searchString))
+            {
+                movies = movies.Where(m => m.Title.Contains(searchString));
+            }
+
+            return View("Index", await movies.ToListAsync());
+        }
         // GET: Movies/Details/5
         public async Task<IActionResult> Details(int? id)
         {
