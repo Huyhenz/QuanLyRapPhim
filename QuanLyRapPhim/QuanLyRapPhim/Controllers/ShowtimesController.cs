@@ -11,6 +11,7 @@ using QuanLyRapPhim.Models;
 
 namespace QuanLyRapPhim.Controllers
 {
+    [Authorize]
     public class ShowtimesController : Controller
     {
         private readonly DBContext _context;
