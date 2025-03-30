@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -60,7 +61,7 @@ namespace QuanLyRapPhim.Controllers
 
             return View(showtime);
         }
-
+        [Authorize(Roles = "Admin")]
         // GET: Showtimes/Create
         public IActionResult Create()
         {

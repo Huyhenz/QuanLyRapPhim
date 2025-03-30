@@ -1,0 +1,95 @@
+﻿@model QuanLyRapPhim.Models.Payment
+
+@{
+    ViewData["Title"] = "Thanh toán";
+    var booking = ViewBag.Booking as QuanLyRapPhim.Models.Booking;
+}
+
+<div class="container my-5">
+    <h1 class="text-light mb-4">Thanh toán vé xem phim</h1>
+
+    <!-- Thông tin đặt vé -->
+    <div class="card bg-dark text-light mb-4">
+        <div class="card-body">
+            <h4 class="card-title">Thông tin đặt vé</h4>
+            <p><strong>Phim:</strong> @booking.Showtime.Movie.Title</p>
+            <p><strong>Phòng:</strong> @booking.Showtime.Room.RoomName</p>
+            <p><strong>Ngày chiếu:</strong> @booking.Showtime.Date.ToString("dd/MM/yyyy")</p>
+            <p><strong>Giờ chiếu:</strong> @booking.Showtime.StartTime</p>
+            <p><strong>Ghế đã chọn:</strong> @string.Join(", ", booking.BookingDetails.Select(bd => bd.Seat.SeatNumber))</p>
+            <p><strong>Tổng tiền:</strong> @booking.TotalPrice.ToString("N0") VNĐ</p>
+        </div>
+    </div>
+
+    <!-- Form thanh toán -->
+    <form asp-action="Create" method="post">
+        <input type="hidden" asp-for="PaymentId" />
+        <input type="hidden" asp-for="BookingId" />
+        <input type="hidden" asp-for="Amount" />
+        <input type="hidden" asp-for="PaymentDate" />
+        <input type="hidden" asp-for="PaymentStatus" />
+
+        <div class="mb-3">
+            <label asp-for="PaymentMethod" class="form-label text-light">Phương thức thanh toán</label>
+            <select asp-for="PaymentMethod" class="form-select bg-dark text-light">
+                <option value="Cash">Tiền mặt</option>
+                <option value="CreditCard">Thẻ tín dụng</option>
+                <option value="Momo">MoMo</option>
+                <option value="ZaloPay">ZaloPay</option>
+            </select>
+            <span asp-validation-for="PaymentMethod" class="text-danger"></span>
+        </div>
+
+        <div class="text-center">
+            <button type="submit" class="btn btn-primary btn-lg">
+                <i class="fas fa-credit-card me-1"></i> Thanh toán
+            </button>
+            <a asp-controller="Tickets" asp-action="SelectRoomAndSeat" asp-route-showtimeId="@booking.ShowtimeId" class="btn btn-secondary">
+                <i class="fas fa-arrow-left me-1"></i> Quay lại chọn ghế
+            </a>
+        </div>
+    </form>
+</div>
+
+<!-- CSS tùy chỉnh -->
+<style>
+    body {
+        background-color: #1a1a1a;
+    }
+
+    .card {
+        border: none;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+    }
+
+    .form-select {
+        border: 1px solid #444;
+    }
+
+    .btn-primary {
+        background-color: #007bff;
+        border: none;
+        padding: 10px 20px;
+    }
+
+        .btn-primary:hover {
+            background-color: #0056b3;
+        }
+
+    .btn-secondary {
+        background-color: #6c757d;
+        border: none;
+        padding: 10px 20px;
+    }
+
+        .btn-secondary:hover {
+            background-color: #5a6268;
+        }
+</style>
+
+<!-- Thêm Font Awesome -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

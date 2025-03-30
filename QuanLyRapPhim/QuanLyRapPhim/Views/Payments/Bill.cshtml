@@ -1,0 +1,135 @@
+﻿@model QuanLyRapPhim.Models.Payment
+
+@{
+    ViewData["Title"] = "Hóa đơn thanh toán";
+    var booking = Model.Booking;
+    var fullName = ViewBag.FullName as string;
+    var userEmail = ViewBag.UserEmail as string;
+    var dateOfBirth = ViewBag.DateOfBirth as string;
+}
+
+<div class="container my-5">
+    <div class="card bg-dark text-light shadow-lg">
+        <div class="card-header text-center">
+            <h2 class="mb-0">HÓA ĐƠN THANH TOÁN</h2>
+            <p class="text-muted">Mã thanh toán: @Model.PaymentId</p>
+        </div>
+        <div class="card-body">
+            <!-- Thông tin rạp phim -->
+            <div class="row mb-4">
+                <div class="col-12 text-center">
+                    <h4>Rạp chiếu phim XYZ</h4>
+                    <p>Địa chỉ: 123 Đường Điện Ảnh, TP. Hồ Chí Minh</p>
+                    <p>Hotline: 1900 1234</p>
+                </div>
+            </div>
+
+            <!-- Thông tin khách hàng -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <h5>Thông tin khách hàng</h5>
+                    <p><strong>Họ và tên:</strong> @fullName</p>
+                    <p><strong>Email:</strong> @userEmail</p>
+                    <p><strong>Ngày sinh:</strong> @dateOfBirth</p>
+                </div>
+            </div>
+
+            <!-- Thông tin đặt vé -->
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <h5>Thông tin vé</h5>
+                    <p><strong>Phim:</strong> @booking.Showtime.Movie.Title</p>
+                    <p><strong>Phòng:</strong> @booking.Showtime.Room.RoomName</p>
+                    <p><strong>Ngày chiếu:</strong> @booking.Showtime.Date.ToString("dd/MM/yyyy")</p>
+                    <p><strong>Giờ chiếu:</strong> @booking.Showtime.StartTime</p>
+                </div>
+                <div class="col-md-6">
+                    <h5>Chi tiết ghế</h5>
+                    <ul class="list-unstyled">
+                        @foreach (var detail in booking.BookingDetails)
+                        {
+                            <li>@detail.Seat.SeatNumber - @detail.Price.ToString("N0") VNĐ</li>
+                        }
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Thông tin thanh toán -->
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <h5>Thông tin thanh toán</h5>
+                    <p><strong>Mã đặt vé:</strong> @booking.BookingId</p>
+                    <p><strong>Ngày thanh toán:</strong> @Model.PaymentDate.ToString("dd/MM/yyyy HH:mm")</p>
+                    <p><strong>Phương thức:</strong> @Model.PaymentMethod</p>
+                    <p><strong>Trạng thái:</strong> @Model.PaymentStatus</p>
+                </div>
+                <div class="col-md-6 text-end">
+                    <h5>Tổng tiền</h5>
+                    <p class="fs-3 fw-bold text-primary">@Model.Amount.ToString("N0") VNĐ</p>
+                </div>
+            </div>
+
+            <!-- Nút hành động -->
+            <div class="text-center">
+                <a href="javascript:window.print()" class="btn btn-primary me-2">
+                    <i class="fas fa-print me-1"></i> In hóa đơn
+                </a>
+                <a asp-controller="Movies" asp-action="Index" class="btn btn-secondary">
+                    <i class="fas fa-home me-1"></i> Về trang chủ
+                </a>
+            </div>
+        </div>
+        <div class="card-footer text-center text-muted">
+            <p>Cảm ơn bạn đã sử dụng dịch vụ của chúng tôi!</p>
+        </div>
+    </div>
+</div>
+
+<!-- CSS tùy chỉnh -->
+<style>
+    body {
+        background-color: #1a1a1a;
+    }
+
+    .card {
+        border: none;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+    }
+
+    .card-header {
+        background-color: #2a2a2a;
+        border-bottom: 1px solid #444;
+    }
+
+    .card-footer {
+        background-color: #2a2a2a;
+        border-top: 1px solid #444;
+    }
+
+    .text-primary {
+        color: #007bff !important;
+    }
+
+    .btn-primary {
+        background-color: #007bff;
+        border: none;
+        padding: 10px 20px;
+    }
+
+        .btn-primary:hover {
+            background-color: #0056b3;
+        }
+
+    .btn-secondary {
+        background-color: #6c757d;
+        border: none;
+        padding: 10px 20px;
+    }
+
+        .btn-secondary:hover {
+            background-color: #5a6268;
+        }
+</style>
+
+<!-- Thêm Font Awesome -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />

@@ -84,28 +84,39 @@ namespace QuanLyRapPhim.Controllers
             }
 
             var user = await _userManager.GetUserAsync(User);
+            var totalRows = (int)Math.Ceiling((double)showtime.Room.Seats.Count / 10);
+            char lastRowLabel = (char)('A' + totalRows - 1);
+            const decimal normalPrice = 50000;
+            const decimal couplePrice = 100000;
+
             var booking = new Booking
             {
                 ShowtimeId = showtimeId,
                 BookingDate = DateTime.Now,
-                TotalPrice = selectedSeats.Count * 50000,
                 BookingDetails = new List<BookingDetail>()
             };
 
             foreach (var seatId in selectedSeats)
             {
-                booking.BookingDetails.Add(new BookingDetail
+                var seat = showtime.Room.Seats.FirstOrDefault(s => s.SeatId == seatId);
+                if (seat != null)
                 {
-                    SeatId = seatId,
-                    Price = 50000
-                });
+                    decimal price = seat.SeatNumber.StartsWith(lastRowLabel.ToString()) ? couplePrice : normalPrice;
+                    booking.BookingDetails.Add(new BookingDetail
+                    {
+                        SeatId = seatId,
+                        Price = price
+                    });
+                }
             }
+
+            booking.TotalPrice = booking.BookingDetails.Sum(bd => bd.Price);
 
             _context.Bookings.Add(booking);
             await _context.SaveChangesAsync();
 
-            TempData["SuccessMessage"] = "Đặt vé thành công!";
-            return RedirectToAction("Index", "Movies");
+            // Chuyển hướng sang trang thanh toán
+            return RedirectToAction("Create", "Payments", new { bookingId = booking.BookingId });
         }
     }
 }
