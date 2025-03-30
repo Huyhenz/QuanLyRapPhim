@@ -9,8 +9,8 @@
 
 <div class="container my-5">
     <!-- Tiêu đề -->
-    <h1 class="text-light mb-2">Chọn lịch chiếu</h1>
-    <h4 class="text-muted mb-4">Phim: @movieTitle</h4>
+    <h1 class="text-primary mb-2">Chọn lịch chiếu</h1>
+    <h4 class="text-primary mb-4">Phim: @movieTitle</h4>
 
     <!-- Thông báo lỗi nếu không có lịch chiếu -->
     @if (ViewBag.ErrorMessage != null)
@@ -45,17 +45,39 @@
                             <a asp-controller="Tickets" asp-action="SelectRoomAndSeat" asp-route-showtimeId="@showtime.ShowtimeId" class="btn btn-primary btn-sm">
                                 <i class="fas fa-ticket-alt me-1"></i> Chọn lịch này
                             </a>
+                            @if (User.IsInRole("Admin"))
+                            {
+                                <!-- Nút sửa lịch chiếu (chỉ dành cho admin) -->
+                                <a asp-controller="Showtimes" asp-action="Edit" asp-route-id="@showtime.ShowtimeId" class="btn btn-warning btn-sm">
+                                    <i class="fas fa-edit me-1"></i> Sửa
+                                </a>
+
+                                <!-- Nút xóa lịch chiếu (chỉ dành cho admin) -->
+                                <a asp-controller="Showtimes" asp-action="Delete" asp-route-id="@showtime.ShowtimeId" class="btn btn-danger btn-sm" onclick="return confirm('Bạn có chắc chắn muốn xóa lịch chiếu này?');">
+                                    <i class="fas fa-trash-alt me-1"></i> Xóa
+                                </a>
+                            }
+                        </div>
                         </div>
                     </div>
-                </div>
+                
             }
         </div>
     }
 
-    <!-- Nút quay lại -->
+    <!-- Nút quay lại, tạo lịch chiếu và quay lại danh sách phim -->
     <div class="mt-4">
-        <a asp-controller="Movies" asp-action="Details" asp-route-id="@movieId" class="btn btn-secondary">
-            <i class="fas fa-arrow-left me-1"></i> Quay lại chi tiết phim
+        <!-- New Button to Create Showtime -->
+        @if (User.IsInRole("Admin"))
+        {
+            <a asp-controller="Showtimes" asp-action="Create" asp-route-movieId="@movieId" class="btn btn-success ms-3">
+                <i class="fas fa-plus me-1"></i> Tạo lịch chiếu mới
+            </a>
+        }
+
+        <!-- New Button to go back to Movie List -->
+        <a asp-controller="Movies" asp-action="Index" class="btn btn-info ms-3">
+            <i class="fas fa-list me-1"></i> Quay lại danh sách phim
         </a>
     </div>
 </div>
@@ -63,12 +85,16 @@
 <!-- CSS tùy chỉnh -->
 <style>
     body {
-        background-color: #1a1a1a;
+        background: linear-gradient(135deg, #ff9a8b 0%, #ff6a88 50%, #6b48ff 100%);
+        font-family: 'Arial', sans-serif;
+        color: #fff;
     }
 
     .showtime-card {
         border: none;
-        background-color: #2a2a2a;
+        background: rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(10px);
+        border-radius: 15px;
         transition: transform 0.3s ease, box-shadow 0.3s ease;
     }
 
@@ -78,48 +104,89 @@
         }
 
     .card-img-top {
-        border-top-left-radius: 0.5rem;
-        border-top-right-radius: 0.5rem;
+        border-top-left-radius: 15px;
+        border-top-right-radius: 15px;
+        height: 200px;
+        object-fit: cover;
     }
 
     .card-title {
         font-size: 1.25rem;
         font-weight: bold;
+        color: #fff;
     }
 
     .card-text {
-        color: #e0e0e0;
+        color: #f8f9fa;
         font-size: 0.95rem;
         margin-bottom: 0.5rem;
     }
 
     .card-footer {
-        background-color: #2a2a2a;
+        background: rgba(255, 255, 255, 0.1);
         border-top: none;
+        border-radius: 0 0 15px 15px;
     }
 
     .btn-primary {
-        background-color: #007bff;
+        background: linear-gradient(90deg, #ff6a88 0%, #6b48ff 100%);
+        color: #fff;
         border: none;
-        transition: background-color 0.3s ease;
+        border-radius: 8px;
+        transition: background 0.3s ease;
     }
 
         .btn-primary:hover {
-            background-color: #0056b3;
+            background: linear-gradient(90deg, #ff6a88 50%, #6b48ff 100%);
+            transform: scale(1.05);
         }
 
     .btn-secondary {
-        background-color: #6c757d;
+        background: linear-gradient(90deg, #6c757d 0%, #343a40 100%);
         border: none;
         transition: background-color 0.3s ease;
+        color: white;
     }
 
         .btn-secondary:hover {
-            background-color: #5a6268;
+            background: linear-gradient(90deg, #5a6268 0%, #23272b 100%);
+            transform: scale(1.05);
+        }
+
+    .btn-success {
+        background: linear-gradient(90deg, #28a745 0%, #218838 100%);
+        color: #fff;
+        border: none;
+        border-radius: 8px;
+        padding: 10px 20px;
+        transition: background 0.3s ease;
+    }
+
+        .btn-success:hover {
+            background: linear-gradient(90deg, #218838 0%, #28a745 100%);
+            transform: scale(1.05);
+        }
+
+    .btn-info {
+        background: linear-gradient(90deg, #17a2b8 0%, #117a8b 100%);
+        color: #fff;
+        border: none;
+        border-radius: 8px;
+        padding: 10px 20px;
+        transition: background 0.3s ease;
+    }
+
+        .btn-info:hover {
+            background: linear-gradient(90deg, #117a8b 0%, #17a2b8 100%);
+            transform: scale(1.05);
         }
 
     .text-muted {
-        color: #a0a0a0 !important;
+        color: #dcdcdc !important;
+    }
+
+    .text-darkblue {
+        color: #004080 !important;
     }
 </style>
 
