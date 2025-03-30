@@ -9,29 +9,25 @@
 }
 
 <div class="container my-5">
-    <div class="card bg-dark text-light shadow-lg">
-        <div class="card-header text-center">
+    <div class="card showtime-card text-light mb-4 shadow-lg rounded-3">
+        <div class="card-body text-center">
             <h2 class="mb-0">HÓA ĐƠN THANH TOÁN</h2>
             <p class="text-muted">Mã thanh toán: @Model.PaymentId</p>
         </div>
         <div class="card-body">
             <!-- Thông tin rạp phim -->
-            <div class="row mb-4">
-                <div class="col-12 text-center">
-                    <h4>Rạp chiếu phim XYZ</h4>
-                    <p>Địa chỉ: 123 Đường Điện Ảnh, TP. Hồ Chí Minh</p>
-                    <p>Hotline: 1900 1234</p>
-                </div>
+            <div class="row mb-4 text-center">
+                <h4>Rạp chiếu phim XYZ</h4>
+                <p>Địa chỉ: 123 Đường Điện Ảnh, TP. Hồ Chí Minh</p>
+                <p>Hotline: 1900 1234</p>
             </div>
 
             <!-- Thông tin khách hàng -->
             <div class="row mb-4">
-                <div class="col-12">
-                    <h5>Thông tin khách hàng</h5>
-                    <p><strong>Họ và tên:</strong> @fullName</p>
-                    <p><strong>Email:</strong> @userEmail</p>
-                    <p><strong>Ngày sinh:</strong> @dateOfBirth</p>
-                </div>
+                <h5>Thông tin khách hàng</h5>
+                <p><strong>Họ và tên:</strong> @fullName</p>
+                <p><strong>Email:</strong> @userEmail</p>
+                <p><strong>Ngày sinh:</strong> @dateOfBirth</p>
             </div>
 
             <!-- Thông tin đặt vé -->
@@ -71,16 +67,13 @@
 
             <!-- Nút hành động -->
             <div class="text-center">
-                <a href="javascript:window.print()" class="btn btn-primary me-2">
+                <a href="javascript:window.print()" class="btn btn-primary me-2 rounded-pill px-4">
                     <i class="fas fa-print me-1"></i> In hóa đơn
                 </a>
-                <a asp-controller="Movies" asp-action="Index" class="btn btn-secondary">
+                <a asp-controller="Movies" asp-action="Index" class="btn btn-secondary rounded-pill px-4">
                     <i class="fas fa-home me-1"></i> Về trang chủ
                 </a>
             </div>
-        </div>
-        <div class="card-footer text-center text-muted">
-            <p>Cảm ơn bạn đã sử dụng dịch vụ của chúng tôi!</p>
         </div>
     </div>
 </div>
@@ -88,46 +81,45 @@
 <!-- CSS tùy chỉnh -->
 <style>
     body {
-        background-color: #1a1a1a;
+        background: linear-gradient(135deg, #ff9a8b 0%, #ff6a88 50%, #6b48ff 100%);
+        font-family: 'Arial', sans-serif;
+        color: #fff;
     }
 
-    .card {
+    .showtime-card {
         border: none;
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+        background: rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(10px);
+        border-radius: 15px;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
     }
 
-    .card-header {
-        background-color: #2a2a2a;
-        border-bottom: 1px solid #444;
-    }
-
-    .card-footer {
-        background-color: #2a2a2a;
-        border-top: 1px solid #444;
-    }
-
-    .text-primary {
-        color: #007bff !important;
-    }
+        .showtime-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3) !important;
+        }
 
     .btn-primary {
-        background-color: #007bff;
+        background: linear-gradient(90deg, #ff6a88 0%, #6b48ff 100%);
+        color: #fff;
         border: none;
-        padding: 10px 20px;
+        border-radius: 8px;
+        transition: background 0.3s ease;
     }
 
         .btn-primary:hover {
-            background-color: #0056b3;
+            background: linear-gradient(90deg, #ff6a88 50%, #6b48ff 100%);
+            transform: scale(1.05);
         }
 
     .btn-secondary {
-        background-color: #6c757d;
+        background-color: #333;
         border: none;
-        padding: 10px 20px;
+        transition: background 0.3s;
     }
 
         .btn-secondary:hover {
-            background-color: #5a6268;
+            background-color: #555;
         }
 </style>
 
