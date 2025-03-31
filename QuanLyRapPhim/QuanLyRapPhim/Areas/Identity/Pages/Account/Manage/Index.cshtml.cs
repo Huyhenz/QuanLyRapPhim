@@ -26,39 +26,35 @@ namespace QuanLyRapPhim.Areas.Identity.Pages.Account.Manage
             _signInManager = signInManager;
         }
 
-        /// <summary>
-        ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-        ///     directly from your code. This API may change or be removed in future releases.
-        /// </summary>
         public string Username { get; set; }
 
-        /// <summary>
-        ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-        ///     directly from your code. This API may change or be removed in future releases.
-        /// </summary>
         [TempData]
         public string StatusMessage { get; set; }
 
-        /// <summary>
-        ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-        ///     directly from your code. This API may change or be removed in future releases.
-        /// </summary>
         [BindProperty]
         public InputModel Input { get; set; }
 
-        /// <summary>
-        ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-        ///     directly from your code. This API may change or be removed in future releases.
-        /// </summary>
         public class InputModel
         {
-            /// <summary>
-            ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-            ///     directly from your code. This API may change or be removed in future releases.
-            /// </summary>
             [Phone]
             [Display(Name = "Phone number")]
             public string PhoneNumber { get; set; }
+
+            [Required(ErrorMessage = "Mật khẩu cũ là bắt buộc.")]
+            [DataType(DataType.Password)]
+            [Display(Name = "Old Password")]
+            public string OldPassword { get; set; }
+
+            [Required(ErrorMessage = "Mật khẩu mới là bắt buộc.")]
+            [StringLength(100, ErrorMessage = "Mật khẩu mới phải có ít nhất {2} và tối đa {1} ký tự.", MinimumLength = 6)]
+            [DataType(DataType.Password)]
+            [Display(Name = "New Password")]
+            public string NewPassword { get; set; }
+
+            [DataType(DataType.Password)]
+            [Display(Name = "Confirm New Password")]
+            [Compare("NewPassword", ErrorMessage = "Mật khẩu xác nhận không khớp với mật khẩu mới.")]
+            public string ConfirmPassword { get; set; }
         }
 
         private async Task LoadAsync(User user)
@@ -86,7 +82,7 @@ namespace QuanLyRapPhim.Areas.Identity.Pages.Account.Manage
             return Page();
         }
 
-        public async Task<IActionResult> OnPostAsync()
+        public async Task<IActionResult> OnPostUpdateProfileAsync()
         {
             var user = await _userManager.GetUserAsync(User);
             if (user == null)
@@ -113,6 +109,47 @@ namespace QuanLyRapPhim.Areas.Identity.Pages.Account.Manage
 
             await _signInManager.RefreshSignInAsync(user);
             StatusMessage = "Your profile has been updated";
+            return RedirectToPage();
+        }
+
+        public async Task<IActionResult> OnPostChangePasswordAsync()
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null)
+            {
+                return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
+            }
+
+            if (!ModelState.IsValid)
+            {
+                await LoadAsync(user);
+                return Page();
+            }
+
+            // Kiểm tra mật khẩu cũ
+            var checkOldPassword = await _signInManager.CheckPasswordSignInAsync(user, Input.OldPassword, false);
+            if (!checkOldPassword.Succeeded)
+            {
+                ModelState.AddModelError(string.Empty, "Mật khẩu cũ không đúng.");
+                await LoadAsync(user);
+                return Page();
+            }
+
+            // Thay đổi mật khẩu
+            var changePasswordResult = await _userManager.ChangePasswordAsync(user, Input.OldPassword, Input.NewPassword);
+            if (!changePasswordResult.Succeeded)
+            {
+                foreach (var error in changePasswordResult.Errors)
+                {
+                    ModelState.AddModelError(string.Empty, error.Description);
+                }
+                await LoadAsync(user);
+                return Page();
+            }
+
+            // Cập nhật phiên đăng nhập
+            await _signInManager.RefreshSignInAsync(user);
+            StatusMessage = "Your password has been changed successfully.";
             return RedirectToPage();
         }
     }

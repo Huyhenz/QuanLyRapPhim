@@ -29,17 +29,14 @@ namespace QuanLyRapPhim.Controllers
         }
 
         // Action để tìm kiếm phim
-        public async Task<IActionResult> Search(string searchString)
+        public IActionResult Search(string searchString)
         {
-            var movies = from m in _context.Movies
-                         select m;
+            // Tìm kiếm phim theo title
+            var movies = string.IsNullOrEmpty(searchString)
+                ? _context.Movies.ToList()
+                : _context.Movies.Where(m => m.Title.Contains(searchString)).ToList();
 
-            if (!string.IsNullOrEmpty(searchString))
-            {
-                movies = movies.Where(m => m.Title.Contains(searchString));
-            }
-
-            return View("Index", await movies.ToListAsync());
+            return View("Index", movies); // Trả về view Index với danh sách phim tìm được
         }
         // GET: Movies/Details/5
         public async Task<IActionResult> Details(int? id)

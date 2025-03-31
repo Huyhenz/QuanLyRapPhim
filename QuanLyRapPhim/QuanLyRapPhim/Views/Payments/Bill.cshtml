@@ -4,8 +4,8 @@
     ViewData["Title"] = "Hóa đơn thanh toán";
     var booking = Model.Booking;
     var fullName = ViewBag.FullName as string;
-    var userEmail = ViewBag.UserEmail as string;
-    var dateOfBirth = ViewBag.DateOfBirth as string;
+    // var userEmail = ViewBag.UserEmail as string;
+    // var dateOfBirth = ViewBag.DateOfBirth as string;
 }
 
 <div class="container my-5">
@@ -26,8 +26,8 @@
             <div class="row mb-4">
                 <h5>Thông tin khách hàng</h5>
                 <p><strong>Họ và tên:</strong> @fullName</p>
-                <p><strong>Email:</strong> @userEmail</p>
-                <p><strong>Ngày sinh:</strong> @dateOfBirth</p>
+                @* <p><strong>Email:</strong> @userEmail</p> *@
+                @* <p><strong>Ngày sinh:</strong> @dateOfBirth</p> *@
             </div>
 
             <!-- Thông tin đặt vé -->

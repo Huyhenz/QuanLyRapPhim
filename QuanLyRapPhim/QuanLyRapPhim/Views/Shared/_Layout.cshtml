@@ -1,31 +1,57 @@
 ﻿<!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - QuanLyRapPhim</title>
+
+    <!-- Font tiếng Việt -->
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
-    <script type="importmap"></script>
+
+    <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+
+    <!-- Font Awesome (cho icon tìm kiếm và mạng xã hội) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
+
+    <!-- Custom CSS -->
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/QuanLyRapPhim.styles.css" asp-append-version="true" />
+
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #F5A89A; /* Màu nền tối giống giao diện */
+        }
+    </style>
 </head>
+
 <body>
     <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">QuanLyRapPhim</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
+        <nav class="navbar navbar-expand-lg shadow" style="background-color: lightpink;">
+            <div class="container">
+                <!-- Logo -->
+                <a class="navbar-brand fw-bold" asp-area="" asp-controller="Home" asp-action="Index">
+                    <i class="fas fa-film"></i> CinemaX
+                </a>
+
+                <!-- Navbar Toggler -->
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                        aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav me-auto">
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+                            <a class="nav-link active text-danger" asp-area="" asp-controller="Home" asp-action="Index">
+                                <i class="fas fa-home"></i> Trang chủ
+                            </a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+                         <li class="nav-item"> 
+                            <a class="nav-link text-secondary" asp-area="" asp-controller="Home" asp-action="Privacy"> 
+                                <i class="fas fa-shield-alt"></i> Chính sách 
+                            </a>
                         </li>
                     </ul>
                     <partial name="_LoginPartial" />
@@ -33,20 +59,51 @@
             </div>
         </nav>
     </header>
+
     <div class="container">
         <main role="main" class="pb-3">
             @RenderBody()
         </main>
     </div>
 
-    <footer class="border-top footer text-muted">
+    <footer class="bg-dark text-white py-5">
         <div class="container">
-            © 2025 - QuanLyRapPhim - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+            <div class="row">
+                <!-- Logo and Slogan -->
+                <div class="col-md-3">
+                    <img src="https://i.pinimg.com/736x/84/bb/7d/84bb7dc83f72e12a7098a5e31c484baf.jpg" alt="CinemaX Logo" height="50" />
+                    <h5>CinemaX</h5>
+                    <p>BE HAPPY, BE A STAR</p>
+                    <p class="mt-3">Ngôn ngữ: <img src="https://i.pinimg.com/736x/4d/01/84/4d01846694471249d81d3ddfafbfa031.jpg" alt="VN Flag" height="20" /> VN</p>
+                </div>
+
+                <!-- Tài khoản -->
+                <div class="col-md-2">
+                    <h5>TÀI KHOẢN</h5>
+                    <ul class="list-unstyled">
+                        @if (User.Identity.IsAuthenticated)
+                        {
+                            <li><span class="text-white">Xin chào, @User.Identity.Name</span></li>
+                            <a href="/Identity/Account/Manage/Index" class="btn btn-outline-secondary">Profile</a>
+                            <li><a href="/Identity/Account/Logout" class="text-white text-decoration-none">Đăng xuất</a></li>
+                        }
+                        else
+                        {
+                            <li><a href="/Identity/Account/Login" class="text-white text-decoration-none">Đăng nhập</a></li>
+                            <li><a href="/Identity/Account/Register" class="text-white text-decoration-none">Đăng ký</a></li>
+                        }
+                        <li><a href="#" class="text-white text-decoration-none">Membership</a></li>
+                    </ul>
+                </div>
+            </div>
         </div>
     </footer>
+
+    <!-- Scripts -->
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
+
 </html>
