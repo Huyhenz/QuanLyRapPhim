@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -11,14 +12,17 @@ using QuanLyRapPhim.Models;
 
 namespace QuanLyRapPhim.Controllers
 {
+    
     [Authorize]
     public class MoviesController : Controller
     {
         private readonly DBContext _context;
+        private readonly UserManager<User> _userManager;
 
-        public MoviesController(DBContext context)
+        public MoviesController(DBContext context, UserManager<User> userManager)
         {
             _context = context;
+            _userManager = userManager;
         }
         [Authorize(Roles = "Admin,User")]
         // GET: Movies
@@ -27,7 +31,52 @@ namespace QuanLyRapPhim.Controllers
             var movies = await _context.Movies.ToListAsync();
             return View(movies);
         }
+        [Authorize]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AddReview(int movieId, string comment, int rating)
+        {
+            if (!ModelState.IsValid)
+            {
+                return RedirectToAction("Details", new { id = movieId });
+            }
 
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null)
+            {
+                return RedirectToAction("Login", "Account", new { area = "Identity" });
+            }
+
+            // Kiểm tra xem user đã đánh giá phim này chưa
+            var existingReview = await _context.Reviews
+                .FirstOrDefaultAsync(r => r.MovieId == movieId && r.UserId == user.Id);
+
+            if (existingReview != null)
+            {
+                // Nếu đã có đánh giá, cập nhật (ghi đè) đánh giá cũ
+                existingReview.Comment = comment;
+                existingReview.Rating = rating;
+                existingReview.CreatedAt = DateTime.Now; // Cập nhật thời gian
+                _context.Reviews.Update(existingReview);
+            }
+            else
+            {
+                // Nếu chưa có, tạo đánh giá mới
+                var review = new Review
+                {
+                    MovieId = movieId,
+                    UserId = user.Id,
+                    Comment = comment,
+                    Rating = rating,
+                    CreatedAt = DateTime.Now
+                };
+                _context.Reviews.Add(review);
+            }
+
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction("Details", new { id = movieId });
+        }
         // Action để tìm kiếm phim
         public IActionResult Search(string searchString)
         {
@@ -47,7 +96,10 @@ namespace QuanLyRapPhim.Controllers
             }
 
             var movie = await _context.Movies
+                .Include(m => m.Reviews)
+                .ThenInclude(r => r.User)
                 .FirstOrDefaultAsync(m => m.MovieId == id);
+
             if (movie == null)
             {
                 return NotFound();

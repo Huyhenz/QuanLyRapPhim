@@ -16,5 +16,6 @@ namespace QuanLyRapPhim.Models
         public string Actors { get; set; }
 
         public ICollection<Showtime>? Showtimes { get; set; }
+        public List<Review> Reviews { get; set; } = new List<Review>();
     }
 }

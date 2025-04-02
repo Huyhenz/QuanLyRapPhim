@@ -15,5 +15,6 @@ namespace QuanLyRapPhim.Data
         public DbSet<Models.Booking> Bookings { get; set; }
         public DbSet<Models.BookingDetail> BookingDetails { get; set; }
         public DbSet<Models.Payment> Payments { get; set; }
+        public DbSet<Review> Reviews { get; set; }
     }
 }

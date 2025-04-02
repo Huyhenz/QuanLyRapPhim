@@ -48,6 +48,76 @@
             </div>
         </div>
     </div>
+
+    <!-- Form thêm nhận xét -->
+    <div class="mt-5">
+        <h4 class="text-primary">Viết nhận xét</h4>
+        @if (User.Identity.IsAuthenticated)
+        {
+            <form asp-action="AddReview" method="post">
+                <input type="hidden" name="movieId" value="@Model.MovieId" />
+                <div class="form-group mb-3">
+                    <label for="comment" class="text-white">Nhận xét:</label>
+                    <textarea name="comment" id="comment" class="form-control" rows="3" required maxlength="500"></textarea>
+                </div>
+                <div class="form-group mb-3">
+                    <label class="text-white">Đánh giá (1-5):</label>
+                    <div class="star-rating">
+                        <span class="fa fa-star" data-value="1"></span>
+                        <span class="fa fa-star" data-value="2"></span>
+                        <span class="fa fa-star" data-value="3"></span>
+                        <span class="fa fa-star" data-value="4"></span>
+                        <span class="fa fa-star" data-value="5"></span>
+                    </div>
+                    <input type="hidden" name="rating" id="rating" value="0" required />
+                    <div class="text-danger" id="rating-error" style="display: none;">Vui lòng chọn số sao để đánh giá.</div>
+                </div>
+                <button type="submit" class="btn btn-primary">Gửi nhận xét</button>
+            </form>
+        }
+        else
+        {
+            <p class="text-white">Vui lòng <a href="/Identity/Account/Login">đăng nhập</a> để viết nhận xét.</p>
+        }
+    </div>
+
+    <!-- Danh sách nhận xét -->
+    <div class="mt-5">
+        <h4 class="text-primary">Nhận xét từ người dùng</h4>
+        @if (Model.Reviews.Any())
+        {
+            <div class="list-group">
+                @foreach (var review in Model.Reviews.OrderByDescending(r => r.CreatedAt))
+                {
+                    <div class="list-group-item mb-3 movie-card text-light">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h5 class="mb-1">@review.User.UserName</h5>
+                            <small>@review.CreatedAt.ToString("dd/MM/yyyy HH:mm")</small>
+                        </div>
+                        <p class="mb-1">@review.Comment</p>
+                        <small>
+                            Đánh giá:
+                            @for (int i = 1; i <= 5; i++)
+                            {
+                                if (i <= review.Rating)
+                                {
+                                    <span class="fa fa-star text-warning"></span>
+                                }
+                                else
+                                {
+                                    <span class="fa fa-star text-muted"></span>
+                                }
+                            }
+                        </small>
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            <p class="text-white">Chưa có nhận xét nào cho phim này.</p>
+        }
+    </div>
 </div>
 
 <!-- CSS tùy chỉnh -->
@@ -160,4 +230,84 @@
         .btn-danger:hover {
             background-color: #cc0000;
         }
+
+    .list-group-item {
+        background: rgba(255, 255, 255, 0.2);
+        border: none;
+        border-radius: 10px;
+    }
+
+    /* CSS cho phần đánh giá sao */
+    .star-rating {
+        font-size: 1.5rem;
+        cursor: pointer;
+    }
+
+        .star-rating .fa-star {
+            color: #ccc; /* Màu mặc định của sao (xám) */
+            transition: color 0.2s;
+        }
+
+            .star-rating .fa-star.checked {
+                color: #ffca28; /* Màu vàng khi được chọn */
+            }
+
+            .star-rating .fa-star:hover,
+            .star-rating .fa-star:hover ~ .fa-star {
+                color: #ffca28; /* Màu vàng khi hover */
+            }
 </style>
+
+<!-- JavaScript để xử lý chọn sao -->
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const stars = document.querySelectorAll('.star-rating .fa-star');
+            const ratingInput = document.getElementById('rating');
+            const ratingError = document.getElementById('rating-error');
+
+            stars.forEach(star => {
+                star.addEventListener('click', function () {
+                    const value = this.getAttribute('data-value');
+                    ratingInput.value = value;
+
+                    // Xóa class checked từ tất cả các sao
+                    stars.forEach(s => s.classList.remove('checked'));
+
+                    // Thêm class checked cho các sao từ 1 đến sao được chọn
+                    for (let i = 0; i < value; i++) {
+                        stars[i].classList.add('checked');
+                    }
+
+                    // Ẩn thông báo lỗi nếu có
+                    ratingError.style.display = 'none';
+                });
+
+                // Hover effect
+                star.addEventListener('mouseover', function () {
+                    const value = this.getAttribute('data-value');
+                    for (let i = 0; i < value; i++) {
+                        stars[i].classList.add('checked');
+                    }
+                });
+
+                star.addEventListener('mouseout', function () {
+                    const currentValue = ratingInput.value;
+                    stars.forEach(s => s.classList.remove('checked'));
+                    for (let i = 0; i < currentValue; i++) {
+                        stars[i].classList.add('checked');
+                    }
+                });
+            });
+
+            // Validation khi submit form
+            document.querySelector('form').addEventListener('submit', function (e) {
+                if (ratingInput.value == '0') {
+                    e.preventDefault();
+                    ratingError.style.display = 'block';
+                }
+            });
+        });
+    </script>
+}
