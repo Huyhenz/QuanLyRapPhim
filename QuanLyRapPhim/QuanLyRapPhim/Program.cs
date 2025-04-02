@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
 using QuanLyRapPhim.Data;
@@ -12,6 +12,8 @@ builder.Services.AddControllersWithViews();
 // Cấu hình DbContext
 builder.Services.AddDbContext<DBContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DB")));
+
+//builder.Services.AddDefaultIdentity<User>(options => options.SignIn.RequireConfirmedAccount = true).AddEntityFrameworkStores<DBContext>();
 
 // Cấu hình Identity
 builder.Services.AddIdentity<User, IdentityRole>(options =>
