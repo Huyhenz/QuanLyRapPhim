@@ -53,28 +53,25 @@ namespace QuanLyRapPhim.Controllers
 
             if (existingReview != null)
             {
-                // Nếu đã có đánh giá, cập nhật (ghi đè) đánh giá cũ
-                existingReview.Comment = comment;
-                existingReview.Rating = rating;
-                existingReview.CreatedAt = DateTime.Now; // Cập nhật thời gian
-                _context.Reviews.Update(existingReview);
+                // Nếu đã có đánh giá, trả về thông báo lỗi
+                TempData["ErrorMessage"] = "Bạn đã đánh giá phim này rồi. Mỗi người dùng chỉ được đánh giá một lần.";
+                return RedirectToAction("Details", new { id = movieId });
             }
-            else
+
+            // Nếu chưa có, tạo đánh giá mới
+            var review = new Review
             {
-                // Nếu chưa có, tạo đánh giá mới
-                var review = new Review
-                {
-                    MovieId = movieId,
-                    UserId = user.Id,
-                    Comment = comment,
-                    Rating = rating,
-                    CreatedAt = DateTime.Now
-                };
-                _context.Reviews.Add(review);
-            }
+                MovieId = movieId,
+                UserId = user.Id,
+                Comment = comment,
+                Rating = rating,
+                CreatedAt = DateTime.Now
+            };
+            _context.Reviews.Add(review);
 
             await _context.SaveChangesAsync();
 
+            TempData["SuccessMessage"] = "Đánh giá của bạn đã được gửi thành công!";
             return RedirectToAction("Details", new { id = movieId });
         }
         // Action để tìm kiếm phim
