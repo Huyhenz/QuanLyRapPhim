@@ -50,6 +50,7 @@ namespace QuanLyRapPhim.Controllers
         // POST: Tickets/ConfirmBooking
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize]
         public async Task<IActionResult> ConfirmBooking(int showtimeId, List<int> selectedSeats)
         {
             if (selectedSeats == null || !selectedSeats.Any())
@@ -93,8 +94,10 @@ namespace QuanLyRapPhim.Controllers
             {
                 ShowtimeId = showtimeId,
                 BookingDate = DateTime.Now,
+                UserId = user?.Id, // THÊM DÒNG NÀY
                 BookingDetails = new List<BookingDetail>()
             };
+
 
             foreach (var seatId in selectedSeats)
             {

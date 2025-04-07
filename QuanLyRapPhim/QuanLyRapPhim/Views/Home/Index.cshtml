@@ -23,27 +23,40 @@
                 <span class="navbar-toggler-icon"></span>
             </button>
 
-            @* <!-- Navbar Items --> *@
-            @* <div class="collapse navbar-collapse" id="navbarNav"> *@
-            @*     <ul class="navbar-nav me-auto"> *@
-            @*         <li class="nav-item"> *@
-            @*             <a class="nav-link" href="/Movies">Danh sách phim</a> *@
-            @*         </li> *@
-            @*         <li class="nav-item"> *@
-            @*             <a class="nav-link" href="#">Giới thiệu</a> *@
-            @*         </li> *@
-            @*     </ul> *@
+            <!-- Navbar Items -->
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    @if (User.IsInRole("Admin"))
+                    {
+                        <li class="nav-item">
+                            <a class="nav-link" href="/Movies">Danh sách phim</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/Showtimes">Lịch chiếu</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/Rooms">Phòng</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/Seats">Ghế</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/Admin/ManageBookings">Quản lý đặt vé</a>
+                        </li>
+                    }
+                </ul>
 
                 <!-- Right Side Actions -->
-            <!-- Right Side Actions -->
-            <div class="d-flex align-items-center">
-                <a href="/Movies" class="btn btn-warning me-2">ĐẶT VÉ NGAY</a>
-                <form class="d-flex me-2" asp-action="Search" asp-controller="Movies" method="get">
-                    <input class="form-control me-2" type="search" name="searchString" placeholder="Tìm phim" aria-label="Search">
-                    <button class="btn btn-outline-light" type="submit"><i class="fas fa-search"></i></button>
-                </form>
+                <div class="d-flex align-items-center">
+                    <a href="/Movies" class="btn btn-warning me-2">ĐẶT VÉ NGAY</a>
+                    <form class="d-flex me-2" asp-action="Search" asp-controller="Movies" method="get">
+                        <input class="form-control me-2" type="search" name="searchString" placeholder="Tìm phim" aria-label="Search">
+                        <button class="btn btn-outline-light" type="submit"><i class="fas fa-search"></i></button>
+                    </form>
+                </div>
             </div>
-
+        </div>
+    </nav>
 </header>
 
 <!-- Banner Carousel -->
@@ -79,7 +92,6 @@
         </button>
     </div>
 </section>
-
 
 <!-- Now Showing Movies -->
 <section class="container my-5">
