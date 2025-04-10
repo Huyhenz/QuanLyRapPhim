@@ -4,11 +4,14 @@ using Microsoft.EntityFrameworkCore;
 using QuanLyRapPhim.Data;
 using QuanLyRapPhim.Models;
 using QuanLyRapPhim.Service.Momo;
+using QuanLyRapPhim.Service.VNPay;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.Configure<MomoOptionModel>(builder.Configuration.GetSection("MomoAPI"));
 builder.Services.AddScoped<IMomoService, MomoService>();
+
+
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
@@ -36,6 +39,7 @@ builder.Services.AddTransient<IEmailSender, EmailSender>();
 
 builder.Services.AddRazorPages();
 
+builder.Services.AddScoped<IVnPayService, VnPayService>();
 // Build the application
 var app = builder.Build();
 

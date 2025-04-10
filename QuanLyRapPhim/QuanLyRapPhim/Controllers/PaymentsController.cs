@@ -8,22 +8,41 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using QuanLyRapPhim.Data;
 using QuanLyRapPhim.Models;
+using QuanLyRapPhim.Models.VNPay;
 using QuanLyRapPhim.Service.Momo;
+using QuanLyRapPhim.Service.VNPay;
 
 namespace QuanLyRapPhim.Controllers
 {
     public class PaymentsController : Controller
     {
+        private readonly IVnPayService _vnPayService;
         private IMomoService _momoService;
         private readonly DBContext _context;
         private readonly UserManager<User> _userManager;
 
-        public PaymentsController(DBContext context, UserManager<User> userManager, IMomoService momoService)
+        public PaymentsController(DBContext context, UserManager<User> userManager, IMomoService momoService, IVnPayService vnPayService)
         {
             _context = context;
             _userManager = userManager;
             _momoService = momoService;
+            _vnPayService = vnPayService;
         }
+        [HttpPost]
+        public IActionResult CreatePaymentUrlVnpay(PaymentInformationModel model)
+        {
+            var url = _vnPayService.CreatePaymentUrl(model, HttpContext);
+
+            return Redirect(url);
+        }
+        [HttpGet]
+        public IActionResult PaymentCallbackVnpay()
+        {
+            var response = _vnPayService.PaymentExecute(Request.Query);
+
+            return Json(response);
+        }
+
 
         [HttpPost]
         [Route("CreatePaymentUrl")]

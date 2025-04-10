@@ -49,12 +49,20 @@
 
     <!-- Form thanh toán MoMo (API) -->
     <form method="POST" asp-action="CreatePaymentMomo" asp-controller="Payments">
-        <input type="hidden" name="FullName" value="Rap phim" />
+        <input type="hidden" name="FullName" value="@User.Identity.Name" />
         <input type="hidden" name="Amount" value="@Model.Amount" />
         <input type="hidden" name="OrderInfo" value="Thanh toán Momo" />
         <button class="btn btn-danger" type="submit">Pay with MoMo</button>
     </form>
-</div>
+    <!-- Form thanh toán MoMo (API) -->
+    <form method="POST" asp-action="CreatePaymentUrlVnpay" asp-controller="Payments">
+        <input type="hidden" name="Name" value="@User.Identity.Name" />
+        <input type="hidden" name="Amount" value="@Model.Amount" />
+        <input type="hidden" name="OrderDescription" value="Thanh toán VNPay" />
+        <input type="hidden" name="OrderType" value="other" />
+        <button class="btn btn-danger" type="submit">Pay with VNPay</button>
+    </form>
+</div>  
 
 
 <!-- CSS tùy chỉnh -->
