@@ -8,18 +8,35 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using QuanLyRapPhim.Data;
 using QuanLyRapPhim.Models;
+using QuanLyRapPhim.Service.Momo;
 
 namespace QuanLyRapPhim.Controllers
 {
     public class PaymentsController : Controller
     {
+        private IMomoService _momoService;
         private readonly DBContext _context;
         private readonly UserManager<User> _userManager;
 
-        public PaymentsController(DBContext context, UserManager<User> userManager)
+        public PaymentsController(DBContext context, UserManager<User> userManager, IMomoService momoService)
         {
             _context = context;
             _userManager = userManager;
+            _momoService = momoService;
+        }
+
+        [HttpPost]
+        [Route("CreatePaymentUrl")]
+        public async Task<IActionResult> CreatePaymentMomo(OrderInfoModel model)
+        {
+            var response = await _momoService.CreatePaymentMomo(model);
+            return Redirect(response.PayUrl);
+        }
+        [HttpGet]
+        public IActionResult PaymentCallBack()
+        {
+            var response = _momoService.PaymentExecuteAsync(HttpContext.Request.Query);
+            return View(response);
         }
 
         // GET: Payments
