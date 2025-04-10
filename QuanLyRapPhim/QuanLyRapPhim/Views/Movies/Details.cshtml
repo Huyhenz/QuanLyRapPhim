@@ -6,15 +6,13 @@
 }
 
 <div class="container my-5 position-relative">
-    <!-- Các hình tròn gradient trang trí -->
+  
     <div class="circle circle-1"></div>
     <div class="circle circle-2"></div>
     <div class="circle circle-3"></div>
 
-    <!-- Tiêu đề -->
     <h1 class="text-primary mb-4">Chi tiết phim: @Model.Title</h1>
 
-    <!-- Hiển thị thông báo thành công hoặc lỗi -->
     @if (TempData["SuccessMessage"] != null)
     {
         <div class="alert alert-success alert-dismissible fade show" role="alert">

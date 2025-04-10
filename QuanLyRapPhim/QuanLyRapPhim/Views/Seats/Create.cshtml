@@ -5,39 +5,52 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h1>Create</h1>
+<h1 style="background-color: #FFD700; color: #333; padding: 10px; text-align: center; border-radius: 5px;">Create Seats for Room</h1>
 
-<h4>Seat</h4>
+<h4>Choose a Room to Generate Seats</h4>
 <hr />
+
 <div class="row">
     <div class="col-md-4">
         <form asp-action="Create">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <!-- Dropdown phòng và xử lý số ghế -->
             <div class="form-group">
-                <label asp-for="RoomId" class="control-label"></label>
-                <select asp-for="RoomId" class ="form-control" asp-items="ViewBag.RoomId"></select>
+                <label for="RoomId" class="control-label">Room</label>
+                <select id="RoomId" name="RoomId" class="form-control" asp-items="ViewBag.RoomId" onchange="updateSeatCount(this)"></select>
+                <span asp-validation-for="RoomId" class="text-danger"></span>
             </div>
-            <div class="form-group">
-                <label asp-for="SeatNumber" class="control-label"></label>
-                <input asp-for="SeatNumber" class="form-control" />
-                <span asp-validation-for="SeatNumber" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Status" class="control-label"></label>
-                <input asp-for="Status" class="form-control" />
-                <span asp-validation-for="Status" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
+
+            <!-- Hiển thị số ghế tương ứng -->
+            <div id="seatCount" class="mt-2 text-info fw-bold"></div>
+
+            <div class="form-group mt-3">
+                <input type="submit" value="Generate Seats" class="btn btn-primary" style="background-color: #4CAF50; border: none;" />
             </div>
         </form>
     </div>
 </div>
 
 <div>
-    <a asp-action="Index">Back to List</a>
+    <a asp-action="Index" style="display: inline-block; padding: 8px 15px; background-color: #FFA07A; color: white; text-decoration: none; border-radius: 5px;">Back to List</a>
 </div>
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        async function updateSeatCount(select) {
+            const roomId = select.value;
+            if (roomId) {
+                const response = await fetch(`/Rooms/GetTotalSeats?roomId=${roomId}`);
+                const totalSeats = await response.json();
+                document.getElementById('seatCount').innerText = `Số ghế sẽ được tạo: ${totalSeats}`;
+            } else {
+                document.getElementById('seatCount').innerText = '';
+            }
+        }
+    </script>
+
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }

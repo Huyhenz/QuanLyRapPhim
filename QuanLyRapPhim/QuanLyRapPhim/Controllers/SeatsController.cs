@@ -48,25 +48,63 @@ namespace QuanLyRapPhim.Controllers
         // GET: Seats/Create
         public IActionResult Create()
         {
-            ViewData["RoomId"] = new SelectList(_context.Rooms, "RoomId", "RoomId");
+            // Hiển thị dropdown list các phòng, hiển thị RoomName thay vì RoomId
+            ViewData["RoomId"] = new SelectList(_context.Rooms, "RoomId", "RoomName");
             return View();
         }
 
         // POST: Seats/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("SeatId,RoomId,SeatNumber,Status")] Seat seat)
+        public async Task<IActionResult> Create(int RoomId)
         {
-            if (ModelState.IsValid)
+            // Kiểm tra xem RoomId có hợp lệ không
+            var room = await _context.Rooms.FindAsync(RoomId);
+            if (room == null)
             {
-                _context.Add(seat);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                ModelState.AddModelError("RoomId", "Phòng không tồn tại.");
+                ViewData["RoomId"] = new SelectList(_context.Rooms, "RoomId", "RoomName", RoomId);
+                return View();
             }
-            ViewData["RoomId"] = new SelectList(_context.Rooms, "RoomId", "RoomId", seat.RoomId);
-            return View(seat);
+
+            // Kiểm tra xem phòng đã có ghế chưa
+            var existingSeats = await _context.Seats.Where(s => s.RoomId == RoomId).ToListAsync();
+            if (existingSeats.Any())
+            {
+                ModelState.AddModelError("", "Phòng này đã có ghế. Vui lòng xóa các ghế hiện tại trước khi tạo mới.");
+                ViewData["RoomId"] = new SelectList(_context.Rooms, "RoomId", "RoomName", RoomId);
+                return View();
+            }
+
+            // Tạo ghế tự động dựa trên TotalSeats của phòng
+            int seatsPerRow = 10; // Mỗi hàng có 10 ghế, nhưng đánh số từ 0-9
+            int totalSeats = room.Capacity;
+            int totalRows = (int)Math.Ceiling((double)totalSeats / seatsPerRow);
+
+            var seatsToAdd = new List<Seat>();
+            for (int row = 0; row < totalRows; row++)
+            {
+                char rowLabel = (char)('A' + row); // A, B, C, ...
+                int seatsInThisRow = Math.Min(seatsPerRow, totalSeats - (row * seatsPerRow));
+
+                for (int seatNum = 0; seatNum < seatsInThisRow; seatNum++) // Đánh số từ 0-9
+                {
+                    var seat = new Seat
+                    {
+                        RoomId = RoomId,
+                        SeatNumber = $"{rowLabel}{seatNum}", // Ví dụ: A0, A1, ..., A9, B0, B1, ..., B9
+                        Status = "Trong" // Trạng thái mặc định
+                    };
+                    seatsToAdd.Add(seat);
+                }
+            }
+
+            // Thêm tất cả ghế vào cơ sở dữ liệu
+            _context.Seats.AddRange(seatsToAdd);
+            await _context.SaveChangesAsync();
+
+            TempData["SuccessMessage"] = $"Đã tạo thành công {seatsToAdd.Count} ghế cho phòng {room.RoomName}!";
+            return RedirectToAction(nameof(Index));
         }
 
         // GET: Seats/Edit/5
@@ -82,13 +120,11 @@ namespace QuanLyRapPhim.Controllers
             {
                 return NotFound();
             }
-            ViewData["RoomId"] = new SelectList(_context.Rooms, "RoomId", "RoomId", seat.RoomId);
+            ViewData["RoomId"] = new SelectList(_context.Rooms, "RoomId", "RoomName", seat.RoomId);
             return View(seat);
         }
 
         // POST: Seats/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("SeatId,RoomId,SeatNumber,Status")] Seat seat)
@@ -118,7 +154,7 @@ namespace QuanLyRapPhim.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["RoomId"] = new SelectList(_context.Rooms, "RoomId", "RoomId", seat.RoomId);
+            ViewData["RoomId"] = new SelectList(_context.Rooms, "RoomId", "RoomName", seat.RoomId);
             return View(seat);
         }
 

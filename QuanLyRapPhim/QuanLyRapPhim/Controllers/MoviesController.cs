@@ -47,18 +47,18 @@ namespace QuanLyRapPhim.Controllers
                 return RedirectToAction("Login", "Account", new { area = "Identity" });
             }
 
-            // Kiểm tra xem user đã đánh giá phim này chưa
+   
             var existingReview = await _context.Reviews
                 .FirstOrDefaultAsync(r => r.MovieId == movieId && r.UserId == user.Id);
 
             if (existingReview != null)
             {
-                // Nếu đã có đánh giá, trả về thông báo lỗi
+                
                 TempData["ErrorMessage"] = "Bạn đã đánh giá phim này rồi. Mỗi người dùng chỉ được đánh giá một lần.";
                 return RedirectToAction("Details", new { id = movieId });
             }
 
-            // Nếu chưa có, tạo đánh giá mới
+         
             var review = new Review
             {
                 MovieId = movieId,
@@ -74,15 +74,15 @@ namespace QuanLyRapPhim.Controllers
             TempData["SuccessMessage"] = "Đánh giá của bạn đã được gửi thành công!";
             return RedirectToAction("Details", new { id = movieId });
         }
-        // Action để tìm kiếm phim
+        
         public IActionResult Search(string searchString)
         {
-            // Tìm kiếm phim theo title
+         
             var movies = string.IsNullOrEmpty(searchString)
                 ? _context.Movies.ToList()
                 : _context.Movies.Where(m => m.Title.Contains(searchString)).ToList();
 
-            return View("Index", movies); // Trả về view Index với danh sách phim tìm được
+            return View("Index", movies); 
         }
         // GET: Movies/Details/5
         public async Task<IActionResult> Details(int? id)
