@@ -29,33 +29,30 @@
         <input type="hidden" asp-for="PaymentDate" />
         <input type="hidden" asp-for="PaymentStatus" />
 
-        <div class="mb-3">
-            <label asp-for="PaymentMethod" class="form-label text-light">Phương thức thanh toán</label>
-            <select asp-for="PaymentMethod" class="form-select bg-dark text-light border-secondary">
-                <option value="Momo">MoMo</option>
-            </select>
-            <span asp-validation-for="PaymentMethod" class="text-danger"></span>
-        </div>
+    @*     <div class="mb-3"> *@
+    @*         <label asp-for="PaymentMethod" class="form-label text-light">Phương thức thanh toán</label> *@
+    @*         <select asp-for="PaymentMethod" class="form-select bg-dark text-light border-secondary"> *@
+    @*             <option value="Momo">MoMo</option> *@
+    @*         </select> *@
+    @*         <span asp-validation-for="PaymentMethod" class="text-danger"></span> *@
+    @*     </div> *@
 
-        <div class="text-center mb-3">
-            <button type="submit" class="btn btn-primary btn-lg rounded-pill px-4">
-                <i class="fas fa-credit-card me-1"></i> Thanh toán
-            </button>
-            <a asp-controller="Tickets" asp-action="SelectRoomAndSeat" asp-route-showtimeId="@booking.ShowtimeId" class="btn btn-secondary rounded-pill px-4">
-                <i class="fas fa-arrow-left me-1"></i> Quay lại chọn ghế
-            </a>
-        </div>
-    </form>
+    @*     <div class="text-center mb-3"> *@
+    @*         <button type="submit" class="btn btn-primary btn-lg rounded-pill px-4"> *@
+    @*             <i class="fas fa-credit-card me-1"></i> Thanh toán *@
+    @*         </button> *@
+    @*         <a asp-controller="Tickets" asp-action="SelectRoomAndSeat" asp-route-showtimeId="@booking.ShowtimeId" class="btn btn-secondary rounded-pill px-4"> *@
+    @*             <i class="fas fa-arrow-left me-1"></i> Quay lại chọn ghế *@
+    @*         </a> *@
+    @*     </div> *@
+     </form> 
 
     <!-- Form thanh toán MoMo (API) -->
-    <form method="POST" asp-action="CreatePaymentUrl" asp-controller="Payment" class="text-center">
-        <input type="hidden" name="OrderInfo" value="Thanh toán đặt hàng qua Momo tại HieuTanStore" />
-        <input type="hidden" name="Amount" value="@booking.TotalPrice" />
-        <input type="hidden" name="BookingId" value="@booking.BookingId" />
-
-        <button class="btn btn-danger btn-lg rounded-pill px-4" name="PayUrl" type="submit">
-            <i class="fas fa-wallet me-1"></i> Thanh toán MoMo
-        </button>
+    <form method="POST" asp-action="CreatePaymentMomo" asp-controller="Payments">
+        <input type="hidden" name="FullName" value="Rap phim" />
+        <input type="hidden" name="Amount" value="@Model.Amount" />
+        <input type="hidden" name="OrderInfo" value="Thanh toán Momo" />
+        <button class="btn btn-danger" type="submit">Pay with MoMo</button>
     </form>
 </div>
 
