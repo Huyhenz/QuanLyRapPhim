@@ -39,8 +39,8 @@ namespace QuanLyRapPhim.Controllers
         public IActionResult PaymentCallbackVnpay()
         {
             var response = _vnPayService.PaymentExecute(Request.Query);
+               return Json(response);
 
-            return Json(response);
         }
 
 

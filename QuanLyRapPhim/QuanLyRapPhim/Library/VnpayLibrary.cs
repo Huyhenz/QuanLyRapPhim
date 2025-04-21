@@ -1,19 +1,23 @@
-﻿using QuanLyRapPhim.Models.VNPay;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Net.Sockets;
 using System.Net;
-using System.Text;
 using System.Security.Cryptography;
+using System.Text;
 using System.Globalization;
+using QuanLyRapPhim.Models.VNPay;
 
 namespace QuanLyRapPhim.Library
 {
-    public class VnpayLibrary
+    public class VnPayLibrary
     {
         private readonly SortedList<string, string> _requestData = new SortedList<string, string>(new VnPayCompare());
         private readonly SortedList<string, string> _responseData = new SortedList<string, string>(new VnPayCompare());
+
         public PaymentResponseModel GetFullResponseData(IQueryCollection collection, string hashSecret)
         {
-            var vnPay = new VnpayLibrary();
+            var vnPay = new VnPayLibrary();
             foreach (var (key, value) in collection)
             {
                 if (!string.IsNullOrEmpty(key) && key.StartsWith("vnp_"))
@@ -46,6 +50,7 @@ namespace QuanLyRapPhim.Library
                 VnPayResponseCode = vnpResponseCode
             };
         }
+
         public string GetIpAddress(HttpContext context)
         {
             var ipAddress = string.Empty;
@@ -73,6 +78,7 @@ namespace QuanLyRapPhim.Library
 
             return "127.0.0.1";
         }
+
         public void AddRequestData(string key, string value)
         {
             if (!string.IsNullOrEmpty(value))
@@ -80,6 +86,7 @@ namespace QuanLyRapPhim.Library
                 _requestData.Add(key, value);
             }
         }
+
         public void AddResponseData(string key, string value)
         {
             if (!string.IsNullOrEmpty(value))
@@ -87,6 +94,7 @@ namespace QuanLyRapPhim.Library
                 _responseData.Add(key, value);
             }
         }
+
         public string GetResponseData(string key)
         {
             return _responseData.TryGetValue(key, out var retValue) ? retValue : string.Empty;
@@ -114,6 +122,7 @@ namespace QuanLyRapPhim.Library
 
             return baseUrl;
         }
+
         public bool ValidateSignature(string inputHash, string secretKey)
         {
             var rspRaw = GetResponseData();
@@ -136,6 +145,7 @@ namespace QuanLyRapPhim.Library
 
             return hash.ToString();
         }
+
         private string GetResponseData()
         {
             var data = new StringBuilder();
@@ -175,5 +185,4 @@ namespace QuanLyRapPhim.Library
             return vnpCompare.Compare(x, y, CompareOptions.Ordinal);
         }
     }
-
 }

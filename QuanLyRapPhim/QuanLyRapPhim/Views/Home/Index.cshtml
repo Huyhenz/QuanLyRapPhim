@@ -49,6 +49,20 @@
                 <!-- Right Side Actions -->
                 <div class="d-flex align-items-center">
                     <a href="/Movies" class="btn btn-warning me-2">ĐẶT VÉ NGAY</a>
+                    <form method="POST" asp-action="CreatePaymentMomo" asp-controller="Payments">
+                        <input type="hidden" name="FullName" value="@User.Identity.Name" />
+                        <input type="hidden" name="Amount" value= "300000" />
+                        <input type="hidden" name="OrderInfo" value="Thanh toán Momo" />
+                        <button class="btn btn-danger" type="submit">Pay with MoMo</button>
+                    </form>
+                    <!-- Form thanh toán vnpay (API) -->
+                    <form method="POST" asp-action="CreatePaymentUrlVnpay" asp-controller="Payments">
+                        <input type="hidden" name="Name" value="@User.Identity.Name" />
+                        <input type="hidden" name="Amount" value= "300000" />
+                        <input type="hidden" name="OrderDescription" value="Thanh toán VNPay" />
+                        <input type="hidden" name="OrderType" value="250000" />
+                        <button class="btn btn-danger" type="submit">Pay with VNPay</button>
+                    </form>
                     <form class="d-flex me-2" asp-action="Search" asp-controller="Movies" method="get">
                         <input class="form-control me-2" type="search" name="searchString" placeholder="Tìm phim" aria-label="Search">
                         <button class="btn btn-outline-light" type="submit"><i class="fas fa-search"></i></button>
