@@ -50,8 +50,6 @@ namespace QuanLyRapPhim.Controllers
         }
 
         // POST: Rooms/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("RoomId,RoomName,Capacity")] Room room)
@@ -82,8 +80,6 @@ namespace QuanLyRapPhim.Controllers
         }
 
         // POST: Rooms/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("RoomId,RoomName,Capacity")] Room room)
@@ -139,13 +135,51 @@ namespace QuanLyRapPhim.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var room = await _context.Rooms.FindAsync(id);
-            if (room != null)
+            var room = await _context.Rooms
+                .Include(r => r.Seats) // Bao gồm ghế liên quan
+                .Include(r => r.Showtimes) // Bao gồm lịch chiếu liên quan
+                .ThenInclude(s => s.Bookings) // Bao gồm đặt vé liên quan
+                .ThenInclude(b => b.BookingDetails) // Bao gồm chi tiết đặt vé
+                .FirstOrDefaultAsync(r => r.RoomId == id);
+
+            if (room == null)
             {
-                _context.Rooms.Remove(room);
+                return NotFound();
             }
 
+            // Xóa các BookingDetails liên quan
+            foreach (var booking in room.Showtimes.SelectMany(s => s.Bookings))
+            {
+                if (booking.BookingDetails != null && booking.BookingDetails.Any())
+                {
+                    _context.BookingDetails.RemoveRange(booking.BookingDetails);
+                }
+            }
+
+            // Xóa các Booking liên quan
+            var bookingsToRemove = room.Showtimes.SelectMany(s => s.Bookings).ToList();
+            if (bookingsToRemove.Any())
+            {
+                _context.Bookings.RemoveRange(bookingsToRemove);
+            }
+
+            // Xóa các Showtimes liên quan
+            if (room.Showtimes.Any())
+            {
+                _context.Showtimes.RemoveRange(room.Showtimes);
+            }
+
+            // Xóa các Seats liên quan
+            if (room.Seats.Any())
+            {
+                _context.Seats.RemoveRange(room.Seats);
+            }
+
+            // Xóa Room
+            _context.Rooms.Remove(room);
             await _context.SaveChangesAsync();
+
+            TempData["SuccessMessage"] = $"Đã xóa thành công phòng {room.RoomName}!";
             return RedirectToAction(nameof(Index));
         }
 

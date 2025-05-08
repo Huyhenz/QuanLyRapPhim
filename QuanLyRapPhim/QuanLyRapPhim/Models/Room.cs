@@ -11,5 +11,7 @@ namespace QuanLyRapPhim.Models
 
         public int Capacity { get; set; }
         public ICollection<Seat>? Seats { get; set; }
+        public ICollection<Showtime>? Showtimes { get; set; }
+
     }
 }

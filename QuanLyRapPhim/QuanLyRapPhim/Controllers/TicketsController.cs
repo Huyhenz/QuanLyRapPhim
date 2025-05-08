@@ -41,7 +41,7 @@ namespace QuanLyRapPhim.Controllers
 
             foreach (var seat in showtime.Room.Seats)
             {
-                seat.Status = bookedSeats.Contains(seat.SeatId) ? "Taken" : "Available";
+                seat.Status = bookedSeats.Contains(seat.SeatId) ? "Đã đặt" : "Trống";
             }
 
             return View(showtime);
@@ -94,10 +94,9 @@ namespace QuanLyRapPhim.Controllers
             {
                 ShowtimeId = showtimeId,
                 BookingDate = DateTime.Now,
-                UserId = user?.Id, // THÊM DÒNG NÀY
+                UserId = user?.Id,
                 BookingDetails = new List<BookingDetail>()
             };
-
 
             foreach (var seatId in selectedSeats)
             {
@@ -116,6 +115,17 @@ namespace QuanLyRapPhim.Controllers
             booking.TotalPrice = booking.BookingDetails.Sum(bd => bd.Price);
 
             _context.Bookings.Add(booking);
+            await _context.SaveChangesAsync();
+
+            // Cập nhật trạng thái ghế thành "Đã đặt" trong cơ sở dữ liệu
+            foreach (var seatId in selectedSeats)
+            {
+                var seat = await _context.Seats.FindAsync(seatId);
+                if (seat != null)
+                {
+                    seat.Status = "Đã đặt";
+                }
+            }
             await _context.SaveChangesAsync();
 
             // Chuyển hướng sang trang thanh toán
@@ -137,8 +147,23 @@ namespace QuanLyRapPhim.Controllers
                 return RedirectToAction("SelectRoomAndSeat", new { showtimeId });
             }
 
+            // Lấy danh sách SeatId từ BookingDetails
+            var seatIds = booking.BookingDetails.Select(bd => bd.SeatId).ToList();
+
+            // Xóa BookingDetails và Booking
             _context.BookingDetails.RemoveRange(booking.BookingDetails);
             _context.Bookings.Remove(booking);
+
+            // Cập nhật trạng thái ghế về "Trống"
+            foreach (var seatId in seatIds)
+            {
+                var seat = await _context.Seats.FindAsync(seatId);
+                if (seat != null)
+                {
+                    seat.Status = "Trống";
+                }
+            }
+
             await _context.SaveChangesAsync();
 
             TempData["SuccessMessage"] = "Đã hủy đặt vé. Vui lòng chọn lại ghế.";

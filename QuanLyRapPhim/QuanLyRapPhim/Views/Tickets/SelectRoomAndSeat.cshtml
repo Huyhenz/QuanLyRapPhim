@@ -61,7 +61,7 @@
         <!-- Sơ đồ ghế -->
         <div class="seating-chart mb-4">
             @{
-                var seats = Model.Room.Seats.OrderBy(s => s.SeatNumber).ToList(); // Sắp xếp ghế theo SeatNumber
+                var seats = Model.Room.Seats.OrderBy(s => s.SeatNumber).ToList(); // Sắp xếp ghế inviting theo SeatNumber
                 int seatsPerRow = 10; // Số ghế mỗi hàng
                 int totalSeats = seats.Count;
                 int totalRows = (int)Math.Ceiling((double)totalSeats / seatsPerRow);
@@ -78,8 +78,8 @@
                             @foreach (var seat in rowSeats)
                             {
                                 bool isCoupleSeat = isLastRow; // Ghế đôi ở hàng cuối
-                                <div class="seat @(seat.Status == "Taken" ? "seat-taken" : "seat-available") @(isCoupleSeat ? "seat-couple" : "") mx-1">
-                                    <input type="checkbox" name="selectedSeats" value="@seat.SeatId" id="seat-@seat.SeatId" @(seat.Status == "Taken" ? "disabled" : "") />
+                                <div class="seat @(seat.Status == "Đã đặt" ? "seat-taken" : "seat-available") @(isCoupleSeat ? "seat-couple" : "") mx-1">
+                                    <input type="checkbox" name="selectedSeats" value="@seat.SeatId" id="seat-@seat.SeatId" @(seat.Status == "Đã đặt" ? "disabled" : "") />
                                     <label for="seat-@seat.SeatId" class="seat-label">@seat.SeatNumber</label>
                                 </div>
                             }

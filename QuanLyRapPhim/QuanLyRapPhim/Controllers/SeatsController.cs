@@ -92,8 +92,10 @@ namespace QuanLyRapPhim.Controllers
                     var seat = new Seat
                     {
                         RoomId = RoomId,
-                        SeatNumber = $"{rowLabel}{seatNum}", // Ví dụ: A0, A1, ..., A9, B0, B1, ..., B9
-                        Status = "Trong" // Trạng thái mặc định
+                        SeatNumber = $"{rowLabel}{seatNum}",
+                        Status = "Trống", // Trạng thái mặc định
+                        Room = null,
+                        BookingDetails = null
                     };
                     seatsToAdd.Add(seat);
                 }
