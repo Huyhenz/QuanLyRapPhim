@@ -121,5 +121,28 @@ namespace QuanLyRapPhim.Controllers
             // Chuyển hướng sang trang thanh toán
             return RedirectToAction("Create", "Payments", new { bookingId = booking.BookingId });
         }
+
+        // POST: Tickets/CancelBooking
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> CancelBooking(int bookingId, int showtimeId)
+        {
+            var booking = await _context.Bookings
+                .Include(b => b.BookingDetails)
+                .FirstOrDefaultAsync(b => b.BookingId == bookingId);
+
+            if (booking == null)
+            {
+                TempData["ErrorMessage"] = "Không tìm thấy đặt vé.";
+                return RedirectToAction("SelectRoomAndSeat", new { showtimeId });
+            }
+
+            _context.BookingDetails.RemoveRange(booking.BookingDetails);
+            _context.Bookings.Remove(booking);
+            await _context.SaveChangesAsync();
+
+            TempData["SuccessMessage"] = "Đã hủy đặt vé. Vui lòng chọn lại ghế.";
+            return RedirectToAction("SelectRoomAndSeat", new { showtimeId });
+        }
     }
 }
