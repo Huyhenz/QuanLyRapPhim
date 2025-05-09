@@ -1,11 +1,11 @@
 ﻿@model QuanLyRapPhim.Models.VNPay.PaymentResponseModel
-@{
-    ViewData["Title"] = "Thanh toán VNPAY";
-}
+@* @{ *@
+@*     ViewData["Title"] = "Thanh toán VNPAY"; *@
+@* } *@
 <h5>Thanh toán VNPAY thành công</h5>
-<h6>Mã giao dịch : @Model.OrderId</h6>
+<h6>Mã đặt vé : @Model.OrderId</h6>
 <h6>Thông tin thanh toán : @Model.OrderDescription</h6>
-<h6>Cách thức : @Model.PaymentMethod</h6>
+<h6>Cách thức thanh toán : @Model.PaymentMethod</h6>
 <h6>Mã giao dịch : @Model.TransactionId</h6>
-<h6>Mã thanh toán : @Model.PaymentId</h6>
+<h6>Tình trạng : @Model.Success</h6>
 @* <h5>Xem <a asp-controller = ""</h5> *@
