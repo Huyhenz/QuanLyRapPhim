@@ -24,45 +24,45 @@
             </button>
 
             <!-- Navbar Items -->
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav me-auto">
-                    @if (User.IsInRole("Admin"))
-                    {
-                        <li class="nav-item">
-                            <a class="nav-link" href="/Movies">Danh sách phim</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="/Showtimes">Lịch chiếu</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="/Rooms">Phòng</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="/Seats">Ghế</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="/Admin/ManageBookings">Quản lý đặt vé</a>
-                        </li>
-                    }
-                </ul>
+            @* <div class="collapse navbar-collapse" id="navbarNav"> *@
+            @*     <ul class="navbar-nav me-auto"> *@
+            @*         @if (User.IsInRole("Admin")) *@
+            @*         { *@
+            @*             <li class="nav-item"> *@
+            @*                 <a class="nav-link" href="/Movies">Danh sách phim</a> *@
+            @*             </li> *@
+            @*             <li class="nav-item"> *@
+            @*                 <a class="nav-link" href="/Showtimes">Lịch chiếu</a> *@
+            @*             </li> *@
+            @*             <li class="nav-item"> *@
+            @*                 <a class="nav-link" href="/Rooms">Phòng</a> *@
+            @*             </li> *@
+            @*             <li class="nav-item"> *@
+            @*                 <a class="nav-link" href="/Seats">Ghế</a> *@
+            @*             </li> *@
+            @*             <li class="nav-item"> *@
+            @*                 <a class="nav-link" href="/Admin/ManageBookings">Quản lý đặt vé</a> *@
+            @*             </li> *@
+            @*         } *@
+            @*     </ul> *@
 
                 <!-- Right Side Actions -->
                 <div class="d-flex align-items-center">
                     <a href="/Movies" class="btn btn-warning me-2">ĐẶT VÉ NGAY</a>
-                    <form method="POST" asp-action="CreatePaymentMomo" asp-controller="Payments">
-                        <input type="hidden" name="FullName" value="@User.Identity.Name" />
-                        <input type="hidden" name="Amount" value= "300000" />
-                        <input type="hidden" name="OrderInfo" value="Thanh toán Momo" />
-                        <button class="btn btn-danger" type="submit">Pay with MoMo</button>
-                    </form>
-                    <!-- Form thanh toán vnpay (API) -->
-                    <form method="POST" asp-action="CreatePaymentUrlVnpay" asp-controller="Payments">
-                        <input type="hidden" name="Name" value="@User.Identity.Name" />
-                        <input type="hidden" name="Amount" value= "300000" />
-                        <input type="hidden" name="OrderDescription" value="Thanh toán VNPay" />
-                        <input type="hidden" name="OrderType" value="250000" />
-                        <button class="btn btn-danger" type="submit">Pay with VNPay</button>
-                    </form>
+                    @* <form method="POST" asp-action="CreatePaymentMomo" asp-controller="Payments"> *@
+                    @*     <input type="hidden" name="FullName" value="@User.Identity.Name" /> *@
+                    @*     <input type="hidden" name="Amount" value= "300000" /> *@
+                    @*     <input type="hidden" name="OrderInfo" value="Thanh toán Momo" /> *@
+                    @*     <button class="btn btn-danger" type="submit">Pay with MoMo</button> *@
+                    @*  </form>  *@
+                @*     <!-- Form thanh toán vnpay (API) --> *@
+                @*     <form method="POST" asp-action="CreatePaymentUrlVnpay" asp-controller="Payments"> *@
+                @*         <input type="hidden" name="Name" value="@User.Identity.Name" /> *@
+                @*         <input type="hidden" name="Amount" value= "300000" /> *@
+                @*         <input type="hidden" name="OrderDescription" value="Thanh toán VNPay" /> *@
+                @*         <input type="hidden" name="OrderType" value="250000" /> *@
+                @*         <button class="btn btn-danger" type="submit">Pay with VNPay</button> *@
+                @*     </form> *@
                     <form class="d-flex me-2" asp-action="Search" asp-controller="Movies" method="get">
                         <input class="form-control me-2" type="search" name="searchString" placeholder="Tìm phim" aria-label="Search">
                         <button class="btn btn-outline-light" type="submit"><i class="fas fa-search"></i></button>
@@ -72,6 +72,22 @@
         </div>
     </nav>
 </header>
+@if (User.IsInRole("Admin"))
+{
+    <button id="toggleDashboard" class="dashboard-toggle">☰</button>
+    <aside id="adminDashboard" class="admin-dashboard">
+        <h4>Quản lý</h4>
+        <ul class="list-unstyled">
+            <li><a href="/Admin/Dashboard">📊 Dashboard</a></li>
+            <li><a href="/Movies">🎬 Danh sách phim</a></li>
+            <li><a href="/Showtimes">🕒 Lịch chiếu</a></li>
+            <li><a href="/Rooms">🏢 Quản lý phòng</a></li>
+            <li><a href="/Seats">💺 Quản lý ghế</a></li>
+            <li><a href="/Admin/ManageBookings">📌 Quản lý đặt vé</a></li>
+            <li><a href="/Admin/Reports">📑 Báo cáo thống kê</a></li>
+        </ul>
+    </aside>
+}
 
 <!-- Banner Carousel -->
 <section>
@@ -131,3 +147,48 @@
         <p class="text-center text-white">Hiện tại không có phim nào đang chiếu hoặc không tìm thấy kết quả phù hợp.</p>
     }
 </section>
+<style>
+    .admin-dashboard {
+        position: fixed;
+        top: 0;
+        left: -250px; /* Ẩn dashboard ban đầu */
+        width: 250px;
+        height: 100vh;
+        background: rgba(0, 0, 0, 0.8);
+        color: white;
+        padding: 20px;
+        z-index: 999;
+        transition: left 0.3s ease-in-out; /* Hiệu ứng trượt */
+    }
+
+    .dashboard-toggle {
+        position: fixed;
+        top: 20px;
+        left: 10px;
+        background: #222;
+        color: white;
+        border: none;
+        padding: 10px;
+        cursor: pointer;
+        z-index: 1000;
+        transition: left 0.3s ease-in-out; /* Hiệu ứng trượt */
+    }
+
+        .dashboard-toggle:hover {
+            background: #444;
+        }
+</style>
+<script>
+    document.getElementById("toggleDashboard").addEventListener("click", function() {
+        let dashboard = document.getElementById("adminDashboard");
+        let toggleButton = document.getElementById("toggleDashboard");
+
+        if (dashboard.style.left === "-250px") {
+            dashboard.style.left = "0"; // Hiện Dashboard
+            toggleButton.style.left = "260px"; // Nút chuyển sang bên phải
+        } else {
+            dashboard.style.left = "-250px"; // Ẩn Dashboard
+            toggleButton.style.left = "10px"; // Nút chuyển lại bên trái
+        }
+    });
+</script>

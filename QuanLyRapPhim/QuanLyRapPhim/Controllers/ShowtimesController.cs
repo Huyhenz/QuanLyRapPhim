@@ -20,6 +20,38 @@ namespace QuanLyRapPhim.Controllers
         {
             _context = context;
         }
+        public IActionResult Search(string searchTitle, string startDate, string endDate, string genre)
+        {
+
+            var showtimes = _context.Showtimes.Include(s => s.Movie).AsQueryable();
+
+            // Nếu không có điều kiện tìm kiếm, hiển thị toàn bộ lịch chiếu
+            if (string.IsNullOrEmpty(searchTitle) && string.IsNullOrEmpty(startDate) && string.IsNullOrEmpty(endDate) && string.IsNullOrEmpty(genre))
+            {
+                return View("Index", showtimes.ToList());
+            }
+
+            if (!string.IsNullOrEmpty(searchTitle))
+            {
+                showtimes = showtimes.Where(s => s.Movie.Title.Contains(searchTitle));
+            }
+
+            // Chuyển đổi & lọc theo khoảng ngày chiếu
+            DateTime? start = DateTime.TryParse(startDate, out DateTime parsedStart) ? parsedStart.Date : null;
+            DateTime? end = DateTime.TryParse(endDate, out DateTime parsedEnd) ? parsedEnd.Date : null;
+
+            if (start.HasValue && end.HasValue)
+            {
+                showtimes = showtimes.Where(s => (s.Date.Date.CompareTo(start.Value) >= 0) && (s.Date.Date.CompareTo(end.Value) <= 0));
+            }
+
+            if (!string.IsNullOrEmpty(genre))
+            {
+                showtimes = showtimes.Where(s => s.Movie.Genre.Equals(genre));
+            }
+
+            return View("Index", showtimes.ToList());
+        }
         // GET: Showtimes/SelectShowtime?movieId=5
         public async Task<IActionResult> SelectShowtime(int movieId)
         {

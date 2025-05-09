@@ -18,6 +18,22 @@
 <p>
     <a asp-action="Create" style="display: inline-block; padding: 8px 15px; background-color: #4CAF50; color: white; text-decoration: none; border-radius: 5px;">Create New</a>
 </p>
+@if (User.IsInRole("Admin"))
+{
+    <button id="toggleDashboard" class="dashboard-toggle">☰</button>
+    <aside id="adminDashboard" class="admin-dashboard">
+        <h4>Quản lý</h4>
+        <ul class="list-unstyled">
+            <li><a href="/Admin/Dashboard">📊 Dashboard</a></li>
+            <li><a href="/Movies">🎬 Danh sách phim</a></li>
+            <li><a href="/Showtimes">🕒 Lịch chiếu</a></li>
+            <li><a href="/Rooms">🏢 Quản lý phòng</a></li>
+            <li><a href="/Seats">💺 Quản lý ghế</a></li>
+            <li><a href="/Admin/ManageBookings">📌 Quản lý đặt vé</a></li>
+            <li><a href="/Admin/Reports">📑 Báo cáo thống kê</a></li>
+        </ul>
+    </aside>
+}
 
 <table class="table" style="width: 100%; border-collapse: collapse; background-color: #FFFBE6; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
     <thead>
@@ -44,3 +60,48 @@
         }
     </tbody>
 </table>
+<style>
+    .admin-dashboard {
+        position: fixed;
+        top: 0;
+        left: -250px; /* Ẩn dashboard ban đầu */
+        width: 250px;
+        height: 100vh;
+        background: rgba(0, 0, 0, 0.8);
+        color: white;
+        padding: 20px;
+        z-index: 999;
+        transition: left 0.3s ease-in-out; /* Hiệu ứng trượt */
+    }
+
+    .dashboard-toggle {
+        position: fixed;
+        top: 20px;
+        left: 10px;
+        background: #222;
+        color: white;
+        border: none;
+        padding: 10px;
+        cursor: pointer;
+        z-index: 1000;
+        transition: left 0.3s ease-in-out; /* Hiệu ứng trượt */
+    }
+
+        .dashboard-toggle:hover {
+            background: #444;
+        }
+</style>
+<script>
+    document.getElementById("toggleDashboard").addEventListener("click", function() {
+        let dashboard = document.getElementById("adminDashboard");
+        let toggleButton = document.getElementById("toggleDashboard");
+
+        if (dashboard.style.left === "-250px") {
+            dashboard.style.left = "0"; // Hiện Dashboard
+            toggleButton.style.left = "260px"; // Nút chuyển sang bên phải
+        } else {
+            dashboard.style.left = "-250px"; // Ẩn Dashboard
+            toggleButton.style.left = "10px"; // Nút chuyển lại bên trái
+        }
+    });
+</script>

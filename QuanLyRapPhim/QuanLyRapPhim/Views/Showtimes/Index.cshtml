@@ -10,8 +10,23 @@
 <div class="container my-5">
     <!-- Tiêu đề -->
     <h1 class="text-primary mb-2">Chọn lịch chiếu</h1>
-    <h4 class="text-primary mb-4">Phim: @movieTitle</h4>
+    @* <h4 class="text-primary mb-4">Phim: @movieTitle</h4> *@
 
+    <form class="search-form d-flex mb-4" asp-controller="Showtimes" asp-action="Search" method="get">
+        <input class="form-control me-2" type="text" name="searchTitle" placeholder="Nhập tên phim...">
+        <input class="form-control me-2" type="date" name="startDate" placeholder="Từ ngày">
+        <input class="form-control me-2" type="date" name="endDate" placeholder="Đến ngày">
+        <select class="form-control me-2" name="genre">
+            <option value="">Chọn thể loại...</option>
+            <option value="Hành động">Hành động</option>
+            <option value="Tình cảm">Tình cảm</option>
+            <option value="Kinh dị">Kinh dị</option>
+            <option value="Hoạt hình">Hoạt hình</option>
+            <option value="Khoa học viễn tưởng">Khoa học viễn tưởng</option>
+        </select>
+        <button class="btn btn-primary me-2" type="submit"><i class="fas fa-search"></i> Tìm kiếm</button>
+        <button class="btn btn-secondary" type="button" onclick="resetSearch()"><i class="fas fa-sync-alt"></i> Load lại trang</button>
+    </form>
     <!-- Thông báo lỗi nếu không có lịch chiếu -->
     @if (ViewBag.ErrorMessage != null)
     {
@@ -82,6 +97,23 @@
     </div>
 </div>
 
+
+@if (User.IsInRole("Admin"))
+{
+    <button id="toggleDashboard" class="dashboard-toggle">☰</button>
+    <aside id="adminDashboard" class="admin-dashboard">
+        <h4>Quản lý</h4>
+        <ul class="list-unstyled">
+            <li><a href="/Admin/Dashboard">📊 Dashboard</a></li>
+            <li><a href="/Movies">🎬 Danh sách phim</a></li>
+            <li><a href="/Showtimes">🕒 Lịch chiếu</a></li>
+            <li><a href="/Rooms">🏢 Quản lý phòng</a></li>
+            <li><a href="/Seats">💺 Quản lý ghế</a></li>
+            <li><a href="/Admin/ManageBookings">📌 Quản lý đặt vé</a></li>
+            <li><a href="/Admin/Reports">📑 Báo cáo thống kê</a></li>
+        </ul>
+    </aside>
+}
 <!-- CSS tùy chỉnh -->
 <style>
     body {
@@ -128,6 +160,22 @@
         border-radius: 0 0 15px 15px;
     }
 
+    .search-form input[type="text"],
+    .search-form input[type="date"],
+    .search-form input[type="time"],
+    .search-form select {
+        width: 150px; /* Giảm chiều rộng */
+        padding: 5px; /* Giảm padding */
+        font-size: 14px; /* Cỡ chữ nhỏ hơn */
+        border-radius: 6px; /* Bo góc nhẹ */
+    }
+
+    .search-form button {
+        padding: 6px 10px;
+        font-size: 14px;
+        border-radius: 6px;
+    }
+
     .btn-primary {
         background: linear-gradient(90deg, #ff6a88 0%, #6b48ff 100%);
         color: #fff;
@@ -141,6 +189,55 @@
             transform: scale(1.05);
         }
 </style>
+<style>
+    .admin-dashboard {
+        position: fixed;
+        top: 0;
+        left: -250px; /* Ẩn dashboard ban đầu */
+        width: 250px;
+        height: 100vh;
+        background: rgba(0, 0, 0, 0.8);
+        color: white;
+        padding: 20px;
+        z-index: 999;
+        transition: left 0.3s ease-in-out; /* Hiệu ứng trượt */
+    }
 
+    .dashboard-toggle {
+        position: fixed;
+        top: 20px;
+        left: 10px;
+        background: #222;
+        color: white;
+        border: none;
+        padding: 10px;
+        cursor: pointer;
+        z-index: 1000;
+        transition: left 0.3s ease-in-out; /* Hiệu ứng trượt */
+    }
+
+        .dashboard-toggle:hover {
+            background: #444;
+        }
+</style>
+<script>
+    document.getElementById("toggleDashboard").addEventListener("click", function() {
+        let dashboard = document.getElementById("adminDashboard");
+        let toggleButton = document.getElementById("toggleDashboard");
+
+        if (dashboard.style.left === "-250px") {
+            dashboard.style.left = "0"; // Hiện Dashboard
+            toggleButton.style.left = "260px"; // Nút chuyển sang bên phải
+        } else {
+            dashboard.style.left = "-250px"; // Ẩn Dashboard
+            toggleButton.style.left = "10px"; // Nút chuyển lại bên trái
+        }
+    });
+</script>
+<script>
+    function resetSearch() {
+        window.location.href = '/Showtimes/Search'; // Tải lại trang tìm kiếm
+    }
+</script>
 <!-- Thêm Font Awesome để sử dụng icon -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
