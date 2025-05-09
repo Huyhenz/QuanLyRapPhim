@@ -47,7 +47,7 @@ namespace QuanLyRapPhim.Controllers
 
             if (!string.IsNullOrEmpty(genre))
             {
-                showtimes = showtimes.Where(s => s.Movie.Genre.Equals(genre));
+                showtimes = showtimes.Where(s => s.Movie.Genre.Contains(genre));
             }
 
             return View("Index", showtimes.ToList());
