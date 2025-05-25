@@ -7,16 +7,21 @@
     var movieTitle = Model.FirstOrDefault()?.Movie?.Title ?? "Phim không xác định";
 }
 
-<div class="container my-5">
-    <!-- Tiêu đề -->
-    <h1 class="text-primary mb-2">Chọn lịch chiếu</h1>
-    <h4 class="text-primary mb-4">Phim: @movieTitle</h4>
+<div class="container my-5 position-relative">
+    <!-- Các hình tròn gradient trang trí -->
+    <div class="circle circle-1"></div>
+    <div class="circle circle-2"></div>
+    <div class="circle circle-3"></div>
 
-    <!-- Thông báo lỗi nếu không có lịch chiếu -->
+    <h1 class="text-primary mb-2">Chọn lịch chiếu</h1>
+    <h4 class="text-muted mb-4">Phim: @movieTitle</h4>
+
+    <!-- Thông báo lỗi -->
     @if (ViewBag.ErrorMessage != null)
     {
-        <div class="alert alert-warning" role="alert">
+        <div class="alert alert-warning alert-dismissible fade show" role="alert">
             @ViewBag.ErrorMessage
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     }
     else
@@ -26,34 +31,30 @@
             @foreach (var showtime in Model)
             {
                 <div class="col-md-4 col-lg-3 mb-4">
-                    <div class="card showtime-card h-100 shadow-sm">
-                        <!-- Poster phim -->
+                    <div class="card movie-card h-100 shadow-sm text-light">
                         <img src="@showtime.Poster" class="card-img-top" alt="@showtime.Title" style="height: 200px; object-fit: cover;" />
                         <div class="card-body">
-                            <h5 class="card-title text-light">@showtime.Title</h5>
+                            <h5 class="card-title">@showtime.Title</h5>
                             <p class="card-text">
                                 <i class="fas fa-calendar-alt text-primary me-2"></i>
                                 <strong>Ngày chiếu:</strong> @showtime.Date.ToString("dd/MM/yyyy")
                             </p>
                             <p class="card-text">
                                 <i class="fas fa-clock text-primary me-2"></i>
-                                <strong>Giờ chiếu:</strong> @showtime.StartTime
+                                <strong>Giờ chiếu:</strong> @showtime.StartTime.ToString(@"hh\:mm")
                             </p>
                         </div>
                         <div class="card-footer d-flex justify-content-between">
-                            <!-- Chọn lịch chiếu -->
                             <a asp-controller="Tickets" asp-action="SelectRoomAndSeat" asp-route-showtimeId="@showtime.ShowtimeId" class="btn btn-primary btn-sm">
                                 <i class="fas fa-ticket-alt me-1"></i> Chọn lịch này
                             </a>
-
-                            <!-- Chỉ hiển thị nếu là Admin -->
                             @if (User.IsInRole("Admin"))
                             {
                                 <div class="d-flex">
-                                    <a asp-controller="Showtimes" asp-action="Edit" asp-route-id="@showtime.ShowtimeId" class="btn btn-warning btn-sm me-2">
+                                    <a asp-action="Edit" asp-route-id="@showtime.ShowtimeId" class="btn btn-warning btn-sm me-2">
                                         <i class="fas fa-edit"></i> Sửa
                                     </a>
-                                    <a asp-controller="Showtimes" asp-action="Delete" asp-route-id="@showtime.ShowtimeId" class="btn btn-danger btn-sm">
+                                    <a asp-action="Delete" asp-route-id="@showtime.ShowtimeId" class="btn btn-danger btn-sm">
                                         <i class="fas fa-trash-alt"></i> Xóa
                                     </a>
                                 </div>
@@ -65,19 +66,16 @@
         </div>
     }
 
-    <!-- Nút quay lại, tạo lịch chiếu và quay lại danh sách phim -->
+    <!-- Nút quay lại và tạo lịch chiếu mới -->
     <div class="mt-4">
-        <!-- New Button to Create Showtime -->
         @if (User.IsInRole("Admin"))
         {
-            <a asp-controller="Showtimes" asp-action="Create" asp-route-movieId="@movieId" class="btn btn-success ms-3">
+            <a asp-action="Create" asp-route-movieId="@movieId" class="btn btn-primary">
                 <i class="fas fa-plus me-1"></i> Tạo lịch chiếu mới
             </a>
         }
-
-        <!-- New Button to go back to Movie List -->
-        <a asp-controller="Movies" asp-action="Index" class="btn btn-info ms-3">
-            <i class="fas fa-list me-1"></i> Quay lại danh sách phim
+        <a asp-controller="Movies" asp-action="Index" class="btn btn-back ms-3">
+            <i class="fas fa-arrow-left me-1"></i> Quay lại danh sách phim
         </a>
     </div>
 </div>
@@ -128,6 +126,22 @@
         border-radius: 0 0 15px 15px;
     }
 
+    .search-form input[type="text"],
+    .search-form input[type="date"],
+    .search-form input[type="time"],
+    .search-form select {
+        width: 150px; /* Giảm chiều rộng */
+        padding: 5px; /* Giảm padding */
+        font-size: 14px; /* Cỡ chữ nhỏ hơn */
+        border-radius: 6px; /* Bo góc nhẹ */
+    }
+
+    .search-form button {
+        padding: 6px 10px;
+        font-size: 14px;
+        border-radius: 6px;
+    }
+
     .btn-primary {
         background: linear-gradient(90deg, #ff6a88 0%, #6b48ff 100%);
         color: #fff;
@@ -141,6 +155,88 @@
             transform: scale(1.05);
         }
 </style>
+<style>
+    .admin-dashboard {
+        position: fixed;
+        top: 0;
+        left: -300px;
+        width: 300px;
+        height: 100vh;
+        background: linear-gradient(135deg, #222, #444);
+        color: white;
+        padding: 20px;
+        z-index: 999;
+        transition: left 0.4s ease-in-out;
+        box-shadow: 5px 0 15px rgba(0, 0, 0, 0.3);
+    }
 
+    .dashboard-toggle {
+        position: fixed;
+        top: 20px;
+        left: 10px;
+        background: #222;
+        color: white;
+        border: none;
+        padding: 12px 15px;
+        font-size: 18px;
+        cursor: pointer;
+        z-index: 1000;
+        border-radius: 50%;
+        box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.3);
+    }
+
+        .dashboard-toggle:hover {
+            background: #555;
+        }
+
+    .dashboard-header {
+        text-align: center;
+        font-size: 20px;
+        margin-bottom: 20px;
+    }
+
+    .dashboard-menu {
+        list-style: none;
+        padding: 0;
+    }
+
+        .dashboard-menu li {
+            margin-bottom: 15px;
+        }
+
+            .dashboard-menu li a {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                color: white;
+                text-decoration: none;
+                padding: 10px;
+                border-radius: 5px;
+                transition: background 0.3s ease;
+            }
+
+                .dashboard-menu li a:hover {
+                    background: rgba(255, 255, 255, 0.2);
+                }
+</style>
+<script>
+    document.getElementById("toggleDashboard").addEventListener("click", function() {
+        let dashboard = document.getElementById("adminDashboard");
+        let toggleButton = document.getElementById("toggleDashboard");
+
+        if (dashboard.style.left === "-300px") {
+            dashboard.style.left = "0";
+            toggleButton.style.left = "310px";
+        } else {
+            dashboard.style.left = "-300px";
+            toggleButton.style.left = "10px";
+        }
+    });
+</script>
+<script>
+    function resetSearch() {
+        window.location.href = '/Showtimes/Search'; // Tải lại trang tìm kiếm
+    }
+</script>
 <!-- Thêm Font Awesome để sử dụng icon -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />

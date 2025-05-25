@@ -10,7 +10,7 @@ namespace QuanLyRapPhim.Models
         public int MovieId { get; set; }
         [Url]
         public string Poster { get; set; }
-        public string StartTime { get; set; }
+        public TimeSpan StartTime { get; set; }
         public DateTime Date { get; set; }
         public int RoomId { get; set; }
         public Room? Room { get; set; }
