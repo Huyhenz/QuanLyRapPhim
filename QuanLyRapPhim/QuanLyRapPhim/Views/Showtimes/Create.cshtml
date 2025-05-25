@@ -15,34 +15,38 @@
                     <form asp-action="Create">
                         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
-                        <div class="form-group">
-                            <label asp-for="Title" class="control-label"></label>
-                            <input asp-for="Title" class="form-control" style="background-color: #333; border: 1px solid #444; color: #fff; border-radius: 20px; font-size: 1rem; font-weight: 500;" />
+                        <div class="form-group mb-3">
+                            <label asp-for="Title" class="control-label text-light"></label>
+                            <input asp-for="Title" class="form-control" />
                             <span asp-validation-for="Title" class="text-danger"></span>
                         </div>
-                        <div class="form-group">
-                            <label asp-for="MovieId" class="control-label"></label>
-                            <select asp-for="MovieId" class="form-control" asp-items="ViewBag.MovieId" style="background-color: #333; border: 1px solid #444; color: #fff; border-radius: 20px; font-size: 1rem; font-weight: 500;"></select>
+                        <div class="form-group mb-3">
+                            <label asp-for="MovieId" class="control-label text-light"></label>
+                            <select asp-for="MovieId" class="form-control" asp-items="ViewBag.MovieId">
+                                <option value="">-- Chọn phim --</option>
+                            </select>
                             <span asp-validation-for="MovieId" class="text-danger"></span>
                         </div>
-                        <div class="form-group">
-                            <label asp-for="RoomId" class="control-label"></label>
-                            <select asp-for="RoomId" class="form-control" asp-items="ViewBag.RoomId" style="background-color: #333; border: 1px solid #444; color: #fff; border-radius: 20px; font-size: 1rem; font-weight: 500;"></select>
+                        <div class="form-group mb-3">
+                            <label asp-for="RoomId" class="control-label text-light"></label>
+                            <select asp-for="RoomId" class="form-control" asp-items="ViewBag.RoomId">
+                                <option value="">-- Chọn phòng --</option>
+                            </select>
                             <span asp-validation-for="RoomId" class="text-danger"></span>
                         </div>
-                        <div class="form-group">
-                            <label asp-for="Poster" class="control-label"></label>
-                            <input asp-for="Poster" class="form-control" style="background-color: #333; border: 1px solid #444; color: #fff; border-radius: 20px; font-size: 1rem; font-weight: 500;" />
+                        <div class="form-group mb-3">
+                            <label asp-for="Poster" class="control-label text-light"></label>
+                            <input asp-for="Poster" class="form-control" />
                             <span asp-validation-for="Poster" class="text-danger"></span>
                         </div>
-                        <div class="form-group">
-                            <label asp-for="StartTime" class="control-label"></label>
-                            <input asp-for="StartTime" class="form-control" style="background-color: #333; border: 1px solid #444; color: #fff; border-radius: 20px; font-size: 1rem; font-weight: 500;" />
+                        <div class="form-group mb-3">
+                            <label asp-for="StartTime" class="control-label text-light"></label>
+                            <input asp-for="StartTime" class="form-control" type="time" />
                             <span asp-validation-for="StartTime" class="text-danger"></span>
                         </div>
-                        <div class="form-group">
-                            <label asp-for="Date" class="control-label"></label>
-                            <input asp-for="Date" class="form-control" type="date" style="background-color: #333; border: 1px solid #444; color: #fff; border-radius: 20px; font-size: 1rem; font-weight: 500;" />
+                        <div class="form-group mb-3">
+                            <label asp-for="Date" class="control-label text-light"></label>
+                            <input asp-for="Date" class="form-control" type="date" />
                             <span asp-validation-for="Date" class="text-danger"></span>
                         </div>
                         <div class="form-group d-flex justify-content-between mt-4">
@@ -89,8 +93,28 @@
         box-shadow: none;
     }
 
-    .btn-primary {
-        background-color: #ff0033;
+    .form-control {
+        background-color: #2a2a2a;
+        color: #e0e0e0;
+        border: 1px solid #444;
+        transition: border-color 0.3s ease;
+    }
+
+        .form-control:focus {
+            background-color: #2a2a2a;
+            color: #e0e0e0;
+            border-color: #007bff;
+            box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+        }
+
+    .control-label {
+        color: #e0e0e0;
+        font-weight: 500;
+    }
+
+    .btn-back {
+        background: linear-gradient(90deg, #4e54c8 0%, #8f94fb 100%);
+        color: #fff;
         border: none;
         border-radius: 20px;
         padding: 8px 20px;
@@ -121,8 +145,11 @@
         }
 </style>
 
+<!-- Thêm Font Awesome và Bootstrap -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
 @section Scripts {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
+    <partial name="_ValidationScriptsPartial" />
 }
