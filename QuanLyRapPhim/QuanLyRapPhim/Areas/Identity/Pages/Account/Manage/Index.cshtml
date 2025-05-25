@@ -5,52 +5,175 @@
     ViewData["ActivePage"] = ManageNavPages.Index;
 }
 
-<h3>@ViewData["Title"]</h3>
+<h3 class="text-white">@ViewData["Title"]</h3>
 <partial name="_StatusMessage" for="StatusMessage" />
 
-<div class="row">
-    <!-- Form cập nhật số điện thoại -->
-    <div class="col-md-6">
-        <h4>Cập nhật thông tin</h4>
-        <form id="profile-form" method="post" asp-page-handler="UpdateProfile">
-            <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
-            <div class="form-floating mb-3">
-                <input asp-for="Username" class="form-control" placeholder="Please choose your username." disabled />
-                <label asp-for="Username" class="form-label"></label>
+<div class="container-fluid vh-100 d-flex align-items-center justify-content-center position-relative overflow-hidden">
+    <!-- Khung bao quanh -->
+    <div class="frame-wrapper">
+        <div class="row w-100">
+            <!-- Form cập nhật số điện thoại -->
+            <div class="col-md-6">
+                <h4 class="text-white">Cập nhật thông tin</h4>
+                <form id="profile-form" method="post" asp-page-handler="UpdateProfile" class="form-card p-4">
+                    <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
+                    <div class="form-floating mb-3">
+                        <input asp-for="Username" class="form-control" placeholder="Please choose your username." disabled />
+                        <label asp-for="Username" class="form-label text-white"></label>
+                    </div>
+                    <div class="form-floating mb-3">
+                        <input asp-for="Input.PhoneNumber" class="form-control" placeholder="Please enter your phone number." />
+                        <label asp-for="Input.PhoneNumber" class="form-label text-white"></label>
+                        <span asp-validation-for="Input.PhoneNumber" class="text-danger"></span>
+                    </div>
+                    <button id="update-profile-button" type="submit" class="w-100 btn btn-create btn-lg">Save</button>
+                </form>
             </div>
-            <div class="form-floating mb-3">
-                <input asp-for="Input.PhoneNumber" class="form-control" placeholder="Please enter your phone number." />
-                <label asp-for="Input.PhoneNumber" class="form-label"></label>
-                <span asp-validation-for="Input.PhoneNumber" class="text-danger"></span>
-            </div>
-            <button id="update-profile-button" type="submit" class="w-100 btn btn-lg btn-primary">Save</button>
-        </form>
-    </div>
 
-    <!-- Form thay đổi mật khẩu -->
-    <div class="col-md-6">
-        <h4>Thay đổi mật khẩu</h4>
-        <form id="change-password-form" method="post" asp-page-handler="ChangePassword">
-            <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
-            <div class="form-floating mb-3">
-                <input asp-for="Input.OldPassword" type="password" class="form-control" placeholder="Old password" />
-                <label asp-for="Input.OldPassword" class="form-label">Mật khẩu cũ</label>
-                <span asp-validation-for="Input.OldPassword" class="text-danger"></span>
+            <!-- Form thay đổi mật khẩu -->
+            <div class="col-md-6">
+                <h4 class="text-white">Thay đổi mật khẩu</h4>
+                <form id="change-password-form" method="post" asp-page-handler="ChangePassword" class="form-card p-4">
+                    <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
+                    <div class="form-floating mb-3">
+                        <input asp-for="Input.OldPassword" type="password" class="form-control" placeholder="Old password" />
+                        <label asp-for="Input.OldPassword" class="form-label text-white">Mật khẩu cũ</label>
+                        <span asp-validation-for="Input.OldPassword" class="text-danger"></span>
+                    </div>
+                    <div class="form-floating mb-3">
+                        <input asp-for="Input.NewPassword" type="password" class="form-control" placeholder="New password" />
+                        <label asp-for="Input.NewPassword" class="form-label text-white">Mật khẩu mới</label>
+                        <span asp-validation-for="Input.NewPassword" class="text-danger"></span>
+                    </div>
+                    <div class="form-floating mb-3">
+                        <input asp-for="Input.ConfirmPassword" type="password" class="form-control" placeholder="Confirm new password" />
+                        <label asp-for="Input.ConfirmPassword" class="form-label text-white">Xác nhận mật khẩu mới</label>
+                        <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
+                    </div>
+                    <button id="change-password-button" type="submit" class="w-100 btn btn-create btn-lg">Change Password</button>
+                </form>
             </div>
-            <div class="form-floating mb-3">
-                <input asp-for="Input.NewPassword" type="password" class="form-control" placeholder="New password" />
-                <label asp-for="Input.NewPassword" class="form-label">Mật khẩu mới</label>
-                <span asp-validation-for="Input.NewPassword" class="text-danger"></span>
-            </div>
-            <div class="form-floating mb-3">
-                <input asp-for="Input.ConfirmPassword" type="password" class="form-control" placeholder="Confirm new password" />
-                <label asp-for="Input.ConfirmPassword" class="form-label">Xác nhận mật khẩu mới</label>
-                <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
-            </div>
-            <button id="change-password-button" type="submit" class="w-100 btn btn-lg btn-primary">Change Password</button>
-        </form>
+        </div>
     </div>
 </div>
+
+<style>
+    body {
+        background-color: #0F0F0F; /* Đen */
+        margin: 0;
+        font-family: 'Montserrat', sans-serif;
+        overflow: hidden;
+    }
+
+    .vh-100 {
+        height: 100vh;
+    }
+
+    .container-fluid {
+        display: flex;
+        width: 100%;
+        height: 100%;
+        align-items: center;
+        justify-content: center;
+    }
+
+    /* Khung bao quanh */
+    .frame-wrapper {
+        display: flex;
+        width: 90%;
+        max-width: 1200px;
+        height: 80%;
+        background: #2e2e2e; /* Nền sáng hơn */
+        border-radius: 15px;
+        border: 4px solid #2e2e2e; /* Viền cùng màu với nền */
+        box-shadow: 0 0 20px rgba(46, 46, 46, 0.4); /* Bóng đổ khớp với nền */
+        overflow: hidden;
+        padding: 20px;
+    }
+
+    .row {
+        display: flex;
+        flex-wrap: wrap;
+        margin: 0;
+        width: 100%;
+    }
+
+    .col-md-6 {
+        flex: 0 0 50%;
+        max-width: 50%;
+        padding: 0 15px;
+    }
+
+    h3, h4 {
+        font-weight: 700;
+        text-transform: uppercase;
+        color: #ffffff;
+        margin-bottom: 20px;
+    }
+
+    .form-card {
+        background: #1c1c1c;
+        border-radius: 10px;
+        border: 1px solid transparent;
+        background-image: linear-gradient(rgba(28, 28, 28, 0.9), rgba(28, 28, 28, 0.9)), linear-gradient(45deg, #e50914, #0F0F0F);
+        background-origin: border-box;
+        background-clip: padding-box, border-box;
+        padding: 30px;
+        z-index: 2;
+    }
+
+    .form-control {
+        border-radius: 5px;
+        padding: 12px;
+        font-size: 16px;
+        border: 1px solid #cc0022;
+        background: #2a2a2a;
+        color: #ffffff;
+        transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    }
+
+        .form-control:focus {
+            border-color: #ff0033;
+            box-shadow: 0 0 5px rgba(255, 0, 51, 0.5);
+            background: #333;
+            color: #ffffff;
+        }
+
+        .form-control::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .form-control:disabled {
+            background: #333;
+            opacity: 0.7;
+        }
+
+    .form-label {
+        font-size: 14px;
+        font-weight: 500;
+        color: #ffffff;
+        margin-bottom: 5px;
+    }
+
+    .btn-create {
+        background: linear-gradient(90deg, #ff0033 0%, #e50914 100%);
+        border: none;
+        border-radius: 5px;
+        padding: 12px;
+        font-size: 16px;
+        color: #ffffff;
+        font-weight: 600;
+        transition: background 0.3s ease;
+    }
+
+        .btn-create:hover {
+            background: linear-gradient(90deg, #e6002e 0%, #d30912 100%);
+        }
+
+    .text-danger {
+        font-size: 14px;
+    }
+</style>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />

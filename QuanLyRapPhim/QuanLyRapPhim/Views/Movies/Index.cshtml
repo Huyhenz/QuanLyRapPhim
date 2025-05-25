@@ -3,144 +3,246 @@
 @{
     ViewData["Title"] = "Danh sách phim";
     Layout = "~/Views/Shared/_Layout.cshtml";
+    var random = new Random(); // Tạo đối tượng Random để sinh số ngẫu nhiên
 }
 
 <!-- Danh sách phim -->
-<div class="container my-5 position-relative">
-    <!-- Các hình tròn gradient trang trí -->
-    <div class="circle circle-1"></div>
-    <div class="circle circle-2"></div>
-    <div class="circle circle-3"></div>
-
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1 class="text-primary">Danh sách phim</h1>
-        @if (User.IsInRole("Admin"))
-        {
-            <a asp-action="Create" class="btn btn-primary">Thêm phim mới</a>
-        }
-    </div>
-
-    @if (User.IsInRole("Admin"))
-    {
-        <button id="toggleDashboard" class="dashboard-toggle"><i class="fas fa-bars"></i></button>
-        <aside id="adminDashboard" class="admin-dashboard">
-            <div class="dashboard-header">
-                <h4><i class="fas fa-user-shield"></i> Quản lý Admin</h4>
-            </div>
-            <ul class="dashboard-menu">
-                <li><a href="/Admin/Dashboard"><i class="fas fa-chart-line"></i> Dashboard</a></li>
-                <li><a href="/Movies"><i class="fas fa-film"></i> Danh sách phim</a></li>
-                <li><a href="/Showtimes"><i class="fas fa-clock"></i> Lịch chiếu</a></li>
-                <li><a href="/Rooms"><i class="fas fa-door-open"></i> Quản lý phòng</a></li>
-                <li><a href="/Seats"><i class="fas fa-chair"></i> Quản lý ghế</a></li>
-                <li><a href="/Admin/ManageBookings"><i class="fas fa-ticket-alt"></i> Quản lý đặt vé</a></li>
-                <li><a href="/Admin/Reports"><i class="fas fa-file-alt"></i> Báo cáo thống kê</a></li>
-            </ul>
-        </aside>
-    }
-    <!-- Danh sách phim dạng thẻ -->
-    <div class="row">
-        @foreach (var item in Model)
-        {
-            <div class="col-md-4 col-lg-3 mb-4">
-                <div class="card movie-card h-100">
-                    <div class="poster-container">
-                        <img src="@item.Poster" class="card-img-top movie-poster" alt="@item.Title" />
-                    </div>
-                    <div class="card-body">
-                        <h5 class="card-title text-primary">@item.Title</h5>
-                        <p class="card-text text-description">
-                            @if (string.IsNullOrEmpty(item.Description))
-                            {
-                                <span>Chưa có mô tả</span>
-                            }
-                            else if (item.Description.Length > 100)
-                            {
-                                @(item.Description.Substring(0, 100) + "...")
-                            }
-                            else
-                            {
-                                @item.Description
-                            }
-                        </p>
-                        <p class="card-text text-description"><strong>Thể loại:</strong> @item.Genre</p>
-                        <p class="card-text text-description"><strong>Thời lượng:</strong> @item.Duration phút</p>
-                    </div>
-                    <div class="card-footer d-flex justify-content-between">
-                        <a asp-action="Details" asp-route-id="@item.MovieId" class="btn btn-primary">Chi tiết</a>
-                        @if (User.IsInRole("Admin"))
-                        {
-                            <div>
-                                <a asp-action="Edit" asp-route-id="@item.MovieId" class="btn btn-warning btn-sm">Sửa</a>
-                                <a asp-action="Delete" asp-route-id="@item.MovieId" class="btn btn-danger btn-sm">Xóa</a>
-                            </div>
-                        }
-                    </div>
+<div class="container-fluid vh-100 d-flex flex-column justify-content-center position-relative overflow-hidden">
+    <!-- Khung bao quanh -->
+    <div class="frame-wrapper flex-grow-1">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h1 class="text-white">Danh sách phim</h1>
+                <div class="date-selection mb-2">
+                    <label class="text-white me-2">Chọn ngày:</label>
+                    <select id="dateSelect" class="form-select form-select-sm w-auto d-inline-block">
+                        <option value="2025-05-26">Mon, May 26, 2025</option>
+                        <option value="2025-05-27">Tue, May 27, 2025</option>
+                        <option value="2025-05-28">Wed, May 28, 2025</option>
+                        <option value="2025-05-29">Thu, May 29, 2025</option>
+                        <option value="2025-05-30">Fri, May 30, 2025</option>
+                        <option value="2025-05-31">Sat, May 31, 2025</option>
+                        <option value="2025-06-01">Sun, Jun 01, 2025</option>
+                    </select>
                 </div>
             </div>
+            @if (User.IsInRole("Admin"))
+            {
+                <a asp-action="Create" class="btn btn-create">Thêm phim mới</a>
+            }
+        </div>
+
+        @if (User.IsInRole("Admin"))
+        {
+            <button id="toggleDashboard" class="dashboard-toggle"><i class="fas fa-bars"></i></button>
+            <aside id="adminDashboard" class="admin-dashboard">
+                <div class="dashboard-header">
+                    <h4><i class="fas fa-user-shield"></i> Quản lý Admin</h4>
+                </div>
+                <ul class="dashboard-menu">
+                    <li><a href="/Admin/Dashboard"><i class="fas fa-chart-line"></i> Dashboard</a></li>
+                    <li><a href="/Movies"><i class="fas fa-film"></i> Danh sách phim</a></li>
+                    <li><a href="/Showtimes"><i class="fas fa-clock"></i> Lịch chiếu</a></li>
+                    <li><a href="/Rooms"><i class="fas fa-door-open"></i> Quản lý phòng</a></li>
+                    <li><a href="/Seats"><i class="fas fa-chair"></i> Quản lý ghế</a></li>
+                    <li><a href="/Admin/ManageBookings"><i class="fas fa-ticket-alt"></i> Quản lý đặt vé</a></li>
+                    <li><a href="/Admin/Reports"><i class="fas fa-file-alt"></i> Báo cáo thống kê</a></li>
+                </ul>
+            </aside>
         }
+        <!-- Danh sách phim dạng thẻ -->
+        <div class="row">
+            @foreach (var item in Model)
+            {
+                <!-- Tính toán số sao dựa trên trung bình Rating từ Reviews -->
+                double rating = 0;
+                if (item.Reviews != null && item.Reviews.Any())
+                {
+                    rating = item.Reviews.Average(r => r.Rating); // Tính trung bình
+                }
+                int fullStars = (int)Math.Floor(rating);
+                bool hasHalfStar = (rating % 1) >= 0.5;
+                <!-- Tạo số lượng đánh giá ngẫu nhiên từ 0 đến 50 -->
+                int reviewCount = random.Next(0, 51); // Số ngẫu nhiên từ 0 đến 50
+                <div class="col-md-4 col-lg-3 mb-4">
+                    <div class="card movie-card">
+                        <div class="poster-container">
+                            <img src="@item.Poster" class="card-img-top movie-poster" alt="@item.Title" />
+                        </div>
+                        <div class="card-body">
+                            <h5 class="card-title text-white">@item.Title</h5>
+                            <p class="card-text text-description">
+                                @if (string.IsNullOrEmpty(item.Description))
+                                {
+                                    <span>Chưa có mô tả</span>
+                                }
+                                else if (item.Description.Length > 100)
+                                {
+                                    @(item.Description.Substring(0, 100) + "...")
+                                }
+                                else
+                                {
+                                    @item.Description
+                                }
+                            </p>
+                            <!-- Đánh giá sao động -->
+                            <div class="star-rating mb-2">
+                                @for (int i = 1; i <= 5; i++)
+                                {
+                                    if (i <= fullStars)
+                                    {
+                                        <span class="fas fa-star rated"></span>
+                                    }
+                                    else if (i == fullStars + 1 && hasHalfStar)
+                                    {
+                                        <span class="fas fa-star-half-alt rated"></span>
+                                    }
+                                    else
+                                    {
+                                        <span class="fas fa-star"></span>
+                                    }
+                                }
+                                <span class="rating-text"> (@(rating > 0 ? rating.ToString("F1") : "Chưa có đánh giá")/5) (@reviewCount đánh giá)</span>
+                            </div>
+                            <p class="card-text text-description"><strong>Thể loại:</strong> @item.Genre</p>
+                            <p class="card-text text-description"><strong>Thời lượng:</strong> @item.Duration phút</p>
+                        </div>
+                        <div class="card-footer d-flex justify-content-between">
+                            <a asp-action="Details" asp-route-id="@item.MovieId" class="btn btn-create btn-sm">Chi tiết</a>
+                            @if (User.IsInRole("Admin"))
+                            {
+                                <div>
+                                    <a asp-action="Edit" asp-route-id="@item.MovieId" class="btn btn-warning btn-sm">Sửa</a>
+                                    <a asp-action="Delete" asp-route-id="@item.MovieId" class="btn btn-danger btn-sm">Xóa</a>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
     </div>
+
+    <!-- Footer -->
+    <footer class="footer text-center py-3">
+        <p class="text-white mb-0">© 2025 CinemaX. All rights reserved. | Last updated: 06:19 PM +07, May 25, 2025</p>
+    </footer>
 </div>
 
 <!-- CSS tùy chỉnh -->
 <style>
     body {
-        background: linear-gradient(135deg, #ff9a8b 0%, #ff6a88 50%, #6b48ff 100%);
-        color: #333;
-        font-family: 'Arial', sans-serif;
+        background-color: #0F0F0F; /* Đen */
+        margin: 0;
+        font-family: 'Montserrat', sans-serif;
+        overflow: hidden;
     }
 
-    .container {
-        padding-top: 20px;
-        padding-bottom: 20px;
+    .vh-100 {
+        height: 100vh;
     }
 
-    .circle {
-        position: absolute;
-        border-radius: 50%;
-        background: linear-gradient(135deg, #ff9a8b 0%, #ff6a88 50%, #6b48ff 100%);
-        opacity: 0.3;
+    .container-fluid {
+        display: flex;
+        width: 100%;
+        height: 100%;
+        align-items: center;
+        justify-content: center;
     }
 
-    .circle-1 {
-        width: 300px;
-        height: 300px;
-        top: -50px;
-        left: -50px;
+    /* Khung bao quanh */
+    .frame-wrapper {
+        display: flex;
+        flex-direction: column;
+        width: 90%;
+        max-width: 1200px;
+        height: 80%;
+        background: #2e2e2e; /* Nền xám tối */
+        border-radius: 20px;
+        border: 4px solid #2e2e2e; /* Viền cùng màu nền */
+        box-shadow: 0 0 25px rgba(46, 46, 46, 0.5);
+        overflow: hidden;
+        padding: 20px;
     }
 
-    .circle-2 {
-        width: 200px;
-        height: 200px;
-        bottom: -50px;
-        left: 50px;
+    .row {
+        display: flex;
+        flex-wrap: wrap;
+        margin: 0 -10px;
+        height: 100%;
+        overflow-y: auto;
     }
 
-    .circle-3 {
-        width: 150px;
-        height: 150px;
-        top: 50%;
-        left: 20%;
+    .col-md-4, .col-lg-3 {
+        flex: 0 0 25%;
+        max-width: 25%;
+        padding: 0 10px;
     }
+
+    h1 {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #ffffff;
+        text-transform: uppercase;
+        margin-bottom: 10px;
+        background: linear-gradient(90deg, #ff0033 0%, #e50914 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .date-selection {
+        font-size: 0.9rem;
+    }
+
+    .form-select {
+        background: #1c1c1c;
+        border: 1px solid #cc0022;
+        color: #ffffff;
+        border-radius: 8px;
+        padding: 5px 10px;
+    }
+
+        .form-select:focus {
+            border-color: #ff0033;
+            box-shadow: 0 0 10px rgba(255, 0, 51, 0.5);
+        }
 
     .movie-card {
-        background: rgba(255, 255, 255, 0.1); /* Nền trong suốt hơn */
-        backdrop-filter: blur(10px);
+        background: #1c1c1c;
         border-radius: 15px;
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        border: 1px solid transparent;
+        background-image: linear-gradient(rgba(28, 28, 28, 0.9), rgba(28, 28, 28, 0.9)), linear-gradient(45deg, #e50914, #0F0F0F);
+        background-origin: border-box;
+        background-clip: padding-box, border-box;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        transition: transform 0.3s ease;
         overflow: hidden;
-        border: none;
-        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
-        color: inherit;
     }
 
         .movie-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+        }
+
+    .poster-container {
+        overflow: hidden;
+        border-radius: 15px 15px 0 0;
+        position: relative;
+    }
+
+        .poster-container:hover::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: 15px 15px 0 0;
+            border: 2px solid rgba(255, 0, 51, 0.5);
+            box-shadow: 0 0 15px rgba(255, 0, 51, 0.3);
         }
 
     .movie-poster {
-        border-radius: 15px 15px 0 0;
+        width: 100%;
         height: 300px;
         object-fit: cover;
         transition: transform 0.3s ease;
@@ -150,33 +252,66 @@
             transform: scale(1.05);
         }
 
-    .card-body, .card-footer {
-        background: transparent !important;
-        backdrop-filter: blur(10px);
-        color: inherit;
+    .card-body {
+        padding: 20px;
     }
 
-    .text-primary {
-        color: #333;
-        font-weight: bold;
+    .card-title {
+        font-size: 1.3rem;
+        font-weight: 700;
+        margin-bottom: 12px;
     }
 
     .text-description {
-        color: #000;
+        font-size: 0.85rem;
+        color: #cccccc;
+        margin-bottom: 8px;
+        line-height: 1.4;
     }
 
-    .btn-primary {
-        background: linear-gradient(90deg, #ff6a88 0%, #6b48ff 100%);
-        color: #fff;
+    .star-rating {
+        font-size: 0.9rem;
+        color: #ffca28;
+    }
+
+        .star-rating .fas {
+            margin-right: 2px;
+        }
+
+        .star-rating .rated {
+            color: #ffca28; /* Sao sáng */
+        }
+
+        .star-rating .fa-star-half-alt {
+            color: #ffca28; /* Sao nửa sáng */
+        }
+
+    .rating-text {
+        font-size: 0.8rem;
+        color: #cccccc;
+        margin-left: 5px;
+    }
+
+    .card-footer {
+        background: transparent;
+        padding: 12px;
+        border-top: 1px solid #444;
+    }
+
+    .btn-create {
+        background: linear-gradient(90deg, #ff0033 0%, #e50914 100%);
         border: none;
         border-radius: 8px;
-        padding: 10px 20px;
-        transition: background 0.3s ease;
+        padding: 8px 15px;
+        font-size: 14px;
+        color: #ffffff;
+        font-weight: 600;
+        transition: background 0.3s ease, transform 0.2s ease;
     }
 
-        .btn-primary:hover {
-            background: linear-gradient(90deg, #ff6a88 50%, #6b48ff 100%);
-            transform: scale(1.05);
+        .btn-create:hover {
+            background: linear-gradient(90deg, #e6002e 0%, #d30912 100%);
+            transform: translateY(-2px);
         }
 
     .btn-warning {
@@ -185,6 +320,7 @@
         border: none;
         border-radius: 8px;
         padding: 5px 15px;
+        margin-left: 5px;
     }
 
         .btn-warning:hover {
@@ -197,13 +333,14 @@
         border: none;
         border-radius: 8px;
         padding: 5px 15px;
+        margin-left: 5px;
     }
 
         .btn-danger:hover {
             background-color: #cc0000;
         }
-</style>
-<style>
+
+    /* Admin Dashboard */
     .admin-dashboard {
         position: fixed;
         top: 0;
@@ -266,7 +403,23 @@
                 .dashboard-menu li a:hover {
                     background: rgba(255, 255, 255, 0.2);
                 }
+
+    /* Footer */
+    .footer {
+        background: #1a1a1a;
+        border-top: 1px solid #2e2e2e;
+        width: 90%;
+        max-width: 1200px;
+        margin: 0 auto;
+        border-radius: 0 0 20px 20px;
+    }
+
+        .footer p {
+            font-size: 12px;
+            color: #cccccc;
+        }
 </style>
+
 <script>
     document.getElementById("toggleDashboard").addEventListener("click", function() {
         let dashboard = document.getElementById("adminDashboard");
@@ -279,5 +432,11 @@
             dashboard.style.left = "-300px";
             toggleButton.style.left = "10px";
         }
+    });
+
+    // Thêm sự kiện thay đổi ngày (chỉ thay đổi giao diện, không ảnh hưởng logic)
+    document.getElementById("dateSelect").addEventListener("change", function() {
+        let selectedDate = this.value;
+        console.log("Selected date: " + selectedDate); // Có thể mở rộng để tải suất phim tương ứng
     });
 </script>

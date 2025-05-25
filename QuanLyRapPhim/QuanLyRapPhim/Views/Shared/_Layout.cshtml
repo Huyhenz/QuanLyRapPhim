@@ -24,12 +24,35 @@
             font-family: 'Roboto', sans-serif;
             background-color: #F5A89A; /* Màu nền tối giống giao diện */
         }
+
+        .navbar {
+            background-color: #1C2526 !important; /* Màu Smoke Black */
+            border-bottom: 1px solid #0F1213; /* Viền dưới Smoke Black đậm hơn */
+        }
+
+        .navbar-brand {
+            color: #FFDAB9 !important; /* Màu đào nhạt cho logo */
+            font-weight: bold;
+        }
+
+        .nav-link {
+            color: #FFDAB9 !important; /* Màu đào nhạt cho liên kết */
+            transition: color 0.3s ease; /* Hiệu ứng chuyển màu mượt */
+        }
+
+            .nav-link:hover {
+                color: #FFFFFF !important; /* Trắng khi hover */
+            }
+
+        .navbar-toggler-icon {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='%23FFDAB9' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e") !important; /* Màu đào nhạt cho icon toggler */
+        }
     </style>
 </head>
 
 <body>
     <header>
-        <nav class="navbar navbar-expand-lg shadow" style="background-color: lightpink;">
+        <nav class="navbar navbar-expand-lg shadow">
             <div class="container">
                 <!-- Logo -->
                 <a class="navbar-brand fw-bold" asp-area="" asp-controller="Home" asp-action="Index">
@@ -44,13 +67,13 @@
                 <div class="collapse navbar-collapse" id="navbarNav">
                     <ul class="navbar-nav me-auto">
                         <li class="nav-item">
-                            <a class="nav-link active text-danger" asp-area="" asp-controller="Home" asp-action="Index">
+                            <a class="nav-link active" asp-area="" asp-controller="Home" asp-action="Index">
                                 <i class="fas fa-home"></i> Trang chủ
                             </a>
                         </li>
-                         <li class="nav-item"> 
-                            <a class="nav-link text-secondary" asp-area="" asp-controller="Home" asp-action="Privacy"> 
-                                <i class="fas fa-shield-alt"></i> Chính sách 
+                        <li class="nav-item">
+                            <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Privacy">
+                                <i class="fas fa-shield-alt"></i> Chính sách
                             </a>
                         </li>
                     </ul>

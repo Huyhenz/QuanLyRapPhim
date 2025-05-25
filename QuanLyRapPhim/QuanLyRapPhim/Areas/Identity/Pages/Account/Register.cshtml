@@ -7,164 +7,198 @@
 
 <!-- Đăng ký -->
 <div class="container-fluid vh-100 d-flex align-items-center justify-content-center position-relative overflow-hidden">
-    <!-- Các hình tròn gradient trang trí -->
-    <div class="circle circle-1"></div>
-    <div class="circle circle-2"></div>
-    <div class="circle circle-3"></div>
+    <!-- Khung bao quanh -->
+    <div class="frame-wrapper">
+        <!-- Form đăng ký bên trái -->
+        <div class="left-section">
+            <div class="card shadow-lg border-0 register-card p-4">
+                <h2 class="mb-3 text-white">Đăng ký</h2>
+                <form id="registerForm" asp-route-returnUrl="@Model.ReturnUrl" method="post">
+                    <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
 
-    <!-- Form đăng ký -->
-    <div class="card shadow-lg border-0 register-card p-4">
-        <h2 class="mb-3">Đăng ký</h2>
-        <form id="registerForm" asp-route-returnUrl="@Model.ReturnUrl" method="post">
-            <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
+                    <!-- Name -->
+                    <div class="mb-3">
+                        <label asp-for="Input.Name" class="form-label text-white">Họ và tên</label>
+                        <input asp-for="Input.Name" class="form-control" placeholder="Họ và tên" />
+                        <span asp-validation-for="Input.Name" class="text-danger"></span>
+                    </div>
 
-            <!-- Name -->
-            <div class="mb-3">
-                <label asp-for="Input.Name" class="form-label">Họ và tên</label>
-                <input asp-for="Input.Name" class="form-control" placeholder="Họ và tên" />
-                <span asp-validation-for="Input.Name" class="text-danger"></span>
+                    <!-- Date of Birth -->
+                    <div class="mb-3">
+                        <label asp-for="Input.DOB" class="form-label text-white">Ngày sinh</label>
+                        <input asp-for="Input.DOB" type="date" class="form-control" placeholder="Ngày sinh" />
+                        <span asp-validation-for="Input.DOB" class="text-danger"></span>
+                    </div>
+
+                    <!-- Email -->
+                    <div class="mb-3">
+                        <label asp-for="Input.Email" class="form-label text-white">Email</label>
+                        <input asp-for="Input.Email" class="form-control" autocomplete="username" aria-required="true" placeholder="username@gmail.com" />
+                        <span asp-validation-for="Input.Email" class="text-danger"></span>
+                    </div>
+
+                    <!-- Password -->
+                    <div class="mb-3">
+                        <label asp-for="Input.Password" class="form-label text-white">Mật khẩu</label>
+                        <input asp-for="Input.Password" class="form-control" autocomplete="new-password" aria-required="true" placeholder="********" />
+                        <span asp-validation-for="Input.Password" class="text-danger"></span>
+                    </div>
+
+                    <!-- Confirm Password -->
+                    <div class="mb-3">
+                        <label asp-for="Input.ConfirmPassword" class="form-label text-white">Xác nhận mật khẩu</label>
+                        <input asp-for="Input.ConfirmPassword" class="form-control" autocomplete="new-password" aria-required="true" placeholder="********" />
+                        <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
+                    </div>
+
+                    <!-- Nút Đăng ký -->
+                    <div class="d-grid mb-4">
+                        <button id="registerSubmit" type="submit" class="btn btn-create btn-lg">Đăng ký</button>
+                    </div>
+
+                    <!-- Liên kết đăng nhập -->
+                    <div class="text-center">
+                        <p class="text-white">
+                            Đã có tài khoản? <a asp-page="./Login" asp-route-returnUrl="@Model.ReturnUrl" class="text-light-red">Đăng nhập</a>
+                        </p>
+                    </div>
+                </form>
+
+                <!-- Đăng ký bằng dịch vụ bên ngoài -->
+                @if ((Model.ExternalLogins?.Count ?? 0) > 0)
+                {
+                    <hr class="my-4 border-light" />
+                    <h5 class="text-center text-white mb-3">Hoặc đăng ký bằng</h5>
+                    <form id="external-account" asp-page="./ExternalLogin" asp-route-returnUrl="@Model.ReturnUrl" method="post" class="form-horizontal">
+                        <div class="d-flex justify-content-center gap-3">
+                            @foreach (var provider in Model.ExternalLogins!)
+                            {
+                                <button type="submit" class="btn btn-outline-secondary" name="provider" value="@provider.Name" title="Đăng ký bằng tài khoản @provider.DisplayName">
+                                    <i class="fab fa-@provider.Name.ToLower()"></i>
+                                </button>
+                            }
+                        </div>
+                    </form>
+                }
             </div>
+        </div>
 
-            <!-- Date of Birth -->
-            <div class="mb-3">
-                <label asp-for="Input.DOB" class="form-label">Ngày sinh</label>
-                <input asp-for="Input.DOB" type="date" class="form-control" placeholder="Ngày sinh" />
-                <span asp-validation-for="Input.DOB" class="text-danger"></span>
+        <!-- Phần hình ảnh bên phải -->
+        <div class="right-section">
+            <div class="intro-text">
+                <h2 class="text-white">CinemaX</h2>
+                <h3 class="text-white">Experience movies like never before – only at</h3>
             </div>
-
-            <!-- Email -->
-            <div class="mb-3">
-                <label asp-for="Input.Email" class="form-label">Email</label>
-                <input asp-for="Input.Email" class="form-control" autocomplete="username" aria-required="true" placeholder="username@gmail.com" />
-                <span asp-validation-for="Input.Email" class="text-danger"></span>
-            </div>
-
-            <!-- Password -->
-            <div class="mb-3">
-                <label asp-for="Input.Password" class="form-label">Mật khẩu</label>
-                <input asp-for="Input.Password" class="form-control" autocomplete="new-password" aria-required="true" placeholder="********" />
-                <span asp-validation-for="Input.Password" class="text-danger"></span>
-            </div>
-
-            <!-- Confirm Password -->
-            <div class="mb-3">
-                <label asp-for="Input.ConfirmPassword" class="form-label">Xác nhận mật khẩu</label>
-                <input asp-for="Input.ConfirmPassword" class="form-control" autocomplete="new-password" aria-required="true" placeholder="********" />
-                <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
-            </div>
-
-            <!-- Nút Đăng ký -->
-            <div class="d-grid mb-4">
-                <button id="registerSubmit" type="submit" class="btn btn-primary btn-lg">Đăng ký</button>
-            </div>
-
-            <!-- Liên kết đăng nhập -->
-            <div class="text-center">
-                <p class="text-muted">
-                    Đã có tài khoản? <a asp-page="./Login" asp-route-returnUrl="@Model.ReturnUrl" class="text-primary">Đăng nhập</a>
-                </p>
-            </div>
-        </form>
-
-        <!-- Đăng ký bằng dịch vụ bên ngoài -->
-        @if ((Model.ExternalLogins?.Count ?? 0) > 0)
-        {
-            <hr class="my-4" />
-            <h5 class="text-center text-muted mb-3">Hoặc đăng ký bằng</h5>
-            <form id="external-account" asp-page="./ExternalLogin" asp-route-returnUrl="@Model.ReturnUrl" method="post" class="form-horizontal">
-                <div class="d-flex justify-content-center gap-3">
-                    @foreach (var provider in Model.ExternalLogins!)
-                    {
-                        <button type="submit" class="btn btn-outline-secondary" name="provider" value="@provider.Name" title="Đăng ký bằng tài khoản @provider.DisplayName">
-                            <i class="fab fa-@provider.Name.ToLower()"></i>
-                        </button>
-                    }
-                </div>
-            </form>
-        }
+        </div>
     </div>
 </div>
 
 <!-- CSS tùy chỉnh -->
 <style>
     body {
-        background: linear-gradient(135deg, #ff9a8b 0%, #ff6a88 50%, #6b48ff 100%);
+        background-color: #0F0F0F; /* Đen */
         margin: 0;
-        font-family: 'Arial', sans-serif;
+        font-family: 'Montserrat', sans-serif;
+        overflow: hidden;
     }
 
     .vh-100 {
         height: 100vh;
     }
 
-    /* Các hình tròn gradient trang trí */
-    .circle {
-        position: absolute;
-        border-radius: 50%;
-        background: linear-gradient(135deg, #ff9a8b 0%, #ff6a88 50%, #6b48ff 100%);
-        opacity: 0.3;
+    .container-fluid {
+        display: flex;
+        width: 100%;
+        height: 100%;
+        align-items: center;
+        justify-content: center;
     }
 
-    .circle-1 {
-        width: 300px;
-        height: 300px;
-        top: -50px;
-        left: -50px;
+    /* Khung bao quanh */
+    .frame-wrapper {
+        display: flex;
+        width: 90%;
+        max-width: 1200px;
+        height: 80%;
+        background: #2e2e2e; /* Nền sáng hơn */
+        border-radius: 15px;
+        border: 4px solid #2e2e2e; /* Viền cùng màu với nền */
+        box-shadow: 0 0 20px rgba(46, 46, 46, 0.4); /* Bóng đổ khớp với nền */
+        overflow: hidden;
     }
 
-    .circle-2 {
-        width: 200px;
-        height: 200px;
-        bottom: -50px;
-        left: 50px;
+    /* Phần form bên trái */
+    .left-section {
+        flex: 1;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background-color: #2e2e2e;
     }
 
-    .circle-3 {
-        width: 150px;
-        height: 150px;
-        top: 50%;
-        left: 20%;
-    }
-
-    /* Form đăng ký */
     .register-card {
         max-width: 400px;
         width: 100%;
-        background-color: #fff;
-        border-radius: 15px;
-        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        background: #1c1c1c;
+        border-radius: 10px;
+        border: 1px solid transparent;
+        background-image: linear-gradient(rgba(28, 28, 28, 0.9), rgba(28, 28, 28, 0.9)), linear-gradient(45deg, #e50914, #0F0F0F);
+        background-origin: border-box;
+        background-clip: padding-box, border-box;
+        padding: 30px;
+        z-index: 2;
+    }
+
+    h2 {
+        font-size: 2rem;
+        font-weight: 700;
+        text-align: center;
+        color: #ffffff;
+        text-transform: uppercase;
+        margin-bottom: 20px;
     }
 
     .form-control {
-        border-radius: 8px;
+        border-radius: 5px;
         padding: 12px;
         font-size: 16px;
-        border: 1px solid #ddd;
-        background-color: #f5f5f5;
+        border: 1px solid #cc0022;
+        background: #2a2a2a;
+        color: #ffffff;
+        transition: border-color 0.3s ease, box-shadow 0.3s ease;
     }
 
         .form-control:focus {
-            border-color: #6b48ff;
-            box-shadow: 0 0 5px rgba(107, 72, 255, 0.3);
-            background-color: #fff;
+            border-color: #ff0033;
+            box-shadow: 0 0 5px rgba(255, 0, 51, 0.5);
+            background: #333;
+            color: #ffffff;
+        }
+
+        .form-control::placeholder {
+            color: rgba(255, 255, 255, 0.6);
         }
 
     .form-label {
         font-size: 14px;
-        color: #333;
+        font-weight: 500;
+        color: #ffffff;
+        margin-bottom: 5px;
     }
 
-    .btn-primary {
-        background: linear-gradient(90deg, #ff6a88 0%, #6b48ff 100%);
+    .btn-create {
+        background: linear-gradient(90deg, #ff0033 0%, #e50914 100%);
         border: none;
-        border-radius: 8px;
+        border-radius: 5px;
         padding: 12px;
         font-size: 16px;
+        color: #ffffff;
+        font-weight: 600;
         transition: background 0.3s ease;
     }
 
-        .btn-primary:hover {
-            background: linear-gradient(90deg, #ff6a88 50%, #6b48ff 100%);
+        .btn-create:hover {
+            background: linear-gradient(90deg, #e6002e 0%, #d30912 100%);
         }
 
     .btn-outline-secondary {
@@ -174,34 +208,87 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        transition: background-color 0.3s ease;
+        border: 1px solid #cc0022;
+        background-color: #2a2a2a;
+        color: #cc0022;
+        transition: background-color 0.3s ease, border-color 0.3s ease;
     }
 
         .btn-outline-secondary:hover {
-            background-color: #f0f0f0;
+            background-color: #cc0022;
+            color: #ffffff;
+            border-color: #cc0022;
         }
 
-    .text-primary {
-        color: #6b48ff !important;
+    .text-light-red {
+        color: #cc0022 !important;
         text-decoration: none;
+        transition: color 0.3s ease;
     }
 
-        .text-primary:hover {
+        .text-light-red:hover {
+            color: #ff0033 !important;
             text-decoration: underline;
         }
 
-    .text-muted a {
-        color: #6b48ff;
+    .text-white a {
+        color: #cc0022;
         text-decoration: none;
     }
 
-        .text-muted a:hover {
+        .text-white a:hover {
+            color: #ff0033;
             text-decoration: underline;
         }
 
     hr {
-        border-color: #ddd;
+        border-color: #444;
     }
+
+    .border-light {
+        border-color: #cc0022 !important;
+    }
+
+    /* Phần hình ảnh bên phải */
+    .right-section {
+        flex: 1;
+        background: url('https://i.pinimg.com/originals/40/21/94/402194c8db6bf41861c1aef74a457117.gif') no-repeat center center/cover; /* Sử dụng ảnh từ form đăng nhập */
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+        .right-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.2);
+            z-index: 1;
+        }
+
+    .intro-text {
+        position: relative;
+        z-index: 2;
+        color: #ffffff;
+        text-align: center;
+        padding: 20px;
+    }
+
+        .intro-text h3 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .intro-text h2 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
 </style>
 
 @section Scripts {

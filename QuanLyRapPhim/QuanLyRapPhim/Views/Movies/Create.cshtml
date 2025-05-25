@@ -5,104 +5,228 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<div class="container my-5">
-    <h1 class="text-primary mb-3">Thêm Phim Mới</h1>
-    <hr />
-    <div class="row justify-content-center">
-        <div class="col-md-6">
-            <div class="card movie-card shadow-lg p-4">
-                <form asp-action="Create">
-                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+<div class="container-fluid vh-100 d-flex flex-column justify-content-center position-relative overflow-hidden">
+    <!-- Khung bao quanh -->
+    <div class="frame-wrapper flex-grow-1">
+        <h1 class="text-white mb-3">Thêm Phim Mới</h1>
+        <hr class="border-white" />
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="card movie-card p-4">
+                    <form asp-action="Create">
+                        <div asp-validation-summary="ModelOnly" class="text-danger text-center mb-3"></div>
 
-                    <div class="form-group mb-3">
-                        <label asp-for="Title" class="form-label text-light">Tiêu đề</label>
-                        <input asp-for="Title" class="form-control" />
-                        <span asp-validation-for="Title" class="text-danger"></span>
-                    </div>
+                        <div class="form-group mb-3">
+                            <label asp-for="Title" class="form-label text-white">Tiêu đề</label>
+                            <input asp-for="Title" class="form-control" />
+                            <span asp-validation-for="Title" class="text-danger"></span>
+                        </div>
 
-                    <div class="form-group mb-3">
-                        <label asp-for="Description" class="form-label text-light">Mô tả</label>
-                        <textarea asp-for="Description" class="form-control" rows="3"></textarea>
-                        <span asp-validation-for="Description" class="text-danger"></span>
-                    </div>
+                        <div class="form-group mb-3">
+                            <label asp-for="Description" class="form-label text-white">Mô tả</label>
+                            <textarea asp-for="Description" class="form-control" rows="3"></textarea>
+                            <span asp-validation-for="Description" class="text-danger"></span>
+                        </div>
 
-                    <div class="form-group mb-3">
-                        <label asp-for="Duration" class="form-label text-light">Thời lượng (phút)</label>
-                        <input asp-for="Duration" type="number" class="form-control" />
-                        <span asp-validation-for="Duration" class="text-danger"></span>
-                    </div>
+                        <div class="form-group mb-3">
+                            <label asp-for="Duration" class="form-label text-white">Thời lượng (phút)</label>
+                            <input asp-for="Duration" type="number" class="form-control" />
+                            <span asp-validation-for="Duration" class="text-danger"></span>
+                        </div>
 
-                    <div class="form-group mb-3">
-                        <label asp-for="Poster" class="form-label text-light">Link Poster</label>
-                        <input asp-for="Poster" class="form-control" />
-                        <span asp-validation-for="Poster" class="text-danger"></span>
-                    </div>
+                        <div class="form-group mb-3">
+                            <label asp-for="Poster" class="form-label text-white">Link Poster</label>
+                            <input asp-for="Poster" class="form-control" />
+                            <span asp-validation-for="Poster" class="text-danger"></span>
+                        </div>
 
-                    <div class="form-group mb-3">
-                        <label asp-for="Genre" class="form-label text-light">Thể loại</label>
-                        <input asp-for="Genre" class="form-control" />
-                        <span asp-validation-for="Genre" class="text-danger"></span>
-                    </div>
+                        <div class="form-group mb-3">
+                            <label asp-for="Genre" class="form-label text-white">Thể loại</label>
+                            <input asp-for="Genre" class="form-control" />
+                            <span asp-validation-for="Genre" class="text-danger"></span>
+                        </div>
 
-                    <div class="form-group mb-3">
-                        <label asp-for="Director" class="form-label text-light">Đạo diễn</label>
-                        <input asp-for="Director" class="form-control" />
-                        <span asp-validation-for="Director" class="text-danger"></span>
-                    </div>
+                        <div class="form-group mb-3">
+                            <label asp-for="Director" class="form-label text-white">Đạo diễn</label>
+                            <input asp-for="Director" class="form-control" />
+                            <span asp-validation-for="Director" class="text-danger"></span>
+                        </div>
 
-                    <div class="form-group mb-3">
-                        <label asp-for="Actors" class="form-label text-light">Diễn viên</label>
-                        <input asp-for="Actors" class="form-control" />
-                        <span asp-validation-for="Actors" class="text-danger"></span>
-                    </div>
+                        <div class="form-group mb-3">
+                            <label asp-for="Actors" class="form-label text-white">Diễn viên</label>
+                            <input asp-for="Actors" class="form-control" />
+                            <span asp-validation-for="Actors" class="text-danger"></span>
+                        </div>
 
-                    <div class="d-flex justify-content-between">
-                        <a asp-action="Index" class="btn btn-secondary">Quay lại</a>
-                        <button type="submit" class="btn btn-primary">Thêm phim</button>
-                    </div>
-                </form>
+                        <div class="d-flex justify-content-between">
+                            <a asp-action="Index" class="btn btn-secondary">Quay lại</a>
+                            <button type="submit" class="btn btn-create">Thêm phim</button>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
+
+    <!-- Footer -->
+    <footer class="footer text-center py-3">
+        <p class="text-white mb-0">© 2025 CinemaX. All rights reserved. | Last updated: 05:54 PM +07, May 25, 2025</p>
+    </footer>
 </div>
 
 <style>
     body {
-        background: linear-gradient(135deg, #ff9a8b 0%, #ff6a88 50%, #6b48ff 100%);
-        font-family: 'Arial', sans-serif;
-        color: #fff;
+        background-color: #0F0F0F; /* Đen */
+        margin: 0;
+        font-family: 'Montserrat', sans-serif;
+        overflow: hidden;
+    }
+
+    .vh-100 {
+        height: 100vh;
+    }
+
+    .container-fluid {
+        display: flex;
+        width: 100%;
+        height: 100%;
+        align-items: center;
+        justify-content: center;
+    }
+
+    /* Khung bao quanh */
+    .frame-wrapper {
+        display: flex;
+        flex-direction: column;
+        width: 90%;
+        max-width: 1200px;
+        height: 80%;
+        background: #2e2e2e; /* Nền xám tối */
+        border-radius: 20px;
+        border: 4px solid #2e2e2e; /* Viền cùng màu nền */
+        box-shadow: 0 0 25px rgba(46, 46, 46, 0.5);
+        overflow: hidden;
+        padding: 20px;
+    }
+
+    .row {
+        display: flex;
+        flex-wrap: wrap;
+        margin: 0 -10px;
+        height: 100%;
+        overflow-y: auto;
+    }
+
+    .col-md-6 {
+        flex: 0 0 50%;
+        max-width: 50%;
+        padding: 0 10px;
+    }
+
+    h1 {
+        font-size: 2rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        background: linear-gradient(90deg, #ff0033 0%, #e50914 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
     }
 
     .movie-card {
-        background: rgba(255, 255, 255, 0.2);
-        backdrop-filter: blur(10px);
+        background: #1c1c1c;
         border-radius: 15px;
+        border: 1px solid transparent;
+        background-image: linear-gradient(rgba(28, 28, 28, 0.9), rgba(28, 28, 28, 0.9)), linear-gradient(45deg, #e50914, #0F0F0F);
+        background-origin: border-box;
+        background-clip: padding-box, border-box;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        transition: transform 0.3s ease;
     }
 
-    .form-control {
-        background: rgba(255, 255, 255, 0.1);
-        color: #fff;
-        border: none;
+        .movie-card:hover {
+            transform: translateY(-5px);
+        }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-label {
+        font-size: 0.9rem;
+        font-weight: 500;
+        color: #ffffff;
+        margin-bottom: 5px;
+    }
+
+    .form-control, .form-control:focus {
         border-radius: 8px;
+        padding: 12px 15px;
+        font-size: 16px;
+        border: 1px solid #cc0022;
+        background: #2a2a2a;
+        color: #ffffff;
+        transition: border-color 0.3s ease, box-shadow 0.3s ease;
     }
 
         .form-control:focus {
-            background: rgba(255, 255, 255, 0.2);
-            color: #fff;
-            box-shadow: none;
+            border-color: #ff0033;
+            box-shadow: 0 0 10px rgba(255, 0, 51, 0.5);
+            background: #333;
         }
 
-    .btn-primary {
-        background: linear-gradient(90deg, #ff6a88 0%, #6b48ff 100%);
-        color: #fff;
+        .form-control::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+    .btn-create {
+        background: linear-gradient(90deg, #ff0033 0%, #e50914 100%);
         border: none;
         border-radius: 8px;
+        padding: 10px 20px;
+        font-size: 16px;
+        color: #ffffff;
+        font-weight: 600;
+        transition: background 0.3s ease, transform 0.2s ease;
+    }
+
+        .btn-create:hover {
+            background: linear-gradient(90deg, #e6002e 0%, #d30912 100%);
+            transform: translateY(-2px);
+        }
+
+    .btn-secondary {
+        background: #444;
+        border: none;
+        border-radius: 8px;
+        padding: 10px 20px;
+        font-size: 16px;
+        color: #ffffff;
+        font-weight: 600;
         transition: background 0.3s ease;
     }
 
-        .btn-primary:hover {
-            background: linear-gradient(90deg, #ff6a88 50%, #6b48ff 100%);
-            transform: scale(1.05);
+        .btn-secondary:hover {
+            background: #555;
+        }
+
+    .text-danger {
+        font-size: 0.85rem;
+        margin-top: 5px;
+    }
+
+    /* Footer */
+    .footer {
+        background: #1a1a1a;
+        border-top: 1px solid #2e2e2e;
+        width: 90%;
+        max-width: 1200px;
+        margin: 0 auto;
+        border-radius: 0 0 20px 20px;
+    }
+
+        .footer p {
+            font-size: 12px;
+            color: #cccccc;
         }
 </style>
 
