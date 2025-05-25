@@ -9,7 +9,7 @@
     <!-- Thông tin phim và lịch chiếu -->
     <div class="row mb-4">
         <div class="col-md-8">
-            <h1 class="text-light mb-2">Chọn ghế xem phim</h1>
+            <h1 class="text-white mb-2 title-gradient">Chọn ghế xem phim</h1>
             <h4 class="text-muted mb-3">Phim: @Model.Movie.Title</h4>
             <div class="d-flex flex-wrap text-light">
                 <p class="me-4">
@@ -27,7 +27,7 @@
             </div>
         </div>
         <div class="col-md-4 text-end">
-            <a asp-controller="Showtimes" asp-action="SelectShowtime" asp-route-movieId="@Model.MovieId" class="btn btn-secondary">
+            <a asp-controller="Showtimes" asp-action="SelectShowtime" asp-route-movieId="@Model.MovieId" class="btn btn-secondary glow-effect">
                 <i class="fas fa-arrow-left me-1"></i> Quay lại chọn lịch chiếu
             </a>
         </div>
@@ -36,13 +36,13 @@
     <!-- Thông báo lỗi hoặc thành công -->
     @if (TempData["ErrorMessage"] != null)
     {
-        <div class="alert alert-danger" role="alert">
+        <div class="alert alert-danger glow-effect" role="alert">
             @TempData["ErrorMessage"]
         </div>
     }
     @if (TempData["SuccessMessage"] != null)
     {
-        <div class="alert alert-success" role="alert">
+        <div class="alert alert-success glow-effect" role="alert">
             @TempData["SuccessMessage"]
         </div>
     }
@@ -53,35 +53,43 @@
 
         <!-- Màn hình chiếu -->
         <div class="screen-container text-center mb-4">
-            <div class="screen">
+            <div class="screen title-gradient glow-effect">
                 <span class="screen-label">Màn hình chiếu</span>
             </div>
         </div>
 
         <!-- Sơ đồ ghế -->
         <div class="seating-chart mb-4">
+            <div class="blur-background"></div>
             @{
-                var seats = Model.Room.Seats.OrderBy(s => s.SeatNumber).ToList(); // Sắp xếp ghế inviting theo SeatNumber
-                int seatsPerRow = 10; // Số ghế mỗi hàng
+                var seats = Model.Room.Seats.OrderBy(s => s.SeatNumber).ToList();
+                int seatsPerRow = 10;
                 int totalSeats = seats.Count;
                 int totalRows = (int)Math.Ceiling((double)totalSeats / seatsPerRow);
-                char lastRowLabel = (char)('A' + totalRows - 1); // Xác định hàng cuối cùng
+                char lastRowLabel = (char)('A' + totalRows - 1);
 
                 for (int row = 0; row < totalRows; row++)
                 {
-                    var rowSeats = seats.Skip(row * seatsPerRow).Take(seatsPerRow);
-                    char rowLabel = (char)('A' + row); // A, B, C, ...
-                    bool isLastRow = (rowLabel == lastRowLabel); // Kiểm tra hàng cuối cùng
-                    <div class="seat-row d-flex align-items-center mb-2">
-                        <span class="row-label text-light me-3">Hàng @rowLabel</span>
-                        <div class="d-flex justify-content-center flex-grow-1">
+                    var rowSeats = seats.Skip(row * seatsPerRow).Take(seatsPerRow).ToList();
+                    char rowLabel = (char)('A' + row);
+                    bool isLastRow = (rowLabel == lastRowLabel);
+                    <div class="seat-row d-flex align-items-center mb-3">
+                        <span class="row-label text-light me-3 glow-effect">Hàng @rowLabel</span>
+                        <div class="d-flex justify-content-center flex-grow-1 seat-container">
                             @foreach (var seat in rowSeats)
                             {
-                                bool isCoupleSeat = isLastRow; // Ghế đôi ở hàng cuối
-                                <div class="seat @(seat.Status == "Đã đặt" ? "seat-taken" : "seat-available") @(isCoupleSeat ? "seat-couple" : "") mx-1">
+                                bool isCoupleSeat = isLastRow;
+                                <div class="seat @(seat.Status == "Đã đặt" ? "seat-taken" : "seat-available") @(isCoupleSeat ? "seat-couple" : "") mx-2 glow-effect">
                                     <input type="checkbox" name="selectedSeats" value="@seat.SeatId" id="seat-@seat.SeatId" @(seat.Status == "Đã đặt" ? "disabled" : "") />
                                     <label for="seat-@seat.SeatId" class="seat-label">@seat.SeatNumber</label>
                                 </div>
+                            }
+                            @if (rowSeats.Count < seatsPerRow)
+                            {
+                                @for (int i = 0; i < seatsPerRow - rowSeats.Count; i++)
+                                {
+                                    <div class="seat seat-placeholder mx-2"></div>
+                                }
                             }
                         </div>
                     </div>
@@ -92,22 +100,22 @@
         <!-- Chú thích trạng thái ghế -->
         <div class="seat-legend text-center mb-4">
             <p class="text-light">
-                <span class="badge bg-success me-2"><i class="fas fa-chair me-1"></i> Ghế trống</span>
-                <span class="badge bg-danger me-2"><i class="fas fa-chair me-1"></i> Ghế đã đặt</span>
-                <span class="badge bg-primary me-2"><i class="fas fa-chair me-1"></i> Ghế đang chọn</span>
-                <span class="badge bg-warning text-dark"><i class="fas fa-chair me-1"></i> Ghế đôi</span>
+                <span class="badge bg-success me-2 glow-effect"><i class="fas fa-chair me-1"></i> Ghế trống</span>
+                <span class="badge bg-danger me-2 glow-effect"><i class="fas fa-chair me-1"></i> Ghế đã đặt</span>
+                <span class="badge bg-primary me-2 glow-effect"><i class="fas fa-chair me-1"></i> Ghế đang chọn</span>
+                <span class="badge bg-warning text-dark me-2 glow-effect"><i class="fas fa-chair me-1"></i> Ghế đôi</span>
             </p>
         </div>
 
         <!-- Danh sách ghế đã chọn và tổng tiền -->
-        <div class="selected-seats-info text-light mb-4">
+        <div class="selected-seats-info text-light mb-4 glow-effect">
             <h5>Ghế đã chọn: <span id="selected-seats-list"></span></h5>
             <h5>Tổng tiền: <span id="total-price">0</span> VNĐ</h5>
         </div>
 
         <!-- Nút xác nhận -->
         <div class="text-center">
-            <button type="submit" class="btn btn-primary btn-lg">
+            <button type="submit" class="btn btn-primary btn-lg glow-effect title-gradient">
                 <i class="fas fa-ticket-alt me-1"></i> Xác nhận đặt vé
             </button>
         </div>
@@ -117,23 +125,47 @@
 <!-- CSS tùy chỉnh -->
 <style>
     body {
-        background: linear-gradient(135deg, #ff9a8b 0%, #ff6a88 50%, #6b48ff 100%);
-        font-family: 'Arial', sans-serif;
-        color: #fff;
+        background-color: #0F0F0F;
+        color: #ffffff;
+        font-family: 'Montserrat', sans-serif;
     }
 
-    /* Màn hình chiếu */
+    .title-gradient {
+        background: linear-gradient(90deg, #ff0033, #1c1c1c);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        color: transparent;
+    }
+
+        .title-gradient:not(h1) {
+            -webkit-text-fill-color: inherit;
+            background-clip: inherit;
+            color: #fff;
+        }
+
+    .glow-effect {
+        box-shadow: 0 0 15px rgba(255, 0, 51, 0.3);
+        transition: box-shadow 0.3s ease;
+    }
+
+        .glow-effect:hover {
+            box-shadow: 0 0 25px rgba(255, 0, 51, 0.5);
+        }
+
     .screen-container {
         margin: 0 auto;
         max-width: 600px;
+        position: relative;
     }
 
     .screen {
-        background: linear-gradient(90deg, #444, #666, #444);
-        height: 30px;
-        border-radius: 5px;
+        background: linear-gradient(90deg, #333, #555, #333);
+        height: 40px;
+        border-radius: 15px;
         position: relative;
         box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+        z-index: 2;
     }
 
     .screen-label {
@@ -142,58 +174,97 @@
         left: 50%;
         transform: translate(-50%, -50%);
         color: #fff;
-        font-weight: bold;
+        font-weight: 600;
         text-transform: uppercase;
         letter-spacing: 2px;
     }
 
-    /* Sơ đồ ghế */
     .seating-chart {
         max-width: 600px;
         margin: 0 auto;
+        padding: 20px;
+        background-color: #1c1c1c;
+        border-radius: 15px;
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .blur-background {
+        position: absolute;
+        top: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 80%;
+        height: 100%;
+        background: radial-gradient(circle at top, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0) 70%);
+        filter: blur(20px);
+        z-index: 1;
     }
 
     .seat-row {
         display: flex;
         align-items: center;
+        position: relative;
+        z-index: 2;
     }
 
     .row-label {
         width: 50px;
-        font-weight: bold;
+        font-weight: 600;
         line-height: 40px;
+        color: #b3b3b3;
+        background: #2a2a2a;
+        border-radius: 5px;
+        text-align: center;
+    }
+
+    .seat-container {
+        display: flex;
+        justify-content: center;
+        flex-grow: 1;
+        gap: 10px;
     }
 
     .seat {
         width: 40px;
         height: 40px;
-        margin: 5px;
-        border-radius: 5px;
+        border-radius: 8px;
         display: flex;
         align-items: center;
         justify-content: center;
-        transition: transform 0.2s ease;
+        transition: transform 0.2s ease, box-shadow 0.3s ease;
+        position: relative;
+        overflow: hidden;
     }
 
     .seat-available {
-        background-color: #28a745;
+        background-color: #00cc00;
         cursor: pointer;
     }
 
     .seat-taken {
-        background-color: #dc3545;
+        background-color: #e6002e;
         cursor: not-allowed;
     }
 
     .seat-couple {
-        width: 80px; /* Ghế đôi rộng gấp đôi */
-        background-color: #ffc107; /* Màu vàng cho ghế đôi */
-        border: 2px solid #fff; /* Viền trắng để nổi bật */
+        width: 80px;
+        background-color: #ffcc00;
+        border: 2px solid #fff;
+        border-radius: 10px;
     }
 
         .seat-couple input:checked + .seat-label {
-            background-color: #ffca2c; /* Màu khi ghế đôi được chọn */
+            background-color: #ffca2c;
         }
+
+    .seat-placeholder {
+        width: 40px;
+        height: 40px;
+        margin: 5px;
+        visibility: hidden;
+    }
 
     .seat input {
         display: none;
@@ -202,17 +273,22 @@
     .seat-label {
         color: #fff;
         font-size: 0.9rem;
-        font-weight: bold;
+        font-weight: 600;
         display: block;
         margin: 0;
         text-align: center;
         width: 100%;
+        height: 100%;
+        line-height: 40px;
+        border-radius: 8px;
+        transition: background-color 0.3s ease;
     }
 
     .seat input:checked + .seat-label {
-        background-color: #007bff;
-        border-radius: 5px;
+        background-color: #00bfff;
+        border-radius: 8px;
         transform: scale(1.1);
+        box-shadow: 0 0 10px rgba(0, 191, 255, 0.5);
     }
 
     .seat input:disabled + .seat-label {
@@ -221,53 +297,80 @@
 
     .seat:hover:not(.seat-taken) {
         transform: scale(1.1);
+        box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
     }
 
-    /* Chú thích trạng thái ghế */
     .seat-legend .badge {
         font-size: 1rem;
         padding: 8px 12px;
+        border-radius: 20px;
+        box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
     }
 
-    /* Thông tin ghế đã chọn và tổng tiền */
     .selected-seats-info {
         max-width: 600px;
         margin: 0 auto;
-        padding: 15px;
-        background-color: #2a2a2a;
-        border-radius: 5px;
+        padding: 20px;
+        background-color: #1c1c1c;
+        border-radius: 15px;
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+        border: 1px solid #ff0033;
     }
 
         .selected-seats-info h5 {
             margin: 0;
             font-size: 1.1rem;
+            color: #b3b3b3;
         }
 
-    /* Nút */
     .btn-primary {
-        background: linear-gradient(90deg, #ff6a88 0%, #6b48ff 100%);
+        background-color: #ff0033;
         border: none;
-        padding: 10px 20px;
-        transition: background-color 0.3s ease;
+        border-radius: 20px;
+        padding: 10px 30px;
+        font-weight: 600;
+        font-size: 1.2rem;
+        transition: background-color 0.3s ease, transform 0.3s ease;
     }
 
         .btn-primary:hover {
-            background: linear-gradient(90deg, #ff6a88 50%, #6b48ff 50%);
+            background-color: #e6002e;
+            transform: scale(1.05);
         }
 
     .btn-secondary {
-        background-color: #6c757d;
-        border: none;
-        padding: 10px 20px;
-        transition: background-color 0.3s ease;
+        border-color: #ff0033;
+        color: #ff0033;
+        border-radius: 20px;
+        padding: 8px 20px;
+        font-weight: 600;
+        font-size: 1rem;
+        transition: background-color 0.3s ease, transform 0.3s ease;
     }
 
         .btn-secondary:hover {
-            background-color: #5a6268;
+            background-color: #ff0033;
+            color: #ffffff;
+            border-color: #ff0033;
+            transform: scale(1.05);
         }
 
     .text-muted {
-        color: #a0a0a0 !important;
+        color: #b3b3b3 !important;
+    }
+
+    .alert-danger {
+        background-color: #333;
+        color: #fff;
+        border: 1px solid #e6002e;
+        border-radius: 10px;
+    }
+
+    .alert-success {
+        background-color: #333;
+        color: #fff;
+        border: 1px solid #444;
+        border-radius: 10px;
     }
 </style>
 
@@ -280,8 +383,8 @@
         const seatCheckboxes = document.querySelectorAll('input[name="selectedSeats"]');
         const selectedSeatsList = document.getElementById('selected-seats-list');
         const totalPriceElement = document.getElementById('total-price');
-        const normalPrice = 50000; // Giá ghế thường
-        const couplePrice = 100000; // Giá ghế đôi (giả sử cao hơn ghế thường)
+        const normalPrice = 50000;
+        const couplePrice = 100000;
 
         function updateSelectedSeats() {
             const selectedSeats = Array.from(seatCheckboxes)

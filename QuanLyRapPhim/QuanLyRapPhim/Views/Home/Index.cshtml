@@ -14,7 +14,7 @@
         <div class="container rounded-nav">
             <!-- Logo -->
             <a class="navbar-brand" href="/">
-                <img src="https://assets.grok.com/users/43f4e212-8391-4266-a03f-58bd79df93d1/generated/kWopRbXV9EIItKPu/image.jpg" alt="CinemaX Logo" height="60" />
+                <img src="https://i.pinimg.com/736x/dc/e2/4e/dce24e1753323e14dc6b39527dc53e32.jpg" alt="CinemaX Logo" height="60" />
                 <span class="logo-text">CinemaX</span>
             </a>
 
@@ -95,62 +95,44 @@
 
 <!-- Banner Carousel -->
 <section>
-    <div id="movieCarousel" class="carousel slide">
+    <div id="movieCarousel" class="carousel slide" data-bs-ride="carousel">
         <div class="carousel-inner">
             <div class="carousel-item active">
-                <img src="https://i.pinimg.com/736x/13/b0/43/13b043d26ce8e7cd9e72a3de24ad5b00.jpg" class="d-block w-100" alt="The Batman" style="height: 500px; object-fit: cover;">
+                <div class="carousel-overlay"></div>
+                <img src="https://i.pinimg.com/736x/13/b0/43/13b043d26ce8e7cd9e72a3de24ad5b00.jpg" class="d-block w-100" alt="The Batman" style="height: 600px; object-fit: cover;">
                 <div class="carousel-caption d-none d-md-block text-start">
                     <h1 class="carousel-title">The Batman</h1>
-                    <div class="carousel-rating">
-                        <span class="rating-stars">★★★★☆ 4.6</span>
-                    </div>
                     <div class="carousel-meta">
                         <span>Hành động • 2022</span>
                     </div>
-                    <div class="carousel-actions">
-                        <a href="/Movies/Watch/TheBatman" class="btn btn-primary watch-btn">Xem Trailer</a>
-                        <a href="/Movies/Book/TheBatman" class="btn btn-outline-light book-btn"><i class="fas fa-ticket-alt"></i> Đặt vé ngay</a>
-                    </div>
                 </div>
             </div>
             <div class="carousel-item">
-                <img src="https://i.pinimg.com/736x/ad/c8/e0/adc8e054ab0a62fc6fff8e96a25cbdcc.jpg" class="d-block w-100" alt="Inception" style="height: 500px; object-fit: cover;">
+                <div class="carousel-overlay"></div>
+                <img src="https://i.pinimg.com/736x/ad/c8/e0/adc8e054ab0a62fc6fff8e96a25cbdcc.jpg" class="d-block w-100" alt="Inception" style="height: 600px; object-fit: cover;">
                 <div class="carousel-caption d-none d-md-block text-start">
                     <h1 class="carousel-title">Inception</h1>
-                    <div class="carousel-rating">
-                        <span class="rating-stars">★★★★★ 5.0</span>
-                    </div>
                     <div class="carousel-meta">
                         <span>Khoa học viễn tưởng • 2010</span>
                     </div>
-                    <div class="carousel-actions">
-                        <a href="/Movies/Watch/Inception" class="btn btn-primary watch-btn">Xem Trailer</a>
-                        <a href="/Movies/Book/Inception" class="btn btn-outline-light book-btn"><i class="fas fa-ticket-alt"></i> Đặt vé ngay</a>
-                    </div>
                 </div>
             </div>
             <div class="carousel-item">
-                <img src="https://i.pinimg.com/736x/c2/6b/68/c26b682ef1df8611eff6d392af092a6e.jpg" class="d-block w-100" alt="Interstellar" style="height: 500px; object-fit: cover;">
+                <div class="carousel-overlay"></div>
+                <img src="https://i.pinimg.com/736x/c2/6b/68/c26b682ef1df8611eff6d392af092a6e.jpg" class="d-block w-100" alt="Interstellar" style="height: 600px; object-fit: cover;">
                 <div class="carousel-caption d-none d-md-block text-start">
                     <h1 class="carousel-title">Interstellar</h1>
-                    <div class="carousel-rating">
-                        <span class="rating-stars">★★★★☆ 4.8</span>
-                    </div>
                     <div class="carousel-meta">
                         <span>Khoa học viễn tưởng • 2014</span>
-                    </div>
-                    <div class="carousel-actions">
-                        <a href="/Movies/Watch/Interstellar" class="btn btn-primary watch-btn">Xem Trailer</a>
-                        <a href="/Movies/Book/Interstellar" class="btn btn-outline-light book-btn"><i class="fas fa-ticket-alt"></i> Đặt vé ngay</a>
                     </div>
                 </div>
             </div>
         </div>
-        <button class="carousel-control-prev" onclick="moveSlide(-1)">
+        <button class="carousel-control-prev" type="button" data-bs-target="#movieCarousel" data-bs-slide="prev">
             <span class="carousel-control-prev-icon" aria-hidden="true"></span>
             <span class="visually-hidden">Trước</span>
         </button>
-        <button class="carousel-control-next" onclick="moveSlide(1)">
+        <button class="carousel-control-next" type="button" data-bs-target="#movieCarousel" data-bs-slide="next">
             <span class="carousel-control-next-icon" aria-hidden="true"></span>
             <span class="visually-hidden">Tiếp</span>
         </button>
@@ -434,78 +416,86 @@
                     background: #ff4040;
                 }
 
+    /* Carousel Styling */
     .carousel {
         position: relative;
         background: #1c1c1c;
-        border-radius: 15px;
+        border-radius: 25px;
         overflow: hidden;
-        margin: 20px 0;
+        margin: 30px 0;
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
     }
 
     .carousel-item {
         position: relative;
+        transition: transform 0.8s ease-in-out;
     }
 
         .carousel-item img {
-            filter: brightness(50%);
+            filter: brightness(70%);
+            transition: filter 0.5s ease;
         }
+
+        .carousel-item:hover img {
+            filter: brightness(85%);
+        }
+
+    .carousel-overlay {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 50%;
+        background: linear-gradient(to top, rgba(0, 0, 0, 0.9), transparent);
+        z-index: 1;
+    }
 
     .carousel-caption {
         position: absolute;
-        top: 50%;
+        top: 70%;
         left: 5%;
         transform: translateY(-50%);
         text-align: left;
         color: #ffffff;
+        z-index: 2;
     }
 
     .carousel-title {
-        font-size: 3rem;
-        font-weight: 700;
-        margin-bottom: 15px;
+        font-size: 4rem;
+        font-weight: 800;
+        margin-bottom: 20px;
         text-transform: uppercase;
-    }
-
-    .carousel-rating {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        margin-bottom: 10px;
-    }
-
-    .rating-stars {
-        color: #ffd700;
-        font-size: 1.2rem;
-    }
-
-    .rating-text {
-        font-size: 0.9rem;
-        color: #cccccc;
-        margin-left: 5px;
+        text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.7);
     }
 
     .carousel-meta {
-        color: #b3b3b3;
-        font-size: 1rem;
-        margin-bottom: 15px;
+        color: #cccccc;
+        font-size: 1.2rem;
         font-weight: 500;
+        text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
     }
 
-    .carousel-actions {
-        display: flex;
-        gap: 15px;
+    .carousel-control-prev,
+    .carousel-control-next {
+        width: 5%;
+        background: rgba(0, 0, 0, 0.3);
+        border-radius: 50%;
+        transition: background 0.3s ease;
     }
 
-    .watch-btn {
+        .carousel-control-prev:hover,
+        .carousel-control-next:hover {
+            background: rgba(255, 0, 51, 0.5);
+        }
+
+    .carousel-control-prev-icon,
+    .carousel-control-next-icon {
+        width: 30px;
+        height: 30px;
+        background-size: 100%, 100%;
         background-color: #ff0033;
-        border-radius: 20px;
-        padding: 10px 30px;
-        font-weight: 600;
-    }
-
-    .book-btn {
-        border-radius: 20px;
-        padding: 10px 30px;
+        border-radius: 50%;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
     }
 
     .now-showing-section {
@@ -549,7 +539,7 @@
 
     .movie-meta {
         display: flex;
-        justify-content: center; /* Chỉ hiển thị rating ở giữa */
+        justify-content: center;
         color: #b3b3b3;
         font-size: 0.9rem;
         margin-bottom: 10px;
@@ -560,11 +550,11 @@
     }
 
     .rating-stars .rated {
-        color: #ffd700; /* Sao sáng */
+        color: #ffd700;
     }
 
     .rating-stars .fa-star-half-alt {
-        color: #ffd700; /* Sao nửa sáng */
+        color: #ffd700;
     }
 
     .no-movie-message {
@@ -639,6 +629,7 @@
     }
 </style>
 
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
     document.getElementById("toggleDashboard").addEventListener("click", function() {
         let dashboard = document.getElementById("adminDashboard");
