@@ -11,38 +11,121 @@ using QuanLyRapPhim.Models;
 using QuanLyRapPhim.Models.VNPay;
 using QuanLyRapPhim.Service.Momo;
 using QuanLyRapPhim.Service.VNPay;
+using Microsoft.Extensions.Logging;
+using Microsoft.EntityFrameworkCore.Storage; // For transaction management
 
 namespace QuanLyRapPhim.Controllers
 {
     public class PaymentsController : Controller
     {
         private readonly IVnPayService _vnPayService;
-        private IMomoService _momoService;
+        private readonly IMomoService _momoService;
         private readonly DBContext _context;
         private readonly UserManager<User> _userManager;
+        private readonly ILogger<PaymentsController> _logger;
 
-        public PaymentsController(DBContext context, UserManager<User> userManager, IMomoService momoService, IVnPayService vnPayService)
+        public PaymentsController(DBContext context, UserManager<User> userManager, IMomoService momoService, IVnPayService vnPayService, ILogger<PaymentsController> logger)
         {
             _context = context;
             _userManager = userManager;
             _momoService = momoService;
             _vnPayService = vnPayService;
+            _logger = logger;
         }
+
         [HttpPost]
         public IActionResult CreatePaymentUrlVnpay(PaymentInformationModel model)
         {
-            var url = _vnPayService.CreatePaymentUrl(model, HttpContext);
+            _logger.LogInformation("CreatePaymentUrlVnpay called with BookingId: {BookingId}, Amount: {Amount}", model.BookingId, model.Amount);
 
+            // Store BookingId in TempData with explicit type conversion
+            TempData["BookingId"] = model.BookingId.ToString();
+            var url = _vnPayService.CreatePaymentUrl(model, HttpContext);
             return Redirect(url);
         }
+
         [HttpGet]
-        public IActionResult PaymentCallbackVnpay()
+        public async Task<IActionResult> PaymentCallbackVnpay()
         {
+            _logger.LogInformation("PaymentCallbackVnpay called at {Time}", DateTime.Now); // 11:06 PM +07, May 25, 2025
+
             var response = _vnPayService.PaymentExecute(Request.Query);
-               return Json(response);
 
+            _logger.LogInformation("VNPay Response: Success={Success}, OrderId={OrderId}, TransactionId={TransactionId}", response.Success, response.OrderId, response.TransactionId);
+
+            // Retrieve BookingId from TempData
+            string bookingIdString = TempData["BookingId"]?.ToString();
+            if (string.IsNullOrEmpty(bookingIdString) || !int.TryParse(bookingIdString, out int bookingId))
+            {
+                _logger.LogError("Failed to retrieve or parse BookingId from TempData. TempData['BookingId']={BookingIdString}", bookingIdString);
+                return Json(new { Success = false, Message = "Không tìm thấy hoặc không thể phân tích BookingId." });
+            }
+
+            _logger.LogInformation("Retrieved BookingId: {BookingId}", bookingId);
+
+            // Find the booking
+            var booking = await _context.Bookings
+                .AsNoTracking() // Prevent entity tracking issues
+                .FirstOrDefaultAsync(b => b.BookingId == bookingId);
+            if (booking == null)
+            {
+                _logger.LogError("Booking not found for BookingId: {BookingId}", bookingId);
+                return Json(new { Success = false, Message = "Không tìm thấy thông tin đặt vé." });
+            }
+
+            _logger.LogInformation("Booking found: BookingId={BookingId}, TotalPrice={TotalPrice}", booking.BookingId, booking.TotalPrice);
+
+            using (var transaction = await _context.Database.BeginTransactionAsync())
+            {
+                try
+                {
+                    // Check or create Payment record
+                    var payment = await _context.Payments.FirstOrDefaultAsync(p => p.BookingId == bookingId);
+                    if (payment == null)
+                    {
+                        payment = new Payment
+                        {
+                            BookingId = bookingId,
+                            Amount = booking.TotalPrice,
+                            PaymentMethod = "VNPay",
+                            PaymentDate = DateTime.Now, // 11:06 PM +07, May 25, 2025
+                            PaymentStatus = response.Success ? "Completed" : "Failed"
+                        };
+                        _context.Payments.Add(payment);
+                        _logger.LogInformation("Created new Payment record for BookingId: {BookingId}, Status: {PaymentStatus}", payment.BookingId, payment.PaymentStatus);
+                    }
+                    else
+                    {
+                        payment.PaymentStatus = response.Success ? "Completed" : "Failed";
+                        payment.PaymentDate = DateTime.Now;
+                        _context.Payments.Update(payment);
+                        _logger.LogInformation("Updated existing Payment record for BookingId: {BookingId}, Status: {PaymentStatus}", payment.BookingId, payment.PaymentStatus);
+                    }
+
+                    // Save changes within the transaction
+                    int changes = await _context.SaveChangesAsync();
+                    _logger.LogInformation("Database changes saved: {Changes} record(s) affected", changes);
+
+                    // Commit the transaction
+                    await transaction.CommitAsync();
+                }
+                catch (DbUpdateException ex)
+                {
+                    _logger.LogError(ex, "Database update failed for BookingId: {BookingId}. Inner Exception: {InnerException}", bookingId, ex.InnerException?.Message);
+                    await transaction.RollbackAsync();
+                    return Json(new { Success = false, Message = "Lỗi khi lưu thông tin thanh toán vào cơ sở dữ liệu." });
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Unexpected error for BookingId: {BookingId}", bookingId);
+                    await transaction.RollbackAsync();
+                    return Json(new { Success = false, Message = "Lỗi không mong muốn khi xử lý thanh toán." });
+                }
+            }
+
+            // Redirect to the VNPayResponse view with the response data
+            return View("VNPayResponse", response);
         }
-
 
         [HttpPost]
         [Route("CreatePaymentUrl")]
@@ -51,6 +134,7 @@ namespace QuanLyRapPhim.Controllers
             var response = await _momoService.CreatePaymentMomo(model);
             return Redirect(response.PayUrl);
         }
+
         [HttpGet]
         public IActionResult PaymentCallBack()
         {
@@ -113,7 +197,6 @@ namespace QuanLyRapPhim.Controllers
             return View(payment);
         }
 
-        // POST: Payments/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("PaymentId,BookingId,Amount,PaymentMethod,PaymentStatus,PaymentDate")] Payment payment)
@@ -140,7 +223,6 @@ namespace QuanLyRapPhim.Controllers
             return View(payment);
         }
 
-        // GET: Payments/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -157,9 +239,6 @@ namespace QuanLyRapPhim.Controllers
             return View(payment);
         }
 
-        // POST: Payments/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("PaymentId,BookingId,Amount,PaymentMethod,PaymentStatus,PaymentDate")] Payment payment)
@@ -193,7 +272,6 @@ namespace QuanLyRapPhim.Controllers
             return View(payment);
         }
 
-        // GET: Payments/Bill/5
         public async Task<IActionResult> Bill(int paymentId)
         {
             var payment = await _context.Payments
@@ -213,7 +291,6 @@ namespace QuanLyRapPhim.Controllers
                 return NotFound();
             }
 
-            // Lấy thông tin tài khoản người dùng hiện tại
             var user = await _userManager.GetUserAsync(User);
             if (user != null)
             {
@@ -231,7 +308,6 @@ namespace QuanLyRapPhim.Controllers
             return View(payment);
         }
 
-        // GET: Payments/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -250,7 +326,6 @@ namespace QuanLyRapPhim.Controllers
             return View(payment);
         }
 
-        // POST: Payments/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)

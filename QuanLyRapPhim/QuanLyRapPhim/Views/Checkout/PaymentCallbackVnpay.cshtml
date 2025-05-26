@@ -1,11 +1,147 @@
 ﻿@model QuanLyRapPhim.Models.VNPay.PaymentResponseModel
-@* @{ *@
-@*     ViewData["Title"] = "Thanh toán VNPAY"; *@
-@* } *@
-<h5>Thanh toán VNPAY thành công</h5>
-<h6>Mã đặt vé : @Model.OrderId</h6>
-<h6>Thông tin thanh toán : @Model.OrderDescription</h6>
-<h6>Cách thức thanh toán : @Model.PaymentMethod</h6>
-<h6>Mã giao dịch : @Model.TransactionId</h6>
-<h6>Tình trạng : @Model.Success</h6>
-@* <h5>Xem <a asp-controller = ""</h5> *@
+
+@{
+    ViewData["Title"] = "Thanh toán VNPAY";
+
+    // Split the OrderDescription into email and amount
+    var orderDescriptionParts = Model.OrderDescription.Split(" Thanh toán VNPay ");
+    var email = orderDescriptionParts.Length > 0 ? orderDescriptionParts[0] : "Không xác định";
+    var amount = orderDescriptionParts.Length > 1 ? orderDescriptionParts[1] : "Không xác định";
+}
+
+<div class="container my-5">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card showtime-card text-light glow-effect">
+                <div class="card-body">
+                    <h5 class="title-gradient mb-4">Thanh toán VNPAY @(Model.Success ? "Thành công" : "Thất bại")</h5>
+                    <dl class="row">
+                        <dt class="col-sm-4 text-muted">Mã đặt vé</dt>
+                        <dd class="col-sm-8">@(ViewBag.BookingId ?? "Không xác định")</dd>
+
+                        <dt class="col-sm-4 text-muted">Email</dt>
+                        <dd class="col-sm-8">@email</dd>
+
+                        <dt class="col-sm-4 text-muted">Số tiền</dt>
+                        <dd class="col-sm-8">@amount VNĐ</dd>
+
+                        <dt class="col-sm-4 text-muted">Cách thức thanh toán</dt>
+                        <dd class="col-sm-8">@Model.PaymentMethod</dd>
+
+                        <dt class="col-sm-4 text-muted">Mã giao dịch</dt>
+                        <dd class="col-sm-8">@Model.TransactionId</dd>
+
+                        <dt class="col-sm-4 text-muted">Tình trạng</dt>
+                        <dd class="col-sm-8">@(Model.Success ? "Thành công" : "Thất bại")</dd>
+                    </dl>
+                    <div class="text-center mt-4">
+                        <a asp-controller="Movies" asp-action="Index" class="btn btn-secondary glow-effect">
+                            <i class="fas fa-arrow-left me-1"></i> Quay lại danh sách phim
+                        </a>
+                        @if (User.IsInRole("Admin"))
+                        {
+                            <a asp-controller="Admin" asp-action="ManageBookings" class="btn btn-secondary glow-effect ms-2" id="viewBookingsBtn">
+                                <i class="fas fa-ticket-alt me-1"></i> Xem quản lý đặt vé
+                            </a>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- CSS tùy chỉnh -->
+<style>
+    body {
+        background-color: #0F0F0F; /* Galaxy Black */
+        color: #ffffff;
+        font-family: 'Montserrat', sans-serif;
+    }
+
+    .title-gradient {
+        background: linear-gradient(90deg, #ff0033, #1c1c1c);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        color: transparent;
+    }
+
+    .glow-effect {
+        box-shadow: 0 0 15px rgba(255, 0, 51, 0.3);
+        transition: box-shadow 0.3s ease, transform 0.3s ease;
+    }
+
+        .glow-effect:hover {
+            box-shadow: 0 0 25px rgba(255, 0, 51, 0.5);
+            transform: scale(1.05);
+        }
+
+    .showtime-card {
+        background-color: #1c1c1c;
+        border: none;
+        border-radius: 15px;
+    }
+
+        .showtime-card .card-body {
+            background-color: #1c1c1c;
+            border-radius: 15px;
+        }
+
+    .text-muted {
+        color: #b3b3b3 !important;
+    }
+
+    dl.row dt, dd {
+        margin-bottom: 10px;
+        color: #b3b3b3;
+    }
+
+    dl.row dd {
+        color: #ffffff;
+    }
+
+    .btn-secondary {
+        border-color: #ff0033;
+        color: #ff0033;
+        border-radius: 20px;
+        padding: 10px 20px;
+        font-weight: 600;
+        font-size: 1rem;
+        transition: background-color 0.3s ease, transform 0.3s ease;
+    }
+
+        .btn-secondary:hover {
+            background-color: #ff0033;
+            color: #ffffff;
+            border-color: #ff0033;
+            transform: scale(1.05);
+        }
+</style>
+
+<!-- Thêm Font Awesome -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+
+<script>
+    // Trigger immediate status update in ManageBookings when admin clicks the button
+    document.getElementById("viewBookingsBtn")?.addEventListener("click", function () {
+        const bookingId = @ViewBag.BookingId;
+        if (bookingId) {
+            fetch(`/Admin/UpdatePaymentStatus?bookingId=${bookingId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    console.log(`Status updated for booking ${bookingId} to ${data.paymentStatus}`);
+                } else {
+                    console.error('Failed to update status:', data.message);
+                }
+            })
+            .catch(error => console.error('Error updating status:', error));
+        }
+    });
+</script>

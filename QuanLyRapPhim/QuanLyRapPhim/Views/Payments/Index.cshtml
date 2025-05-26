@@ -1,60 +1,175 @@
 ﻿@model IEnumerable<QuanLyRapPhim.Models.Payment>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Danh sách thanh toán";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h1>Index</h1>
+<div class="container my-5">
+    <h1 class="text-white mb-4 title-gradient">Danh sách thanh toán</h1>
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Amount)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.PaymentMethod)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.PaymentStatus)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.PaymentDate)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Booking)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Amount)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.PaymentMethod)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.PaymentStatus)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.PaymentDate)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Booking.BookingId)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.PaymentId">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.PaymentId">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.PaymentId">Delete</a>
-            </td>
-        </tr>
-}
-    </tbody>
-</table>
+    <p>
+        <a asp-action="Create" class="btn btn-primary glow-effect title-gradient"><i class="fas fa-plus me-1"></i> Tạo mới</a>
+    </p>
+
+    <table class="table table-dark table-bordered glow-effect">
+        <thead>
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.Amount)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.PaymentMethod)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.PaymentStatus)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.PaymentDate)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Booking)
+                </th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Amount)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.PaymentMethod)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.PaymentStatus)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.PaymentDate)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Booking.BookingId)
+                    </td>
+                    <td>
+                        <a asp-action="Edit" asp-route-id="@item.PaymentId" class="btn btn-warning btn-sm glow-effect me-2"><i class="fas fa-edit me-1"></i> Sửa</a>
+                        <a asp-action="Details" asp-route-id="@item.PaymentId" class="btn btn-primary btn-sm glow-effect me-2 title-gradient"><i class="fas fa-info-circle me-1"></i> Chi tiết</a>
+                        <a asp-action="Delete" asp-route-id="@item.PaymentId" class="btn btn-danger btn-sm glow-effect"><i class="fas fa-trash-alt me-1"></i> Xóa</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<!-- CSS tùy chỉnh -->
+<style>
+    body {
+        background-color: #0F0F0F; /* Galaxy Black */
+        color: #ffffff;
+        font-family: 'Montserrat', sans-serif;
+    }
+
+    .title-gradient {
+        background: linear-gradient(90deg, #ff0033, #1c1c1c);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        color: transparent;
+    }
+
+        .title-gradient:not(h1) {
+            -webkit-text-fill-color: inherit;
+            background-clip: inherit;
+            color: #fff;
+        }
+
+    .glow-effect {
+        box-shadow: 0 0 15px rgba(255, 0, 51, 0.3);
+        transition: box-shadow 0.3s ease, transform 0.3s ease;
+    }
+
+        .glow-effect:hover {
+            box-shadow: 0 0 25px rgba(255, 0, 51, 0.5);
+            transform: scale(1.05);
+        }
+
+    .table-dark {
+        background-color: #1c1c1c;
+        border-radius: 15px;
+        overflow: hidden;
+    }
+
+        .table-dark th {
+            background-color: #2a2a2a;
+            color: #b3b3b3;
+            font-weight: 600;
+            border: 1px solid #444;
+            padding: 12px;
+            text-align: center;
+        }
+
+        .table-dark td {
+            background-color: #1c1c1c;
+            color: #ffffff;
+            border: 1px solid #444;
+            padding: 12px;
+            text-align: center;
+        }
+
+        .table-dark tr:hover td {
+            background-color: #2a2a2a;
+        }
+
+    .btn-primary {
+        background-color: #ff0033;
+        border: none;
+        border-radius: 20px;
+        padding: 8px 20px;
+        font-weight: 600;
+        font-size: 1rem;
+        transition: background-color 0.3s ease, transform 0.3s ease;
+    }
+
+        .btn-primary:hover {
+            background-color: #e6002e;
+            transform: scale(1.05);
+        }
+
+    .btn-warning {
+        background-color: #ffcc00;
+        border: none;
+        border-radius: 20px;
+        padding: 8px 15px;
+        font-weight: 600;
+        font-size: 0.9rem;
+        color: #000;
+    }
+
+        .btn-warning:hover {
+            background-color: #ffca2c;
+            transform: scale(1.05);
+        }
+
+    .btn-danger {
+        background-color: #e6002e;
+        border: none;
+        border-radius: 20px;
+        padding: 8px 15px;
+        font-weight: 600;
+        font-size: 0.9rem;
+    }
+
+        .btn-danger:hover {
+            background-color: #cc0027;
+            transform: scale(1.05);
+        }
+
+    .text-muted {
+        color: #b3b3b3 !important;
+    }
+</style>
+
+<!-- Thêm Font Awesome để sử dụng icon -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />

@@ -5,19 +5,14 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<div class="container my-5 position-relative">
-    <!-- Các hình tròn gradient trang trí -->
-    <div class="circle circle-1"></div>
-    <div class="circle circle-2"></div>
-    <div class="circle circle-3"></div>
-
-    <h1 class="text-light mb-2">Xóa lịch chiếu</h1>
+<div class="container my-5">
+    <h1 class="text-white mb-2 title-gradient">Xóa lịch chiếu</h1>
     <h4 class="text-muted mb-4">Lịch chiếu: @Model.Title</h4>
     <hr />
 
     <div class="row">
         <div class="col-md-8 offset-md-2">
-            <div class="card movie-card text-light">
+            <div class="card movie-card text-light glow-effect">
                 <div class="card-body">
                     <h5 class="text-danger mb-4">Bạn có chắc chắn muốn xóa lịch chiếu này?</h5>
                     <dl class="row">
@@ -45,10 +40,10 @@
                     <form asp-action="Delete" method="post">
                         <input type="hidden" asp-for="ShowtimeId" />
                         <div class="form-group mt-4 d-flex justify-content-between">
-                            <button type="submit" class="btn btn-danger">
+                            <button type="submit" class="btn btn-danger glow-effect">
                                 <i class="fas fa-trash-alt me-1"></i> Xóa
                             </button>
-                            <a asp-action="Index" class="btn btn-back">
+                            <a asp-action="Index" class="btn btn-secondary glow-effect">
                                 <i class="fas fa-arrow-left me-1"></i> Hủy
                             </a>
                         </div>
@@ -62,122 +57,88 @@
 <!-- CSS tùy chỉnh -->
 <style>
     body {
-        background: linear-gradient(135deg, #ff9a8b 0%, #ff6a88 50%, #6b48ff 100%);
-        font-family: 'Arial', sans-serif;
-        color: #fff;
+        background-color: #0F0F0F; /* Galaxy Black */
+        color: #ffffff;
+        font-family: 'Montserrat', sans-serif;
     }
 
-    .container {
-        padding-top: 20px;
-        padding-bottom: 20px;
+    .title-gradient {
+        background: linear-gradient(90deg, #ff0033, #1c1c1c);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        color: transparent;
     }
 
-    .circle {
-        position: absolute;
-        border-radius: 50%;
-        background: linear-gradient(135deg, #ff9a8b 0%, #ff6a88 50%, #6b48ff 100%);
-        opacity: 0.3;
+    .glow-effect {
+        box-shadow: 0 0 15px rgba(255, 0, 51, 0.3);
+        transition: box-shadow 0.3s ease, transform 0.3s ease;
     }
 
-    .circle-1 {
-        width: 300px;
-        height: 300px;
-        top: -50px;
-        left: -50px;
-    }
-
-    .circle-2 {
-        width: 200px;
-        height: 200px;
-        bottom: -50px;
-        left: 50px;
-    }
-
-    .circle-3 {
-        width: 150px;
-        height: 150px;
-        top: 50%;
-        left: 20%;
-    }
+        .glow-effect:hover {
+            box-shadow: 0 0 25px rgba(255, 0, 51, 0.5);
+            transform: scale(1.05);
+        }
 
     .movie-card {
-        background: rgba(255, 255, 255, 0.2);
-        backdrop-filter: blur(10px);
+        background-color: #1c1c1c;
+        border: none;
         border-radius: 15px;
-        border: none;
-        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
     }
 
-        .movie-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+        .movie-card .card-body {
+            background-color: #1c1c1c;
+            border-radius: 15px;
         }
 
-    .form-control {
-        background-color: #2a2a2a;
-        color: #e0e0e0;
-        border: 1px solid #444;
-        transition: border-color 0.3s ease;
+    .text-danger {
+        color: #e6002e !important;
     }
-
-        .form-control:focus {
-            background-color: #2a2a2a;
-            color: #e0e0e0;
-            border-color: #007bff;
-            box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
-        }
-
-    .btn-primary {
-        background: linear-gradient(90deg, #ff6a88 0%, #6b48ff 100%);
-        color: #fff;
-        border: none;
-        border-radius: 8px;
-        padding: 10px 20px;
-        transition: background 0.3s ease;
-    }
-
-        .btn-primary:hover {
-            background: linear-gradient(90deg, #ff6a88 50%, #6b48ff 100%);
-            transform: scale(1.05);
-        }
-
-    .btn-danger {
-        background: linear-gradient(90deg, #dc3545 0%, #ff6a88 100%);
-        color: #fff;
-        border: none;
-        border-radius: 8px;
-        padding: 10px 20px;
-        transition: background 0.3s ease;
-    }
-
-        .btn-danger:hover {
-            background: linear-gradient(90deg, #ff6a88 0%, #dc3545 100%);
-            transform: scale(1.05);
-        }
-
-    .btn-back {
-        background: linear-gradient(90deg, #4e54c8 0%, #8f94fb 100%);
-        color: #fff;
-        border: none;
-        border-radius: 8px;
-        padding: 10px 20px;
-        transition: transform 0.3s ease, background 0.3s ease;
-        font-weight: bold;
-    }
-
-        .btn-back:hover {
-            background: linear-gradient(90deg, #8f94fb 0%, #4e54c8 100%);
-            transform: scale(1.05);
-        }
 
     .text-muted {
-        color: #dcdcdc !important;
+        color: #b3b3b3 !important;
     }
 
     dl.row dt, dd {
         margin-bottom: 10px;
+        color: #b3b3b3;
     }
+
+    dl.row dd {
+        color: #ffffff;
+    }
+
+    .btn-danger {
+        background-color: #e6002e;
+        border: none;
+        border-radius: 20px;
+        padding: 10px 20px;
+        font-weight: 600;
+        font-size: 1rem;
+        transition: background-color 0.3s ease, transform 0.3s ease;
+    }
+
+        .btn-danger:hover {
+            background-color: #cc0027;
+            transform: scale(1.05);
+        }
+
+    .btn-secondary {
+        border-color: #ff0033;
+        color: #ff0033;
+        border-radius: 20px;
+        padding: 10px 20px;
+        font-weight: 600;
+        font-size: 1rem;
+        transition: background-color 0.3s ease, transform 0.3s ease;
+    }
+
+        .btn-secondary:hover {
+            background-color: #ff0033;
+            color: #ffffff;
+            border-color: #ff0033;
+            transform: scale(1.05);
+        }
 </style>
 
 <!-- Thêm Font Awesome và Bootstrap -->
