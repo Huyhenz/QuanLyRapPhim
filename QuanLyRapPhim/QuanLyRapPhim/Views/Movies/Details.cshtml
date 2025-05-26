@@ -5,7 +5,7 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<div class="container-fluid vh-100 d-flex flex-column justify-content-center position-relative overflow-hidden">
+<div class="container-fluid d-flex flex-column position-relative">
     <!-- Khung bao quanh -->
     <div class="frame-wrapper flex-grow-1">
         <h1 class="text-white mb-4">Chi tiết phim: @Model.Title</h1>
@@ -29,7 +29,14 @@
         <div class="row">
             <!-- Poster phim -->
             <div class="col-md-6">
-                <img src="@Model.Poster" class="img-fluid rounded shadow movie-poster" alt="@Model.Title" />
+                @if (!string.IsNullOrEmpty(Model.Poster))
+                {
+                    <img src="@Model.Poster" class="img-fluid rounded shadow movie-poster glow-effect" alt="@Model.Title" />
+                }
+                else
+                {
+                    <div class="text-center text-muted mb-3" style="height: 500px; line-height: 500px;">Không có poster</div>
+                }
             </div>
 
             <!-- Thông tin chi tiết phim -->
@@ -60,9 +67,56 @@
             </div>
         </div>
 
+        <!-- Trailer Section -->
+        @if (!string.IsNullOrEmpty(Model.TrailerUrl))
+        {
+            // Convert YouTube URL to embed format
+            var videoId = "";
+            if (Model.TrailerUrl.Contains("youtube.com/watch?v="))
+            {
+                videoId = Model.TrailerUrl.Split("v=")[1];
+                var ampersandPosition = videoId.IndexOf('&');
+                if (ampersandPosition != -1)
+                {
+                    videoId = videoId.Substring(0, ampersandPosition);
+                }
+            }
+            else if (Model.TrailerUrl.Contains("youtu.be/"))
+            {
+                videoId = Model.TrailerUrl.Split("youtu.be/")[1];
+                var questionMarkPosition = videoId.IndexOf('?');
+                if (questionMarkPosition != -1)
+                {
+                    videoId = videoId.Substring(0, questionMarkPosition);
+                }
+            }
+
+            if (!string.IsNullOrEmpty(videoId))
+            {
+                <div class="mt-5 mb-5 trailer-section">
+                    <h4 class="text-white mb-3">Trailer</h4>
+                    <div class="embed-responsive embed-responsive-16by9 movie-card glow-effect">
+                        <iframe class="embed-responsive-item"
+                                src="https://www.youtube.com/embed/@videoId"
+                                title="Trailer phim @Model.Title"
+                                frameborder="0"
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                allowfullscreen></iframe>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="mt-5 mb-5 trailer-section">
+                    <h4 class="text-white mb-3">Trailer</h4>
+                    <p class="text-muted">Không thể hiển thị trailer: Link không hợp lệ.</p>
+                </div>
+            }
+        }
+
         <!-- Form thêm nhận xét -->
         <div class="mt-5 review-section">
-            <h4 class="text-white">Viết nhận xét</h4>
+            <h4 class="text-white mb-3">Viết nhận xét</h4>
             @if (User.Identity.IsAuthenticated)
             {
                 var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
@@ -104,7 +158,7 @@
 
         <!-- Danh sách nhận xét -->
         <div class="mt-5 review-section">
-            <h4 class="text-white">Nhận xét từ người dùng</h4>
+            <h4 class="text-white mb-3">Nhận xét từ người dùng</h4>
             @if (Model.Reviews.Any())
             {
                 <div class="list-group">
@@ -143,7 +197,7 @@
 
     <!-- Footer -->
     <footer class="footer text-center py-3">
-        <p class="text-white mb-0">© 2025 CinemaX. All rights reserved. | Last updated: 07:34 PM +07, May 26, 2025</p>
+        <p class="text-white mb-0">© 2025 CinemaX. All rights reserved. | Last updated: 01:31 AM +07, May 27, 2025</p>
     </footer>
 </div>
 
@@ -156,16 +210,13 @@
         overflow: auto; /* Cho phép cuộn tự nhiên */
     }
 
-    .vh-100 {
-        min-height: 100vh;
-    }
-
     .container-fluid {
         display: flex;
         width: 100%;
         min-height: 100vh;
-        align-items: flex-start;
-        justify-content: center;
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-start;
         padding: 20px 0;
     }
 
@@ -179,7 +230,6 @@
         border-radius: 20px;
         border: 4px solid #2e2e2e; /* Viền cùng màu nền */
         box-shadow: 0 0 25px rgba(46, 46, 46, 0.5);
-        overflow: visible; /* Xóa giới hạn tràn */
         padding: 20px;
     }
 
@@ -357,9 +407,34 @@
                 color: #ffca28; /* Màu vàng khi hover */
             }
 
+    /* Trailer section */
+    .trailer-section {
+        width: 100%;
+        margin-bottom: 40px; /* Thêm khoảng cách dưới */
+    }
+
+    .embed-responsive {
+        position: relative;
+        padding-bottom: 56.25%; /* 16:9 Aspect Ratio */
+        height: 0;
+        overflow: hidden;
+        max-width: 100%;
+        background: #1c1c1c;
+    }
+
+        .embed-responsive iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
     /* Review sections */
     .review-section {
-        /* Xóa max-height và overflow-y để không có khung kéo */
+        width: 100%;
+        margin-bottom: 40px; /* Thêm khoảng cách dưới */
     }
 
     /* Footer */

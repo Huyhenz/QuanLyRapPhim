@@ -58,6 +58,12 @@
                             <span asp-validation-for="Actors" class="text-danger"></span>
                         </div>
 
+                        <div class="form-group mb-3">
+                            <label asp-for="TrailerUrl" class="form-label text-white">Link Trailer (YouTube)</label>
+                            <input asp-for="TrailerUrl" class="form-control" placeholder="Ví dụ: https://www.youtube.com/watch?v=VIDEO_ID" />
+                            <span asp-validation-for="TrailerUrl" class="text-danger"></span>
+                        </div>
+
                         <div class="d-flex justify-content-between">
                             <a asp-action="Index" class="btn btn-secondary">Quay lại</a>
                             <button type="submit" class="btn btn-create">Thêm phim</button>
@@ -70,7 +76,7 @@
 
     <!-- Footer -->
     <footer class="footer text-center py-3">
-        <p class="text-white mb-0">© 2025 CinemaX. All rights reserved. | Last updated: 05:54 PM +07, May 25, 2025</p>
+        <p class="text-white mb-0">© 2025 CinemaX. All rights reserved. | Last updated: 01:19 AM +07, May 27, 2025</p>
     </footer>
 </div>
 

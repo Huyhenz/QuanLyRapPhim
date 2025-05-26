@@ -49,6 +49,11 @@
                         <input asp-for="Actors" class="form-control" />
                         <span asp-validation-for="Actors" class="text-danger"></span>
                     </div>
+                    <div class="mb-3">
+                        <label asp-for="TrailerUrl" class="form-label font-bold text-white"></label>
+                        <input asp-for="TrailerUrl" class="form-control" placeholder="Ví dụ: https://www.youtube.com/watch?v=VIDEO_ID" />
+                        <span asp-validation-for="TrailerUrl" class="text-danger"></span>
+                    </div>
                     <div class="text-center">
                         <button type="submit" class="btn btn-create px-4 py-2">Lưu</button>
                     </div>

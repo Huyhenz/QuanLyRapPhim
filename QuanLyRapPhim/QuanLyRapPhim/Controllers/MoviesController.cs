@@ -116,7 +116,7 @@ namespace QuanLyRapPhim.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("MovieId,Title,Description,Duration,Poster,Genre,Director,Actors")] Movie movie)
+        public async Task<IActionResult> Create([Bind("MovieId,Title,Description,Duration,Poster,Genre,Director,Actors,TrailerUrl")] Movie movie)
         {
             if (ModelState.IsValid)
             {
@@ -148,7 +148,7 @@ namespace QuanLyRapPhim.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("MovieId,Title,Description,Duration,Poster,Genre,Director,Actors")] Movie movie)
+        public async Task<IActionResult> Edit(int id, [Bind("MovieId,Title,Description,Duration,Poster,Genre,Director,Actors,TrailerUrl")] Movie movie)
         {
             if (id != movie.MovieId)
             {

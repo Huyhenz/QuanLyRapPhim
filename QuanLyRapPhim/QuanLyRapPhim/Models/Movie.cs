@@ -14,6 +14,7 @@ namespace QuanLyRapPhim.Models
         public string Genre { get; set; }
         public string Director { get; set; }
         public string Actors { get; set; }
+        public string TrailerUrl { get; set; }
 
         public ICollection<Showtime>? Showtimes { get; set; }
         public List<Review> Reviews { get; set; } = new List<Review>();
