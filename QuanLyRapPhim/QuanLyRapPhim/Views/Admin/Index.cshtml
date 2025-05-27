@@ -1,0 +1,809 @@
+﻿@model dynamic
+
+@{
+    ViewData["Title"] = "Admin Dashboard";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="admin-dashboard">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h3 class="sidebar-title">CinemaX Admin</h3>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="/Admin/Index" class="nav-item active"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+            <a href="/Movies" class="nav-item"><i class="fas fa-film"></i> Manage Movies</a>
+            <a href="/Showtimes" class="nav-item"><i class="fas fa-clock"></i> Manage Showtimes</a>
+            <a href="/Rooms" class="nav-item"><i class="fas fa-door-open"></i> Manage Rooms</a>
+            <a href="/Seats" class="nav-item"><i class="fas fa-chair"></i> Manage Seats</a>
+            <a href="/Admin/ManageBookings" class="nav-item"><i class="fas fa-ticket-alt"></i> Manage Bookings</a>
+            <div class="nav-divider"></div>
+            <a href="#" class="nav-item"><i class="fab fa-facebook"></i> Facebook</a>
+            <a href="#" class="nav-item"><i class="fab fa-twitter"></i> Twitter</a>
+            <a href="#" class="nav-item"><i class="fab fa-google"></i> Google</a>
+        </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="content-header">
+            <h2 class="content-title">Order</h2>
+            <div class="header-actions">
+                <span class="order-count">28 orders found</span>
+                <div class="date-filter">
+                    <span>From</span>
+                    <input type="date" class="date-input" value="2020-07-31">
+                    <span>to</span>
+                    <input type="date" class="date-input" value="2020-08-03">
+                </div>
+                <div class="user-profile">
+                    <span>User</span>
+                    <i class="fas fa-user"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Alerts for Success/Error Messages -->
+        <div id="alert-container" class="mb-4"></div>
+
+        <!-- Movies Section -->
+        <div class="admin-section">
+            <h3 class="section-subtitle">Manage Movies</h3>
+            <button class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#addMovieModal">Add New Movie</button>
+            <div class="table-responsive">
+                <table class="table table-custom">
+                    <thead>
+                        <tr>
+                            <th>Title</th>
+                            <th>Genre</th>
+                            <th>Duration</th>
+                            <th>Director</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="movies-table">
+                        @foreach (var movie in ViewBag.Movies)
+                        {
+                            <tr data-id="@movie.MovieId">
+                                <td>@movie.Title</td>
+                                <td>@movie.Genre</td>
+                                <td>@movie.Duration phút</td>
+                                <td>@movie.Director</td>
+                                <td>
+                                    <button class="btn btn-sm btn-warning edit-movie-btn" data-id="@movie.MovieId">Edit</button>
+                                    <button class="btn btn-sm btn-danger delete-movie-btn" data-id="@movie.MovieId">Delete</button>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <div class="pagination">
+                <span>Showing 01-10 of 28</span>
+                <div class="pagination-controls">
+                    <button class="btn-pag"><i class="fas fa-angle-left"></i></button>
+                    <button class="btn-pag active">1</button>
+                    <button class="btn-pag">2</button>
+                    <button class="btn-pag">3</button>
+                    <button class="btn-pag"><i class="fas fa-angle-right"></i></button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Showtimes Section -->
+        <div class="admin-section">
+            <h3 class="section-subtitle">Manage Showtimes</h3>
+            <button class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#addShowtimeModal">Add New Showtime</button>
+            <div class="table-responsive">
+                <table class="table table-custom">
+                    <thead>
+                        <tr>
+                            <th>Movie</th>
+                            <th>Room</th>
+                            <th>Date & Time</th>
+                            <th>Price</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="showtimes-table">
+                        @foreach (var showtime in ViewBag.Showtimes)
+                        {
+                            <tr data-id="@showtime.ShowtimeId">
+                                <td>@showtime.Movie.Title</td>
+                                <td>@showtime.Room.RoomName</td>
+                                <td>@showtime.Date.ToString("dd/MM/yyyy HH:mm")</td>
+                                @* <td>@showtime.TicketPrice.ToString("C", new System.Globalization.CultureInfo("vi-VN"))</td> <!-- Updated Price to TicketPrice --> *@
+                                <td>
+                                    <button class="btn btn-sm btn-warning edit-showtime-btn" data-id="@showtime.ShowtimeId">Edit</button>
+                                    <button class="btn btn-sm btn-danger delete-showtime-btn" data-id="@showtime.ShowtimeId">Delete</button>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <div class="pagination">
+                <span>Showing 01-10 of 28</span>
+                <div class="pagination-controls">
+                    <button class="btn-pag"><i class="fas fa-angle-left"></i></button>
+                    <button class="btn-pag active">1</button>
+                    <button class="btn-pag">2</button>
+                    <button class="btn-pag">3</button>
+                    <button class="btn-pag"><i class="fas fa-angle-right"></i></button>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<!-- Add Movie Modal -->
+<div class="modal fade" id="addMovieModal" tabindex="-1" aria-labelledby="addMovieModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addMovieModalLabel">Add New Movie</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="add-movie-form">
+                    <div class="mb-3">
+                        <label for="addTitle" class="form-label">Title</label>
+                        <input type="text" class="form-control" id="addTitle" name="Title" required />
+                    </div>
+                    <div class="mb-3">
+                        <label for="addDescription" class="form-label">Description</label>
+                        <textarea class="form-control" id="addDescription" name="Description" rows="3"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="addDuration" class="form-label">Duration (minutes)</label>
+                        <input type="number" class="form-control" id="addDuration" name="Duration" required />
+                    </div>
+                    <div class="mb-3">
+                        <label for="addPoster" class="form-label">Poster URL</label>
+                        <input type="url" class="form-control" id="addPoster" name="Poster" />
+                    </div>
+                    <div class="mb-3">
+                        <label for="addGenre" class="form-label">Genre</label>
+                        <input type="text" class="form-control" id="addGenre" name="Genre" />
+                    </div>
+                    <div class="mb-3">
+                        <label for="addDirector" class="form-label">Director</label>
+                        <input type="text" class="form-control" id="addDirector" name="Director" />
+                    </div>
+                    <div class="mb-3">
+                        <label for="addActors" class="form-label">Actors</label>
+                        <input type="text" class="form-control" id="addActors" name="Actors" />
+                    </div>
+                    <div class="mb-3">
+                        <label for="addTrailerUrl" class="form-label">Trailer URL (YouTube)</label>
+                        <input type="url" class="form-control" id="addTrailerUrl" name="TrailerUrl" placeholder="e.g., https://www.youtube.com/watch?v=VIDEO_ID" />
+                    </div>
+                    <button type="submit" class="btn btn-primary">Add Movie</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Movie Modal -->
+<div class="modal fade" id="editMovieModal" tabindex="-1" aria-labelledby="editMovieModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editMovieModalLabel">Edit Movie</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="edit-movie-form">
+                    <input type="hidden" id="editMovieId" name="MovieId" />
+                    <div class="mb-3">
+                        <label for="editTitle" class="form-label">Title</label>
+                        <input type="text" class="form-control" id="editTitle" name="Title" required />
+                    </div>
+                    <div class="mb-3">
+                        <label for="editDescription" class="form-label">Description</label>
+                        <textarea class="form-control" id="editDescription" name="Description" rows="3"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editDuration" class="form-label">Duration (minutes)</label>
+                        <input type="number" class="form-control" id="editDuration" name="Duration" required />
+                    </div>
+                    <div class="mb-3">
+                        <label for="editPoster" class="form-label">Poster URL</label>
+                        <input type="url" class="form-control" id="editPoster" name="Poster" />
+                    </div>
+                    <div class="mb-3">
+                        <label for="editGenre" class="form-label">Genre</label>
+                        <input type="text" class="form-control" id="editGenre" name="Genre" />
+                    </div>
+                    <div class="mb-3">
+                        <label for="editDirector" class="form-label">Director</label>
+                        <input type="text" class="form-control" id="editDirector" name="Director" />
+                    </div>
+                    <div class="mb-3">
+                        <label for="editActors" class="form-label">Actors</label>
+                        <input type="text" class="form-control" id="editActors" name="Actors" />
+                    </div>
+                    <div class="mb-3">
+                        <label for="editTrailerUrl" class="form-label">Trailer URL (YouTube)</label>
+                        <input type="url" class="form-control" id="editTrailerUrl" name="TrailerUrl" placeholder="e.g., https://www.youtube.com/watch?v=VIDEO_ID" />
+                    </div>
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Showtime Modal -->
+<div class="modal fade" id="addShowtimeModal" tabindex="-1" aria-labelledby="addShowtimeModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addShowtimeModalLabel">Add New Showtime</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="add-showtime-form">
+                    <div class="mb-3">
+                        <label for="addShowtimeMovieId" class="form-label">Movie</label>
+                        <select class="form-control" id="addShowtimeMovieId" name="MovieId" required>
+                            <option value="">Select Movie</option>
+                            @foreach (var movie in ViewBag.Movies)
+                            {
+                                <option value="@movie.MovieId">@movie.Title</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="addShowtimeRoomId" class="form-label">Room</label>
+                        <select class="form-control" id="addShowtimeRoomId" name="RoomId" required>
+                            <option value="">Select Room</option>
+                            @foreach (var room in ViewBag.Rooms)
+                            {
+                                <option value="@room.RoomId">@room.RoomName</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="addShowtimeDateTime" class="form-label">Date & Time</label>
+                        <input type="datetime-local" class="form-control" id="addShowtimeDateTime" name="Date" required />
+                    </div>
+                    <div class="mb-3">
+                        <label for="addShowtimePrice" class="form-label">Price (VND)</label>
+                        <input type="number" class="form-control" id="addShowtimePrice" name="TicketPrice" required />
+                    </div>
+                    <button type="submit" class="btn btn-primary">Add Showtime</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Showtime Modal -->
+<div class="modal fade" id="editShowtimeModal" tabindex="-1" aria-labelledby="editShowtimeModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editShowtimeModalLabel">Edit Showtime</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="edit-showtime-form">
+                    <input type="hidden" id="editShowtimeId" name="ShowtimeId" />
+                    <div class="mb-3">
+                        <label for="editShowtimeMovieId" class="form-label">Movie</label>
+                        <select class="form-control" id="editShowtimeMovieId" name="MovieId" required>
+                            <option value="">Select Movie</option>
+                            @foreach (var movie in ViewBag.Movies)
+                            {
+                                <option value="@movie.MovieId">@movie.Title</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editShowtimeRoomId" class="form-label">Room</label>
+                        <select class="form-control" id="editShowtimeRoomId" name="RoomId" required>
+                            <option value="">Select Room</option>
+                            @foreach (var room in ViewBag.Rooms)
+                            {
+                                <option value="@room.RoomId">@room.RoomName</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editShowtimeDateTime" class="form-label">Date & Time</label>
+                        <input type="datetime-local" class="form-control" id="editShowtimeDateTime" name="Date" required />
+                    </div>
+                    <div class="mb-3">
+                        <label for="editShowtimePrice" class="form-label">Price (VND)</label>
+                        <input type="number" class="form-control" id="editShowtimePrice" name="TicketPrice" required />
+                    </div>
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    html, body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        background-color: #f5f7fa; /* Ensure background extends to entire page */
+        color: #333;
+        font-family: 'Roboto', sans-serif;
+        overflow-x: hidden; /* Prevent horizontal scroll */
+    }
+
+    .admin-dashboard {
+        display: flex;
+        min-height: 100vh; /* Allow content to grow beyond viewport */
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .sidebar {
+        width: 250px;
+        background: linear-gradient(135deg, #007bff, #00c4ff);
+        color: #fff;
+        padding: 20px 0;
+        position: fixed;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        height: 100%;
+        box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+        overflow-y: auto; /* Allow sidebar to scroll if content overflows */
+    }
+
+    .sidebar-header {
+        padding: 10px 20px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .sidebar-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        margin: 0;
+    }
+
+    .sidebar-nav {
+        margin-top: 20px;
+    }
+
+    .nav-item {
+        display: flex;
+        align-items: center;
+        padding: 12px 20px;
+        color: #fff;
+        text-decoration: none;
+        font-size: 1rem;
+        transition: background 0.3s ease;
+    }
+
+        .nav-item i {
+            margin-right: 10px;
+            font-size: 1.2rem;
+        }
+
+        .nav-item:hover, .nav-item.active {
+            background: rgba(255, 255, 255, 0.1);
+            border-left: 4px solid #fff;
+        }
+
+    .nav-divider {
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        margin: 10px 0;
+    }
+
+    .main-content {
+        margin-left: 250px; /* Match sidebar width */
+        padding: 20px;
+        width: calc(100% - 250px); /* Ensure main content takes remaining width */
+        background: #fff;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        min-height: 100vh; /* Ensure it fills viewport height */
+        box-sizing: border-box;
+        overflow-y: auto; /* Allow scrolling for main content */
+    }
+
+    .content-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+
+    .content-title {
+        font-size: 1.8rem;
+        font-weight: 600;
+        color: #333;
+    }
+
+    .header-actions {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .order-count {
+        font-size: 0.9rem;
+        color: #666;
+    }
+
+    .date-filter {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    .date-input {
+        padding: 5px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+    }
+
+    .user-profile {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        cursor: pointer;
+    }
+
+        .user-profile i {
+            font-size: 1.2rem;
+            color: #007bff;
+        }
+
+    .admin-section {
+        margin-bottom: 50px;
+    }
+
+    .section-subtitle {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: #007bff;
+        margin-bottom: 20px;
+    }
+
+    .table-custom {
+        width: 100%; /* Ensure table doesn't overflow */
+        background: #fff;
+        border: 1px solid #eee;
+        border-radius: 8px;
+        overflow: hidden;
+        table-layout: fixed; /* Prevent table columns from stretching too wide */
+    }
+
+        .table-custom th, .table-custom td {
+            padding: 12px;
+            text-align: left;
+            color: #666;
+            vertical-align: middle;
+            word-wrap: break-word; /* Prevent text overflow in cells */
+        }
+
+        .table-custom th {
+            background: #f8f9fa;
+            color: #333;
+            font-weight: 600;
+        }
+
+    .btn-primary {
+        background: linear-gradient(90deg, #007bff, #00c4ff);
+        border: none;
+        border-radius: 6px;
+        padding: 8px 16px;
+        color: #fff;
+        font-weight: 600;
+        transition: transform 0.2s ease;
+    }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            background: linear-gradient(90deg, #0056b3, #00a3cc);
+        }
+
+    .btn-warning {
+        background-color: #ffca28;
+        color: #333;
+        border: none;
+        border-radius: 6px;
+    }
+
+        .btn-warning:hover {
+            background-color: #ffb300;
+        }
+
+    .btn-danger {
+        background-color: #dc3545;
+        border: none;
+        border-radius: 6px;
+    }
+
+        .btn-danger:hover {
+            background-color: #c82333;
+        }
+
+    .pagination {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 20px;
+        color: #666;
+    }
+
+    .pagination-controls {
+        display: flex;
+        gap: 5px;
+    }
+
+    .btn-pag {
+        padding: 5px 10px;
+        border: 1px solid #ddd;
+        background: #fff;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+
+        .btn-pag.active {
+            background: #007bff;
+            color: #fff;
+            border-color: #007bff;
+        }
+
+    .modal-content {
+        background-color: #fff;
+        color: #333;
+        border-radius: 8px;
+        border: none;
+    }
+
+    .modal-header {
+        border-bottom: 1px solid #eee;
+    }
+
+    .modal-title {
+        color: #007bff;
+    }
+
+    .modal-body .form-label {
+        color: #333;
+        font-weight: 500;
+    }
+
+    .modal-body .form-control {
+        background-color: #fff;
+        border: 1px solid #ddd;
+        color: #333;
+        border-radius: 4px;
+    }
+
+        .modal-body .form-control:focus {
+            border-color: #007bff;
+            box-shadow: 0 0 5px rgba(0, 123, 255, 0.3);
+        }
+
+    /* Responsive Design */
+    @@media (max-width: 768px) {
+        .sidebar
+
+    {
+        width: 200px;
+        z-index: 1000; /* Ensure sidebar stays above content */
+    }
+
+    .main-content {
+        margin-left: 200px;
+        width: calc(100% - 200px);
+    }
+
+    }
+
+    @@media (max-width: 576px) {
+        .admin-dashboard
+
+    {
+        flex-direction: column;
+    }
+
+    .sidebar {
+        position: relative;
+        width: 100%;
+        height: auto;
+    }
+
+    .main-content {
+        margin-left: 0;
+        width: 100%;
+        min-height: auto; /* Allow content to grow naturally */
+    }
+
+    }
+</style>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            // Show Alert
+            function showAlert(message, type) {
+                var alertHtml = `<div class="alert alert-${type} alert-dismissible fade show" role="alert">
+                    ${message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>`;
+                $('#alert-container').html(alertHtml);
+            }
+
+            // Add Movie
+            $('#add-movie-form').submit(function (e) {
+                e.preventDefault();
+                $.ajax({
+                    url: '@Url.Action("CreateMovie", "Admin")',
+                    type: 'POST',
+                    data: $(this).serialize(),
+                    success: function (response) {
+                        if (response.success) {
+                            showAlert(response.message, 'success');
+                            $('#addMovieModal').modal('hide');
+                            location.reload();
+                        } else {
+                            showAlert(response.message + '<br>' + (response.errors ? response.errors.join('<br>') : ''), 'danger');
+                        }
+                    },
+                    error: function () {
+                        showAlert('An error occurred while adding the movie.', 'danger');
+                    }
+                });
+            });
+
+            // Edit Movie - Populate Modal
+            $(document).on('click', '.edit-movie-btn', function () {
+                var movieId = $(this).data('id');
+                var row = $(this).closest('tr');
+                $('#editMovieId').val(movieId);
+                $('#editTitle').val(row.find('td:eq(0)').text());
+                $('#editGenre').val(row.find('td:eq(1)').text());
+                $('#editDuration').val(parseInt(row.find('td:eq(2)').text()));
+                $('#editDirector').val(row.find('td:eq(3)').text());
+                $.ajax({
+                    url: '@Url.Action("Details", "Movies")/' + movieId,
+                    type: 'GET',
+                    success: function (data) {
+                        $('#editDescription').val(data.description);
+                        $('#editPoster').val(data.poster);
+                        $('#editActors').val(data.actors);
+                        $('#editTrailerUrl').val(data.trailerUrl);
+                    }
+                });
+                $('#editMovieModal').modal('show');
+            });
+
+            // Edit Movie - Submit
+            $('#edit-movie-form').submit(function (e) {
+                e.preventDefault();
+                $.ajax({
+                    url: '@Url.Action("EditMovie", "Admin")',
+                    type: 'POST',
+                    data: $(this).serialize(),
+                    success: function (response) {
+                        if (response.success) {
+                            showAlert(response.message, 'success');
+                            $('#editMovieModal').modal('hide');
+                            location.reload();
+                        } else {
+                            showAlert(response.message + '<br>' + (response.errors ? response.errors.join('<br>') : ''), 'danger');
+                        }
+                    },
+                    error: function () {
+                        showAlert('An error occurred while updating the movie.', 'danger');
+                    }
+                });
+            });
+
+            // Delete Movie
+            $(document).on('click', '.delete-movie-btn', function () {
+                if (!confirm('Are you sure you want to delete this movie?')) return;
+                var movieId = $(this).data('id');
+                $.ajax({
+                    url: '@Url.Action("DeleteMovie", "Admin")',
+                    type: 'POST',
+                    data: { id: movieId, __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val() },
+                    success: function (response) {
+                        if (response.success) {
+                            showAlert(response.message, 'success');
+                            location.reload();
+                        } else {
+                            showAlert(response.message, 'danger');
+                        }
+                    },
+                    error: function () {
+                        showAlert('An error occurred while deleting the movie.', 'danger');
+                    }
+                });
+            });
+
+            // Add Showtime
+            $('#add-showtime-form').submit(function (e) {
+                e.preventDefault();
+                $.ajax({
+                    url: '@Url.Action("CreateShowtime", "Admin")',
+                    type: 'POST',
+                    data: $(this).serialize(),
+                    success: function (response) {
+                        if (response.success) {
+                            showAlert(response.message, 'success');
+                            $('#addShowtimeModal').modal('hide');
+                            location.reload();
+                        } else {
+                            showAlert(response.message + '<br>' + (response.errors ? response.errors.join('<br>') : ''), 'danger');
+                        }
+                    },
+                    error: function () {
+                        showAlert('An error occurred while adding the showtime.', 'danger');
+                    }
+                });
+            });
+
+            // Edit Showtime - Populate Modal
+            $(document).on('click', '.edit-showtime-btn', function () {
+                var showtimeId = $(this).data('id');
+                var row = $(this).closest('tr');
+                $('#editShowtimeId').val(showtimeId);
+                $('#editShowtimeMovieId').val(ViewBag.Showtimes.find(s => s.ShowtimeId == showtimeId).MovieId);
+                $('#editShowtimeRoomId').val(ViewBag.Showtimes.find(s => s.ShowtimeId == showtimeId).RoomId);
+                var dateTime = new Date(row.find('td:eq(2)').text().split(' ').join('T').replace(/\//g, '-'));
+                $('#editShowtimeDateTime').val(dateTime.toISOString().slice(0, 16));
+                $('#editShowtimePrice').val(parseInt(row.find('td:eq(3)').text().replace(/[^0-9]/g, '')));
+                $('#editShowtimeModal').modal('show');
+            });
+
+            // Edit Showtime - Submit
+            $('#edit-showtime-form').submit(function (e) {
+                e.preventDefault();
+                $.ajax({
+                    url: '@Url.Action("EditShowtime", "Admin")',
+                    type: 'POST',
+                    data: $(this).serialize(),
+                    success: function (response) {
+                        if (response.success) {
+                            showAlert(response.message, 'success');
+                            $('#editShowtimeModal').modal('hide');
+                            location.reload();
+                        } else {
+                            showAlert(response.message + '<br>' + (response.errors ? response.errors.join('<br>') : ''), 'danger');
+                        }
+                    },
+                    error: function () {
+                        showAlert('An error occurred while updating the showtime.', 'danger');
+                    }
+                });
+            });
+
+            // Delete Showtime
+            $(document).on('click', '.delete-showtime-btn', function () {
+                if (!confirm('Are you sure you want to delete this showtime?')) return;
+                var showtimeId = $(this).data('id');
+                $.ajax({
+                    url: '@Url.Action("DeleteShowtime", "Admin")',
+                    type: 'POST',
+                    data: { id: showtimeId, __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val() },
+                    success: function (response) {
+                        if (response.success) {
+                            showAlert(response.message, 'success');
+                            location.reload();
+                        } else {
+                            showAlert(response.message, 'danger');
+                        }
+                    },
+                    error: function () {
+                        showAlert('An error occurred while deleting the showtime.', 'danger');
+                    }
+                });
+            });
+        });
+    </script>
+}
