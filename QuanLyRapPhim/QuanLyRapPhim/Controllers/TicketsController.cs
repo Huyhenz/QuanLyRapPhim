@@ -5,6 +5,10 @@ using Microsoft.EntityFrameworkCore;
 using QuanLyRapPhim.Data;
 using QuanLyRapPhim.Models;
 using System.Threading.Tasks;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using Microsoft.EntityFrameworkCore.Storage; // For transaction management
 
 namespace QuanLyRapPhim.Controllers
 {
@@ -114,19 +118,49 @@ namespace QuanLyRapPhim.Controllers
 
             booking.TotalPrice = booking.BookingDetails.Sum(bd => bd.Price);
 
-            _context.Bookings.Add(booking);
-            await _context.SaveChangesAsync();
-
-            // Cập nhật trạng thái ghế thành "Đã đặt" trong cơ sở dữ liệu
-            foreach (var seatId in selectedSeats)
+            // Bắt đầu giao dịch
+            using (var transaction = await _context.Database.BeginTransactionAsync())
             {
-                var seat = await _context.Seats.FindAsync(seatId);
-                if (seat != null)
+                try
                 {
-                    seat.Status = "Đã đặt";
+                    // Thêm Booking vào cơ sở dữ liệu
+                    _context.Bookings.Add(booking);
+                    await _context.SaveChangesAsync();
+
+                    // Tạo bản ghi Payment tương ứng
+                    var payment = new Payment
+                    {
+                        BookingId = booking.BookingId,
+                        Amount = booking.TotalPrice,
+                        PaymentDate = booking.BookingDate,
+                        PaymentMethod = "VNPay",
+                        PaymentStatus = "Completed"
+                    };
+                    _context.Payments.Add(payment);
+                    await _context.SaveChangesAsync();
+
+                    // Cập nhật trạng thái ghế thành "Đã đặt"
+                    foreach (var seatId in selectedSeats)
+                    {
+                        var seat = await _context.Seats.FindAsync(seatId);
+                        if (seat != null)
+                        {
+                            seat.Status = "Đã đặt";
+                        }
+                    }
+                    await _context.SaveChangesAsync();
+
+                    // Commit giao dịch
+                    await transaction.CommitAsync();
+                }
+                catch (Exception)
+                {
+                    // Nếu có lỗi, rollback giao dịch
+                    await transaction.RollbackAsync();
+                    TempData["ErrorMessage"] = "Đã xảy ra lỗi khi xử lý đặt vé. Vui lòng thử lại.";
+                    return RedirectToAction("SelectRoomAndSeat", new { showtimeId });
                 }
             }
-            await _context.SaveChangesAsync();
 
             // Chuyển hướng sang trang thanh toán
             return RedirectToAction("Create", "Payments", new { bookingId = booking.BookingId });

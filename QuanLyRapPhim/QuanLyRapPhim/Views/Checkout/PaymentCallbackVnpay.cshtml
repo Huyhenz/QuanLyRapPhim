@@ -16,8 +16,10 @@
                 <div class="card-body">
                     <h5 class="title-gradient mb-4">Thanh toán VNPAY @(Model.Success ? "Thành công" : "Thất bại")</h5>
                     <dl class="row">
-                        <dt class="col-sm-4 text-muted">Mã đặt vé</dt>
-                        <dd class="col-sm-8">@(ViewBag.BookingId ?? "Không xác định")</dd>
+                        @* <dt class="col-sm-4 text-muted">Mã đặt vé</dt> *@
+                        @* <dd class="col-sm-8">@(ViewBag.BookingId ?? "Không xác định")</dd> *@
+                        <dt class="col-sm-4 text-muted">Mã giao dịch</dt>
+                        <dd class="col-sm-8">@Model.TransactionId</dd>
 
                         <dt class="col-sm-4 text-muted">Email</dt>
                         <dd class="col-sm-8">@email</dd>
@@ -28,8 +30,7 @@
                         <dt class="col-sm-4 text-muted">Cách thức thanh toán</dt>
                         <dd class="col-sm-8">@Model.PaymentMethod</dd>
 
-                        <dt class="col-sm-4 text-muted">Mã giao dịch</dt>
-                        <dd class="col-sm-8">@Model.TransactionId</dd>
+                        
 
                         <dt class="col-sm-4 text-muted">Tình trạng</dt>
                         <dd class="col-sm-8">@(Model.Success ? "Thành công" : "Thất bại")</dd>
