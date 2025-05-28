@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 using QuanLyRapPhim.Data;
 using QuanLyRapPhim.Models;
 using System;
@@ -27,9 +28,9 @@ namespace QuanLyRapPhim.Controllers
                 .Include(s => s.Movie)
                 .Include(s => s.Room)
                 .ToList();
-            ViewBag.Movies = movies;
-            ViewBag.Showtimes = showtimes;
-            ViewBag.Rooms = _context.Rooms.ToList(); // For showtime creation
+            ViewBag.Movies = _context.Movies.ToList(); // Thay bằng logic lấy dữ liệu thực tế
+            ViewBag.Showtimes = _context.Showtimes.Include(s => s.Movie).Include(s => s.Room).ToList(); // Thay bằng logic lấy dữ liệu thực tế
+            ViewBag.Rooms = _context.Rooms.ToList(); // Để populate dropdown trong modal
             return View();
         }
 
@@ -188,6 +189,91 @@ namespace QuanLyRapPhim.Controllers
                 .ToList();
             ViewBag.Payments = _context.Payments.ToList();
             return View(bookings);
+        }
+
+        public IActionResult RevenueStatistics()
+        {
+            // Lấy tất cả bookings cùng thông tin liên quan
+            var bookings = _context.Bookings
+                .Include(b => b.Showtime)
+                .ThenInclude(s => s.Movie)
+                .ToList();
+
+            // Tính tổng doanh thu
+            var totalRevenue = bookings.Sum(b => b.TotalPrice);
+
+            // Tính doanh thu theo phim
+            var revenueByMovie = bookings
+                .GroupBy(b => b.Showtime.Movie.Title)
+                .Select(g => new
+                {
+                    MovieTitle = g.Key,
+                    Revenue = g.Sum(b => b.TotalPrice)
+                })
+                .OrderByDescending(x => x.Revenue) // Sắp xếp theo doanh thu giảm dần
+                .ToList();
+
+            // Tính doanh thu theo ngày
+            var revenueByDate = bookings
+                .GroupBy(b => b.BookingDate.Date) // Nhóm theo ngày (bỏ qua thời gian)
+                .Select(g => new RevenueByDateItem
+                {
+                    Date = g.Key,
+                    Revenue = g.Sum(b => b.TotalPrice)
+                })
+                .OrderBy(x => x.Date) // Sắp xếp theo ngày tăng dần
+                .ToList();
+
+            // Tạo đối tượng dữ liệu để truyền sang view
+            var revenueData = new
+            {
+                TotalRevenue = totalRevenue,
+                RevenueByMovie = revenueByMovie,
+                RevenueByDate = revenueByDate
+            };
+
+            // Chuyển đổi RevenueByDate thành định dạng phù hợp cho JavaScript
+            var formattedRevenueByDate = revenueData.RevenueByDate.Select(x => new
+            {
+                Date = x.Date.ToString("dd/MM/yyyy"),
+                Revenue = x.Revenue
+            }).ToList();
+
+            // Truyền dữ liệu sang view
+            ViewBag.RevenueData = revenueData;
+            ViewBag.FormattedRevenueByDate = JsonConvert.SerializeObject(formattedRevenueByDate);
+
+            return View();
+        }
+
+        public IActionResult GetShowtime(int id)
+        {
+            // Cast ViewBag.Showtimes to IEnumerable<dynamic> to use LINQ
+            var showtimes = (ViewBag.Showtimes as System.Collections.IEnumerable)?.Cast<dynamic>();
+            if (showtimes == null)
+            {
+                return NotFound(new { success = false, message = "Showtime data is not available." });
+            }
+
+            // Use FirstOrDefault with the casted collection
+            var showtime = showtimes.FirstOrDefault(s => (int)s.ShowtimeId == id);
+            if (showtime == null)
+            {
+                return NotFound(new { success = false, message = "Showtime not found." });
+            }
+
+            return Json(new
+            {
+                success = true,
+                data = new
+                {
+                    showtime.ShowtimeId,
+                    showtime.MovieId,
+                    showtime.RoomId,
+                    Date = showtime.Date.ToString("yyyy-MM-ddTHH:mm"), // Format for datetime-local input
+                    showtime.TicketPrice
+                }
+            });
         }
     }
 }
