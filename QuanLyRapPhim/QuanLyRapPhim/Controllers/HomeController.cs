@@ -32,5 +32,16 @@ namespace QuanLyRapPhim.Controllers
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
+
+        public IActionResult Search(string searchString)
+        {
+            ViewData["CurrentSearch"] = searchString; // Store the search string in ViewData
+
+            var movies = string.IsNullOrEmpty(searchString)
+                ? _context.Movies.ToList()
+                : _context.Movies.Where(m => m.Title.Contains(searchString)).ToList();
+
+            return View("Index", movies);
+        }
     }
 }
