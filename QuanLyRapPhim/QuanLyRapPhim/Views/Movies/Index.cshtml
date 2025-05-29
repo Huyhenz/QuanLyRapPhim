@@ -19,13 +19,13 @@
                 <h3 class="sidebar-title">CinemaX Admin</h3>
             </div>
             <nav class="sidebar-nav">
-                @* <a href="/Admin/Index" class="nav-item active"><i class="fas fa-tachometer-alt"></i> Dashboard</a> *@
-                <a href="/Movies" class="nav-item"><i class="fas fa-film"></i> Manage Movies</a>
-                <a href="/Showtimes" class="nav-item"><i class="fas fa-clock"></i> Manage Showtimes</a>
-                <a href="/Rooms" class="nav-item"><i class="fas fa-door-open"></i> Manage Rooms</a>
-                <a href="/Seats" class="nav-item"><i class="fas fa-chair"></i> Manage Seats</a>
-                <a href="/Admin/ManageBookings" class="nav-item"><i class="fas fa-ticket-alt"></i> Manage Bookings</a>
-                <a href="/Admin/RevenueStatistics" class="nav-item"><i class="fas fa-chart-bar"></i> Revenue Statistics</a>
+                @* <a href="/Admin/Index" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Admin" && ViewContext.RouteData.Values["Action"]?.ToString() == "Index" ? "active" : "")"><i class="fas fa-tachometer-alt"></i> Dashboard</a> *@
+                <a href="/Movies" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Movies" ? "active" : "")"><i class="fas fa-film"></i> Manage Movies</a>
+                <a href="/Showtimes" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Showtimes" ? "active" : "")"><i class="fas fa-clock"></i> Manage Showtimes</a>
+                <a href="/Rooms" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Rooms" ? "active" : "")"><i class="fas fa-door-open"></i> Manage Rooms</a>
+                <a href="/Seats" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Seats" ? "active" : "")"><i class="fas fa-chair"></i> Manage Seats</a>
+                <a href="/Admin/ManageBookings" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Admin" && ViewContext.RouteData.Values["Action"]?.ToString() == "ManageBookings" ? "active" : "")"><i class="fas fa-ticket-alt"></i> Manage Bookings</a>
+                <a href="/Admin/RevenueStatistics" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Admin" && ViewContext.RouteData.Values["Action"]?.ToString() == "RevenueStatistics" ? "active" : "")"><i class="fas fa-chart-bar"></i> Revenue Statistics</a>
                 <div class="nav-divider"></div>
                 <a href="#" class="nav-item"><i class="fab fa-facebook"></i> Facebook</a>
                 <a href="#" class="nav-item"><i class="fab fa-twitter"></i> Twitter</a>
@@ -178,7 +178,7 @@
         }
         else
         {
-            <!-- User Card View (Unchanged) -->
+            <!-- User Card View -->
             <div id="movieCarousel" class="carousel slide movie-row" data-bs-ride="carousel">
                 <div class="carousel-inner">
                     @{
@@ -303,12 +303,12 @@
 
         <!-- Footer -->
         <footer class="footer text-center py-3 @(isAdmin ? "admin-view" : "user-view")">
-            <p class="text-white mb-0">© 2025 CinemaX. All rights reserved. | Last updated: 11:55 PM +07, May 29, 2025</p>
+            <p class="text-white mb-0">© 2025 CinemaX. All rights reserved. | Last updated: 12:39 AM +07, May 30, 2025</p>
         </footer>
     </div>
 </div>
 
-<!-- Add Movie Modal (Admin Only) and Edit Movie Modal (Unchanged) -->
+<!-- Add Movie Modal (Admin Only) and Edit Movie Modal -->
 @if (isAdmin)
 {
     <!-- Add Movie Modal -->
@@ -911,7 +911,7 @@
     }
 </style>
 
-<!-- JavaScript (Unchanged) -->
+<!-- JavaScript -->
 @section Scripts {
     <script>
         $(document).ready(function () {
