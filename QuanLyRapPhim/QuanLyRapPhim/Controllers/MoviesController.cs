@@ -75,15 +75,7 @@ namespace QuanLyRapPhim.Controllers
             return RedirectToAction("Details", new { id = movieId });
         }
         
-        public IActionResult Search(string searchString)
-        {
-         
-            var movies = string.IsNullOrEmpty(searchString)
-                ? _context.Movies.ToList()
-                : _context.Movies.Where(m => m.Title.Contains(searchString)).ToList();
-
-            return View("Index", movies); 
-        }
+        
         // GET: Movies/Details/5
         public async Task<IActionResult> Details(int? id)
         {
@@ -215,5 +207,7 @@ namespace QuanLyRapPhim.Controllers
         {
             return _context.Movies.Any(e => e.MovieId == id);
         }
+
+
     }
 }
