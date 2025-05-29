@@ -1,919 +1,205 @@
 ﻿@model dynamic
-@using System.Linq
 
 @{
     ViewData["Title"] = "Admin Dashboard";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<div class="admin-dashboard">
-    <!-- Sidebar -->
-    <aside class="sidebar glow-effect">
-        <div class="sidebar-header">
-            <h3 class="sidebar-title title-gradient">CinemaX Admin</h3>
-        </div>
-        <nav class="sidebar-nav">
-            <a href="/Admin/Index" class="nav-item active"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
-            <a href="/Rooms" class="nav-item"><i class="fas fa-door-open"></i> Manage Rooms</a>
-            <a href="/Seats" class="nav-item"><i class="fas fa-chair"></i> Manage Seats</a>
-            <a href="/Admin/ManageBookings" class="nav-item"><i class="fas fa-ticket-alt"></i> Manage Bookings</a>
-            <a href="/Admin/RevenueStatistics" class="nav-item"><i class="fas fa-chart-bar"></i> Revenue Statistics</a>
-            <div class="nav-divider"></div>
-            <a href="#" class="nav-item"><i class="fab fa-facebook"></i> Facebook</a>
-            <a href="#" class="nav-item"><i class="fab fa-twitter"></i> Twitter</a>
-            <a href="#" class="nav-item"><i class="fab fa-google"></i> Google</a>
-        </nav>
-    </aside>
-
-    <!-- Main Content -->
-    <main class="main-content">
-        <div class="frame-wrapper mx-auto">
-            <div class="content-header">
-                <h2 class="content-title title-gradient">Order</h2>
-                <div class="header-actions">
-                    <span class="order-count">28 orders found</span>
-                    <div class="date-filter">
-                        <span>From</span>
-                        <input type="date" class="date-input glow-effect" value="2025-05-01">
-                        <span>to</span>
-                        <input type="date" class="date-input glow-effect" value="2025-05-28">
-                    </div>
-                    <div class="user-profile">
-                        <span>User</span>
-                        <i class="fas fa-user"></i>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Alerts for Success/Error Messages -->
-            <div id="alert-container" class="mb-4"></div>
-
-            <!-- Movies Section -->
-            <div class="admin-section">
-                <h3 class="section-subtitle title-gradient">Manage Movies</h3>
-                <button class="btn btn-primary mb-3 glow-effect" data-bs-toggle="modal" data-bs-target="#addMovieModal">Add New Movie</button>
-                <div class="table-responsive">
-                    <table class="table table-custom">
-                        <thead>
-                            <tr>
-                                <th>Title</th>
-                                <th>Genre</th>
-                                <th>Duration</th>
-                                <th>Director</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody id="movies-table">
-                            @{
-                                var movies = ViewBag.Movies as IEnumerable<QuanLyRapPhim.Models.Movie> ?? new List<QuanLyRapPhim.Models.Movie>();
-                                if (movies.Any())
-                                {
-                                    foreach (var movie in movies)
-                                    {
-                                        <tr data-id="@movie.MovieId">
-                                            <td>@(movie.Title ?? "N/A")</td>
-                                            <td>@(movie.Genre ?? "N/A")</td>
-                                            <td>@(movie.Duration != 0 ? $"{movie.Duration} phút" : "N/A")</td>
-                                            <td>@(movie.Director ?? "N/A")</td>
-                                            <td>
-                                                <button class="btn btn-sm btn-warning edit-movie-btn glow-effect" data-id="@movie.MovieId">Edit</button>
-                                                <button class="btn btn-sm btn-danger delete-movie-btn glow-effect" data-id="@movie.MovieId">Delete</button>
-                                            </td>
-                                        </tr>
-                                    }
-                                }
-                                else
-                                {
-                                    <tr>
-                                        <td colspan="5" class="text-center">No movies available.</td>
-                                    </tr>
-                                }
-                            }
-                        </tbody>
-                    </table>
-                </div>
-                <div class="pagination">
-                    <span>Showing 01-10 of @movies.Count()</span>
-                    <div class="pagination-controls">
-                        <button class="btn-pag glow-effect"><i class="fas fa-angle-left"></i></button>
-                        <button class="btn-pag active glow-effect">1</button>
-                        <button class="btn-pag glow-effect">2</button>
-                        <button class="btn-pag glow-effect">3</button>
-                        <button class="btn-pag glow-effect"><i class="fas fa-angle-right"></i></button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Showtimes Section -->
-            <div class="admin-section">
-                <h3 class="section-subtitle title-gradient">Manage Showtimes</h3>
-                <button class="btn btn-primary mb-3 glow-effect" data-bs-toggle="modal" data-bs-target="#addShowtimeModal">Add New Showtime</button>
-                <div class="table-responsive">
-                    <table class="table table-custom">
-                        <thead>
-                            <tr>
-                                <th>Title</th>
-                                <th>Movie</th>
-                                <th>Room</th>
-                                <th>Date & Time</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody id="showtimes-table">
-                            @{
-                                var showtimes = ViewBag.Showtimes as IEnumerable<QuanLyRapPhim.Models.Showtime> ?? new List<QuanLyRapPhim.Models.Showtime>();
-                                if (showtimes.Any())
-                                {
-                                    foreach (var showtime in showtimes)
-                                    {
-                                        <tr data-id="@showtime.ShowtimeId">
-                                            <td>@(showtime.Title ?? "N/A")</td>
-                                            <td>@(showtime.Movie?.Title ?? "N/A")</td>
-                                            <td>@(showtime.Room?.RoomName ?? "N/A")</td>
-                                            <td>@(showtime.Date != default(DateTime) ? $"{showtime.Date:dd/MM/yyyy} {showtime.StartTime:hh\\:mm}" : "N/A")</td>
-                                            <td>
-                                   
-                                                <button class="btn btn-sm btn-danger delete-showtime-btn glow-effect" data-id="@showtime.ShowtimeId">Delete</button>
-                                            </td>
-                                        </tr>
-                                    }
-                                }
-                                else
-                                {
-                                    <tr>
-                                        <td colspan="5" class="text-center">No showtimes available.</td>
-                                    </tr>
-                                }
-                            }
-                        </tbody>
-                    </table>
-                </div>
-                <div class="pagination">
-                    <span>Showing 01-10 of @showtimes.Count()</span>
-                    <div class="pagination-controls">
-                        <button class="btn-pag glow-effect"><i class="fas fa-angle-left"></i></button>
-                        <button class="btn-pag active glow-effect">1</button>
-                        <button class="btn-pag glow-effect">2</button>
-                        <button class="btn-pag glow-effect">3</button>
-                        <button class="btn-pag glow-effect"><i class="fas fa-angle-right"></i></button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </main>
-</div>
-
-<!-- Add Movie Modal -->
-<div class="modal fade" id="addMovieModal" tabindex="-1" aria-labelledby="addMovieModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title title-gradient" id="addMovieModalLabel">Add New Movie</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <form id="add-movie-form">
-                    @Html.AntiForgeryToken()
-                    <div class="mb-3">
-                        <label for="addTitle" class="form-label">Title</label>
-                        <input type="text" class="form-control glow-effect" id="addTitle" name="Title" required />
-                    </div>
-                    <div class="mb-3">
-                        <label for="addDescription" class="form-label">Description</label>
-                        <textarea class="form-control glow-effect" id="addDescription" name="Description" rows="3"></textarea>
-                    </div>
-                    <div class="mb-3">
-                        <label for="addDuration" class="form-label">Duration (minutes)</label>
-                        <input type="number" class="form-control glow-effect" id="addDuration" name="Duration" required />
-                    </div>
-                    <div class="mb-3">
-                        <label for="addPoster" class="form-label">Poster URL</label>
-                        <input type="url" class="form-control glow-effect" id="addPoster" name="Poster" />
-                    </div>
-                    <div class="mb-3">
-                        <label for="addGenre" class="form-label">Genre</label>
-                        <input type="text" class="form-control glow-effect" id="addGenre" name="Genre" />
-                    </div>
-                    <div class="mb-3">
-                        <label for="addDirector" class="form-label">Director</label>
-                        <input type="text" class="form-control glow-effect" id="addDirector" name="Director" />
-                    </div>
-                    <div class="mb-3">
-                        <label for="addActors" class="form-label">Actors</label>
-                        <input type="text" class="form-control glow-effect" id="addActors" name="Actors" />
-                    </div>
-                    <div class="mb-3">
-                        <label for="addTrailerUrl" class="form-label">Trailer URL (YouTube)</label>
-                        <input type="url" class="form-control glow-effect" id="addTrailerUrl" name="TrailerUrl" placeholder="e.g., https://www.youtube.com/watch?v=VIDEO_ID" />
-                    </div>
-                    <button type="submit" class="btn btn-primary glow-effect">Add Movie</button>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Edit Movie Modal -->
-<div class="modal fade" id="editMovieModal" tabindex="-1" aria-labelledby="editMovieModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title title-gradient" id="editMovieModalLabel">Edit Movie</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <form id="edit-movie-form">
-                    @Html.AntiForgeryToken()
-                    <input type="hidden" id="editMovieId" name="MovieId" />
-                    <div class="mb-3">
-                        <label for="editTitle" class="form-label">Title</label>
-                        <input type="text" class="form-control glow-effect" id="editTitle" name="Title" required />
-                    </div>
-                    <div class="mb-3">
-                        <label for="editDescription" class="form-label">Description</label>
-                        <textarea class="form-control glow-effect" id="editDescription" name="Description" rows="3"></textarea>
-                    </div>
-                    <div class="mb-3">
-                        <label for="editDuration" class="form-label">Duration (minutes)</label>
-                        <input type="number" class="form-control glow-effect" id="editDuration" name="Duration" required />
-                    </div>
-                    <div class="mb-3">
-                        <label for="editPoster" class="form-label">Poster URL</label>
-                        <input type="url" class="form-control glow-effect" id="editPoster" name="Poster" />
-                    </div>
-                    <div class="mb-3">
-                        <label for="editGenre" class="form-label">Genre</label>
-                        <input type="text" class="form-control glow-effect" id="editGenre" name="Genre" />
-                    </div>
-                    <div class="mb-3">
-                        <label for="editDirector" class="form-label">Director</label>
-                        <input type="text" class="form-control glow-effect" id="editDirector" name="Director" />
-                    </div>
-                    <div class="mb-3">
-                        <label for="editActors" class="form-label">Actors</label>
-                        <input type="text" class="form-control glow-effect" id="editActors" name="Actors" />
-                    </div>
-                    <div class="mb-3">
-                        <label for="editTrailerUrl" class="form-label">Trailer URL (YouTube)</label>
-                        <input type="url" class="form-control glow-effect" id="editTrailerUrl" name="TrailerUrl" placeholder="e.g., https://www.youtube.com/watch?v=VIDEO_ID" />
-                    </div>
-                    <button type="submit" class="btn btn-primary glow-effect">Save Changes</button>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Add Showtime Modal -->
-<div class="modal fade" id="addShowtimeModal" tabindex="-1" aria-labelledby="addShowtimeModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title title-gradient" id="addShowtimeModalLabel">Add New Showtime</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <form id="add-showtime-form">
-                    @Html.AntiForgeryToken()
-                    <div class="mb-4">
-                        <label for="addShowtimeMovieId" class="form-label">Movie</label>
-                        <select class="form-control glow-effect" id="addShowtimeMovieId" name="MovieId" required>
-                            <option value="">-- Select Movie --</option>
-                            @{
-                                var moviesForModal = ViewBag.Movies as IEnumerable<QuanLyRapPhim.Models.Movie> ?? new List<QuanLyRapPhim.Models.Movie>();
-                                foreach (var movie in moviesForModal)
-                                {
-                                    <option value="@movie.MovieId" data-title="@movie.Title" data-poster="@movie.Poster">@(movie.Title ?? "N/A")</option>
-                                }
-                            }
-                        </select>
-                    </div>
-                    <div class="mb-4">
-                        <label for="addShowtimeTitle" class="form-label">Showtime Title</label>
-                        <input type="text" class="form-control glow-effect" id="addShowtimeTitle" name="Title" required />
-                    </div>
-                    <div class="mb-4">
-                        <label for="addShowtimePoster" class="form-label">Poster URL</label>
-                        <input type="url" class="form-control glow-effect" id="addShowtimePoster" name="Poster" />
-                    </div>
-                    <div class="mb-4">
-                        <label for="addShowtimeRoomId" class="form-label">Room</label>
-                        <select class="form-control glow-effect" id="addShowtimeRoomId" name="RoomId" required>
-                            <option value="">-- Select Room --</option>
-                            @{
-                                var rooms = ViewBag.Rooms as IEnumerable<QuanLyRapPhim.Models.Room> ?? new List<QuanLyRapPhim.Models.Room>();
-                                foreach (var room in rooms)
-                                {
-                                    <option value="@room.RoomId">@(room.RoomName ?? "N/A")</option>
-                                }
-                            }
-                        </select>
-                    </div>
-                    <div class="mb-4">
-                        <label for="addShowtimeDate" class="form-label">Date</label>
-                        <input type="date" class="form-control glow-effect" id="addShowtimeDate" name="Date" required min="2025-05-29" />
-                    </div>
-                    <div class="mb-4">
-                        <label for="addShowtimeStartTime" class="form-label">Start Time</label>
-                        <input type="time" class="form-control glow-effect" id="addShowtimeStartTime" name="StartTime" required />
-                    </div>
-                    <div class="d-flex justify-content-between">
-                        <button type="submit" class="btn btn-danger glow-effect" style="background-color: #ff0000; border: none;">Create</button>
-                        <button type="button" class="btn btn-secondary glow-effect" data-bs-dismiss="modal" style="background-color: #4a90e2; border: none;">Back to List</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
-
-
-
-<style>
-    html, body {
-        height: 100%;
-        margin: 0;
-        padding: 0;
-        background-color: #1C2526;
-        color: #FFFFFF;
-        font-family: 'Montserrat', Arial, sans-serif;
-        overflow-x: hidden;
-    }
-
-    .admin-dashboard {
-        display: flex;
-        min-height: 100vh;
-        width: 100%;
-        box-sizing: border-box;
-        background: linear-gradient(135deg, #1C2526, #0F1415);
-    }
-
-    .sidebar {
-        width: 250px;
-        background: #2C3E50;
-        color: #FFFFFF;
-        padding: 20px 0;
-        position: fixed;
-        top: 0;
-        bottom: 0;
-        left: 0;
-        height: 100%;
-        border-right: 2px solid #34495E;
-        overflow-y: auto;
-    }
-
-    .sidebar-header {
-        padding: 10px 20px;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    }
-
-    .sidebar-title {
-        font-size: 1.5rem;
-        font-weight: 700;
-        margin: 0;
-    }
-
-    .sidebar-nav {
-        margin-top: 20px;
-    }
-
-    .nav-item {
-        display: flex;
-        align-items: center;
-        padding: 12px 20px;
-        color: #FFFFFF;
-        text-decoration: none;
-        font-size: 1rem;
-        transition: background 0.3s ease;
-    }
-
-        .nav-item i {
-            margin-right: 10px;
-            font-size: 1.2rem;
-            color: #ff0033;
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" />
+    <style>
+        body {
+            margin: 0;
+            background-color: #0F0F0F; /* Galaxy Black */
+            color: #ffffff;
+            font-family: 'Montserrat', sans-serif;
+            overflow-x: hidden;
         }
 
-        .nav-item:hover, .nav-item.active {
-            background: #34495E;
-            border-left: 4px solid #ff0033;
+        .admin-dashboard {
+            display: flex;
+            min-height: 100vh;
         }
 
-    .nav-divider {
-        border-top: 1px solid rgba(255, 255, 255, 0.1);
-        margin: 10px 0;
-    }
-
-    .main-content {
-        margin-left: 250px;
-        padding: 20px;
-        width: calc(100% - 250px);
-        min-height: 100vh;
-        box-sizing: border-box;
-        overflow-y: auto;
-    }
-
-    .frame-wrapper {
-        display: flex;
-        flex-direction: column;
-        width: 90%;
-        max-width: 1400px;
-        background: #2C3E50;
-        border-radius: 20px;
-        border: 2px solid #34495E;
-        box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
-        padding: 40px;
-    }
-
-    .content-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 20px;
-    }
-
-    .content-title {
-        font-size: 2rem;
-        font-weight: 700;
-    }
-
-    .header-actions {
-        display: flex;
-        align-items: center;
-        gap: 15px;
-    }
-
-    .order-count {
-        font-size: 0.9rem;
-        color: #D3D3D3;
-    }
-
-    .date-filter {
-        display: flex;
-        align-items: center;
-        gap: 5px;
-        color: #FFFFFF;
-    }
-
-    .date-input {
-        padding: 8px;
-        border-radius: 12px;
-        border: 1px solid transparent;
-        background: #34495E;
-        background-image: linear-gradient(#34495E, #34495E), linear-gradient(45deg, #ff0033, #e50914);
-        background-origin: border-box;
-        background-clip: padding-box, border-box;
-        color: #FFFFFF;
-        transition: box-shadow 0.3s ease;
-    }
-
-    .user-profile {
-        display: flex;
-        align-items: center;
-        gap: 5px;
-        cursor: pointer;
-        color: #FFFFFF;
-    }
-
-        .user-profile i {
-            font-size: 1.2rem;
-            color: #ff0033;
+        .sidebar {
+            width: 250px;
+            background-color: #000000; /* Black background */
+            color: #ffffff; /* White text for readability */
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            padding-top: 20px;
+            border-right: 2px solid #ff0033; /* Red border */
+            overflow-y: auto;
+            z-index: 1000;
         }
 
-    .admin-section {
-        margin-bottom: 50px;
-    }
-
-    .section-subtitle {
-        font-size: 1.5rem;
-        font-weight: 600;
-        margin-bottom: 20px;
-    }
-
-    .table-custom {
-        width: 100%;
-        background: #2C3E50;
-        border: 1px solid #34495E;
-        border-radius: 15px;
-        overflow: hidden;
-        table-layout: fixed;
-    }
-
-        .table-custom th {
-            padding: 12px;
-            text-align: left;
-            color: #D3D3D3;
-            vertical-align: middle;
-            border: 1px solid #34495E;
-            background: #34495E;
-            font-weight: 600;
+        .sidebar-header {
+            padding: 10px 20px;
+            border-bottom: 1px solid #ff0033; /* Red border */
         }
 
-        .table-custom td {
-            padding: 12px;
-            text-align: left;
-            color: #333333;
-            vertical-align: middle;
-            border: 1px solid #34495E;
-            background: #F5F5F5;
+        .sidebar-title {
+            margin: 0;
+            font-size: 1.5em;
+            color: #ff0033; /* Red text for the header */
         }
 
-        .table-custom tr:hover td {
-            background: #E0E0E0;
+        .sidebar-nav {
+            list-style: none;
+            padding: 0;
+            margin: 20px 0;
         }
 
-    .btn-primary {
-        background: linear-gradient(135deg, #ff0033, #e50914);
-        border: none;
-        border-radius: 12px;
-        padding: 12px 25px;
-        font-size: 16px;
-        color: #FFFFFF;
-        font-weight: 600;
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
-    }
-
-        .btn-primary:hover {
-            transform: scale(1.05);
-            box-shadow: 0 0 20px rgba(255, 0, 51, 0.6);
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 10px 20px;
+            color: #ffffff; /* White text */
+            text-decoration: none;
         }
 
-    .btn-warning {
-        background: linear-gradient(135deg, #ffca28, #ffb300);
-        color: #FFFFFF;
-        border: none;
-        border-radius: 12px;
-        padding: 8px 16px;
-        font-size: 14px;
-        font-weight: 600;
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
-    }
-
-        .btn-warning:hover {
-            transform: scale(1.05);
-            box-shadow: 0 0 20px rgba(255, 202, 40, 0.6);
-        }
-
-    .btn-danger {
-        background: linear-gradient(135deg, #ff4444, #cc0000);
-        color: #FFFFFF;
-        border: none;
-        border-radius: 12px;
-        padding: 8px 16px;
-        font-size: 14px;
-        font-weight: 600;
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
-    }
-
-        .btn-danger:hover {
-            transform: scale(1.05);
-            box-shadow: 0 0 20px rgba(255, 68, 68, 0.6);
-        }
-
-    .pagination {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-top: 20px;
-        color: #D3D3D3;
-    }
-
-    .pagination-controls {
-        display: flex;
-        gap: 5px;
-    }
-
-    .btn-pag {
-        padding: 8px 12px;
-        border: 1px solid #34495E;
-        background: #2C3E50;
-        border-radius: 8px;
-        color: #FFFFFF;
-        cursor: pointer;
-        transition: background 0.3s ease;
-    }
-
-        .btn-pag.active {
-            background: #ff0033;
-            border-color: #ff0033;
-            color: #FFFFFF;
-        }
-
-        .btn-pag:hover {
-            background: #34495E;
-        }
-
-    .modal-content {
-        background-color: #FFFFFF;
-        color: #000000;
-        border-radius: 10px;
-        border: 1px solid #ddd;
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-    }
-
-    .modal-header {
-        border-bottom: 1px solid #ddd;
-    }
-
-    .modal-title {
-        font-size: 1.5rem;
-        color: #000000;
-    }
-
-    .modal-body .form-label {
-        color: #000000;
-        font-weight: 500;
-    }
-
-    .modal-body .form-control {
-        border-radius: 5px;
-        padding: 10px;
-        font-size: 14px;
-        border: 1px solid #ccc;
-        background: #fff;
-        color: #000000;
-        transition: border-color 0.3s ease;
-    }
-
-        .modal-body .form-control:focus {
-            border-color: #ff0000;
-            outline: none;
-        }
-
-    .alert {
-        border-radius: 10px;
-        box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
-    }
-
-    .alert-success {
-        background-color: #2C3E50;
-        color: #28a745;
-        border-color: #28a745;
-    }
-
-    .alert-danger {
-        background-color: #2C3E50;
-        color: #dc3545;
-        border-color: #dc3545;
-    }
-
-    .title-gradient {
-        background: linear-gradient(90deg, #ff0033, #e50914);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-        color: transparent;
-    }
-
-    .glow-effect {
-        box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
-        transition: box-shadow 0.3s ease, transform 0.3s ease;
-    }
-
-        .glow-effect:hover {
-            box-shadow: 0 0 25px rgba(255, 0, 51, 0.6);
-            transform: scale(1.05);
-        }
-
-    @@media (max-width: 768px) {
-        .sidebar
-
-    {
-        width: 200px;
-        z-index: 1000;
-    }
-
-    .main-content {
-        margin-left: 200px;
-        width: calc(100% - 200px);
-    }
-
-    }
-
-    @@media (max-width: 576px) {
-        .admin-dashboard
-
-    {
-        flex-direction: column;
-    }
-
-    .sidebar {
-        position: relative;
-        width: 100%;
-        height: auto;
-    }
-
-    .main-content {
-        margin-left: 0;
-        width: 100%;
-        min-height: auto;
-    }
-
-    .frame-wrapper {
-        width: 100%;
-        padding: 20px;
-    }
-
-    }
-</style>
-
-@section Scripts {
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        $(document).ready(function () {
-            // Show Alert
-            function showAlert(message, type) {
-                var alertHtml = `<div class="alert alert-${type} alert-dismissible fade show" role="alert">
-                    ${message}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>`;
-                $('#alert-container').html(alertHtml).find('.alert').delay(3000).fadeOut();
+            .nav-item i {
+                margin-right: 10px;
+                color: #ffffff; /* White icons */
             }
 
-            // Auto-populate Title and Poster when Movie is selected (Add Showtime)
-            $('#addShowtimeMovieId').change(function () {
-                var selectedOption = $(this).find('option:selected');
-                var title = selectedOption.data('title') || '';
-                var poster = selectedOption.data('poster') || '';
-                $('#addShowtimeTitle').val(title);
-                $('#addShowtimePoster').val(poster);
-            });
+            .nav-item:hover {
+                background-color: #ff0033; /* Red on hover */
+                color: #000000; /* Black text on hover for contrast */
+            }
 
-            // Auto-populate Title and Poster when Movie is selected (Edit Showtime)
-            $('#editShowtimeMovieId').change(function () {
-                var selectedOption = $(this).find('option:selected');
-                var title = selectedOption.data('title') || '';
-                var poster = selectedOption.data('poster') || '';
-                $('#editShowtimeTitle').val(title);
-                $('#editShowtimePoster').val(poster);
-            });
-
-            // Add Movie
-            $('#add-movie-form').submit(function (e) {
-                e.preventDefault();
-                var formData = $(this).serialize();
-                $.ajax({
-                    url: '@Url.Action("CreateMovie", "Admin")',
-                    type: 'POST',
-                    data: formData,
-                    success: function (response) {
-                        if (response.success) {
-                            showAlert(response.message, 'success');
-                            $('#addMovieModal').modal('hide');
-                            $('#add-movie-form')[0].reset();
-                            setTimeout(() => location.reload(), 1000);
-                        } else {
-                            showAlert(response.message || 'Failed to add movie.', 'danger');
-                        }
-                    },
-                    error: function (xhr, status, error) {
-                        console.error('Add Movie Error:', status, error, xhr.responseText);
-                        showAlert('An error occurred: ' + (xhr.responseJSON?.message || error), 'danger');
-                    }
-                });
-            });
-
-            // Edit Movie - Populate Modal
-            $(document).on('click', '.edit-movie-btn', function () {
-                var movieId = $(this).data('id');
-                $.ajax({
-                    url: '@Url.Action("GetMovieDetails", "Admin")/' + movieId,
-                    type: 'GET',
-                    dataType: 'json',
-                    success: function (response) {
-                        if (response.success) {
-                            var movie = response.data;
-                            $('#editMovieId').val(movie.MovieId || '');
-                            $('#editTitle').val(movie.Title || '');
-                            $('#editDescription').val(movie.Description || '');
-                            $('#editDuration').val(movie.Duration || '');
-                            $('#editPoster').val(movie.Poster || '');
-                            $('#editGenre').val(movie.Genre || '');
-                            $('#editDirector').val(movie.Director || '');
-                            $('#editActors').val(movie.Actors || '');
-                            $('#editTrailerUrl').val(movie.TrailerUrl || '');
-                            $('#editMovieModal').modal('show');
-                        } else {
-                            showAlert(response.message || 'Failed to fetch movie details.', 'danger');
-                        }
-                    },
-                    error: function (xhr, status, error) {
-                        console.error('GetMovieDetails Error:', status, error, xhr.responseText);
-                        showAlert('An error occurred: ' + (xhr.responseJSON?.message || error), 'danger');
-                    }
-                });
-            });
-
-            // Edit Movie - Submit
-            $('#edit-movie-form').submit(function (e) {
-                e.preventDefault();
-                var formData = $(this).serialize();
-                $.ajax({
-                    url: '@Url.Action("EditMovie", "Admin")',
-                    type: 'POST',
-                    data: formData,
-                    success: function (response) {
-                        if (response.success) {
-                            showAlert(response.message, 'success');
-                            $('#editMovieModal').modal('hide');
-                            setTimeout(() => location.reload(), 1000);
-                        } else {
-                            showAlert(response.message || 'Failed to update movie.', 'danger');
-                        }
-                    },
-                    error: function (xhr, status, error) {
-                        console.error('EditMovie Error:', status, error, xhr.responseText);
-                        showAlert('An error occurred: ' + (xhr.responseJSON?.message || error), 'danger');
-                    }
-                });
-            });
-
-            // Delete Movie
-            $(document).on('click', '.delete-movie-btn', function () {
-                if (!confirm('Are you sure you want to delete this movie?')) return;
-                var movieId = $(this).data('id');
-                $.ajax({
-                    url: '@Url.Action("DeleteMovie", "Admin")',
-                    type: 'POST',
-                    data: { id: movieId, __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val() },
-                    success: function (response) {
-                        if (response.success) {
-                            showAlert(response.message, 'success');
-                            $('tr[data-id="' + movieId + '"]').remove();
-                            setTimeout(() => location.reload(), 1000);
-                        } else {
-                            showAlert(response.message, 'danger');
-                        }
-                    },
-                    error: function (xhr, status, error) {
-                        console.error('DeleteMovie Error:', status, error, xhr.responseText);
-                        showAlert('An error occurred: ' + (xhr.responseJSON?.message || error), 'danger');
-                    }
-                });
-            });
-
-            // Add Showtime
-            $('#add-showtime-form').submit(function (e) {
-                e.preventDefault();
-                var formData = $(this).serializeArray();
-                // Ensure Date and StartTime are correctly formatted
-                var date = $('#addShowtimeDate').val();
-                var startTime = $('#addShowtimeStartTime').val();
-                if (date && startTime) {
-                    formData = formData.filter(item => item.name !== 'Date' && item.name !== 'StartTime');
-                    formData.push({ name: 'Date', value: date });
-                    formData.push({ name: 'StartTime', value: startTime });
+                .nav-item:hover i {
+                    color: #000000; /* Black icons on hover */
                 }
-                $.ajax({
-                    url: '@Url.Action("CreateShowtime", "Admin")',
-                    type: 'POST',
-                    data: formData,
-                    success: function (response) {
-                        if (response.success) {
-                            showAlert(response.message, 'success');
-                            $('#addShowtimeModal').modal('hide');
-                            $('#add-showtime-form')[0].reset();
-                            setTimeout(() => location.reload(), 1000);
-                        } else {
-                            showAlert(response.message || 'Failed to add showtime.', 'danger');
-                        }
-                    },
-                    error: function (xhr, status, error) {
-                        console.error('CreateShowtime Error:', status, error, xhr.responseText);
-                        showAlert('An error occurred: ' + (xhr.responseJSON?.message || error), 'danger');
-                    }
-                });
-            });
 
-            // Edit Showtime - Populate Modal
+            .nav-item.active {
+                background-color: #ff0033; /* Red for active item */
+                color: #000000; /* Black text for active item */
+            }
 
+                .nav-item.active i {
+                    color: #000000; /* Black icons for active item */
+                }
 
-            // Edit Showtime - Submit
-  
+        .nav-divider {
+            border-top: 1px solid #ff0033;
+            margin: 10px 0;
+        }
 
-            // Delete Showtime
-            $(document).on('click', '.delete-showtime-btn', function () {
-                if (!confirm('Are you sure you want to delete this showtime?')) return;
-                var showtimeId = $(this).data('id');
-                $.ajax({
-                    url: '@Url.Action("DeleteShowtime", "Admin")',
-                    type: 'POST',
-                    data: { id: showtimeId, __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val() },
-                    success: function (response) {
-                        if (response.success) {
-                            showAlert(response.message, 'success');
-                            $('tr[data-id="' + showtimeId + '"]').remove();
-                            setTimeout(() => location.reload(), 1000);
-                        } else {
-                            showAlert(response.message, 'danger');
-                        }
-                    },
-                    error: function (xhr, status, error) {
-                        console.error('DeleteShowtime Error:', status, error, xhr.responseText);
-                        showAlert('An error occurred: ' + (xhr.responseJSON?.message || error), 'danger');
-                    }
-                });
-            });
-        });
-    </script>
-}
+        .content {
+            margin-left: 250px;
+            padding: 20px;
+            flex-grow: 1;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+        }
+
+        .content-inner {
+            max-width: 1200px;
+            width: 100%;
+        }
+
+        .page-title {
+            background-color: #1c1c1c;
+            color: #fff;
+            padding: 15px;
+            text-align: center;
+            border-radius: 15px;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 700;
+            text-transform: uppercase;
+            margin-bottom: 20px;
+        }
+
+        .create-button {
+            display: inline-block;
+            padding: 8px 20px;
+            background-color: #00cc00;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 20px;
+            font-weight: 600;
+            font-family: 'Montserrat', sans-serif;
+            margin-bottom: 20px;
+        }
+
+            .create-button:hover {
+                transform: scale(1.05);
+                transition: transform 0.3s ease;
+            }
+
+        /* Fixed Media Queries */
+        @@media (max-width: 768px) {
+            .sidebar {
+                width: 200px;
+                z-index: 1000;
+            }
+
+            .content {
+                margin-left: 200px;
+                width: calc(100% - 200px);
+            }
+        }
+
+        @@media (max-width: 576px) {
+            .admin-dashboard {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                position: relative;
+                width: 100%;
+                height: auto;
+            }
+
+            .content {
+                margin-left: 0;
+                width: 100%;
+                min-height: auto;
+            }
+
+            .content-inner {
+                width: 100%;
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-dashboard">
+        @if (User.IsInRole("Admin"))
+        {
+            <aside class="sidebar">
+                <div class="sidebar-header">
+                    <h3 class="sidebar-title">CinemaX Admin</h3>
+                </div>
+                <nav class="sidebar-nav">
+                    <a href="/Admin/Index" class="nav-item active"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+                    <a href="/Movies" class="nav-item"><i class="fas fa-film"></i> Manage Movies</a>
+                    <a href="/Showtimes" class="nav-item"><i class="fas fa-clock"></i> Manage Showtimes</a>
+                    <a href="/Rooms" class="nav-item"><i class="fas fa-door-open"></i> Manage Rooms</a>
+                    <a href="/Seats" class="nav-item"><i class="fas fa-chair"></i> Manage Seats</a>
+                    <a href="/Admin/ManageBookings" class="nav-item"><i class="fas fa-ticket-alt"></i> Manage Bookings</a>
+                    <a href="/Admin/RevenueStatistics" class="nav-item"><i class="fas fa-chart-bar"></i> Revenue Statistics</a>
+                    <div class="nav-divider"></div>
+                    <a href="#" class="nav-item"><i class="fab fa-facebook"></i> Facebook</a>
+                    <a href="#" class="nav-item"><i class="fab fa-twitter"></i> Twitter</a>
+                    <a href="#" class="nav-item"><i class="fab fa-google"></i> Google</a>
+                </nav>
+            </aside>
+        }
+
+        
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -26,9 +26,27 @@ namespace QuanLyRapPhim.Controllers
         }
         [Authorize(Roles = "Admin,User")]
         // GET: Movies
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int page = 1, string date = null)
         {
-            var movies = await _context.Movies.ToListAsync();
+            int pageSize = 5;
+            var moviesQuery = _context.Movies.Include(m => m.Reviews).AsQueryable();
+
+            // Filter by date if needed (e.g., movies with showtimes on the selected date)
+            if (!string.IsNullOrEmpty(date))
+            {
+                // Add filtering logic here (e.g., join with a Showtimes table)
+            }
+
+            int totalMovies = await moviesQuery.CountAsync();
+            var movies = await moviesQuery
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            ViewBag.CurrentPage = page;
+            ViewBag.PageSize = pageSize;
+            ViewBag.TotalMovies = totalMovies;
+
             return View(movies);
         }
         [Authorize]

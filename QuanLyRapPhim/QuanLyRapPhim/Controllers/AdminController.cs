@@ -23,120 +23,100 @@ namespace QuanLyRapPhim.Controllers
         // GET: Admin Dashboard
         public IActionResult Index()
         {
-            ViewBag.Movies = _context.Movies.ToList();
-            ViewBag.Showtimes = _context.Showtimes
+            var movies = _context.Movies.ToList();
+            var showtimes = _context.Showtimes
                 .Include(s => s.Movie)
                 .Include(s => s.Room)
                 .ToList();
-            ViewBag.Rooms = _context.Rooms.ToList();
+            ViewBag.Movies = _context.Movies.ToList(); // Thay bằng logic lấy dữ liệu thực tế
+            ViewBag.Showtimes = _context.Showtimes.Include(s => s.Movie).Include(s => s.Room).ToList(); // Thay bằng logic lấy dữ liệu thực tế
+            ViewBag.Rooms = _context.Rooms.ToList(); // Để populate dropdown trong modal
             return View();
         }
 
-        // POST: Create Movie
+        public IActionResult Movies()
+        {
+            var movies = _context.Movies.ToList();
+            ViewBag.Movies = movies; // Pass movies to the view via ViewBag
+            return View();
+        }
+
+        // Other actions like CreateMovie, EditMovie, DeleteMovie, etc.
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> CreateMovie([Bind("Title,Description,Duration,Poster,Genre,Director,Actors,TrailerUrl")] Movie movie)
+        public IActionResult CreateMovie(Movie movie)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(movie);
-                await _context.SaveChangesAsync();
+                _context.Movies.Add(movie);
+                _context.SaveChanges();
                 return Json(new { success = true, message = "Movie added successfully!" });
             }
-            var errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).ToList();
-            return Json(new { success = false, message = "Failed to add movie.", errors });
+            return Json(new { success = false, message = "Error adding movie.", errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage) });
         }
 
-        // GET: Get Movie Details
+        [HttpPost]
+        public IActionResult EditMovie(Movie movie)
+        {
+            if (ModelState.IsValid)
+            {
+                var existingMovie = _context.Movies.Find(movie.MovieId);
+                if (existingMovie == null)
+                    return Json(new { success = false, message = "Movie not found." });
+
+                existingMovie.Title = movie.Title;
+                existingMovie.Genre = movie.Genre;
+                existingMovie.Duration = movie.Duration;
+                existingMovie.Director = movie.Director;
+                existingMovie.Poster = movie.Poster;
+                existingMovie.Description = movie.Description;
+                existingMovie.Actors = movie.Actors;
+                existingMovie.TrailerUrl = movie.TrailerUrl;
+
+                _context.SaveChanges();
+                return Json(new { success = true, message = "Movie updated successfully!" });
+            }
+            return Json(new { success = false, message = "Error updating movie.", errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage) });
+        }
+
+        [HttpPost]
+        public IActionResult DeleteMovie(int id)
+        {
+            var movie = _context.Movies.Find(id);
+            if (movie == null)
+                return Json(new { success = false, message = "Movie not found." });
+
+            _context.Movies.Remove(movie);
+            _context.SaveChanges();
+            return Json(new { success = true, message = "Movie deleted successfully!" });
+        }
         [HttpGet]
         public IActionResult GetMovieDetails(int id)
         {
-            try
-            {
-                var movie = _context.Movies.FirstOrDefault(m => m.MovieId == id);
-                if (movie == null)
-                {
-                    return Json(new { success = false, message = "Movie not found." });
-                }
-                return Json(new
-                {
-                    success = true,
-                    message = "Movie details fetched successfully.",
-                    data = new
-                    {
-                        MovieId = movie.MovieId,
-                        Title = movie.Title,
-                        Description = movie.Description,
-                        Duration = movie.Duration,
-                        Poster = movie.Poster,
-                        Genre = movie.Genre,
-                        Director = movie.Director,
-                        Actors = movie.Actors,
-                        TrailerUrl = movie.TrailerUrl
-                    }
-                });
-            }
-            catch (Exception ex)
-            {
-                return Json(new { success = false, message = "An error occurred: " + ex.Message });
-            }
-        }
-
-        // POST: Edit Movie
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public IActionResult EditMovie(Movie model)
-        {
-            try
-            {
-                var movie = _context.Movies.FirstOrDefault(m => m.MovieId == model.MovieId);
-                if (movie == null)
-                {
-                    return Json(new { success = false, message = "Movie not found." });
-                }
-                movie.Title = model.Title;
-                movie.Description = model.Description;
-                movie.Duration = model.Duration;
-                movie.Poster = model.Poster;
-                movie.Genre = model.Genre;
-                movie.Director = model.Director;
-                movie.Actors = model.Actors;
-                movie.TrailerUrl = model.TrailerUrl;
-                _context.SaveChanges();
-                return Json(new { success = true, message = "Movie updated successfully." });
-            }
-            catch (Exception ex)
-            {
-                return Json(new { success = false, message = "An error occurred: " + ex.Message });
-            }
-        }
-
-        // POST: Delete Movie
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteMovie(int id)
-        {
-            var movie = await _context.Movies.FindAsync(id);
+            var movie = _context.Movies.Find(id);
             if (movie == null)
             {
-                return Json(new { success = false, message = "Movie not found." });
+                return NotFound();
             }
-            try
+            return Json(new
             {
-                if (_context.Showtimes.Any(s => s.MovieId == id))
-                {
-                    return Json(new { success = false, message = "Cannot delete movie with existing showtimes." });
-                }
-                _context.Movies.Remove(movie);
-                await _context.SaveChangesAsync();
-                return Json(new { success = true, message = "Movie deleted successfully!" });
-            }
-            catch (Exception ex)
-            {
-                return Json(new { success = false, message = $"Failed to delete movie: {ex.Message}" });
-            }
+                title = movie.Title,
+                description = movie.Description,
+                duration = movie.Duration,
+                poster = movie.Poster,
+                genre = movie.Genre,
+                director = movie.Director,
+                actors = movie.Actors,
+                trailerUrl = movie.TrailerUrl
+            });
         }
 
+        public IActionResult ManageShowtimes()
+        {
+            ViewBag.Showtimes = _context.Showtimes.Include(s => s.Movie).Include(s => s.Room).ToList();
+            ViewBag.Movies = _context.Movies.ToList();
+            ViewBag.Rooms = _context.Rooms.ToList();
+            return View();
+        }
         // POST: Create Showtime
         [HttpPost]
         [ValidateAntiForgeryToken]

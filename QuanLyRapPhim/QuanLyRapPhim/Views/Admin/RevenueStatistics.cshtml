@@ -7,14 +7,14 @@
 
 <div class="admin-dashboard">
     <!-- Sidebar -->
-    <aside class="sidebar glow-effect">
+    <aside class="sidebar">
         <div class="sidebar-header">
-            <h3 class="sidebar-title title-gradient">CinemaX Admin</h3>
+            <h3 class="sidebar-title">CinemaX Admin</h3>
         </div>
         <nav class="sidebar-nav">
             <a href="/Admin/Index" class="nav-item"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
-            @* <a href="/Movies" class="nav-item"><i class="fas fa-film"></i> Manage Movies</a> *@
-            @* <a href="/Showtimes" class="nav-item"><i class="fas fa-clock"></i> Manage Showtimes</a> *@
+            <a href="/Movies" class="nav-item"><i class="fas fa-film"></i> Manage Movies</a>
+            <a href="/Showtimes" class="nav-item"><i class="fas fa-clock"></i> Manage Showtimes</a>
             <a href="/Rooms" class="nav-item"><i class="fas fa-door-open"></i> Manage Rooms</a>
             <a href="/Seats" class="nav-item"><i class="fas fa-chair"></i> Manage Seats</a>
             <a href="/Admin/ManageBookings" class="nav-item"><i class="fas fa-ticket-alt"></i> Manage Bookings</a>
@@ -27,18 +27,16 @@
     </aside>
 
     <!-- Main Content -->
-    <main class="main-content">
-        <div class="frame-wrapper mx-auto">
-            <div class="content-header">
-                <h2 class="content-title title-gradient">Revenue Statistics</h2>
-                <div class="header-actions">
-                    <span class="order-count">Revenue Data Overview</span>
-                    <div class="date-filter">
-                        <span>From</span>
-                        <input type="date" class="date-input glow-effect" value="2025-05-25">
-                        <span>to</span>
-                        <input type="date" class="date-input glow-effect" value="2025-05-28">
-                    </div>
+    <main class="content">
+        <div class="content-inner">
+            <h2 class="page-title">Revenue Statistics</h2>
+            <div class="header-actions">
+                <span class="order-count">Revenue Data Overview</span>
+                <div class="date-filter">
+                    <span>From</span>
+                    <input type="date" class="date-input" value="2025-05-25">
+                    <span>to</span>
+                    <input type="date" class="date-input" value="2025-05-28">
                 </div>
             </div>
 
@@ -47,7 +45,7 @@
 
             <!-- Revenue Summary -->
             <div class="admin-section">
-                <h3 class="section-subtitle title-gradient">Summary</h3>
+                <h3 class="section-subtitle">Summary</h3>
                 <div class="summary-card">
                     <h4>Total Revenue: @(((dynamic)ViewBag.RevenueData)?.TotalRevenue.ToString("C", new System.Globalization.CultureInfo("vi-VN")) ?? "N/A")</h4>
                 </div>
@@ -55,7 +53,7 @@
 
             <!-- Revenue by Movie -->
             <div class="admin-section">
-                <h3 class="section-subtitle title-gradient">Revenue by Movie</h3>
+                <h3 class="section-subtitle">Revenue by Movie</h3>
                 <div class="table-responsive">
                     <table class="table table-custom">
                         <thead>
@@ -91,7 +89,7 @@
 
             <!-- Revenue Chart -->
             <div class="admin-section">
-                <h3 class="section-subtitle title-gradient">Revenue by Date</h3>
+                <h3 class="section-subtitle">Revenue by Date</h3>
                 <canvas id="revenueChart" width="400" height="200"></canvas>
             </div>
         </div>
@@ -99,117 +97,117 @@
 </div>
 
 <style>
-    html, body {
-        height: 100%;
+    body {
         margin: 0;
-        padding: 0;
-        background-color: #1C2526;
-        color: #FFFFFF;
-        font-family: 'Montserrat', Arial, sans-serif;
+        background-color: #0F0F0F; /* Galaxy Black */
+        color: #ffffff;
+        font-family: 'Montserrat', sans-serif;
         overflow-x: hidden;
     }
 
     .admin-dashboard {
         display: flex;
         min-height: 100vh;
-        width: 100%;
-        box-sizing: border-box;
-        background: linear-gradient(135deg, #1C2526, #0F1415);
     }
 
     .sidebar {
         width: 250px;
-        background: #2C3E50;
-        color: #FFFFFF;
-        padding: 20px 0;
+        background-color: #000000; /* Black background */
+        color: #ffffff; /* White text for readability */
+        height: 100vh;
         position: fixed;
         top: 0;
-        bottom: 0;
         left: 0;
-        height: 100%;
-        border-right: 2px solid #34495E;
+        padding-top: 20px;
+        border-right: 2px solid #ff0033; /* Red border */
         overflow-y: auto;
+        z-index: 1000;
     }
 
     .sidebar-header {
         padding: 10px 20px;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        border-bottom: 1px solid #ff0033; /* Red border */
     }
 
     .sidebar-title {
-        font-size: 1.5rem;
-        font-weight: 700;
         margin: 0;
+        font-size: 1.5em;
+        color: #ff0033; /* Red text for the header */
     }
 
     .sidebar-nav {
-        margin-top: 20px;
+        list-style: none;
+        padding: 0;
+        margin: 20px 0;
     }
 
     .nav-item {
         display: flex;
         align-items: center;
-        padding: 12px 20px;
-        color: #FFFFFF;
+        padding: 10px 20px;
+        color: #ffffff; /* White text */
         text-decoration: none;
-        font-size: 1rem;
-        transition: background 0.3s ease;
     }
 
         .nav-item i {
             margin-right: 10px;
-            font-size: 1.2rem;
-            color: #ff0033;
+            color: #ffffff; /* White icons */
         }
 
-        .nav-item:hover, .nav-item.active {
-            background: #34495E;
-            border-left: 4px solid #ff0033;
+        .nav-item:hover {
+            background-color: #ff0033; /* Red on hover */
+            color: #000000; /* Black text on hover for contrast */
         }
+
+            .nav-item:hover i {
+                color: #000000; /* Black icons on hover */
+            }
+
+        .nav-item.active {
+            background-color: #ff0033; /* Red for active item */
+            color: #000000; /* Black text for active item */
+        }
+
+            .nav-item.active i {
+                color: #000000; /* Black icons for active item */
+            }
 
     .nav-divider {
-        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        border-top: 1px solid #ff0033;
         margin: 10px 0;
     }
 
-    .main-content {
+    .content {
         margin-left: 250px;
         padding: 20px;
-        width: calc(100% - 250px);
-        min-height: 100vh;
-        box-sizing: border-box;
-        overflow-y: auto;
-    }
-
-    .frame-wrapper {
+        flex-grow: 1;
         display: flex;
-        flex-direction: column;
-        width: 90%;
-        max-width: 1400px;
-        background: #2C3E50;
-        border-radius: 20px;
-        border: 2px solid #34495E;
-        box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
-        overflow: visible;
-        padding: 40px;
+        justify-content: center;
+        align-items: flex-start;
     }
 
-    .content-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 20px;
+    .content-inner {
+        max-width: 1200px;
+        width: 100%;
     }
 
-    .content-title {
-        font-size: 2rem;
+    .page-title {
+        background-color: #1c1c1c;
+        color: #fff;
+        padding: 15px;
+        text-align: center;
+        border-radius: 15px;
+        font-family: 'Montserrat', sans-serif;
         font-weight: 700;
+        text-transform: uppercase;
+        margin-bottom: 20px;
     }
 
     .header-actions {
         display: flex;
         align-items: center;
         gap: 15px;
+        margin-bottom: 20px;
     }
 
     .order-count {
@@ -221,20 +219,21 @@
         display: flex;
         align-items: center;
         gap: 5px;
-        color: #FFFFFF;
+        color: #ffffff;
     }
 
     .date-input {
         padding: 8px;
         border-radius: 12px;
-        border: 1px solid transparent;
-        background: #34495E;
-        background-image: linear-gradient(#34495E, #34495E), linear-gradient(45deg, #ff0033, #e50914);
-        background-origin: border-box;
-        background-clip: padding-box, border-box;
-        color: #FFFFFF;
-        transition: box-shadow 0.3s ease;
+        border: 1px solid #ff0033;
+        background-color: #1c1c1c;
+        color: #ffffff;
     }
+
+        .date-input:hover {
+            transform: scale(1.05);
+            transition: transform 0.3s ease;
+        }
 
     .admin-section {
         margin-bottom: 50px;
@@ -244,12 +243,13 @@
         font-size: 1.5rem;
         font-weight: 600;
         margin-bottom: 20px;
+        color: #ff0033; /* Red text */
     }
 
     .table-custom {
         width: 100%;
-        background: #2C3E50;
-        border: 1px solid #34495E;
+        background: #1c1c1c;
+        border: 1px solid #ff0033;
         border-radius: 15px;
         overflow: hidden;
         table-layout: fixed;
@@ -260,35 +260,35 @@
             text-align: left;
             vertical-align: middle;
             word-wrap: break-word;
-            border: 1px solid #34495E;
+            border: 1px solid #ff0033;
         }
 
         .table-custom th {
-            background: #34495E;
-            color: #D3D3D3;
+            background: #000000;
+            color: #ffffff;
             font-weight: 600;
         }
 
         .table-custom td {
-            background: #F5F5F5;
-            color: #333333;
+            background: #1c1c1c;
+            color: #ffffff;
         }
 
         .table-custom tr:hover td {
-            background: #E0E0E0;
+            background: #ff0033;
+            color: #000000;
         }
 
     .summary-card {
-        background: #2C3E50;
+        background: #1c1c1c;
         padding: 20px;
         border-radius: 15px;
-        border: 1px solid #34495E;
-        box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+        border: 1px solid #ff0033;
         margin-bottom: 20px;
     }
 
         .summary-card h4 {
-            color: #FFFFFF;
+            color: #ffffff;
             font-size: 1.2rem;
             margin: 0;
         }
@@ -296,28 +296,10 @@
     #revenueChart {
         max-width: 100%;
         height: auto !important;
-        background: #2C3E50;
+        background: #1c1c1c;
         border-radius: 15px;
         padding: 10px;
     }
-
-    .title-gradient {
-        background: linear-gradient(90deg, #ff0033, #e50914);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-        color: transparent;
-    }
-
-    .glow-effect {
-        box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
-        transition: box-shadow 0.3s ease, transform 0.3s ease;
-    }
-
-        .glow-effect:hover {
-            box-shadow: 0 0 25px rgba(255, 0, 51, 0.6);
-            transform: scale(1.05);
-        }
 
     .alert {
         border-radius: 10px;
@@ -325,18 +307,18 @@
     }
 
     .alert-success {
-        background-color: #2C3E50;
+        background-color: #1c1c1c;
         color: #28a745;
         border-color: #28a745;
     }
 
     .alert-danger {
-        background-color: #2C3E50;
+        background-color: #1c1c1c;
         color: #dc3545;
         border-color: #dc3545;
     }
 
-    /* Responsive Design */
+    /* Media Queries */
     @@media (max-width: 768px) {
         .sidebar
 
@@ -345,7 +327,7 @@
         z-index: 1000;
     }
 
-    .main-content {
+    .content {
         margin-left: 200px;
         width: calc(100% - 200px);
     }
@@ -365,13 +347,13 @@
         height: auto;
     }
 
-    .main-content {
+    .content {
         margin-left: 0;
         width: 100%;
         min-height: auto;
     }
 
-    .frame-wrapper {
+    .content-inner {
         width: 100%;
         padding: 20px;
     }
@@ -421,25 +403,25 @@
                                 callback: function(value) {
                                     return value.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' });
                                 },
-                                color: '#FFFFFF' // Ensure chart text is visible on dark background
+                                color: '#FFFFFF'
                             },
                             grid: {
-                                color: 'rgba(255, 255, 255, 0.1)' // Adjust grid lines for dark theme
+                                color: 'rgba(255, 255, 255, 0.1)'
                             }
                         },
                         x: {
                             ticks: {
-                                color: '#FFFFFF' // Ensure chart text is visible on dark background
+                                color: '#FFFFFF'
                             },
                             grid: {
-                                color: 'rgba(255, 255, 255, 0.1)' // Adjust grid lines for dark theme
+                                color: 'rgba(255, 255, 255, 0.1)'
                             }
                         }
                     },
                     plugins: {
                         legend: {
                             labels: {
-                                color: '#FFFFFF' // Ensure legend text is visible on dark background
+                                color: '#FFFFFF'
                             }
                         }
                     }
