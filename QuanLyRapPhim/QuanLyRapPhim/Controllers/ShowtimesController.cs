@@ -36,7 +36,6 @@ namespace QuanLyRapPhim.Controllers
                 .AsNoTracking()
                 .AsQueryable();
 
-            // Filter by movieId if provided
             if (movieId.HasValue)
             {
                 showtimes = showtimes.Where(s => s.MovieId == movieId.Value);
@@ -49,10 +48,9 @@ namespace QuanLyRapPhim.Controllers
                     (s.Date.Date == now.Date && s.StartTime >= now.TimeOfDay));
             }
 
-            // Apply search filters
             if (!string.IsNullOrEmpty(searchTitle))
             {
-                showtimes = showtimes.Where(s => s.Movie.Title.Contains(searchTitle, StringComparison.OrdinalIgnoreCase));
+                showtimes = showtimes.Where(s => s.Movie.Title.ToLower().Contains(searchTitle.ToLower()));
             }
 
             if (startDate.HasValue)
@@ -67,12 +65,11 @@ namespace QuanLyRapPhim.Controllers
 
             if (!string.IsNullOrEmpty(genre))
             {
-                showtimes = showtimes.Where(s => s.Movie.Genre.Contains(genre, StringComparison.OrdinalIgnoreCase));
+                showtimes = showtimes.Where(s => s.Movie.Genre.ToLower().Contains(genre.ToLower()));
             }
 
             var result = await showtimes.ToListAsync();
 
-            // Set ViewBag for movieId and movie title
             ViewBag.MovieId = movieId;
             if (movieId.HasValue)
             {
@@ -121,7 +118,7 @@ namespace QuanLyRapPhim.Controllers
             var movie = await _context.Movies.FindAsync(movieId);
             ViewBag.MovieTitle = movie?.Title ?? "Phim không xác định";
 
-            return View("Index", result); // Use Index view for consistency
+            return View("Index", result);
         }
 
         // POST: Showtimes/Search
@@ -147,9 +144,10 @@ namespace QuanLyRapPhim.Controllers
                     (s.Date.Date == now.Date && s.StartTime >= now.TimeOfDay));
             }
 
+            // Use ToLower for case-insensitive search (fixes translation error)
             if (!string.IsNullOrEmpty(searchTitle))
             {
-                showtimes = showtimes.Where(s => s.Movie.Title.Contains(searchTitle, StringComparison.OrdinalIgnoreCase));
+                showtimes = showtimes.Where(s => s.Movie.Title.ToLower().Contains(searchTitle.ToLower()));
             }
 
             if (DateTime.TryParse(startDate, out DateTime parsedStart))
@@ -162,9 +160,10 @@ namespace QuanLyRapPhim.Controllers
                 showtimes = showtimes.Where(s => s.Date.Date <= parsedEnd.Date);
             }
 
+            // Use ToLower for case-insensitive genre search
             if (!string.IsNullOrEmpty(genre))
             {
-                showtimes = showtimes.Where(s => s.Movie.Genre.Contains(genre, StringComparison.OrdinalIgnoreCase));
+                showtimes = showtimes.Where(s => s.Movie.Genre.ToLower().Contains(genre.ToLower()));
             }
 
             var result = await showtimes.ToListAsync();
