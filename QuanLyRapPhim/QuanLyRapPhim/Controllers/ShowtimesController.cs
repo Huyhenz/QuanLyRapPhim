@@ -26,8 +26,8 @@ namespace QuanLyRapPhim.Controllers
             return TimeZoneInfo.ConvertTime(DateTime.UtcNow, timeZone);
         }
 
-        // GET: Showtimes
-        public async Task<IActionResult> Index()
+        // GET: Showtimes?movieId=4
+        public async Task<IActionResult> Index(int? movieId, string searchTitle, DateTime? startDate, DateTime? endDate, string genre)
         {
             var now = GetCurrentTime();
             var showtimes = _context.Showtimes
@@ -36,6 +36,12 @@ namespace QuanLyRapPhim.Controllers
                 .AsNoTracking()
                 .AsQueryable();
 
+            // Filter by movieId if provided
+            if (movieId.HasValue)
+            {
+                showtimes = showtimes.Where(s => s.MovieId == movieId.Value);
+            }
+
             if (!User.IsInRole("Admin"))
             {
                 showtimes = showtimes.Where(s =>
@@ -43,7 +49,47 @@ namespace QuanLyRapPhim.Controllers
                     (s.Date.Date == now.Date && s.StartTime >= now.TimeOfDay));
             }
 
-            return View(await showtimes.ToListAsync());
+            // Apply search filters
+            if (!string.IsNullOrEmpty(searchTitle))
+            {
+                showtimes = showtimes.Where(s => s.Movie.Title.Contains(searchTitle, StringComparison.OrdinalIgnoreCase));
+            }
+
+            if (startDate.HasValue)
+            {
+                showtimes = showtimes.Where(s => s.Date.Date >= startDate.Value.Date);
+            }
+
+            if (endDate.HasValue)
+            {
+                showtimes = showtimes.Where(s => s.Date.Date <= endDate.Value.Date);
+            }
+
+            if (!string.IsNullOrEmpty(genre))
+            {
+                showtimes = showtimes.Where(s => s.Movie.Genre.Contains(genre, StringComparison.OrdinalIgnoreCase));
+            }
+
+            var result = await showtimes.ToListAsync();
+
+            // Set ViewBag for movieId and movie title
+            ViewBag.MovieId = movieId;
+            if (movieId.HasValue)
+            {
+                var movie = await _context.Movies.FindAsync(movieId.Value);
+                ViewBag.MovieTitle = movie?.Title ?? "Phim không xác định";
+            }
+            else
+            {
+                ViewBag.MovieTitle = "Tất cả phim";
+            }
+
+            if (!result.Any() && movieId.HasValue)
+            {
+                ViewBag.ErrorMessage = "Hiện tại chưa có lịch chiếu khả dụng cho phim này.";
+            }
+
+            return View(result);
         }
 
         // GET: Showtimes/SelectShowtime?movieId=5
@@ -72,11 +118,14 @@ namespace QuanLyRapPhim.Controllers
             }
 
             ViewBag.MovieId = movieId;
-            return View(result);
+            var movie = await _context.Movies.FindAsync(movieId);
+            ViewBag.MovieTitle = movie?.Title ?? "Phim không xác định";
+
+            return View("Index", result); // Use Index view for consistency
         }
 
         // POST: Showtimes/Search
-        public IActionResult Search(string searchTitle, string startDate, string endDate, string genre)
+        public async Task<IActionResult> Search(int? movieId, string searchTitle, string startDate, string endDate, string genre)
         {
             var now = GetCurrentTime();
             var showtimes = _context.Showtimes
@@ -84,6 +133,12 @@ namespace QuanLyRapPhim.Controllers
                 .Include(s => s.Room)
                 .AsNoTracking()
                 .AsQueryable();
+
+            // Preserve movieId filter
+            if (movieId.HasValue)
+            {
+                showtimes = showtimes.Where(s => s.MovieId == movieId.Value);
+            }
 
             if (!User.IsInRole("Admin"))
             {
@@ -97,11 +152,14 @@ namespace QuanLyRapPhim.Controllers
                 showtimes = showtimes.Where(s => s.Movie.Title.Contains(searchTitle, StringComparison.OrdinalIgnoreCase));
             }
 
-            if (DateTime.TryParse(startDate, out DateTime parsedStart) && DateTime.TryParse(endDate, out DateTime parsedEnd))
+            if (DateTime.TryParse(startDate, out DateTime parsedStart))
             {
-                showtimes = showtimes.Where(s =>
-                    s.Date.Date >= parsedStart.Date &&
-                    s.Date.Date <= parsedEnd.Date);
+                showtimes = showtimes.Where(s => s.Date.Date >= parsedStart.Date);
+            }
+
+            if (DateTime.TryParse(endDate, out DateTime parsedEnd))
+            {
+                showtimes = showtimes.Where(s => s.Date.Date <= parsedEnd.Date);
             }
 
             if (!string.IsNullOrEmpty(genre))
@@ -109,10 +167,25 @@ namespace QuanLyRapPhim.Controllers
                 showtimes = showtimes.Where(s => s.Movie.Genre.Contains(genre, StringComparison.OrdinalIgnoreCase));
             }
 
-            var result = showtimes.ToList();
+            var result = await showtimes.ToListAsync();
+
+            // Set ViewBag for movieId and movie title
+            ViewBag.MovieId = movieId;
+            if (movieId.HasValue)
+            {
+                var movie = await _context.Movies.FindAsync(movieId.Value);
+                ViewBag.MovieTitle = movie?.Title ?? "Phim không xác định";
+            }
+            else
+            {
+                ViewBag.MovieTitle = "Tất cả phim";
+            }
+
             if (!result.Any())
             {
-                ViewBag.ErrorMessage = "Không tìm thấy lịch chiếu phù hợp.";
+                ViewBag.ErrorMessage = movieId.HasValue
+                    ? "Hiện tại chưa có lịch chiếu khả dụng cho phim này."
+                    : "Không tìm thấy lịch chiếu phù hợp.";
             }
 
             return View("Index", result);

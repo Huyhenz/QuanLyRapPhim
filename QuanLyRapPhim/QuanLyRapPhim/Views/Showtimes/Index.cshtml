@@ -4,15 +4,16 @@
     ViewData["Title"] = "Chọn lịch chiếu";
     Layout = "~/Views/Shared/_Layout.cshtml";
     var movieId = ViewBag.MovieId;
-    var movieTitle = Model.FirstOrDefault()?.Movie?.Title ?? "Phim không xác định";
+    var movieTitle = ViewBag.MovieTitle ?? "Phim không xác định";
 }
 
 <div class="container my-5">
     <!-- Tiêu đề -->
     <h1 class="text-white mb-2">Chọn lịch chiếu</h1>
-    @* <h4 class="text-white mb-4">Phim: @movieTitle</h4> *@
+    <h4 class="text-white mb-4">Phim: @movieTitle</h4>
 
     <form class="search-form d-flex mb-4" asp-controller="Showtimes" asp-action="Search" method="get">
+        <input type="hidden" name="movieId" value="@movieId" />
         <input class="form-control me-2" type="text" name="searchTitle" placeholder="Nhập tên phim..."
                value="@Context.Request.Query["searchTitle"]" style="background-color: #333; border: 1px solid #444; color: #fff; border-radius: 20px; font-size: 1rem; font-weight: 500;">
 
@@ -34,8 +35,9 @@
 
         <button class="btn btn-primary me-2" type="submit" style="background-color: #ff0033; border: none; border-radius: 20px; padding: 8px 20px; font-weight: 600; font-size: 1rem;"><i class="fas fa-search"></i> Tìm kiếm</button>
 
-        <button class="btn btn-secondary" type="button" onclick="resetSearch()" style="border-color: #ff0033; color: #ff0033; border-radius: 20px; padding: 8px 20px; font-weight: 600; font-size: 1rem;"><i class="fas fa-sync-alt"></i> Load lại trang</button>
+        <button class="btn btn-secondary" type="button" onclick="window.location.href='/Showtimes?movieId=@movieId'" style="border-color: #ff0033; color: #ff0033; border-radius: 20px; padding: 8px 20px; font-weight: 600; font-size: 1rem;"><i class="fas fa-sync-alt"></i> Load lại trang</button>
     </form>
+
     <!-- Thông báo lỗi nếu không có lịch chiếu -->
     @if (ViewBag.ErrorMessage != null)
     {
@@ -63,6 +65,10 @@
                                 <i class="fas fa-clock text-primary me-2"></i>
                                 <strong>Giờ chiếu:</strong> @showtime.StartTime
                             </p>
+                            <p class="card-text">
+                                <i class="fas fa-door-open text-primary me-2"></i>
+                                <strong>Phòng:</strong> @showtime.Room?.RoomName
+                            </p>
                         </div>
                         <div class="card-footer d-flex justify-content-between" style="background-color: #1c1c1c; border-top: none; border-radius: 0 0 15px 15px;">
                             <!-- Chọn lịch chiếu -->
@@ -88,11 +94,14 @@
             }
         </div>
     }
-    @if (!Model.Any())
+
+    @if (!Model.Any() && ViewBag.ErrorMessage == null)
     {
         <div class="alert alert-danger text-center" style="background-color: #333; color: #fff; border: 1px solid #e6002e; border-radius: 10px;">
-            <i class="fas fa-exclamation-circle"></i> Không có phim này!
+            <i class="fas fa-exclamation-circle"></i> Không có lịch chiếu nào cho phim này!
         </div>
+    }
+</div>
     }
 
     <!-- Nút quay lại, tạo lịch chiếu và quay lại danh sách phim -->
