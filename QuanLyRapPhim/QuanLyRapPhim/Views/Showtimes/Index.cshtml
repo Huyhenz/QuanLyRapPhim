@@ -83,7 +83,8 @@
                                     </p>
                                     <p class="card-text">
                                         <i class="fas fa-clock text-primary me-2"></i>
-                                        <strong>Giờ chiếu:</strong> @showtime.StartTime
+                                        <strong>Giờ chiếu:</strong>
+                                        @DateTime.Today.Add(showtime.StartTime).ToString("hh:mm tt")
                                     </p>
                                     <p class="card-text">
                                         <i class="fas fa-door-open text-primary me-2"></i>
