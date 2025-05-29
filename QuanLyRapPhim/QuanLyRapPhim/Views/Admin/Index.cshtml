@@ -1,5 +1,5 @@
 ﻿@model dynamic
-@using System.Linq // Import LINQ namespace to use Any()
+@using System.Linq
 
 @{
     ViewData["Title"] = "Admin Dashboard";
@@ -14,8 +14,6 @@
         </div>
         <nav class="sidebar-nav">
             <a href="/Admin/Index" class="nav-item active"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
-            <a href="/Movies" class="nav-item"><i class="fas fa-film"></i> Manage Movies</a>
-            <a href="/Showtimes" class="nav-item"><i class="fas fa-clock"></i> Manage Showtimes</a>
             <a href="/Rooms" class="nav-item"><i class="fas fa-door-open"></i> Manage Rooms</a>
             <a href="/Seats" class="nav-item"><i class="fas fa-chair"></i> Manage Seats</a>
             <a href="/Admin/ManageBookings" class="nav-item"><i class="fas fa-ticket-alt"></i> Manage Bookings</a>
@@ -114,6 +112,7 @@
                     <table class="table table-custom">
                         <thead>
                             <tr>
+                                <th>Title</th>
                                 <th>Movie</th>
                                 <th>Room</th>
                                 <th>Date & Time</th>
@@ -128,11 +127,12 @@
                                     foreach (var showtime in showtimes)
                                     {
                                         <tr data-id="@showtime.ShowtimeId">
+                                            <td>@(showtime.Title ?? "N/A")</td>
                                             <td>@(showtime.Movie?.Title ?? "N/A")</td>
                                             <td>@(showtime.Room?.RoomName ?? "N/A")</td>
-                                            <td>@(showtime.Date != default(DateTime) ? showtime.Date.ToString("dd/MM/yyyy HH:mm") : "N/A")</td>
+                                            <td>@(showtime.Date != default(DateTime) ? $"{showtime.Date:dd/MM/yyyy} {showtime.StartTime:hh\\:mm}" : "N/A")</td>
                                             <td>
-                                                <button class="btn btn-sm btn-warning edit-showtime-btn glow-effect" data-id="@showtime.ShowtimeId">Edit</button>
+                                   
                                                 <button class="btn btn-sm btn-danger delete-showtime-btn glow-effect" data-id="@showtime.ShowtimeId">Delete</button>
                                             </td>
                                         </tr>
@@ -141,7 +141,7 @@
                                 else
                                 {
                                     <tr>
-                                        <td colspan="4" class="text-center">No showtimes available.</td>
+                                        <td colspan="5" class="text-center">No showtimes available.</td>
                                     </tr>
                                 }
                             }
@@ -173,6 +173,7 @@
             </div>
             <div class="modal-body">
                 <form id="add-movie-form">
+                    @Html.AntiForgeryToken()
                     <div class="mb-3">
                         <label for="addTitle" class="form-label">Title</label>
                         <input type="text" class="form-control glow-effect" id="addTitle" name="Title" required />
@@ -222,6 +223,7 @@
             </div>
             <div class="modal-body">
                 <form id="edit-movie-form">
+                    @Html.AntiForgeryToken()
                     <input type="hidden" id="editMovieId" name="MovieId" />
                     <div class="mb-3">
                         <label for="editTitle" class="form-label">Title</label>
@@ -272,23 +274,32 @@
             </div>
             <div class="modal-body">
                 <form id="add-showtime-form">
-                    <div class="mb-3">
+                    @Html.AntiForgeryToken()
+                    <div class="mb-4">
                         <label for="addShowtimeMovieId" class="form-label">Movie</label>
                         <select class="form-control glow-effect" id="addShowtimeMovieId" name="MovieId" required>
-                            <option value="">Select Movie</option>
+                            <option value="">-- Select Movie --</option>
                             @{
                                 var moviesForModal = ViewBag.Movies as IEnumerable<QuanLyRapPhim.Models.Movie> ?? new List<QuanLyRapPhim.Models.Movie>();
                                 foreach (var movie in moviesForModal)
                                 {
-                                    <option value="@movie.MovieId">@(movie.Title ?? "N/A")</option>
+                                    <option value="@movie.MovieId" data-title="@movie.Title" data-poster="@movie.Poster">@(movie.Title ?? "N/A")</option>
                                 }
                             }
                         </select>
                     </div>
-                    <div class="mb-3">
+                    <div class="mb-4">
+                        <label for="addShowtimeTitle" class="form-label">Showtime Title</label>
+                        <input type="text" class="form-control glow-effect" id="addShowtimeTitle" name="Title" required />
+                    </div>
+                    <div class="mb-4">
+                        <label for="addShowtimePoster" class="form-label">Poster URL</label>
+                        <input type="url" class="form-control glow-effect" id="addShowtimePoster" name="Poster" />
+                    </div>
+                    <div class="mb-4">
                         <label for="addShowtimeRoomId" class="form-label">Room</label>
                         <select class="form-control glow-effect" id="addShowtimeRoomId" name="RoomId" required>
-                            <option value="">Select Room</option>
+                            <option value="">-- Select Room --</option>
                             @{
                                 var rooms = ViewBag.Rooms as IEnumerable<QuanLyRapPhim.Models.Room> ?? new List<QuanLyRapPhim.Models.Room>();
                                 foreach (var room in rooms)
@@ -298,72 +309,25 @@
                             }
                         </select>
                     </div>
-                    <div class="mb-3">
-                        <label for="addShowtimeDateTime" class="form-label">Date & Time</label>
-                        <input type="datetime-local" class="form-control glow-effect" id="addShowtimeDateTime" name="Date" required />
+                    <div class="mb-4">
+                        <label for="addShowtimeDate" class="form-label">Date</label>
+                        <input type="date" class="form-control glow-effect" id="addShowtimeDate" name="Date" required min="2025-05-29" />
                     </div>
-                    <div class="mb-3">
-                        <label for="addShowtimePrice" class="form-label">Price (VND)</label>
-                        <input type="number" class="form-control glow-effect" id="addShowtimePrice" name="TicketPrice" required />
+                    <div class="mb-4">
+                        <label for="addShowtimeStartTime" class="form-label">Start Time</label>
+                        <input type="time" class="form-control glow-effect" id="addShowtimeStartTime" name="StartTime" required />
                     </div>
-                    <button type="submit" class="btn btn-primary glow-effect">Add Showtime</button>
+                    <div class="d-flex justify-content-between">
+                        <button type="submit" class="btn btn-danger glow-effect" style="background-color: #ff0000; border: none;">Create</button>
+                        <button type="button" class="btn btn-secondary glow-effect" data-bs-dismiss="modal" style="background-color: #4a90e2; border: none;">Back to List</button>
+                    </div>
                 </form>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Edit Showtime Modal -->
-<div class="modal fade" id="editShowtimeModal" tabindex="-1" aria-labelledby="editShowtimeModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title title-gradient" id="editShowtimeModalLabel">Edit Showtime</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <form id="edit-showtime-form">
-                    <input type="hidden" id="editShowtimeId" name="ShowtimeId" />
-                    <div class="mb-3">
-                        <label for="editShowtimeMovieId" class="form-label">Movie</label>
-                        <select class="form-control glow-effect" id="editShowtimeMovieId" name="MovieId" required>
-                            <option value="">Select Movie</option>
-                            @{
-                                var moviesForEditModal = ViewBag.Movies as IEnumerable<QuanLyRapPhim.Models.Movie> ?? new List<QuanLyRapPhim.Models.Movie>();
-                                foreach (var movie in moviesForEditModal)
-                                {
-                                    <option value="@movie.MovieId">@(movie.Title ?? "N/A")</option>
-                                }
-                            }
-                        </select>
-                    </div>
-                    <div class="mb-3">
-                        <label for="editShowtimeRoomId" class="form-label">Room</label>
-                        <select class="form-control glow-effect" id="editShowtimeRoomId" name="RoomId" required>
-                            <option value="">Select Room</option>
-                            @{
-                                var roomsForEditModal = ViewBag.Rooms as IEnumerable<QuanLyRapPhim.Models.Room> ?? new List<QuanLyRapPhim.Models.Room>();
-                                foreach (var room in roomsForEditModal)
-                                {
-                                    <option value="@room.RoomId">@(room.RoomName ?? "N/A")</option>
-                                }
-                            }
-                        </select>
-                    </div>
-                    <div class="mb-3">
-                        <label for="editShowtimeDateTime" class="form-label">Date & Time</label>
-                        <input type="datetime-local" class="form-control glow-effect" id="editShowtimeDateTime" name="Date" required />
-                    </div>
-                    <div class="mb-3">
-                        <label for="editShowtimePrice" class="form-label">Price (VND)</label>
-                        <input type="number" class="form-control glow-effect" id="editShowtimePrice" name="TicketPrice" required />
-                    </div>
-                    <button type="submit" class="btn btn-primary glow-effect">Save Changes</button>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
+
 
 <style>
     html, body {
@@ -423,16 +387,16 @@
         transition: background 0.3s ease;
     }
 
-    .nav-item i {
-        margin-right: 10px;
-        font-size: 1.2rem;
-        color: #ff0033;
-    }
+        .nav-item i {
+            margin-right: 10px;
+            font-size: 1.2rem;
+            color: #ff0033;
+        }
 
-    .nav-item:hover, .nav-item.active {
-        background: #34495E;
-        border-left: 4px solid #ff0033;
-    }
+        .nav-item:hover, .nav-item.active {
+            background: #34495E;
+            border-left: 4px solid #ff0033;
+        }
 
     .nav-divider {
         border-top: 1px solid rgba(255, 255, 255, 0.1);
@@ -457,7 +421,6 @@
         border-radius: 20px;
         border: 2px solid #34495E;
         box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
-        overflow: visible;
         padding: 40px;
     }
 
@@ -511,10 +474,10 @@
         color: #FFFFFF;
     }
 
-    .user-profile i {
-        font-size: 1.2rem;
-        color: #ff0033;
-    }
+        .user-profile i {
+            font-size: 1.2rem;
+            color: #ff0033;
+        }
 
     .admin-section {
         margin-bottom: 50px;
@@ -535,30 +498,28 @@
         table-layout: fixed;
     }
 
-    .table-custom th {
-        padding: 12px;
-        text-align: left;
-        color: #D3D3D3;
-        vertical-align: middle;
-        word-wrap: break-word;
-        border: 1px solid #34495E;
-        background: #34495E;
-        font-weight: 600;
-    }
+        .table-custom th {
+            padding: 12px;
+            text-align: left;
+            color: #D3D3D3;
+            vertical-align: middle;
+            border: 1px solid #34495E;
+            background: #34495E;
+            font-weight: 600;
+        }
 
-    .table-custom td {
-        padding: 12px;
-        text-align: left;
-        color: #333333;
-        vertical-align: middle;
-        word-wrap: break-word;
-        border: 1px solid #34495E;
-        background: #F5F5F5;
-    }
+        .table-custom td {
+            padding: 12px;
+            text-align: left;
+            color: #333333;
+            vertical-align: middle;
+            border: 1px solid #34495E;
+            background: #F5F5F5;
+        }
 
-    .table-custom tr:hover td {
-        background: #E0E0E0;
-    }
+        .table-custom tr:hover td {
+            background: #E0E0E0;
+        }
 
     .btn-primary {
         background: linear-gradient(135deg, #ff0033, #e50914);
@@ -571,10 +532,10 @@
         transition: transform 0.3s ease, box-shadow 0.3s ease;
     }
 
-    .btn-primary:hover {
-        transform: scale(1.05);
-        box-shadow: 0 0 20px rgba(255, 0, 51, 0.6);
-    }
+        .btn-primary:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(255, 0, 51, 0.6);
+        }
 
     .btn-warning {
         background: linear-gradient(135deg, #ffca28, #ffb300);
@@ -587,10 +548,10 @@
         transition: transform 0.3s ease, box-shadow 0.3s ease;
     }
 
-    .btn-warning:hover {
-        transform: scale(1.05);
-        box-shadow: 0 0 20px rgba(255, 202, 40, 0.6);
-    }
+        .btn-warning:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(255, 202, 40, 0.6);
+        }
 
     .btn-danger {
         background: linear-gradient(135deg, #ff4444, #cc0000);
@@ -603,10 +564,10 @@
         transition: transform 0.3s ease, box-shadow 0.3s ease;
     }
 
-    .btn-danger:hover {
-        transform: scale(1.05);
-        box-shadow: 0 0 20px rgba(255, 68, 68, 0.6);
-    }
+        .btn-danger:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(255, 68, 68, 0.6);
+        }
 
     .pagination {
         display: flex;
@@ -631,57 +592,52 @@
         transition: background 0.3s ease;
     }
 
-    .btn-pag.active {
-        background: #ff0033;
-        border-color: #ff0033;
-        color: #FFFFFF;
-    }
+        .btn-pag.active {
+            background: #ff0033;
+            border-color: #ff0033;
+            color: #FFFFFF;
+        }
 
-    .btn-pag:hover {
-        background: #34495E;
-    }
+        .btn-pag:hover {
+            background: #34495E;
+        }
 
     .modal-content {
-        background-color: #2C3E50;
-        color: #FFFFFF;
-        border-radius: 15px;
-        border: 1px solid #34495E;
-        background-image: linear-gradient(#2C3E50, #2C3E50), linear-gradient(45deg, #e50914, #ff0033);
-        background-origin: border-box;
-        background-clip: padding-box, border-box;
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+        background-color: #FFFFFF;
+        color: #000000;
+        border-radius: 10px;
+        border: 1px solid #ddd;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
     }
 
     .modal-header {
-        border-bottom: 1px solid #34495E;
+        border-bottom: 1px solid #ddd;
     }
 
     .modal-title {
         font-size: 1.5rem;
+        color: #000000;
     }
 
     .modal-body .form-label {
-        color: #FFFFFF;
+        color: #000000;
         font-weight: 500;
     }
 
     .modal-body .form-control {
-        border-radius: 12px;
-        padding: 15px 20px;
-        font-size: 16px;
-        border: 1px solid transparent;
-        background: #34495E;
-        background-image: linear-gradient(#34495E, #34495E), linear-gradient(45deg, #ff0033, #e50914);
-        background-origin: border-box;
-        background-clip: padding-box, border-box;
-        color: #FFFFFF;
-        transition: box-shadow 0.3s ease;
+        border-radius: 5px;
+        padding: 10px;
+        font-size: 14px;
+        border: 1px solid #ccc;
+        background: #fff;
+        color: #000000;
+        transition: border-color 0.3s ease;
     }
 
-    .modal-body .form-control:focus {
-        box-shadow: 0 0 15px rgba(255, 0, 51, 0.4);
-        background: #3D566E;
-    }
+        .modal-body .form-control:focus {
+            border-color: #ff0000;
+            outline: none;
+        }
 
     .alert {
         border-radius: 10px;
@@ -713,48 +669,56 @@
         transition: box-shadow 0.3s ease, transform 0.3s ease;
     }
 
-    .glow-effect:hover {
-        box-shadow: 0 0 25px rgba(255, 0, 51, 0.6);
-        transform: scale(1.05);
-    }
+        .glow-effect:hover {
+            box-shadow: 0 0 25px rgba(255, 0, 51, 0.6);
+            transform: scale(1.05);
+        }
 
     @@media (max-width: 768px) {
-        .sidebar {
-            width: 200px;
-            z-index: 1000;
-        }
+        .sidebar
 
-        .main-content {
-            margin-left: 200px;
-            width: calc(100% - 200px);
-        }
+    {
+        width: 200px;
+        z-index: 1000;
+    }
+
+    .main-content {
+        margin-left: 200px;
+        width: calc(100% - 200px);
+    }
+
     }
 
     @@media (max-width: 576px) {
-        .admin-dashboard {
-            flex-direction: column;
-        }
+        .admin-dashboard
 
-        .sidebar {
-            position: relative;
-            width: 100%;
-            height: auto;
-        }
+    {
+        flex-direction: column;
+    }
 
-        .main-content {
-            margin-left: 0;
-            width: 100%;
-            min-height: auto;
-        }
+    .sidebar {
+        position: relative;
+        width: 100%;
+        height: auto;
+    }
 
-        .frame-wrapper {
-            width: 100%;
-            padding: 20px;
-        }
+    .main-content {
+        margin-left: 0;
+        width: 100%;
+        min-height: auto;
+    }
+
+    .frame-wrapper {
+        width: 100%;
+        padding: 20px;
+    }
+
     }
 </style>
 
-@@section Scripts {
+@section Scripts {
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         $(document).ready(function () {
             // Show Alert
@@ -763,27 +727,48 @@
                     ${message}
                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>`;
-                $('#alert-container').html(alertHtml);
+                $('#alert-container').html(alertHtml).find('.alert').delay(3000).fadeOut();
             }
+
+            // Auto-populate Title and Poster when Movie is selected (Add Showtime)
+            $('#addShowtimeMovieId').change(function () {
+                var selectedOption = $(this).find('option:selected');
+                var title = selectedOption.data('title') || '';
+                var poster = selectedOption.data('poster') || '';
+                $('#addShowtimeTitle').val(title);
+                $('#addShowtimePoster').val(poster);
+            });
+
+            // Auto-populate Title and Poster when Movie is selected (Edit Showtime)
+            $('#editShowtimeMovieId').change(function () {
+                var selectedOption = $(this).find('option:selected');
+                var title = selectedOption.data('title') || '';
+                var poster = selectedOption.data('poster') || '';
+                $('#editShowtimeTitle').val(title);
+                $('#editShowtimePoster').val(poster);
+            });
 
             // Add Movie
             $('#add-movie-form').submit(function (e) {
                 e.preventDefault();
+                var formData = $(this).serialize();
                 $.ajax({
                     url: '@Url.Action("CreateMovie", "Admin")',
                     type: 'POST',
-                    data: $(this).serialize(),
+                    data: formData,
                     success: function (response) {
                         if (response.success) {
                             showAlert(response.message, 'success');
                             $('#addMovieModal').modal('hide');
-                            location.reload();
+                            $('#add-movie-form')[0].reset();
+                            setTimeout(() => location.reload(), 1000);
                         } else {
-                            showAlert(response.message + '<br>' + (response.errors ? response.errors.join('<br>') : ''), 'danger');
+                            showAlert(response.message || 'Failed to add movie.', 'danger');
                         }
                     },
-                    error: function () {
-                        showAlert('An error occurred while adding the movie.', 'danger');
+                    error: function (xhr, status, error) {
+                        console.error('Add Movie Error:', status, error, xhr.responseText);
+                        showAlert('An error occurred: ' + (xhr.responseJSON?.message || error), 'danger');
                     }
                 });
             });
@@ -791,43 +776,54 @@
             // Edit Movie - Populate Modal
             $(document).on('click', '.edit-movie-btn', function () {
                 var movieId = $(this).data('id');
-                var row = $(this).closest('tr');
-                $('#editMovieId').val(movieId);
-                $('#editTitle').val(row.find('td:eq(0)').text());
-                $('#editGenre').val(row.find('td:eq(1)').text());
-                $('#editDuration').val(parseInt(row.find('td:eq(2)').text().replace(' phút', '')) || '');
-                $('#editDirector').val(row.find('td:eq(3)').text());
                 $.ajax({
-                    url: '@Url.Action("Details", "Movies")/' + movieId,
+                    url: '@Url.Action("GetMovieDetails", "Admin")/' + movieId,
                     type: 'GET',
-                    success: function (data) {
-                        $('#editDescription').val(data.description);
-                        $('#editPoster').val(data.poster);
-                        $('#editActors').val(data.actors);
-                        $('#editTrailerUrl').val(data.trailerUrl);
+                    dataType: 'json',
+                    success: function (response) {
+                        if (response.success) {
+                            var movie = response.data;
+                            $('#editMovieId').val(movie.MovieId || '');
+                            $('#editTitle').val(movie.Title || '');
+                            $('#editDescription').val(movie.Description || '');
+                            $('#editDuration').val(movie.Duration || '');
+                            $('#editPoster').val(movie.Poster || '');
+                            $('#editGenre').val(movie.Genre || '');
+                            $('#editDirector').val(movie.Director || '');
+                            $('#editActors').val(movie.Actors || '');
+                            $('#editTrailerUrl').val(movie.TrailerUrl || '');
+                            $('#editMovieModal').modal('show');
+                        } else {
+                            showAlert(response.message || 'Failed to fetch movie details.', 'danger');
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        console.error('GetMovieDetails Error:', status, error, xhr.responseText);
+                        showAlert('An error occurred: ' + (xhr.responseJSON?.message || error), 'danger');
                     }
                 });
-                $('#editMovieModal').modal('show');
             });
 
             // Edit Movie - Submit
             $('#edit-movie-form').submit(function (e) {
                 e.preventDefault();
+                var formData = $(this).serialize();
                 $.ajax({
                     url: '@Url.Action("EditMovie", "Admin")',
                     type: 'POST',
-                    data: $(this).serialize(),
+                    data: formData,
                     success: function (response) {
                         if (response.success) {
                             showAlert(response.message, 'success');
                             $('#editMovieModal').modal('hide');
-                            location.reload();
+                            setTimeout(() => location.reload(), 1000);
                         } else {
-                            showAlert(response.message + '<br>' + (response.errors ? response.errors.join('<br>') : ''), 'danger');
+                            showAlert(response.message || 'Failed to update movie.', 'danger');
                         }
                     },
-                    error: function () {
-                        showAlert('An error occurred while updating the movie.', 'danger');
+                    error: function (xhr, status, error) {
+                        console.error('EditMovie Error:', status, error, xhr.responseText);
+                        showAlert('An error occurred: ' + (xhr.responseJSON?.message || error), 'danger');
                     }
                 });
             });
@@ -843,13 +839,15 @@
                     success: function (response) {
                         if (response.success) {
                             showAlert(response.message, 'success');
-                            location.reload();
+                            $('tr[data-id="' + movieId + '"]').remove();
+                            setTimeout(() => location.reload(), 1000);
                         } else {
                             showAlert(response.message, 'danger');
                         }
                     },
-                    error: function () {
-                        showAlert('An error occurred while deleting the movie.', 'danger');
+                    error: function (xhr, status, error) {
+                        console.error('DeleteMovie Error:', status, error, xhr.responseText);
+                        showAlert('An error occurred: ' + (xhr.responseJSON?.message || error), 'danger');
                     }
                 });
             });
@@ -857,76 +855,41 @@
             // Add Showtime
             $('#add-showtime-form').submit(function (e) {
                 e.preventDefault();
+                var formData = $(this).serializeArray();
+                // Ensure Date and StartTime are correctly formatted
+                var date = $('#addShowtimeDate').val();
+                var startTime = $('#addShowtimeStartTime').val();
+                if (date && startTime) {
+                    formData = formData.filter(item => item.name !== 'Date' && item.name !== 'StartTime');
+                    formData.push({ name: 'Date', value: date });
+                    formData.push({ name: 'StartTime', value: startTime });
+                }
                 $.ajax({
                     url: '@Url.Action("CreateShowtime", "Admin")',
                     type: 'POST',
-                    data: $(this).serialize(),
+                    data: formData,
                     success: function (response) {
                         if (response.success) {
                             showAlert(response.message, 'success');
                             $('#addShowtimeModal').modal('hide');
-                            location.reload();
+                            $('#add-showtime-form')[0].reset();
+                            setTimeout(() => location.reload(), 1000);
                         } else {
-                            showAlert(response.message + '<br>' + (response.errors ? response.errors.join('<br>') : ''), 'danger');
+                            showAlert(response.message || 'Failed to add showtime.', 'danger');
                         }
                     },
-                    error: function () {
-                        showAlert('An error occurred while adding the showtime.', 'danger');
+                    error: function (xhr, status, error) {
+                        console.error('CreateShowtime Error:', status, error, xhr.responseText);
+                        showAlert('An error occurred: ' + (xhr.responseJSON?.message || error), 'danger');
                     }
                 });
             });
 
             // Edit Showtime - Populate Modal
-            $(document).on('click', '.edit-showtime-btn', function () {
-                var showtimeId = $(this).data('id');
-                var row = $(this).closest('tr');
 
-                // Set the showtime ID
-                $('#editShowtimeId').val(showtimeId);
-
-                // Fetch showtime details via AJAX
-                $.ajax({
-                    url: '@Url.Action("GetShowtime", "Admin")/' + showtimeId,
-                    type: 'GET',
-                    success: function (response) {
-                        if (response.success) {
-                            var showtime = response.data;
-                            $('#editShowtimeMovieId').val(showtime.movieId);
-                            $('#editShowtimeRoomId').val(showtime.roomId);
-                            $('#editShowtimeDateTime').val(showtime.date);
-                            $('#editShowtimePrice').val(showtime.ticketPrice);
-                            $('#editShowtimeModal').modal('show');
-                        } else {
-                            showAlert(response.message, 'danger');
-                        }
-                    },
-                    error: function () {
-                        showAlert('An error occurred while fetching showtime details.', 'danger');
-                    }
-                });
-            });
 
             // Edit Showtime - Submit
-            $('#edit-showtime-form').submit(function (e) {
-                e.preventDefault();
-                $.ajax({
-                    url: '@Url.Action("EditShowtime", "Admin")',
-                    type: 'POST',
-                    data: $(this).serialize(),
-                    success: function (response) {
-                        if (response.success) {
-                            showAlert(response.message, 'success');
-                            $('#editShowtimeModal').modal('hide');
-                            location.reload();
-                        } else {
-                            showAlert(response.message + '<br>' + (response.errors ? response.errors.join('<br>') : ''), 'danger');
-                        }
-                    },
-                    error: function () {
-                        showAlert('An error occurred while updating the showtime.', 'danger');
-                    }
-                });
-            });
+  
 
             // Delete Showtime
             $(document).on('click', '.delete-showtime-btn', function () {
@@ -939,15 +902,18 @@
                     success: function (response) {
                         if (response.success) {
                             showAlert(response.message, 'success');
-                            location.reload();
+                            $('tr[data-id="' + showtimeId + '"]').remove();
+                            setTimeout(() => location.reload(), 1000);
                         } else {
                             showAlert(response.message, 'danger');
                         }
                     },
-                    error: function () {
-                        showAlert('An error occurred while deleting the showtime.', 'danger');
+                    error: function (xhr, status, error) {
+                        console.error('DeleteShowtime Error:', status, error, xhr.responseText);
+                        showAlert('An error occurred: ' + (xhr.responseJSON?.message || error), 'danger');
                     }
                 });
             });
         });
     </script>
+}

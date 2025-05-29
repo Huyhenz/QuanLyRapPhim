@@ -7,308 +7,347 @@
     var payments = ViewBag.Payments as List<QuanLyRapPhim.Models.Payment>;
 }
 
-<div class="container my-5">
-    <h1 class="text-white mb-4 title-gradient">Quản lý đặt vé</h1>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" />
+    <style>
+        body {
+            margin: 0;
+            background-color: #0F0F0F; /* Galaxy Black */
+            color: #ffffff;
+            font-family: 'Montserrat', sans-serif;
+            overflow-x: hidden;
+        }
 
-    <table class="table table-dark table-bordered glow-effect">
-        <thead>
-            <tr>
-                <th>Mã đặt vé</th>
-                <th>Khách hàng (Email)</th>
-                <th>Phim</th>
-                <th>Phòng</th>
-                <th>Ghế</th>
-                <th>Ngày chiếu</th>
-                <th>Giờ chiếu</th>
-                <th>Tổng tiền</th>
-                <th>Ngày đặt</th>
-                <th>Trạng thái thanh toán</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var booking in Model)
-            {
-                var payment = payments?.FirstOrDefault(p => p.BookingId == booking.BookingId);
-                <tr data-booking-id="@booking.BookingId">
-                    <td>@booking.BookingId</td>
-                    <td>@(booking.User?.Email ?? "Khách vãng lai")</td>
-                    <td>@booking.Showtime.Movie.Title</td>
-                    <td>@booking.Showtime.Room.RoomName</td>
-                    <td>@string.Join(", ", booking.BookingDetails.Select(bd => bd.Seat.SeatNumber))</td>
-                    <td>@booking.Showtime.Date.ToString("dd/MM/yyyy")</td>
-                    <td>@booking.Showtime.StartTime</td>
-                    <td>@booking.TotalPrice.ToString("N0") VNĐ</td>
-                    <td>@booking.BookingDate.ToString("dd/MM/yyyy HH:mm")</td>
-                    <td id="payment-status-@booking.BookingId" class="payment-status">
-                        <span class="status-text">@(payment?.PaymentStatus ?? "Chưa thanh toán")</span>
-                        <span class="spinner-border spinner-border-sm text-danger d-none" role="status" aria-hidden="true"></span>
-                    </td>
-                </tr>
+        .admin-dashboard {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 250px;
+            background-color: #000000; /* Black background */
+            color: #ffffff; /* White text for readability */
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            padding-top: 20px;
+            border-right: 2px solid #ff0033; /* Red border */
+            overflow-y: auto;
+            z-index: 1000;
+        }
+
+        .sidebar-header {
+            padding: 10px 20px;
+            border-bottom: 1px solid #ff0033; /* Red border */
+        }
+
+        .sidebar-title {
+            margin: 0;
+            font-size: 1.5em;
+            color: #ff0033; /* Red text for the header */
+        }
+
+        .sidebar-nav {
+            list-style: none;
+            padding: 0;
+            margin: 20px 0;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 10px 20px;
+            color: #ffffff; /* White text */
+            text-decoration: none;
+        }
+
+            .nav-item i {
+                margin-right: 10px;
+                color: #ffffff; /* White icons */
             }
-        </tbody>
-    </table>
 
-    <div class="text-center">
-        <a asp-controller="Home" asp-action="Index" class="btn btn-secondary rounded-pill px-4 glow-effect">
-            <i class="fas fa-arrow-left me-1"></i> Quay lại trang chủ
-        </a>
-    </div>
-</div>
+            .nav-item:hover {
+                background-color: #ff0033; /* Red on hover */
+                color: #000000; /* Black text on hover for contrast */
+            }
 
-@if (User.IsInRole("Admin"))
-{
-    <button id="toggleDashboard" class="dashboard-toggle glow-effect"><i class="fas fa-bars"></i></button>
-    <aside id="adminDashboard" class="admin-dashboard glow-effect">
-        <div class="dashboard-header">
-            <h4 class="title-gradient"><i class="fas fa-user-shield"></i> Quản lý Admin</h4>
-        </div>
-        <ul class="dashboard-menu">
-            <li><a href="/Admin/Dashboard"><i class="fas fa-chart-line"></i> Dashboard</a></li>
-            <li><a href="/Movies"><i class="fas fa-film"></i> Danh sách phim</a></li>
-            <li><a href="/Showtimes"><i class="fas fa-clock"></i> Lịch chiếu</a></li>
-            <li><a href="/Rooms"><i class="fas fa-door-open"></i> Quản lý phòng</a></li>
-            <li><a href="/Seats"><i class="fas fa-chair"></i> Quản lý ghế</a></li>
-            <li><a href="/Admin/ManageBookings"><i class="fas fa-ticket-alt"></i> Quản lý đặt vé</a></li>
-            <li><a href="/Admin/Reports"><i class="fas fa-file-alt"></i> Báo cáo thống kê</a></li>
-        </ul>
-    </aside>
-}
+                .nav-item:hover i {
+                    color: #000000; /* Black icons on hover */
+                }
 
-<!-- CSS tùy chỉnh -->
-<style>
-    body {
-        background-color: #0F0F0F; /* Galaxy Black */
-        color: #ffffff;
-        font-family: 'Montserrat', sans-serif;
-    }
+            .nav-item.active {
+                background-color: #ff0033; /* Red for active item */
+                color: #000000; /* Black text for active item */
+            }
 
-    .title-gradient {
-        background: linear-gradient(90deg, #ff0033, #1c1c1c);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-        color: transparent;
-    }
+                .nav-item.active i {
+                    color: #000000; /* Black icons for active item */
+                }
 
-        .title-gradient:not(h1) {
-            -webkit-text-fill-color: inherit;
-            background-clip: inherit;
-            color: #fff;
+        .social-item {
+            color: #ff0033; /* Red for social media icons and text */
         }
 
-    .glow-effect {
-        box-shadow: 0 0 15px rgba(255, 0, 51, 0.3);
-        transition: box-shadow 0.3s ease, transform 0.3s ease;
-    }
+            .social-item i {
+                color: #ff0033; /* Red icons for social media */
+            }
 
-        .glow-effect:hover {
-            box-shadow: 0 0 25px rgba(255, 0, 51, 0.5);
-            transform: scale(1.05);
+            .social-item:hover {
+                background-color: #ff0033;
+                color: #000000; /* Black text on hover */
+            }
+
+                .social-item:hover i {
+                    color: #000000; /* Black icons on hover for social items */
+                }
+
+        .content {
+            margin-left: 250px;
+            padding: 20px;
+            flex-grow: 1;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
         }
 
-    .table-dark {
-        background-color: #1c1c1c;
-        border-radius: 15px;
-        overflow: hidden;
-    }
-
-        .table-dark th {
-            background-color: #2a2a2a;
-            color: #b3b3b3;
-            font-weight: 600;
-            border: 1px solid #444;
-            padding: 12px;
-            text-align: center;
+        .content-inner {
+            max-width: 1200px;
+            width: 100%;
         }
 
-        .table-dark td {
+        .title-gradient {
+            background: linear-gradient(90deg, #ff0033, #1c1c1c);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            color: transparent;
+        }
+
+            .title-gradient:not(h1) {
+                -webkit-text-fill-color: inherit;
+                background-clip: inherit;
+                color: #fff;
+            }
+
+        .glow-effect {
+            box-shadow: 0 0 15px rgba(255, 0, 51, 0.3);
+            transition: box-shadow 0.3s ease, transform 0.3s ease;
+        }
+
+            .glow-effect:hover {
+                box-shadow: 0 0 25px rgba(255, 0, 51, 0.5);
+                transform: scale(1.05);
+            }
+
+        .table-dark {
             background-color: #1c1c1c;
-            color: #ffffff;
-            border: 1px solid #444;
-            padding: 12px;
-            text-align: center;
+            border-radius: 15px;
+            overflow: hidden;
+            width: 100%;
+            table-layout: auto;
         }
 
-        .table-dark tr:hover td {
-            background-color: #2a2a2a;
-        }
+            .table-dark th {
+                background-color: #2a2a2a;
+                color: #b3b3b3;
+                font-weight: 600;
+                border: 1px solid #444;
+                padding: 12px;
+                text-align: center;
+                white-space: nowrap;
+            }
 
-    .btn-secondary {
-        border-color: #ff0033;
-        color: #ff0033;
-        border-radius: 20px;
-        padding: 10px 30px;
-        font-weight: 600;
-        font-size: 1rem;
-        transition: background-color 0.3s ease, transform 0.3s ease;
-    }
-
-        .btn-secondary:hover {
-            background-color: #ff0033;
-            color: #ffffff;
-            border-color: #ff0033;
-            transform: scale(1.05);
-        }
-
-    .text-muted {
-        color: #b3b3b3 !important;
-    }
-
-    .admin-dashboard {
-        position: fixed;
-        top: 0;
-        left: -300px;
-        width: 300px;
-        height: 100vh;
-        background-color: #1c1c1c;
-        color: #ffffff;
-        padding: 20px;
-        z-index: 999;
-        transition: left 0.4s ease-in-out;
-        border-right: 2px solid #ff0033;
-    }
-
-    .dashboard-toggle {
-        position: fixed;
-        top: 20px;
-        left: 10px;
-        background-color: #2a2a2a;
-        color: #ffffff;
-        border: 2px solid #ff0033;
-        padding: 12px 15px;
-        font-size: 18px;
-        cursor: pointer;
-        z-index: 1000;
-        border-radius: 50%;
-    }
-
-        .dashboard-toggle:hover {
-            background-color: #ff0033;
-            color: #ffffff;
-        }
-
-    .dashboard-header {
-        text-align: center;
-        font-size: 20px;
-        margin-bottom: 20px;
-    }
-
-    .dashboard-menu {
-        list-style: none;
-        padding: 0;
-    }
-
-        .dashboard-menu li {
-            margin-bottom: 15px;
-        }
-
-            .dashboard-menu li a {
-                display: flex;
-                align-items: center;
-                gap: 10px;
+            .table-dark td {
+                background-color: #1c1c1c;
                 color: #ffffff;
-                text-decoration: none;
-                padding: 10px;
-                border-radius: 5px;
-                transition: background 0.3s ease;
+                border: 1px solid #444;
+                padding: 12px;
+                text-align: center;
+                white-space: nowrap;
             }
 
-                .dashboard-menu li a:hover {
-                    background-color: #ff0033;
-                }
+            .table-dark tr:hover td {
+                background-color: #2a2a2a;
+            }
 
-    .payment-status .spinner-border {
-        margin-left: 5px;
-    }
-</style>
-
-<script>
-    // Toggle dashboard functionality
-    document.getElementById("toggleDashboard").addEventListener("click", function() {
-        let dashboard = document.getElementById("adminDashboard");
-        let toggleButton = document.getElementById("toggleDashboard");
-
-        if (dashboard.style.left === "-300px") {
-            dashboard.style.left = "0";
-            toggleButton.style.left = "310px";
-        } else {
-            dashboard.style.left = "-300px";
-            toggleButton.style.left = "10px";
+        .table-container {
+            overflow-x: auto;
+            overflow-y: hidden;
+            max-height: calc(100vh - 200px);
         }
-    });
 
-    // Function to fetch and update payment statuses
-    function updatePaymentStatuses() {
-        // Show loading spinners for all payment status cells
-        document.querySelectorAll('.payment-status').forEach(cell => {
-            const spinner = cell.querySelector('.spinner-border');
-            const statusText = cell.querySelector('.status-text');
-            if (spinner && statusText) {
-                spinner.classList.remove('d-none');
-                statusText.classList.add('text-muted');
+        .btn-secondary {
+            border-color: #ff0033;
+            color: #ff0033;
+            border-radius: 20px;
+            padding: 10px 30px;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+        }
+
+            .btn-secondary:hover {
+                background-color: #ff0033;
+                color: #ffffff;
+                border-color: #ff0033;
+                transform: scale(1.05);
             }
-        });
 
-        fetch('/Admin/GetPaymentStatuses')
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok: ' + response.statusText);
+        .text-muted {
+            color: #b3b3b3 !important;
+        }
+
+        .payment-status .spinner-border {
+            margin-left: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-dashboard">
+        @if (User.IsInRole("Admin"))
+        {
+            <aside class="sidebar">
+                <div class="sidebar-header">
+                    <h3 class="sidebar-title">CinemaX Admin</h3>
+                </div>
+                <nav class="sidebar-nav">
+                    <a href="/Admin/Index" class="nav-item"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+                    <a href="/Rooms" class="nav-item"><i class="fas fa-door-open"></i> Manage Rooms</a>
+                    <a href="/Seats" class="nav-item"><i class="fas fa-chair"></i> Manage Seats</a>
+                    <a href="/Admin/ManageBookings" class="nav-item active"><i class="fas fa-ticket-alt"></i> Manage Bookings</a>
+                    <a href="/Admin/RevenueStatistics" class="nav-item"><i class="fas fa-chart-bar"></i> Revenue Statistics</a>
+                    <div class="nav-divider"></div>
+                    <a href="#" class="nav-item social-item"><i class="fab fa-facebook"></i> Facebook</a>
+                    <a href="#" class="nav-item social-item"><i class="fab fa-twitter"></i> Twitter</a>
+                    <a href="#" class="nav-item social-item"><i class="fab fa-google"></i> Google</a>
+                </nav>
+            </aside>
+        }
+
+        <div class="content">
+            <div class="content-inner">
+                <h1 class="text-white mb-4 title-gradient">Quản lý đặt vé</h1>
+
+                <div class="table-container">
+                    <table class="table table-dark table-bordered glow-effect">
+                        <thead>
+                            <tr>
+                                <th>Mã đặt vé</th>
+                                <th>Khách hàng (Email)</th>
+                                <th>Phim</th>
+                                <th>Phòng</th>
+                                <th>Ghế</th>
+                                <th>Ngày chiếu</th>
+                                <th>Giờ chiếu</th>
+                                <th>Tổng tiền</th>
+                                <th>Ngày đặt</th>
+                                <th>Trạng thái thanh toán</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var booking in Model)
+                            {
+                                var payment = payments?.FirstOrDefault(p => p.BookingId == booking.BookingId);
+                                <tr data-booking-id="@booking.BookingId">
+                                    <td>@booking.BookingId</td>
+                                    <td>@(booking.User?.Email ?? "Khách vãng lai")</td>
+                                    <td>@booking.Showtime.Movie.Title</td>
+                                    <td>@booking.Showtime.Room.RoomName</td>
+                                    <td>@string.Join(", ", booking.BookingDetails.Select(bd => bd.Seat.SeatNumber))</td>
+                                    <td>@booking.Showtime.Date.ToString("dd/MM/yyyy")</td>
+                                    <td>@booking.Showtime.StartTime</td>
+                                    <td>@booking.TotalPrice.ToString("N0") VNĐ</td>
+                                    <td>@booking.BookingDate.ToString("dd/MM/yyyy HH:mm")</td>
+                                    <td id="payment-status-@booking.BookingId" class="payment-status">
+                                        <span class="status-text">@(payment?.PaymentStatus ?? "Chưa thanh toán")</span>
+                                        <span class="spinner-border spinner-border-sm text-danger d-none" role="status" aria-hidden="true"></span>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="text-center mt-4">
+                    <a asp-controller="Home" asp-action="Index" class="btn btn-secondary rounded-pill px-4 glow-effect">
+                        <i class="fas fa-arrow-left me-1"></i> Quay lại trang chủ
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Function to fetch and update payment statuses
+        function updatePaymentStatuses() {
+            document.querySelectorAll('.payment-status').forEach(cell => {
+                const spinner = cell.querySelector('.spinner-border');
+                const statusText = cell.querySelector('.status-text');
+                if (spinner && statusText) {
+                    spinner.classList.remove('d-none');
+                    statusText.classList.add('text-muted');
                 }
-                return response.json();
-            })
-            .then(data => {
-                console.log('Fetched payment statuses:', data); // Debugging
-                data.forEach(payment => {
-                    const statusCell = document.getElementById(`payment-status-${payment.bookingId}`);
-                    if (statusCell) {
-                        const statusText = statusCell.querySelector('.status-text');
-                        const spinner = statusCell.querySelector('.spinner-border');
-                        if (statusText && spinner) {
-                            statusText.textContent = payment.paymentStatus || "Chưa thanh toán";
+            });
+
+            fetch('/Admin/GetPaymentStatuses')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok: ' + response.statusText);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('Fetched payment statuses:', data);
+                    data.forEach(payment => {
+                        const statusCell = document.getElementById(`payment-status-${payment.bookingId}`);
+                        if (statusCell) {
+                            const statusText = statusCell.querySelector('.status-text');
+                            const spinner = statusCell.querySelector('.spinner-border');
+                            if (statusText && spinner) {
+                                statusText.textContent = payment.paymentStatus || "Chưa thanh toán";
+                                statusText.classList.remove('text-muted');
+                                spinner.classList.add('d-none');
+                            }
+                        }
+                    });
+
+                    document.querySelectorAll('tr[data-booking-id]').forEach(row => {
+                        const bookingId = row.getAttribute('data-booking-id');
+                        const statusCell = document.getElementById(`payment-status-${bookingId}`);
+                        const statusText = statusCell?.querySelector('.status-text');
+                        const spinner = statusCell?.querySelector('.spinner-border');
+                        if (statusText && spinner && !data.some(p => p.bookingId == bookingId)) {
+                            statusText.textContent = "Chưa thanh toán";
                             statusText.classList.remove('text-muted');
                             spinner.classList.add('d-none');
-                        } else {
-                            console.warn(`Status text or spinner not found for booking ID: ${payment.bookingId}`);
                         }
-                    } else {
-                        console.warn(`Status cell not found for booking ID: ${payment.bookingId}`);
-                    }
+                    });
+                })
+                .catch(error => {
+                    console.error('Error fetching payment statuses:', error);
+                    document.querySelectorAll('.payment-status').forEach(cell => {
+                        const spinner = cell.querySelector('.spinner-border');
+                        const statusText = cell.querySelector('.status-text');
+                        if (spinner && statusText) {
+                            spinner.classList.add('d-none');
+                            statusText.classList.remove('text-muted');
+                            statusText.textContent = "Lỗi tải trạng thái";
+                        }
+                    });
                 });
+        }
 
-                // Check for any rows that didn't get updated (e.g., no payment record)
-                document.querySelectorAll('tr[data-booking-id]').forEach(row => {
-                    const bookingId = row.getAttribute('data-booking-id');
-                    const statusCell = document.getElementById(`payment-status-${bookingId}`);
-                    const statusText = statusCell?.querySelector('.status-text');
-                    const spinner = statusCell?.querySelector('.spinner-border');
-                    if (statusText && spinner && !data.some(p => p.bookingId == bookingId)) {
-                        statusText.textContent = "Chưa thanh toán";
-                        statusText.classList.remove('text-muted');
-                        spinner.classList.add('d-none');
-                    }
-                });
-            })
-            .catch(error => {
-                console.error('Error fetching payment statuses:', error);
-                document.querySelectorAll('.payment-status').forEach(cell => {
-                    const spinner = cell.querySelector('.spinner-border');
-                    const statusText = cell.querySelector('.status-text');
-                    if (spinner && statusText) {
-                        spinner.classList.add('d-none');
-                        statusText.classList.remove('text-muted');
-                        statusText.textContent = "Lỗi tải trạng thái";
-                    }
-                });
-            });
-    }
+        // Initial call to update statuses
+        updatePaymentStatuses();
 
-    // Initial call to update statuses
-    updatePaymentStatuses();
-
-    // Set interval to update statuses every 5 seconds for faster synchronization
-    setInterval(updatePaymentStatuses, 5000);
-</script>
-
-<!-- Thêm Font Awesome và Bootstrap (for spinner) -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" />
+        // Set interval to update statuses every 5 seconds
+        setInterval(updatePaymentStatuses, 5000);
+    </script>
+</body>
+</html>

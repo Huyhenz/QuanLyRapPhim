@@ -1,0 +1,516 @@
+﻿@* @model dynamic *@
+
+@* @{ *@
+@*     ViewData["Title"] = "Manage Snacks"; *@
+@*     Layout = "~/Views/Shared/_Layout.cshtml"; *@
+@* } *@
+
+@* <div class="admin-wrapper"> *@
+@*     @if (User.IsInRole("Admin")) *@
+@*     { *@
+@*         <button id="toggleDashboard" class="dashboard-toggle glow-effect"><i class="fas fa-bars"></i></button> *@
+@*         <aside id="adminDashboard" class="admin-dashboard glow-effect"> *@
+@*             <div class="dashboard-header"> *@
+@*                 <h4 class="title-gradient"><i class="fas fa-user-shield"></i> Quản lý Admin</h4> *@
+@*             </div> *@
+@*             <ul class="dashboard-menu"> *@
+@*                 <li><a href="/Admin/Dashboard"><i class="fas fa-chart-line"></i> Dashboard</a></li> *@
+@*                 <li><a href="/Movies"><i class="fas fa-film"></i> Danh sách phim</a></li> *@
+@*                 <li><a href="/Showtimes"><i class="fas fa-clock"></i> Lịch chiếu</a></li> *@
+@*                 <li><a href="/Rooms"><i class="fas fa-door-open"></i> Quản lý phòng</a></li> *@
+@*                 <li><a href="/Seats"><i class="fas fa-chair"></i> Quản lý ghế</a></li> *@
+@*                 <li><a href="/Admin/ManageBookings"><i class="fas fa-ticket-alt"></i> Quản lý đặt vé</a></li> *@
+@*                 <li><a href="/Admin/RevenueStatistics"><i class="fas fa-file-alt"></i> Báo cáo thống kê</a></li> *@
+@*                 <li><a href="/Admin/ManageSnacks" class="active"><i class="fas fa-utensils"></i> Quản lý bắp nước</a></li> *@
+@*             </ul> *@
+@*         </aside> *@
+@*     } *@
+
+@*     <!-- Main Content --> *@
+@*     <main class="main-content"> *@
+@*         <div class="content-header"> *@
+@*             <h2 class="content-title">Manage Snacks</h2> *@
+@*             <div class="header-actions"> *@
+@*                 <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addSnackModal">Add New Snack</button> *@
+@*             </div> *@
+@*         </div> *@
+
+@*         <!-- Alerts for Success/Error Messages --> *@
+@*         <div id="alert-container" class="mb-4"></div> *@
+
+@*         <!-- Snacks Table --> *@
+@*         <div class="admin-section"> *@
+@*             <h3 class="section-subtitle">Available Snacks</h3> *@
+@*             <div class="table-responsive"> *@
+@*                 <table class="table table-custom"> *@
+@*                     <thead> *@
+@*                         <tr> *@
+@*                             <th>Name</th> *@
+@*                             <th>Category</th> *@
+@*                             <th>Price (VND)</th> *@
+@*                             <th>Actions</th> *@
+@*                         </tr> *@
+@*                     </thead> *@
+@*                     <tbody id="snacks-table"> *@
+@*                         @foreach (var product in ViewBag.Products) *@
+@*                         { *@
+@*                             <tr data-id="@product.ProductId"> *@
+@*                                 <td>@product.Name</td> *@
+@*                                 <td>@product.Category</td> *@
+@*                                 <td>@product.Price.ToString("C", new System.Globalization.CultureInfo("vi-VN"))</td> *@
+@*                                 <td> *@
+@*                                     <button class="btn btn-sm btn-warning edit-snack-btn" data-id="@product.ProductId">Edit</button> *@
+@*                                     <button class="btn btn-sm btn-danger delete-snack-btn" data-id="@product.ProductId">Delete</button> *@
+@*                                 </td> *@
+@*                             </tr> *@
+@*                         } *@
+@*                     </tbody> *@
+@*                 </table> *@
+@*             </div> *@
+@*         </div> *@
+
+@*         <!-- Order Snacks Section --> *@
+@*         <div class="admin-section"> *@
+@*             <h3 class="section-subtitle">Order Snacks</h3> *@
+@*             <div class="mb-3"> *@
+@*                 <label for="bookingId" class="form-label">Select Booking ID</label> *@
+@*                 <select class="form-control" id="bookingId" required> *@
+@*                     <option value="">Select Booking</option> *@
+@*                     @foreach (var booking in _context.Bookings.ToList()) *@
+@*                     { *@
+@*                         <option value="@booking.BookingId">@booking.BookingId - @booking.Showtime.Movie.Title (@booking.BookingDate.ToString("dd/MM/yyyy"))</option> *@
+@*                     } *@
+@*                 </select> *@
+@*             </div> *@
+@*             <div class="mb-3"> *@
+@*                 <label for="productId" class="form-label">Select Product</label> *@
+@*                 <select class="form-control" id="productId" required> *@
+@*                     <option value="">Select Product</option> *@
+@*                     @foreach (var product in ViewBag.Products) *@
+@*                     { *@
+@*                         <option value="@product.ProductId">@product.Name (@product.Price.ToString("C", new System.Globalization.CultureInfo("vi-VN")))</option> *@
+@*                     } *@
+@*                 </select> *@
+@*             </div> *@
+@*             <div class="mb-3"> *@
+@*                 <label for="quantity" class="form-label">Quantity</label> *@
+@*                 <input type="number" class="form-control" id="quantity" min="1" value="1" required> *@
+@*             </div> *@
+@*             <button class="btn btn-primary" id="addOrderItemBtn">Add Order</button> *@
+@*             <div id="orderItemsContainer" class="mt-3"></div> *@
+@*         </div> *@
+@*     </main> *@
+@* </div> *@
+
+@* <!-- Add Snack Modal --> *@
+@* <div class="modal fade" id="addSnackModal" tabindex="-1" aria-labelledby="addSnackModalLabel" aria-hidden="true"> *@
+@*     <div class="modal-dialog"> *@
+@*         <div class="modal-content"> *@
+@*             <div class="modal-header"> *@
+@*                 <h5 class="modal-title" id="addSnackModalLabel">Add New Snack</h5> *@
+@*                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button> *@
+@*             </div> *@
+@*             <div class="modal-body"> *@
+@*                 <form id="add-snack-form"> *@
+@*                     <div class="mb-3"> *@
+@*                         <label for="snackName" class="form-label">Name</label> *@
+@*                         <input type="text" class="form-control" id="snackName" name="Name" required> *@
+@*                     </div> *@
+@*                     <div class="mb-3"> *@
+@*                         <label for="snackPrice" class="form-label">Price (VND)</label> *@
+@*                         <input type="number" class="form-control" id="snackPrice" name="Price" step="1000" min="0" required> *@
+@*                     </div> *@
+@*                     <div class="mb-3"> *@
+@*                         <label for="snackCategory" class="form-label">Category</label> *@
+@*                         <select class="form-control" id="snackCategory" name="Category" required> *@
+@*                             <option value="Popcorn">Popcorn</option> *@
+@*                             <option value="Drink">Drink</option> *@
+@*                         </select> *@
+@*                     </div> *@
+@*                     <button type="submit" class="btn btn-primary">Add Snack</button> *@
+@*                 </form> *@
+@*             </div> *@
+@*         </div> *@
+@*     </div> *@
+@* </div> *@
+
+@* <style> *@
+@*     /* Base styles */ *@
+@*     html, body { *@
+@*         height: 100%; *@
+@*         margin: 0; *@
+@*         padding: 0; *@
+@*         background-color: #f5f7fa; *@
+@*         color: #333; *@
+@*         font-family: 'Roboto', sans-serif; *@
+@*         overflow-x: hidden; *@
+@*     } *@
+
+@*     .admin-wrapper { *@
+@*         display: flex; *@
+@*         min-height: 100vh; *@
+@*         width: 100%; *@
+@*         box-sizing: border-box; *@
+@*         position: relative; *@
+@*     } *@
+
+@*     /* Dashboard Toggle */ *@
+@*     .dashboard-toggle { *@
+@*         position: fixed; *@
+@*         top: 20px; *@
+@*         left: 20px; *@
+@*         background: linear-gradient(90deg, #007bff, #00c4ff); *@
+@*         border: none; *@
+@*         border-radius: 50%; *@
+@*         width: 50px; *@
+@*         height: 50px; *@
+@*         display: flex; *@
+@*         align-items: center; *@
+@*         justify-content: center; *@
+@*         color: #fff; *@
+@*         font-size: 1.5rem; *@
+@*         cursor: pointer; *@
+@*         z-index: 1000; *@
+@*         transition: all 0.3s ease; *@
+@*     } *@
+
+@*         .dashboard-toggle:hover { *@
+@*             transform: scale(1.1); *@
+@*         } *@
+
+@*     /* Admin Dashboard Sidebar */ *@
+@*     .admin-dashboard { *@
+@*         width: 250px; *@
+@*         background: #1a1a2e; *@
+@*         color: #fff; *@
+@*         position: fixed; *@
+@*         top: 0; *@
+@*         bottom: 0; *@
+@*         left: -250px; /* Hidden by default */ *@
+@*         height: 100%; *@
+@*         transition: left 0.3s ease; *@
+@*         z-index: 999; *@
+@*     } *@
+
+@*         .admin-dashboard.active { *@
+@*             left: 0; /* Show when toggled */ *@
+@*         } *@
+
+@*     .dashboard-header { *@
+@*         padding: 20px; *@
+@*         border-bottom: 1px solid rgba(255, 255, 255, 0.1); *@
+@*     } *@
+
+@*     .title-gradient { *@
+@*         background: linear-gradient(90deg, #007bff, #00c4ff); *@
+@*         -webkit-background-clip: text; *@
+@*         -webkit-text-fill-color: transparent; *@
+@*         font-size: 1.5rem; *@
+@*         font-weight: 700; *@
+@*         margin: 0; *@
+@*         display: flex; *@
+@*         align-items: center; *@
+@*     } *@
+
+@*         .title-gradient i { *@
+@*             margin-right: 10px; *@
+@*         } *@
+
+@*     .dashboard-menu { *@
+@*         list-style: none; *@
+@*         padding: 0; *@
+@*         margin: 0; *@
+@*     } *@
+
+@*         .dashboard-menu li a { *@
+@*             display: flex; *@
+@*             align-items: center; *@
+@*             padding: 15px 20px; *@
+@*             color: #fff; *@
+@*             text-decoration: none; *@
+@*             font-size: 1rem; *@
+@*             transition: background 0.3s ease; *@
+@*         } *@
+
+@*             .dashboard-menu li a i { *@
+@*                 margin-right: 10px; *@
+@*                 font-size: 1.2rem; *@
+@*             } *@
+
+@*             .dashboard-menu li a:hover, .dashboard-menu li a.active { *@
+@*                 background: rgba(255, 255, 255, 0.1); *@
+@*                 border-left: 4px solid #00c4ff; *@
+@*             } *@
+
+@*     /* Glow Effect */ *@
+@*     .glow-effect { *@
+@*         box-shadow: 0 0 15px rgba(0, 123, 255, 0.5); *@
+@*     } *@
+
+@*     /* Main Content */ *@
+@*     .main-content { *@
+@*         margin-left: 0; /* No margin when sidebar is hidden */ *@
+@*         padding: 20px; *@
+@*         width: 100%; *@
+@*         background: #fff; *@
+@*         border-radius: 8px; *@
+@*         box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); *@
+@*         min-height: 100vh; *@
+@*         box-sizing: border-box; *@
+@*         transition: margin-left 0.3s ease; *@
+@*     } *@
+
+@*         .main-content.shifted { *@
+@*             margin-left: 250px; /* Shift when sidebar is active */ *@
+@*             width: calc(100% - 250px); *@
+@*         } *@
+
+@*     .content-header { *@
+@*         display: flex; *@
+@*         justify-content: space-between; *@
+@*         align-items: center; *@
+@*         margin-bottom: 20px; *@
+@*     } *@
+
+@*     .content-title { *@
+@*         font-size: 1.8rem; *@
+@*         font-weight: 600; *@
+@*         color: #333; *@
+@*     } *@
+
+@*     .header-actions { *@
+@*         display: flex; *@
+@*         align-items: center; *@
+@*         gap: 15px; *@
+@*     } *@
+
+@*     .admin-section { *@
+@*         margin-bottom: 50px; *@
+@*     } *@
+
+@*     .section-subtitle { *@
+@*         font-size: 1.5rem; *@
+@*         font-weight: 600; *@
+@*         color: #007bff; *@
+@*         margin-bottom: 20px; *@
+@*     } *@
+
+@*     .table-custom { *@
+@*         width: 100%; *@
+@*         background: #fff; *@
+@*         border: 1px solid #eee; *@
+@*         border-radius: 8px; *@
+@*         overflow: hidden; *@
+@*         table-layout: fixed; *@
+@*     } *@
+
+@*         .table-custom th, .table-custom td { *@
+@*             padding: 12px; *@
+@*             text-align: left; *@
+@*             color: #666; *@
+@*             vertical-align: middle; *@
+@*             word-wrap: break-word; *@
+@*         } *@
+
+@*         .table-custom th { *@
+@*             background: #f8f9fa; *@
+@*             color: #333; *@
+@*             font-weight: 600; *@
+@*         } *@
+
+@*     .btn-primary { *@
+@*         background: linear-gradient(90deg, #007bff, #00c4ff); *@
+@*         border: none; *@
+@*         border-radius: 6px; *@
+@*         padding: 8px 16px; *@
+@*         color: #fff; *@
+@*         font-weight: 600; *@
+@*         transition: transform 0.2s ease; *@
+@*     } *@
+
+@*         .btn-primary:hover { *@
+@*             transform: translateY(-2px); *@
+@*             background: linear-gradient(90deg, #0056b3, #00a3cc); *@
+@*         } *@
+
+@*     .btn-warning { *@
+@*         background-color: #ffca28; *@
+@*         color: #333; *@
+@*         border: none; *@
+@*         border-radius: 6px; *@
+@*     } *@
+
+@*         .btn-warning:hover { *@
+@*             background-color: #ffb300; *@
+@*         } *@
+
+@*     .btn-danger { *@
+@*         background-color: #dc3545; *@
+@*         border: none; *@
+@*         border-radius: 6px; *@
+@*     } *@
+
+@*         .btn-danger:hover { *@
+@*             background-color: #c82333; *@
+@*         } *@
+
+@*     /* Responsive Design */ *@
+@*     @@media (max-width: 768px) { *@
+@*         .admin-dashboard *@
+
+@*     { *@
+@*         width: 200px; *@
+@*         left: -200px; *@
+@*     } *@
+
+@*     .admin-dashboard.active { *@
+@*         left: 0; *@
+@*     } *@
+
+@*     .main-content.shifted { *@
+@*         margin-left: 200px; *@
+@*         width: calc(100% - 200px); *@
+@*     } *@
+
+@*     } *@
+
+@*     @@media (max-width: 576px) { *@
+@*         .admin-wrapper *@
+
+@*     { *@
+@*         flex-direction: column; *@
+@*     } *@
+
+@*     .admin-dashboard { *@
+@*         position: relative; *@
+@*         width: 100%; *@
+@*         left: 0; *@
+@*         height: auto; *@
+@*     } *@
+
+@*     .main-content { *@
+@*         margin-left: 0; *@
+@*         width: 100%; *@
+@*         min-height: auto; *@
+@*     } *@
+
+@*         .main-content.shifted { *@
+@*             margin-left: 0; *@
+@*             width: 100%; *@
+@*         } *@
+
+@*     .dashboard-toggle { *@
+@*         display: none; *@
+@*     } *@
+
+@*     } *@
+@* </style> *@
+
+@* @section Scripts { *@
+@*     <script> *@
+@*         $(document).ready(function () { *@
+@*             // Toggle Dashboard *@
+@*             $('#toggleDashboard').click(function () { *@
+@*                 $('#adminDashboard').toggleClass('active'); *@
+@*                 $('.main-content').toggleClass('shifted'); *@
+@*             }); *@
+
+@*             // Show Alert *@
+@*             function showAlert(message, type) { *@
+@*                 var alertHtml = `<div class="alert alert-${type} alert-dismissible fade show" role="alert"> *@
+@*                     ${message} *@
+@*                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button> *@
+@*                 </div>`; *@
+@*                 $('#alert-container').html(alertHtml); *@
+@*             } *@
+
+@*             // Add Snack *@
+@*             $('#add-snack-form').submit(function (e) { *@
+@*                 e.preventDefault(); *@
+@*                 $.ajax({ *@
+@*                     url: '@Url.Action("AddSnack", "Admin")', *@
+@*                     type: 'POST', *@
+@*                     data: $(this).serialize(), *@
+@*                     success: function (response) { *@
+@*                         if (response.success) { *@
+@*                             showAlert(response.message, 'success'); *@
+@*                             $('#addSnackModal').modal('hide'); *@
+@*                             location.reload(); *@
+@*                         } else { *@
+@*                             showAlert(response.message + '<br>' + (response.errors ? response.errors.join('<br>') : ''), 'danger'); *@
+@*                         } *@
+@*                     }, *@
+@*                     error: function () { *@
+@*                         showAlert('An error occurred while adding the snack.', 'danger'); *@
+@*                     } *@
+@*                 }); *@
+@*             }); *@
+
+@*             // Add Order Item *@
+@*             $('#addOrderItemBtn').click(function (e) { *@
+@*                 e.preventDefault(); *@
+@*                 var bookingId = $('#bookingId').val(); *@
+@*                 var productId = $('#productId').val(); *@
+@*                 var quantity = $('#quantity').val(); *@
+
+@*                 if (!bookingId || !productId || !quantity) { *@
+@*                     showAlert('Please fill all fields.', 'danger'); *@
+@*                     return; *@
+@*                 } *@
+
+@*                 $.ajax({ *@
+@*                     url: '@Url.Action("AddOrderItem", "Admin")', *@
+@*                     type: 'POST', *@
+@*                     data: { bookingId: bookingId, productId: productId, quantity: quantity }, *@
+@*                     success: function (response) { *@
+@*                         if (response.success) { *@
+@*                             showAlert(response.message, 'success'); *@
+@*                             updateOrderItems(bookingId); *@
+@*                         } else { *@
+@*                             showAlert(response.message, 'danger'); *@
+@*                         } *@
+@*                     }, *@
+@*                     error: function () { *@
+@*                         showAlert('An error occurred while adding the order item.', 'danger'); *@
+@*                     } *@
+@*                 }); *@
+@*             }); *@
+
+@*             // Update Order Items Display *@
+@*             function updateOrderItems(bookingId) { *@
+@*                 $.ajax({ *@
+@*                     url: '@Url.Action("GetOrderItems", "Admin")', *@
+@*                     type: 'GET', *@
+@*                     data: { bookingId: bookingId }, *@
+@*                     success: function (response) { *@
+@*                         var container = $('#orderItemsContainer'); *@
+@*                         container.empty(); *@
+@*                         if (response.length > 0) { *@
+@*                             var html = '<h4>Ordered Items:</h4><ul>'; *@
+@*                             response.forEach(function (item) { *@
+@*                                 html += `<li>${item.quantity} x ${item.product.name} = ${item.totalPrice.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}</li>`; *@
+@*                             }); *@
+@*                             html += '</ul>'; *@
+@*                             container.html(html); *@
+@*                         } else { *@
+@*                             container.html('<p>No items ordered yet.</p>'); *@
+@*                         } *@
+@*                     }, *@
+@*                     error: function () { *@
+@*                         $('#orderItemsContainer').html('<p>Error loading order items.</p>'); *@
+@*                     } *@
+@*                 }); *@
+@*             } *@
+
+@*             // Load order items when booking selection changes *@
+@*             $('#bookingId').change(function () { *@
+@*                 var bookingId = $(this).val(); *@
+@*                 if (bookingId) { *@
+@*                     updateOrderItems(bookingId); *@
+@*                 } else { *@
+@*                     $('#orderItemsContainer').html(''); *@
+@*                 } *@
+@*             }); *@
+@*         }); *@
+@*     </script> *@
+@* } *@

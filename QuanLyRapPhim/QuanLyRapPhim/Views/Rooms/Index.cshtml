@@ -5,151 +5,268 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h1 style="background-color: #1c1c1c; color: #fff; padding: 15px; text-align: center; border-radius: 15px; font-family: 'Montserrat', sans-serif; font-weight: 700; text-transform: uppercase;">Quản lý phòng</h1>
-
-<p>
-    <a asp-action="Create" style="display: inline-block; padding: 8px 20px; background-color: #00cc00; color: #fff; text-decoration: none; border-radius: 20px; font-weight: 600; font-family: 'Montserrat', sans-serif;">Create New</a>
-</p>
-
-@if (User.IsInRole("Admin"))
-{
-    <button id="toggleDashboard" class="dashboard-toggle"><i class="fas fa-bars"></i></button>
-    <aside id="adminDashboard" class="admin-dashboard">
-        <div class="dashboard-header">
-            <h4><i class="fas fa-user-shield"></i> Quản lý Admin</h4>
-        </div>
-        <ul class="dashboard-menu">
-            <li><a href="/Admin/Dashboard"><i class="fas fa-chart-line"></i> Dashboard</a></li>
-            <li><a href="/Movies"><i class="fas fa-film"></i> Danh sách phim</a></li>
-            <li><a href="/Showtimes"><i class="fas fa-clock"></i> Lịch chiếu</a></li>
-            <li><a href="/Rooms"><i class="fas fa-door-open"></i> Quản lý phòng</a></li>
-            <li><a href="/Seats"><i class="fas fa-chair"></i> Quản lý ghế</a></li>
-            <li><a href="/Admin/ManageBookings"><i class="fas fa-ticket-alt"></i> Quản lý đặt vé</a></li>
-            <li><a href="/Admin/Reports"><i class="fas fa-file-alt"></i> Báo cáo thống kê</a></li>
-        </ul>
-    </aside>
-}
-
-<table class="table" style="width: 100%; border-collapse: collapse; background-color: #1c1c1c; box-shadow: 0 10px 20px rgba(0,0,0,0.3); border-radius: 15px; overflow: hidden;">
-    <thead>
-        <tr style="background-color: #333; color: #fff;">
-            <th style="padding: 15px; border: none; font-family: 'Montserrat', sans-serif; font-weight: 600;">@Html.DisplayNameFor(model => model.RoomName)</th>
-            <th style="padding: 15px; border: none; font-family: 'Montserrat', sans-serif; font-weight: 600;">@Html.DisplayNameFor(model => model.Capacity)</th>
-            <th style="padding: 15px; border: none; font-family: 'Montserrat', sans-serif; font-weight: 600;">Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model)
-        {
-            <tr style="transition: background 0.3s ease;">
-                <td style="padding: 12px; border: none; color: #b3b3b3; font-family: 'Montserrat', sans-serif;">@Html.DisplayFor(modelItem => item.RoomName)</td>
-                <td style="padding: 12px; border: none; color: #b3b3b3; font-family: 'Montserrat', sans-serif;">@Html.DisplayFor(modelItem => item.Capacity)</td>
-                <td style="padding: 12px; border: none;">
-                    <a asp-action="Edit" asp-route-id="@item.RoomId" style="color: #000; background-color: #ffcc00; padding: 5px 15px; text-decoration: none; border-radius: 20px; font-weight: 600; font-family: 'Montserrat', sans-serif; margin-right: 5px;">Edit</a>
-                    <a asp-action="Details" asp-route-id="@item.RoomId" style="color: #fff; background-color: #00bfff; padding: 5px 15px; text-decoration: none; border-radius: 20px; font-weight: 600; font-family: 'Montserrat', sans-serif; margin-right: 5px;">Details</a>
-                    <a asp-action="Delete" asp-route-id="@item.RoomId" style="color: #fff; background-color: #e6002e; padding: 5px 15px; text-decoration: none; border-radius: 20px; font-weight: 600; font-family: 'Montserrat', sans-serif;">Delete</a>
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
-
-<style>
-    body {
-        background-color: #0F0F0F; /* Galaxy Black */
-        color: #ffffff;
-        font-family: 'Montserrat', sans-serif;
-    }
-
-    .table tr:hover {
-        background-color: #2a2a2a;
-    }
-
-    a:hover {
-        transform: scale(1.05);
-        transition: transform 0.3s ease;
-    }
-
-    .admin-dashboard {
-        position: fixed;
-        top: 0;
-        left: -300px;
-        width: 300px;
-        height: 100vh;
-        background: #333;
-        color: #ffffff;
-        padding: 20px;
-        z-index: 999;
-        transition: left 0.4s ease-in-out;
-        box-shadow: 5px 0 15px rgba(0, 0, 0, 0.3);
-    }
-
-    .dashboard-toggle {
-        position: fixed;
-        top: 20px;
-        left: 10px;
-        background: #ff0033;
-        color: #ffffff;
-        border: none;
-        padding: 12px 15px;
-        font-size: 18px;
-        cursor: pointer;
-        z-index: 1000;
-        border-radius: 50%;
-        box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.3);
-    }
-
-        .dashboard-toggle:hover {
-            background: #e6002e;
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" />
+    <style>
+        body {
+            margin: 0;
+            background-color: #0F0F0F; /* Galaxy Black */
+            color: #ffffff;
+            font-family: 'Montserrat', sans-serif;
+            overflow-x: hidden;
         }
 
-    .dashboard-header {
-        text-align: center;
-        font-size: 20px;
-        margin-bottom: 20px;
-        font-weight: 600;
-    }
-
-    .dashboard-menu {
-        list-style: none;
-        padding: 0;
-    }
-
-        .dashboard-menu li {
-            margin-bottom: 15px;
+        .admin-dashboard {
+            display: flex;
+            min-height: 100vh;
         }
 
-            .dashboard-menu li a {
-                display: flex;
-                align-items: center;
-                gap: 10px;
-                color: #ffffff;
-                text-decoration: none;
-                padding: 10px;
-                border-radius: 5px;
-                transition: background 0.3s ease;
-                font-weight: 500;
+        .sidebar {
+            width: 250px;
+            background-color: #000000; /* Black background */
+            color: #ffffff; /* White text for readability */
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            padding-top: 20px;
+            border-right: 2px solid #ff0033; /* Red border */
+            overflow-y: auto;
+            z-index: 1000;
+        }
+
+        .sidebar-header {
+            padding: 10px 20px;
+            border-bottom: 1px solid #ff0033; /* Red border */
+        }
+
+        .sidebar-title {
+            margin: 0;
+            font-size: 1.5em;
+            color: #ff0033; /* Red text for the header */
+        }
+
+        .sidebar-nav {
+            list-style: none;
+            padding: 0;
+            margin: 20px 0;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 10px 20px;
+            color: #ffffff; /* White text */
+            text-decoration: none;
+        }
+
+            .nav-item i {
+                margin-right: 10px;
+                color: #ffffff; /* White icons */
             }
 
-                .dashboard-menu li a:hover {
-                    background: #ff4040;
+            .nav-item:hover {
+                background-color: #ff0033; /* Red on hover */
+                color: #000000; /* Black text on hover for contrast */
+            }
+
+                .nav-item:hover i {
+                    color: #000000; /* Black icons on hover */
                 }
-</style>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-<script>
-    document.getElementById("toggleDashboard").addEventListener("click", function() {
-        let dashboard = document.getElementById("adminDashboard");
-        let toggleButton = document.getElementById("toggleDashboard");
+            .nav-item.active {
+                background-color: #ff0033; /* Red for active item */
+                color: #000000; /* Black text for active item */
+            }
 
-        if (dashboard.style.left === "-300px") {
-            dashboard.style.left = "0";
-            toggleButton.style.left = "310px";
-        } else {
-            dashboard.style.left = "-300px";
-            toggleButton.style.left = "10px";
+                .nav-item.active i {
+                    color: #000000; /* Black icons for active item */
+                }
+
+        .social-item {
+            color: #ff0033; /* Red for social media icons and text */
         }
-    });
-</script>
 
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+            .social-item i {
+                color: #ff0033; /* Red icons for social media */
+            }
+
+            .social-item:hover {
+                background-color: #ff0033;
+                color: #000000; /* Black text on hover */
+            }
+
+                .social-item:hover i {
+                    color: #000000; /* Black icons on hover for social items */
+                }
+
+        .content {
+            margin-left: 250px;
+            padding: 20px;
+            flex-grow: 1;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+        }
+
+        .content-inner {
+            max-width: 1200px;
+            width: 100%;
+        }
+
+        .page-title {
+            background-color: #1c1c1c;
+            color: #fff;
+            padding: 15px;
+            text-align: center;
+            border-radius: 15px;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 700;
+            text-transform: uppercase;
+            margin-bottom: 20px;
+        }
+
+        .create-button {
+            display: inline-block;
+            padding: 8px 20px;
+            background-color: #00cc00;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 20px;
+            font-weight: 600;
+            font-family: 'Montserrat', sans-serif;
+            margin-bottom: 20px;
+        }
+
+            .create-button:hover {
+                transform: scale(1.05);
+                transition: transform 0.3s ease;
+            }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: #1c1c1c;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+            border-radius: 15px;
+            overflow: hidden;
+        }
+
+            .table thead tr {
+                background-color: #333;
+                color: #fff;
+            }
+
+            .table th {
+                padding: 15px;
+                border: none;
+                font-family: 'Montserrat', sans-serif;
+                font-weight: 600;
+            }
+
+            .table td {
+                padding: 12px;
+                border: none;
+                color: #b3b3b3;
+                font-family: 'Montserrat', sans-serif;
+            }
+
+            .table tr:hover {
+                background-color: #2a2a2a;
+            }
+
+        .action-link {
+            padding: 5px 15px;
+            text-decoration: none;
+            border-radius: 20px;
+            font-weight: 600;
+            font-family: 'Montserrat', sans-serif;
+            margin-right: 5px;
+        }
+
+        .edit-link {
+            color: #000;
+            background-color: #ffcc00;
+        }
+
+        .details-link {
+            color: #fff;
+            background-color: #00bfff;
+        }
+
+        .delete-link {
+            color: #fff;
+            background-color: #e6002e;
+        }
+
+        .action-link:hover {
+            transform: scale(1.05);
+            transition: transform 0.3s ease;
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-dashboard">
+        @if (User.IsInRole("Admin"))
+        {
+            <aside class="sidebar">
+                <div class="sidebar-header">
+                    <h3 class="sidebar-title">CinemaX Admin</h3>
+                </div>
+                <nav class="sidebar-nav">
+                    <a href="/Admin/Index" class="nav-item"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+                    <a href="/Rooms" class="nav-item active"><i class="fas fa-door-open"></i> Manage Rooms</a>
+                    <a href="/Seats" class="nav-item"><i class="fas fa-chair"></i> Manage Seats</a>
+                    <a href="/Admin/ManageBookings" class="nav-item"><i class="fas fa-ticket-alt"></i> Manage Bookings</a>
+                    <a href="/Admin/RevenueStatistics" class="nav-item"><i class="fas fa-chart-bar"></i> Revenue Statistics</a>
+                    <div class="nav-divider"></div>
+                    <a href="#" class="nav-item social-item"><i class="fab fa-facebook"></i> Facebook</a>
+                    <a href="#" class="nav-item social-item"><i class="fab fa-twitter"></i> Twitter</a>
+                    <a href="#" class="nav-item social-item"><i class="fab fa-google"></i> Google</a>
+                </nav>
+            </aside>
+        }
+
+        <div class="content">
+            <div class="content-inner">
+                <h1 class="page-title">Quản lý phòng</h1>
+
+                <p>
+                    <a asp-action="Create" class="create-button">Create New</a>
+                </p>
+
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>@Html.DisplayNameFor(model => model.RoomName)</th>
+                            <th>@Html.DisplayNameFor(model => model.Capacity)</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>@Html.DisplayFor(modelItem => item.RoomName)</td>
+                                <td>@Html.DisplayFor(modelItem => item.Capacity)</td>
+                                <td>
+                                    <a asp-action="Edit" asp-route-id="@item.RoomId" class="action-link edit-link">Edit</a>
+                                    <a asp-action="Details" asp-route-id="@item.RoomId" class="action-link details-link">Details</a>
+                                    <a asp-action="Delete" asp-route-id="@item.RoomId" class="action-link delete-link">Delete</a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
