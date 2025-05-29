@@ -40,13 +40,13 @@
             <!-- Search Form -->
             <form class="search-form d-flex mb-4" asp-controller="Showtimes" asp-action="Search" method="get">
                 <input type="hidden" name="movieId" value="@movieId" />
-                <input class="form-control me-2" type="text" name="searchTitle" placeholder="Nhập tên phim..."
-                       value="@Context.Request.Query["searchTitle"]" style="background-color: #1c1c1c; border: 1px solid #ff0033; color: #fff; border-radius: 20px; font-size: 1rem; font-weight: 500;">
-                <input class="form-control me-2" type="date" name="startDate" placeholder="Từ ngày"
-                       value="@Context.Request.Query["startDate"]" style="background-color: #1c1c1c; border: 1px solid #ff0033; color: #fff; border-radius: 20px; font-size: 1rem; font-weight: 500;">
-                <input class="form-control me-2" type="date" name="endDate" placeholder="Đến ngày"
-                       value="@Context.Request.Query["endDate"]" style="background-color: #1c1c1c; border: 1px solid #ff0033; color: #fff; border-radius: 20px; font-size: 1rem; font-weight: 500;">
-                <select class="form-control me-2" name="genre" style="background-color: #1c1c1c; border: 1px solid #ff0033; color: #fff; border-radius: 20px; font-size: 1rem; font-weight: 500;">
+                <input class="form-control me-2 search-input" type="text" name="searchTitle" placeholder="Nhập tên phim..."
+                       value="@Context.Request.Query["searchTitle"]">
+                <input class="form-control me-2 search-input" type="date" name="startDate" placeholder="Từ ngày"
+                       value="@Context.Request.Query["startDate"]">
+                <input class="form-control me-2 search-input" type="date" name="endDate" placeholder="Đến ngày"
+                       value="@Context.Request.Query["endDate"]">
+                <select class="form-control me-2 search-input" name="genre">
                     <option value="">Chọn thể loại...</option>
                     @foreach (var genre in new[] { "Hành động", "Tình cảm", "Kinh dị", "Hoạt hình", "Khoa học viễn tưởng", "Chiến tranh", "Hài hước", "Viễn tưởng" })
                     {
@@ -55,8 +55,8 @@
                         </option>
                     }
                 </select>
-                <button class="btn btn-primary me-2" type="submit" style="background-color: #ff0033; border: none; border-radius: 20px; padding: 8px 20px; font-weight: 600; font-size: 1rem;"><i class="fas fa-search"></i> Tìm kiếm</button>
-                <button class="btn btn-secondary" type="button" onclick="window.location.href='/Showtimes?movieId=@movieId'" style="border-color: #ff0033; color: #ff0033; border-radius: 20px; padding: 8px 20px; font-weight: 600; font-size: 1rem;"><i class="fas fa-sync-alt"></i> Load lại trang</button>
+                <button class="btn btn-primary me-2 search-btn" type="submit"><i class="fas fa-search"></i> Tìm kiếm</button>
+                <button class="btn btn-secondary search-btn" type="button" onclick="window.location.href='/Showtimes?movieId=@movieId'"><i class="fas fa-sync-alt"></i> Load lại trang</button>
             </form>
 
             <!-- Thông báo lỗi nếu không có lịch chiếu -->
@@ -279,50 +279,59 @@
         border-radius: 0 0 15px 15px;
     }
 
-    .search-form input[type="text"],
-    .search-form input[type="date"],
-    .search-form select {
+    /* Updated Search Form Styles */
+    .search-form {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap; /* Allow wrapping for smaller screens */
+        gap: 8px; /* Add spacing between elements */
+    }
+
+    .search-input {
         background-color: #1c1c1c;
         border: 1px solid #ff0033;
         color: #ffffff;
-        border-radius: 20px;
-        font-size: 1rem;
+        border-radius: 15px; /* Slightly smaller radius for a compact look */
+        font-size: 0.85rem; /* Smaller font size */
         font-weight: 500;
+        padding: 4px 8px; /* Reduced padding */
+        width: 150px; /* Fixed width to make inputs smaller */
+        height: 32px; /* Fixed height for consistency */
     }
 
-        .search-form input[type="text"]:focus,
-        .search-form input[type="date"]:focus,
-        .search-form select:focus {
+        .search-input:focus {
             background-color: #1c1c1c;
             border-color: #ff0033;
             color: #ffffff;
-            box-shadow: none;
+            box-shadow: 0 0 5px rgba(255, 0, 51, 0.5); /* Subtle glow on focus */
         }
 
-    .btn-primary {
-        background-color: #ff0033;
-        border: none;
-        border-radius: 20px;
-        padding: 8px 20px;
+    .search-btn {
+        border-radius: 15px; /* Match input radius */
+        padding: 4px 12px; /* Reduced padding */
+        font-size: 0.85rem; /* Smaller font size */
         font-weight: 600;
-        font-size: 1rem;
+        height: 32px; /* Match input height */
+        display: flex;
+        align-items: center;
     }
 
-        .btn-primary:hover {
+    .btn-primary.search-btn {
+        background-color: #ff0033;
+        border: none;
+    }
+
+        .btn-primary.search-btn:hover {
             background-color: #e6002e;
             transform: scale(1.05);
         }
 
-    .btn-secondary {
+    .btn-secondary.search-btn {
         border-color: #ff0033;
         color: #ff0033;
-        border-radius: 20px;
-        padding: 8px 20px;
-        font-weight: 600;
-        font-size: 1rem;
     }
 
-        .btn-secondary:hover {
+        .btn-secondary.search-btn:hover {
             background-color: #ff0033;
             color: #ffffff;
             border-color: #ff0033;
@@ -393,44 +402,64 @@
 
     /* Media Queries */
     @@media (max-width: 768px) {
-        .sidebar
+        .sidebar {
+            width: 200px;
+            z-index: 1000;
+        }
 
-    {
-        width: 200px;
-        z-index: 1000;
-    }
+        .content {
+            margin-left: 200px;
+            width: calc(100% - 200px);
+        }
 
-    .content {
-        margin-left: 200px;
-        width: calc(100% - 200px);
-    }
+        .search-input {
+            width: 120px; /* Even smaller width for smaller screens */
+            font-size: 0.8rem;
+            height: 28px;
+        }
 
+        .search-btn {
+            font-size: 0.8rem;
+            padding: 4px 10px;
+            height: 28px;
+        }
     }
 
     @@media (max-width: 576px) {
-        .admin-dashboard
+        .admin-dashboard {
+            flex-direction: column;
+        }
 
-    {
-        flex-direction: column;
-    }
+        .sidebar {
+            position: relative;
+            width: 100%;
+            height: auto;
+        }
 
-    .sidebar {
-        position: relative;
-        width: 100%;
-        height: auto;
-    }
+        .content {
+            margin-left: 0;
+            width: 100%;
+            min-height: auto;
+        }
 
-    .content {
-        margin-left: 0;
-        width: 100%;
-        min-height: auto;
-    }
+        .content-inner {
+            width: 100%;
+            padding: 20px;
+        }
 
-    .content-inner {
-        width: 100%;
-        padding: 20px;
-    }
+        .search-form {
+            flex-direction: column;
+            align-items: stretch;
+        }
 
+        .search-input, .search-btn {
+            width: 100%; /* Full width on very small screens */
+            margin: 5px 0; /* Add vertical spacing */
+        }
+
+        .search-btn {
+            justify-content: center;
+        }
     }
 </style>
 
