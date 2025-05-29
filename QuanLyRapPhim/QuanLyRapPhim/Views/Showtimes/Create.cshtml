@@ -3,108 +3,267 @@
 @{
     ViewData["Title"] = "Tạo lịch chiếu";
     Layout = "~/Views/Shared/_Layout.cshtml";
+    bool isAdmin = User.IsInRole("Admin"); // Check if user is admin for sidebar and CSS
 }
 
-<div class="container my-5 position-relative">
-    <h1 class="text-white mb-4">Tạo lịch chiếu</h1>
+<!-- Main Container -->
+<div class="container-fluid vh-100 d-flex position-relative overflow-hidden">
+    <!-- Admin Sidebar (Visible only to Admins) -->
+    @if (isAdmin)
+    {
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h3 class="sidebar-title">CinemaX Admin</h3>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="/Admin/Index" class="nav-item"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+                <a href="/Movies" class="nav-item"><i class="fas fa-film"></i> Manage Movies</a>
+                <a href="/Showtimes" class="nav-item active"><i class="fas fa-clock"></i> Manage Showtimes</a>
+                <a href="/Rooms" class="nav-item"><i class="fas fa-door-open"></i> Manage Rooms</a>
+                <a href="/Seats" class="nav-item"><i class="fas fa-chair"></i> Manage Seats</a>
+                <a href="/Admin/ManageBookings" class="nav-item"><i class="fas fa-ticket-alt"></i> Manage Bookings</a>
+                <a href="/Admin/RevenueStatistics" class="nav-item"><i class="fas fa-chart-bar"></i> Revenue Statistics</a>
+                <div class="nav-divider"></div>
+                <a href="#" class="nav-item"><i class="fab fa-facebook"></i> Facebook</a>
+                <a href="#" class="nav-item"><i class="fab fa-twitter"></i> Twitter</a>
+                <a href="#" class="nav-item"><i class="fab fa-google"></i> Google</a>
+            </nav>
+        </aside>
+    }
 
-    <div class="row">
-        <div class="col-md-8 offset-md-2">
-            <div class="card movie-card text-white">
-                <div class="card-body">
-                    <form asp-action="Create">
-                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <!-- Frame Wrapper -->
+    <div class="frame-wrapper flex-grow-1 @(isAdmin ? "admin-view" : "user-view")">
+        <!-- Header -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h1 class="title-gradient">Tạo lịch chiếu</h1>
+            </div>
+            @if (isAdmin)
+            {
+                <div class="header-actions">
+                    <a asp-action="Index" class="btn btn-create glow-effect">Quay lại danh sách</a>
+                </div>
+            }
+        </div>
 
-                        <div class="form-group mb-3">
-                            <label asp-for="Title" class="control-label text-light"></label>
-                            <input asp-for="Title" class="form-control" />
-                            <span asp-validation-for="Title" class="text-danger"></span>
+        <!-- Form -->
+        <div class="admin-section">
+            <div class="row justify-content-center">
+                <div class="col-md-8">
+                    <div class="movie-card text-white">
+                        <div class="card-body">
+                            <form asp-action="Create">
+                                <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                                <div class="form-group mb-3">
+                                    <label asp-for="Title" class="control-label"></label>
+                                    <input asp-for="Title" class="form-control glow-effect" />
+                                    <span asp-validation-for="Title" class="text-danger"></span>
+                                </div>
+                                <div class="form-group mb-3">
+                                    <label asp-for="MovieId" class="control-label"></label>
+                                    <select asp-for="MovieId" class="form-control glow-effect" asp-items="ViewBag.MovieId">
+                                        <option value="">-- Chọn phim --</option>
+                                    </select>
+                                    <span asp-validation-for="MovieId" class="text-danger"></span>
+                                </div>
+                                <div class="form-group mb-3">
+                                    <label asp-for="RoomId" class="control-label"></label>
+                                    <select asp-for="RoomId" class="form-control glow-effect" asp-items="ViewBag.RoomId">
+                                        <option value="">-- Chọn phòng --</option>
+                                    </select>
+                                    <span asp-validation-for="RoomId" class="text-danger"></span>
+                                </div>
+                                <div class="form-group mb-3">
+                                    <label asp-for="Poster" class="control-label"></label>
+                                    <input asp-for="Poster" class="form-control glow-effect" />
+                                    <span asp-validation-for="Poster" class="text-danger"></span>
+                                </div>
+                                <div class="form-group mb-3">
+                                    <label asp-for="StartTime" class="control-label"></label>
+                                    <input asp-for="StartTime" class="form-control glow-effect" type="time" />
+                                    <span asp-validation-for="StartTime" class="text-danger"></span>
+                                </div>
+                                <div class="form-group mb-3">
+                                    <label asp-for="Date" class="control-label"></label>
+                                    <input asp-for="Date" class="form-control glow-effect" type="date" />
+                                    <span asp-validation-for="Date" class="text-danger"></span>
+                                </div>
+                                <div class="form-group d-flex justify-content-between mt-4">
+                                    <input type="submit" value="Tạo" class="btn btn-create glow-effect" />
+                                    <a asp-action="Index" class="btn btn-back glow-effect">Quay lại danh sách</a>
+                                </div>
+                            </form>
                         </div>
-                        <div class="form-group mb-3">
-                            <label asp-for="MovieId" class="control-label text-light"></label>
-                            <select asp-for="MovieId" class="form-control" asp-items="ViewBag.MovieId">
-                                <option value="">-- Chọn phim --</option>
-                            </select>
-                            <span asp-validation-for="MovieId" class="text-danger"></span>
-                        </div>
-                        <div class="form-group mb-3">
-                            <label asp-for="RoomId" class="control-label text-light"></label>
-                            <select asp-for="RoomId" class="form-control" asp-items="ViewBag.RoomId">
-                                <option value="">-- Chọn phòng --</option>
-                            </select>
-                            <span asp-validation-for="RoomId" class="text-danger"></span>
-                        </div>
-                        <div class="form-group mb-3">
-                            <label asp-for="Poster" class="control-label text-light"></label>
-                            <input asp-for="Poster" class="form-control" />
-                            <span asp-validation-for="Poster" class="text-danger"></span>
-                        </div>
-                        <div class="form-group mb-3">
-                            <label asp-for="StartTime" class="control-label text-light"></label>
-                            <input asp-for="StartTime" class="form-control" type="time" />
-                            <span asp-validation-for="StartTime" class="text-danger"></span>
-                        </div>
-                        <div class="form-group mb-3">
-                            <label asp-for="Date" class="control-label text-light"></label>
-                            <input asp-for="Date" class="form-control" type="date" />
-                            <span asp-validation-for="Date" class="text-danger"></span>
-                        </div>
-                        <div class="form-group d-flex justify-content-between mt-4">
-                            <input type="submit" value="Tạo" class="btn btn-primary" style="background-color: #ff0033; border: none; border-radius: 20px; padding: 8px 20px; font-weight: 600; font-size: 1rem;" />
-                            <a asp-action="Index" class="btn btn-back" style="border-color: #ff0033; color: #ff0033; border-radius: 20px; padding: 8px 20px; font-weight: 600; font-size: 1rem;">⏪ Quay lại danh sách</a>
-                        </div>
-                    </form>
+                    </div>
                 </div>
             </div>
         </div>
+
+        <!-- Footer -->
+        <footer class="footer text-center py-3 @(isAdmin ? "admin-view" : "user-view")">
+            <p class="text-white mb-0">© 2025 CinemaX. All rights reserved. | Last updated: 12:12 AM +07, May 30, 2025</p>
+        </footer>
     </div>
 </div>
 
-<!-- CSS tùy chỉnh -->
+<!-- CSS Styles -->
 <style>
     body {
-        background-color: #0F0F0F; /* Galaxy Black */
-        color: #ffffff;
+        background-color: #0F0F0F;
+        margin: 0;
         font-family: 'Montserrat', sans-serif;
+        overflow: hidden;
     }
 
-    .container {
+    .vh-100 {
+        height: 100vh;
+    }
+
+    .container-fluid {
+        display: flex;
+        width: 100%;
+        height: 100%;
+    }
+
+    /* Sidebar */
+    .sidebar {
+        width: 250px;
+        background-color: #000000;
+        color: #ffffff;
+        height: 100vh;
+        position: fixed;
+        top: 0;
+        left: 0;
         padding-top: 20px;
-        padding-bottom: 20px;
+        border-right: 2px solid #ff0033;
+        overflow-y: auto;
+        z-index: 999;
+    }
+
+    .sidebar-header {
+        padding: 10px 20px;
+        border-bottom: 1px solid #ff0033;
+    }
+
+    .sidebar-title {
+        margin: 0;
+        font-size: 1.5em;
+        color: #ff0033;
+    }
+
+    .sidebar-nav {
+        list-style: none;
+        padding: 0;
+        margin: 20px 0;
+    }
+
+    .nav-item {
+        display: flex;
+        align-items: center;
+        padding: 10px 20px;
+        color: #ffffff;
+        text-decoration: none;
+    }
+
+        .nav-item i {
+            margin-right: 10px;
+            color: #ffffff;
+        }
+
+        .nav-item:hover {
+            background-color: #ff0033;
+            color: #000000;
+        }
+
+            .nav-item:hover i {
+                color: #000000;
+            }
+
+        .nav-item.active {
+            background-color: #ff0033;
+            color: #000000;
+        }
+
+            .nav-item.active i {
+                color: #000000;
+            }
+
+    .nav-divider {
+        border-top: 1px solid #ff0033;
+        margin: 10px 0;
+    }
+
+    /* Frame Wrapper */
+    .frame-wrapper {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        background: #0F0F0F; /* Changed from #2e2e2e to #0F0F0F */
+        border-radius: 20px;
+        border: 4px solid #0F0F0F; /* Match border color with background */
+        box-shadow: 0 0 25px rgba(46, 46, 46, 0.5);
+        overflow: hidden;
+        padding: 20px;
+    }
+
+        .frame-wrapper.admin-view {
+            width: clamp(60%, calc(100% - 250px), 90%);
+            max-width: 1200px;
+            margin-left: 250px;
+        }
+
+        .frame-wrapper.user-view {
+            width: 100%;
+            max-width: 100%;
+            margin-left: 0;
+            margin-right: 0;
+            padding: 0 20px;
+        }
+
+    .title-gradient {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #ffffff;
+        text-transform: uppercase;
+        margin-bottom: 10px;
+        background: linear-gradient(90deg, #ff0033 0%, #e50914 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
     }
 
     .movie-card {
-        background-color: #1c1c1c;
-        border: none;
-        border-radius: 15px;
-        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
-        padding: 20px;
+        background: #0F0F0F; /* Changed from #1c1c1c to #0F0F0F */
+        border-radius: 12px;
+        border: 1px solid transparent;
+        background-image: linear-gradient(rgba(15, 15, 15, 0.9), rgba(15, 15, 15, 0.9)), linear-gradient(45deg, #e50914, #0F0F0F); /* Updated gradient to match */
+        background-origin: border-box;
+        background-clip: padding-box, border-box;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
         transition: transform 0.3s ease;
+        overflow: hidden;
     }
 
         .movie-card:hover {
             transform: translateY(-5px);
         }
 
-    .form-control:focus {
-        background-color: #333;
-        border-color: #ffffff;
-        color: #ffffff;
-        box-shadow: none;
+    .card-body {
+        padding: 20px;
     }
 
     .form-control {
-        background-color: #2a2a2a;
-        color: #e0e0e0;
-        border: 1px solid #444;
-        transition: border-color 0.3s ease;
+        background: #0F0F0F; /* Changed from #1c1c1c to #0F0F0F */
+        border: 1px solid #cc0022;
+        color: #ffffff;
+        border-radius: 8px;
     }
 
         .form-control:focus {
-            background-color: #2a2a2a;
-            color: #e0e0e0;
-            border-color: #007bff;
-            box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+            border-color: #ff0033;
+            box-shadow: 0 0 10px rgba(255, 0, 51, 0.5);
+            background: #0F0F0F; /* Changed from #1c1c1c to #0F0F0F */
+            color: #ffffff;
         }
 
     .control-label {
@@ -112,42 +271,83 @@
         font-weight: 500;
     }
 
-    .btn-back {
-        background: linear-gradient(90deg, #4e54c8 0%, #8f94fb 100%);
-        color: #fff;
+    .btn-create, .btn-primary {
+        background: linear-gradient(90deg, #ff0033 0%, #e50914 100%);
         border: none;
-        border-radius: 20px;
-        padding: 8px 20px;
+        border-radius: 8px;
+        padding: 8px 15px;
+        font-size: 14px;
+        color: #ffffff;
         font-weight: 600;
-        font-size: 1rem;
+        transition: background 0.3s ease, transform 0.2s ease;
     }
 
-        .btn-primary:hover {
-            background-color: #e6002e;
-            transform: scale(1.05);
+        .btn-create:hover, .btn-primary:hover {
+            background: linear-gradient(90deg, #e6002e 0%, #d30912 100%);
+            transform: translateY(-2px);
         }
 
     .btn-back {
-        border-color: #ff0033;
+        background: #0F0F0F; /* Changed from #1c1c1c to #0F0F0F */
+        border: 1px solid #ff0033;
         color: #ff0033;
-        border-radius: 20px;
-        padding: 8px 20px;
+        border-radius: 8px;
+        padding: 8px 15px;
+        font-size: 14px;
         font-weight: 600;
-        font-size: 1rem;
-        text-decoration: none;
+        transition: background 0.3s ease, color 0.3s ease, transform 0.2s ease;
     }
 
         .btn-back:hover {
-            background-color: #ff0033;
+            background: #ff0033;
             color: #ffffff;
-            border-color: #ff0033;
-            transform: scale(1.05);
+            transform: translateY(-2px);
         }
+
+    .glow-effect {
+        transition: box-shadow 0.3s ease;
+    }
+
+        .glow-effect:hover {
+            box-shadow: 0 0 15px rgba(255, 0, 51, 0.5);
+        }
+
+    /* Footer */
+    .footer {
+        background: #0F0F0F; /* Changed from #1a1a1a to #0F0F0F */
+        border-top: 1px solid #2e2e2e;
+        border-radius: 0 0 20px 20px;
+    }
+
+        .footer.admin-view {
+            width: clamp(60%, calc(100% - 250px), 90%);
+            max-width: 1200px;
+            margin-left: 250px;
+            margin-right: auto;
+        }
+
+        .footer.user-view {
+            width: 100%;
+            max-width: 100%;
+            margin-left: 0;
+            margin-right: 0;
+        }
+
+        .footer p {
+            font-size: 12px;
+            color: #cccccc;
+        }
+
+    /* Alerts */
+    .text-danger {
+        font-size: 14px;
+    }
 </style>
 
-<!-- Thêm Font Awesome và Bootstrap -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+<!-- Dependencies -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 @section Scripts {
