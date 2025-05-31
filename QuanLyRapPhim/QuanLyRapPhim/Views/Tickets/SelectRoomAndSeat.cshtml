@@ -82,52 +82,16 @@
                     <div class="seat-row d-flex align-items-center mb-3">
                         <span class="row-label text-light me-3 glow-effect">Hàng @rowLabel</span>
                         <div class="d-flex justify-content-center flex-grow-1 seat-container">
-                            @for (int i = 0; i < rowSeats.Count; i++)
+                            @foreach (var seat in rowSeats)
                             {
-                                var seat = rowSeats[i];
-                                if (isLastRow && int.TryParse(seat.SeatNumber, out int seatNumber) && seatNumber % 2 == 0 && i + 1 < rowSeats.Count)
-                                {
-                                    var nextSeat = rowSeats[i + 1];
-                                    if (int.TryParse(nextSeat.SeatNumber, out int nextSeatNumber) && nextSeatNumber % 2 == 1)
-                                    {
-                                        <div class="seat seat-couple mx-2 glow-effect @(seat.Status == "Đã đặt" || nextSeat.Status == "Đã đặt" ? "seat-taken" : "")">
-                                            <input type="checkbox" name="selectedSeats" value="@seat.SeatId,@nextSeat.SeatId" id="seat-pair-@seat.SeatId" @(seat.Status == "Đã đặt" || nextSeat.Status == "Đã đặt" ? "disabled" : "") />
-                                            <label for="seat-pair-@seat.SeatId" class="seat-label">
-                                                <div class="seat-inner">
-                                                    <i class="fas fa-couch"></i>
-                                                    <span class="seat-number">@seat.SeatNumber</span>
-                                                </div>
-                                                <div class="seat-inner">
-                                                    <i class="fas fa-couch"></i>
-                                                    <span class="seat-number">@nextSeat.SeatNumber</span>
-                                                </div>
-                                                <div class="cup-holder"></div>
-                                                <div class="seat-divider"></div>
-                                            </label>
-                                        </div>
-                                        i++;
-                                    }
-                                    else
-                                    {
-                                        <div class="seat @(seat.Status == "Đã đặt" ? "seat-taken" : "seat-available") mx-2 glow-effect">
-                                            <input type="checkbox" name="selectedSeats" value="@seat.SeatId" id="seat-@seat.SeatId" @(seat.Status == "Đã đặt" ? "disabled" : "") />
-                                            <label for="seat-@seat.SeatId" class="seat-label">
-                                                <i class="fas fa-chair"></i>
-                                                <span class="seat-number">@seat.SeatNumber</span>
-                                            </label>
-                                        </div>
-                                    }
-                                }
-                                else
-                                {
-                                    <div class="seat @(seat.Status == "Đã đặt" ? "seat-taken" : "seat-available") mx-2 glow-effect">
-                                        <input type="checkbox" name="selectedSeats" value="@seat.SeatId" id="seat-@seat.SeatId" @(seat.Status == "Đã đặt" ? "disabled" : "") />
-                                        <label for="seat-@seat.SeatId" class="seat-label">
-                                            <i class="fas fa-chair"></i>
-                                            <span class="seat-number">@seat.SeatNumber</span>
-                                        </label>
-                                    </div>
-                                }
+                                bool isCoupleSeat = isLastRow;
+                                <div class="seat @(seat.Status == "Đã đặt" ? "seat-taken" : "seat-available") @(isCoupleSeat ? "seat-couple" : "") mx-2 glow-effect">
+                                    <input type="checkbox" name="selectedSeats" value="@seat.SeatId" id="seat-@seat.SeatId" @(seat.Status == "Đã đặt" ? "disabled" : "") />
+                                    <label for="seat-@seat.SeatId" class="seat-label">
+                                        <i class="fas fa-chair"></i>
+                                        <span class="seat-number">@seat.SeatNumber</span>
+                                    </label>
+                                </div>
                             }
                             @if (rowSeats.Count < seatsPerRow)
                             {
@@ -139,44 +103,6 @@
                         </div>
                     </div>
                 }
-
-                // Thêm hàng ghế đôi màu vàng
-                char yellowRowLabel = (char)(lastRowLabel + 1);
-                int yellowCoupleSeats = seatsPerRow / 2;
-                int yellowSeatStart = totalSeats + 1;
-                <div class="seat-row d-flex align-items-center mb-3">
-                    <span class="row-label text-light me-3 glow-effect">Hàng @yellowRowLabel</span>
-                    <div class="d-flex justify-content-center flex-grow-1 seat-container">
-                        @for (int i = 0; i < yellowCoupleSeats; i++)
-                        {
-                            int firstSeatNumber = yellowSeatStart + (i * 2);
-                            int secondSeatNumber = firstSeatNumber + 1;
-                            string pairId = $"yellow-pair-{firstSeatNumber}";
-                            <div class="seat seat-couple-yellow mx-2 glow-effect">
-                                <input type="checkbox" name="selectedSeats" value="yellow-@firstSeatNumber,yellow-@secondSeatNumber" id="seat-@pairId" />
-                                <label for="seat-@pairId" class="seat-label">
-                                    <div class="seat-inner">
-                                        <i class="fas fa-couch"></i>
-                                        <span class="seat-number">@firstSeatNumber</span>
-                                    </div>
-                                    <div class="seat-inner">
-                                        <i class="fas fa-couch"></i>
-                                        <span class="seat-number">@secondSeatNumber</span>
-                                    </div>
-                                    <div class="cup-holder"></div>
-                                    <div class="seat-divider"></div>
-                                </label>
-                            </div>
-                        }
-                        @if (yellowCoupleSeats * 2 < seatsPerRow)
-                        {
-                            @for (int i = 0; i < seatsPerRow - (yellowCoupleSeats * 2); i++)
-                            {
-                                <div class="seat seat-placeholder mx-2"></div>
-                            }
-                        }
-                    </div>
-                </div>
             }
         </div>
 
@@ -186,7 +112,7 @@
                 <span class="badge bg-success me-2 glow-effect"><i class="fas fa-chair me-1"></i> Ghế trống</span>
                 <span class="badge bg-danger me-2 glow-effect"><i class="fas fa-chair me-1"></i> Ghế đã đặt</span>
                 <span class="badge bg-primary me-2 glow-effect"><i class="fas fa-chair me-1"></i> Ghế đang chọn</span>
-                <span class="badge bg-yellow-couple text-light me-2 glow-effect"><i class="fas fa-couch me-1"></i> Ghế đôi (Vàng)</span>
+                <span class="badge bg-warning text-dark me-2 glow-effect"><i class="fas fa-chair me-1"></i> Ghế đôi</span>
             </p>
         </div>
 
@@ -228,12 +154,12 @@
         }
 
     .glow-effect {
-        box-shadow: 0 0 15px rgba(255, 0, 51, 0.4);
+        box-shadow: 0 0 15px rgba(255, 0, 51, 0.3);
         transition: box-shadow 0.3s ease, transform 0.3s ease;
     }
 
         .glow-effect:hover {
-            box-shadow: 0 0 25px rgba(255, 0, 51, 0.7);
+            box-shadow: 0 0 25px rgba(255, 0, 51, 0.5);
             transform: scale(1.05);
         }
 
@@ -245,10 +171,10 @@
 
     .screen {
         background: linear-gradient(90deg, #333, #555, #333);
-        height: 50px;
-        border-radius: 10px;
+        height: 40px;
+        border-radius: 15px;
         position: relative;
-        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.6);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
         z-index: 2;
     }
 
@@ -258,20 +184,20 @@
         left: 50%;
         transform: translate(-50%, -50%);
         color: #fff;
-        font-weight: 700;
+        font-weight: 600;
         text-transform: uppercase;
         letter-spacing: 2px;
     }
 
     .seating-chart {
-        max-width: 100%;
+        max-width: 100%; /* Allow full width for scrolling */
         margin: 0 auto;
-        padding: 25px;
-        background: linear-gradient(145deg, #1c1c1c, #2a2a2a);
+        padding: 20px;
+        background-color: #1c1c1c;
         border-radius: 15px;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
         position: relative;
-        overflow-x: auto;
+        overflow-x: auto; /* Enable horizontal scrolling for long rows */
     }
 
     .blur-background {
@@ -279,10 +205,10 @@
         top: 0;
         left: 50%;
         transform: translateX(-50%);
-        width: 90%;
+        width: 80%;
         height: 100%;
-        background: radial-gradient(circle at top, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0) 70%);
-        filter: blur(25px);
+        background: radial-gradient(circle at top, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0) 70%);
+        filter: blur(20px);
         z-index: 1;
     }
 
@@ -291,28 +217,26 @@
         align-items: center;
         position: relative;
         z-index: 2;
-        min-width: fit-content;
-        margin-bottom: 20px;
+        min-width: fit-content; /* Prevent row from wrapping */
     }
 
     .row-label {
-        width: 60px;
-        font-weight: 700;
-        line-height: 45px;
-        color: #ffffff;
-        background: linear-gradient(145deg, #2a2a2a, #3a3a3a);
-        border-radius: 8px;
+        width: 50px;
+        font-weight: 600;
+        line-height: 40px;
+        color: #b3b3b3;
+        background: #2a2a2a;
+        border-radius: 5px;
         text-align: center;
-        flex-shrink: 0;
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+        flex-shrink: 0; /* Prevent label from shrinking */
     }
 
     .seat-container {
         display: flex;
-        justify-content: flex-start;
-        gap: 12px;
-        flex-wrap: nowrap;
-        min-width: 0;
+        justify-content: flex-start; /* Align seats to the start */
+        gap: 10px;
+        flex-wrap: nowrap; /* Prevent wrapping within each row */
+        min-width: 0; /* Allow scrolling */
     }
 
     .seat {
@@ -322,10 +246,7 @@
         align-items: center;
         justify-content: center;
         position: relative;
-        border-radius: 10px;
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
-        background: linear-gradient(145deg, #2a2a2a, #1c1c1c);
-        box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.4);
+        transition: transform 0.2s ease, box-shadow 0.3s ease;
     }
 
     .seat-available .seat-label i {
@@ -339,121 +260,17 @@
     }
 
     .seat-couple {
-        width: 130px;
-        height: 55px;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        position: relative;
-        background: linear-gradient(145deg, #ff3333, #cc0000);
-        border-radius: 12px;
-        overflow: hidden;
-        box-shadow: 0 4px 15px rgba(255, 51, 51, 0.5);
+        width: 100px;
     }
 
-    .seat-couple-yellow {
-        width: 130px;
-        height: 55px;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        position: relative;
-        background: linear-gradient(145deg, #ffcc00, #e6b800);
-        border-radius: 12px;
-        overflow: hidden;
-        box-shadow: 0 4px 15px rgba(255, 204, 0, 0.5);
-    }
-
-        .seat-couple.seat-taken,
-        .seat-couple-yellow.seat-taken {
-            background: linear-gradient(145deg, #e6002e, #b30000);
+        .seat-couple .seat-label i {
+            color: #ffcc00;
+            font-size: 2rem;
         }
 
-        .seat-couple .seat-label,
-        .seat-couple-yellow .seat-label {
-            width: 100%;
-            height: 100%;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            position: relative;
-            transition: background 0.3s ease;
+        .seat-couple input:checked + .seat-label i {
+            color: #ffca2c;
         }
-
-        .seat-couple .seat-inner,
-        .seat-couple-yellow .seat-inner {
-            width: 50%;
-            height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-        }
-
-    .seat-couple .seat-label {
-        background: linear-gradient(145deg, #ff3333, #cc0000);
-    }
-
-    .seat-couple-yellow .seat-label {
-        background: linear-gradient(145deg, #ffcc00, #e6b800);
-    }
-
-    .seat-couple .seat-inner i,
-    .seat-couple-yellow .seat-inner i {
-        color: #ffffff;
-        font-size: 1.8rem;
-        filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.3));
-    }
-
-    .seat-couple .seat-number,
-    .seat-couple-yellow .seat-number {
-        position: absolute;
-        font-size: 0.8rem;
-        font-weight: 700;
-        color: #ffffff;
-        top: 10px;
-        transform: translateY(0);
-        background: rgba(0, 0, 0, 0.6);
-        border-radius: 10px;
-        padding: 3px 8px;
-    }
-
-    .seat-couple input:checked + .seat-label,
-    .seat-couple-yellow input:checked + .seat-label {
-        background: linear-gradient(145deg, #00bfff, #0099cc);
-    }
-
-        .seat-couple input:checked + .seat-label .seat-inner i,
-        .seat-couple-yellow input:checked + .seat-label .seat-inner i {
-            color: #ffffff;
-            transform: scale(1.15);
-            box-shadow: 0 0 15px rgba(0, 191, 255, 0.7);
-        }
-
-    .seat-couple .cup-holder,
-    .seat-couple-yellow .cup-holder {
-        width: 25px;
-        height: 35px;
-        background: linear-gradient(145deg, #ccc, #aaa);
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        border-radius: 8px;
-        z-index: 1;
-        box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.3);
-    }
-
-    .seat-couple .seat-divider,
-    .seat-couple-yellow .seat-divider {
-        width: 3px;
-        height: 100%;
-        background: #000;
-        position: absolute;
-        left: 50%;
-        transform: translateX(-50%);
-        z-index: 2;
-    }
 
     .seat-placeholder {
         width: 50px;
@@ -473,89 +290,92 @@
         position: relative;
         width: 100%;
         height: 100%;
-        transition: transform 0.3s ease, background 0.3s ease;
+        transition: transform 0.2s ease;
     }
 
         .seat-label i {
-            font-size: 1.6rem;
-            transition: color 0.3s ease, transform 0.3s ease;
+            font-size: 1.5rem;
+            transition: color 0.3s ease;
         }
 
-    .seat input:checked + .seat-label {
-        background: linear-gradient(145deg, #00bfff, #0099cc);
+    .seat-number {
+        position: absolute;
+        font-size: 0.7rem;
+        font-weight: 600;
+        color: #fff;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: rgba(0, 0, 0, 0.5);
+        border-radius: 50%;
+        padding: 2px 5px;
     }
 
-        .seat input:checked + .seat-label i {
-            color: #ffffff;
-            transform: scale(1.15);
-            box-shadow: 0 0 15px rgba(0, 191, 255, 0.7);
-        }
+    .seat input:checked + .seat-label i {
+        color: #00bfff;
+        transform: scale(1.1);
+        box-shadow: 0 0 10px rgba(0, 191, 255, 0.5);
+    }
 
     .seat input:disabled + .seat-label i {
         opacity: 0.5;
     }
 
-    .seat:hover:not(.seat-taken) .seat-label {
+    .seat:hover:not(.seat-taken) .seat-label i {
         transform: scale(1.1);
-        box-shadow: 0 0 15px rgba(255, 255, 255, 0.4);
+        box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
     }
 
     .seat-legend .badge {
-        font-size: 1.1rem;
-        padding: 10px 15px;
-        border-radius: 25px;
-        box-shadow: 0 0 12px rgba(255, 255, 255, 0.3);
-        font-weight: 600;
-    }
-
-    .bg-yellow-couple {
-        background: linear-gradient(145deg, #ffcc00, #e6b800);
+        font-size: 1rem;
+        padding: 8px 12px;
+        border-radius: 20px;
+        box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
     }
 
     .selected-seats-info {
         max-width: 600px;
         margin: 0 auto;
-        padding: 25px;
-        background: linear-gradient(145deg, #1c1c1c, #2a2a2a);
+        padding: 20px;
+        background-color: #1c1c1c;
         border-radius: 15px;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
         border: 1px solid #ff0033;
     }
 
         .selected-seats-info h5 {
             margin: 0;
-            font-size: 1.2rem;
-            color: #ffffff;
+            font-size: 1.1rem;
+            color: #b3b3b3;
         }
 
     .btn-primary {
-        background: linear-gradient(145deg, #ff3333, #cc0000);
+        background-color: #ff0033;
         border: none;
-        border-radius: 25px;
-        padding: 12px 35px;
-        font-weight: 700;
-        font-size: 1.3rem;
-        transition: background 0.3s ease, transform 0.3s ease;
+        border-radius: 20px;
+        padding: 10px 30px;
+        font-weight: 600;
+        font-size: 1.2rem;
+        transition: background-color 0.3s ease, transform 0.3s ease;
     }
 
         .btn-primary:hover {
-            background: linear-gradient(145deg, #e6002e, #b30000);
+            background-color: #e6002e;
             transform: scale(1.05);
         }
 
     .btn-secondary {
         border-color: #ff0033;
         color: #ff0033;
-        background: transparent;
-        border-radius: 25px;
-        padding: 10px 25px;
+        border-radius: 20px;
+        padding: 8px 20px;
         font-weight: 600;
-        font-size: 1.1rem;
-        transition: background 0.3s ease, transform 0.3s ease;
+        font-size: 1rem;
+        transition: background-color 0.3s ease, transform 0.3s ease;
     }
 
         .btn-secondary:hover {
-            background: #ff0033;
+            background-color: #ff0033;
             color: #ffffff;
             border-color: #ff0033;
             transform: scale(1.05);
@@ -566,46 +386,17 @@
     }
 
     .alert-danger {
-        background: linear-gradient(145deg, #333, #2a2a2a);
+        background-color: #333;
         color: #fff;
         border: 1px solid #e6002e;
         border-radius: 10px;
     }
 
     .alert-success {
-        background: linear-gradient(145deg, #333, #2a2a2a);
+        background-color: #333;
         color: #fff;
-        border: 1px solid #00cc00;
+        border: 1px solid #444;
         border-radius: 10px;
-    }
-
-    @@media (max-width: 768px) {
-        .seat
-
-    {
-        width: 40px;
-        height: 40px;
-    }
-
-    .seat-couple, .seat-couple-yellow {
-        width: 100px;
-        height: 45px;
-    }
-
-        .seat-couple .seat-inner i,
-        .seat-couple-yellow .seat-inner i {
-            font-size: 1.4rem;
-        }
-
-    .seat-number {
-        font-size: 0.7rem;
-    }
-
-    .row-label {
-        width: 50px;
-        line-height: 40px;
-    }
-
     }
 </style>
 
@@ -620,36 +411,23 @@
         const totalPriceElement = document.getElementById('total-price');
         const normalPrice = 50000;
         const couplePrice = 100000;
-        const yellowCouplePrice = 120000;
 
         function updateSelectedSeats() {
             const selectedSeats = Array.from(seatCheckboxes)
                 .filter(checkbox => checkbox.checked)
                 .map(checkbox => {
                     const label = checkbox.nextElementSibling;
+                    const numberSpan = label.querySelector('.seat-number');
                     const isCouple = checkbox.closest('.seat').classList.contains('seat-couple');
-                    const isYellowCouple = checkbox.closest('.seat').classList.contains('seat-couple-yellow');
-                    if (isCouple || isYellowCouple) {
-                        const seatNumbers = checkbox.value.split(',').map(num => num.split('-').pop());
-                        return { numbers: seatNumbers, isCouple, isYellowCouple };
-                    } else {
-                        const numberSpan = label.querySelector('.seat-number');
-                        return { numbers: [numberSpan.textContent], isCouple, isYellowCouple };
-                    }
+                    return { number: numberSpan.textContent, isCouple };
                 });
 
             selectedSeatsList.textContent = selectedSeats.length > 0
-                ? selectedSeats.flatMap(s => s.numbers).join(', ')
+                ? selectedSeats.map(s => s.number).join(', ')
                 : 'Chưa chọn ghế';
 
             const totalPrice = selectedSeats.reduce((total, seat) => {
-                if (seat.isYellowCouple) {
-                    return total + yellowCouplePrice;
-                } else if (seat.isCouple) {
-                    return total + couplePrice;
-                } else {
-                    return total + normalPrice;
-                }
+                return total + (seat.isCouple ? couplePrice : normalPrice);
             }, 0);
 
             totalPriceElement.textContent = totalPrice.toLocaleString();
