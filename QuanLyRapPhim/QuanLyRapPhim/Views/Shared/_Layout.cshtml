@@ -100,14 +100,19 @@
                     <p class="mt-3">Ngôn ngữ: <img src="https://i.pinimg.com/736x/4d/01/84/4d01846694471249d81d3ddfafbfa031.jpg" alt="VN Flag" height="20" /> VN</p>
                 </div>
 
+
                 <!-- Tài khoản -->
                 <div class="col-md-2">
                     <h5>TÀI KHOẢN</h5>
                     <ul class="list-unstyled">
                         @if (User.Identity.IsAuthenticated)
                         {
-                            <li><span class="text-white">Xin chào, @User.Identity.Name</span></li>
-                            <a href="/Identity/Account/Manage/Index" class="btn btn-outline-secondary">Profile</a>
+                            <li>
+                                <span style="color: white !important; opacity: 1;">
+                                    <i class="fas fa-user-circle me-1"></i> Xin chào, @User.Identity.Name
+                                </span>
+                            </li>
+                            <li><a href="/Identity/Account/Manage/Index" class="btn btn-outline-secondary">Profile</a></li>
                             <li><a href="/Identity/Account/Logout" class="text-white text-decoration-none">Đăng xuất</a></li>
                         }
                         else
@@ -118,6 +123,7 @@
                         <li><a href="#" class="text-white text-decoration-none">Membership</a></li>
                     </ul>
                 </div>
+
             </div>
         </div>
     </footer>

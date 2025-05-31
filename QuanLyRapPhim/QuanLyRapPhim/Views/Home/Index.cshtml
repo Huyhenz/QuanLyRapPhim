@@ -28,45 +28,14 @@
                 <ul class="navbar-nav me-auto nav-icons">
                     @if (User.IsInRole("Admin"))
                     {
-                        <li class="nav-item">
-                            <a class="nav-link nav-icon" href="/Admin/Index">
-                                <i class="fas fa-tachometer-alt"></i>
-                                <span class="nav-text">Admin Dashboard</span>
-                            </a>
-                        </li>
-                        @* <li class="nav-item"> *@
-                        @*     <a class="nav-link nav-icon" href="/Movies"> *@
-                        @*         <i class="fas fa-film"></i> *@
-                        @*         <span class="nav-text">Danh sách phim</span> *@
-                        @*     </a> *@
-                        @* </li> *@
-                        @* <li class="nav-item"> *@
-                        @*     <a class="nav-link nav-icon" href="/Showtimes"> *@
-                        @*         <i class="fas fa-calendar"></i> *@
-                        @*         <span class="nav-text">Lịch chiếu</span> *@
-                        @*     </a> *@
-                        @* </li> *@
-                        @* <li class="nav-item"> *@
-                        @*     <a class="nav-link nav-icon" href="/Rooms"> *@
-                        @*         <i class="fas fa-door-open"></i> *@
-                        @*         <span class="nav-text">Phòng</span> *@
-                        @*     </a> *@
-                        @* </li> *@
-                        @* <li class="nav-item"> *@
-                        @*     <a class="nav-link nav-icon" href="/Seats"> *@
-                        @*         <i class="fas fa-chair"></i> *@
-                        @*         <span class="nav-text">Ghế</span> *@
-                        @*     </a> *@
-                        @* </li> *@
-                        @* <li class="nav-item"> *@
-                        @*     <a class="nav-link nav-icon" href="/Admin/ManageBookings"> *@
-                        @*         <i class="fas fa-ticket-alt"></i> *@
-                        @*         <span class="nav-text">Quản lý đặt vé</span> *@
-                        @*     </a> *@
-                        @* </li> *@
+                        <claim class="nav-item">
+                        <a class="nav-link nav-icon" href="/Admin/Index">
+                            <i class="fas fa-tachometer-alt"></i>
+                            <span class="nav-text">Admin Dashboard</span>
+                        </a>
+                        </claim>
                     }
                 </ul>
-
                 <!-- Right Side Actions -->
                 <div class="d-flex align-items-center">
                     <a href="@(User.Identity.IsAuthenticated ? "/Movies" : "/Identity/Account/Login")" class="btn btn-primary book-btn me-2">ĐẶT VÉ NGAY</a>
@@ -81,6 +50,11 @@
                             <i class="fas fa-search"></i>
                         </button>
                     </form>
+                    
+                    <!-- Nút đăng xuất -->
+                    @* <a href="/Identity/Account/Logout" class="nav-icon" title="Đăng xuất"> *@
+                    @*     <i class="fas fa-sign-out-alt"></i> *@
+                    @* </a> *@
                 </div>
             </div>
         </div>

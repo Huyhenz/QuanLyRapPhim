@@ -4,20 +4,27 @@
 @inject SignInManager<User> SignInManager
 @inject UserManager<User> UserManager
 
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 <ul class="navbar-nav">
     @if (SignInManager.IsSignedIn(User))
     {
         var user = await UserManager.GetUserAsync(User);
-        <!-- Lấy thông tin User -->
+        <!-- Thêm icon lịch sử đặt vé ngay trước nút đăng xuất -->
         <li class="nav-item">
-            <a id="manage" class="nav-link text-dark btn btn-outline-primary" asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">
-                Xin chào @user.FullName ! <!-- Hiển thị họ tên thay vì username -->
+            <a href="/History/TicketHistory" class="nav-link btn btn-outline-secondary d-flex align-items-center justify-content-center" style="height: 100%;" title="Lịch sử đặt vé">
+                <i class="fas fa-history fa-fw"></i> Lịch sử thanh toán 
+            </a>
+        </li>
+        <!-- Hiển thị tên người dùng -->
+        <li class="nav-item">
+            <a id="manage" class="nav-link text-white btn btn-outline-primary" asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">
+                <i class="fas fa-user"></i> @user.FullName <!-- Hiển thị họ tên -->
             </a>
         </li>
         <li class="nav-item">
             <form id="logoutForm" class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
                 <button id="logout" type="submit" class="nav-link btn btn-outline-danger border-0">
-                    Đăng xuất
+                    <i class="fas fa-sign-out-alt"></i>
                 </button>
             </form>
         </li>
@@ -25,13 +32,13 @@
     else
     {
         <li class="nav-item">
-            <a class="nav-link text-dark btn btn-outline-light me-2" id="login" asp-area="Identity" asp-page="/Account/Login">
-                Đăng nhập
+            <a class="nav-link text-white btn btn-outline-light me-2" id="login" asp-area="Identity" asp-page="/Account/Login">
+                Đăng nhập <i class="fas fa-sign-in-alt"></i>
             </a>
         </li>
         <li class="nav-item">
-            <a class="nav-link text-dark btn btn-warning" id="register" asp-area="Identity" asp-page="/Account/Register">
-                Đăng ký
+            <a class="nav-link text-white btn btn-warning" id="register" asp-area="Identity" asp-page="/Account/Register">
+                Đăng ký <i class="fas fa-user-plus"></i>
             </a>
         </li>
     }

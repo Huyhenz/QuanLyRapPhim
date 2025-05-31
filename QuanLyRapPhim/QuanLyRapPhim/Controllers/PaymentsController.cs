@@ -344,5 +344,31 @@ namespace QuanLyRapPhim.Controllers
         {
             return _context.Payments.Any(e => e.PaymentId == id);
         }
+
+        public IActionResult PaymentHistory()
+        {
+            var userId = _userManager.GetUserId(User); // Lấy ID người dùng đang đăng nhập
+
+            var bookings = _context.Bookings
+                .Include(b => b.User)
+                .Include(b => b.Showtime).ThenInclude(st => st.Movie)
+                .Include(b => b.Showtime).ThenInclude(st => st.Room)
+                .Include(b => b.BookingDetails).ThenInclude(bd => bd.Seat)
+                .Where(b => b.UserId == userId)
+                .ToList();
+
+            var payments = _context.Payments
+                .Where(p => p.PaymentStatus == "Đã thanh toán")
+                .ToList();
+
+            // Lọc các booking đã thanh toán
+            var paidBookingIds = payments.Select(p => p.BookingId).ToHashSet();
+            bookings = bookings.Where(b => paidBookingIds.Contains(b.BookingId)).ToList();
+
+            ViewBag.Payments = payments;
+
+            return View(bookings);
+        }
+
     }
 }
