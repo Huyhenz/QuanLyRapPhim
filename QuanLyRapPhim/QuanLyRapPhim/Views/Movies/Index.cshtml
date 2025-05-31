@@ -1,5 +1,4 @@
 ﻿@using System.Linq
-
 @model IEnumerable<QuanLyRapPhim.Models.Movie>
 
 @{
@@ -362,27 +361,27 @@
     /* Sidebar */
     .sidebar {
         width: 250px;
-        background-color: #0F1213; /* Màu Smoke Black đậm hơn */
-        color: #FFDAB9; /* Màu đào nhạt */
+        background-color: #000000; /* Black background to match Showtimes */
+        color: #ffffff; /* White text for readability */
         height: 100vh;
         position: fixed;
         top: 0;
         left: 0;
         padding-top: 20px;
-        border-right: 1px solid #FFDAB9; /* Viền phải màu đào nhạt */
+        border-right: 2px solid #ff0033; /* Red border to match Showtimes */
         overflow-y: auto;
         z-index: 999;
     }
 
     .sidebar-header {
         padding: 10px 20px;
-        border-bottom: 1px solid #FFDAB9;
+        border-bottom: 1px solid #ff0033; /* Red border to match Showtimes */
     }
 
     .sidebar-title {
         margin: 0;
         font-size: 1.5em;
-        color: #FFDAB9;
+        color: #ff0033; /* Red text to match Showtimes */
     }
 
     .sidebar-nav {
@@ -395,35 +394,35 @@
         display: flex;
         align-items: center;
         padding: 10px 20px;
-        color: #FFDAB9;
+        color: #ffffff; /* White text to match Showtimes */
         text-decoration: none;
     }
 
         .nav-item i {
             margin-right: 10px;
-            color: #FFDAB9;
+            color: #ffffff; /* White icons to match Showtimes */
         }
 
         .nav-item:hover {
-            background-color: #FFDAB9;
-            color: #0F1213;
+            background-color: #ff0033; /* Red on hover to match Showtimes */
+            color: #000000; /* Black text on hover for contrast */
         }
 
             .nav-item:hover i {
-                color: #0F1213;
+                color: #000000; /* Black icons on hover to match Showtimes */
             }
 
         .nav-item.active {
-            background-color: #FFDAB9;
-            color: #0F1213;
+            background-color: #ff0033; /* Red for active item to match Showtimes */
+            color: #000000; /* Black text for active item */
         }
 
             .nav-item.active i {
-                color: #0F1213;
+                color: #000000; /* Black icons for active item */
             }
 
     .nav-divider {
-        border-top: 1px solid #FFDAB9;
+        border-top: 1px solid #ff0033; /* Red divider to match Showtimes */
         margin: 10px 0;
     }
 
@@ -554,14 +553,14 @@
         display: flex;
         flex-direction: column;
         justify-content: space-between;
-        color: #FFDAB9;
+        color: #FFDAB9; /* Unchanged for user view */
     }
 
     .card-title {
         font-size: 1.2rem;
         font-weight: 700;
         margin-bottom: 8px;
-        color: #FFDAB9;
+        color: #FFDAB9; /* Unchanged for user view */
     }
 
     .text-ellipsis {
@@ -572,7 +571,7 @@
 
     .star-rating {
         font-size: 0.9rem;
-        color: #FFDAB9;
+        color: #FFDAB9; /* Unchanged for user view */
     }
 
         .star-rating .fas {
@@ -589,7 +588,7 @@
 
     .rating-text {
         font-size: 0.8rem;
-        color: #FFDAB9;
+        color: #FFDAB9; /* Unchanged for user view */
         margin-left: 4px;
     }
 
@@ -625,6 +624,22 @@
             transform: translateY(-2px);
         }
 
+    .btn-create {
+        background: #28A745; /* Green for Add Movie button in admin view */
+        border: none;
+        border-radius: 8px;
+        padding: 6px 12px;
+        font-size: 14px;
+        color: #FFFFFF; /* White text for contrast */
+        font-weight: 600;
+        transition: background 0.3s ease, transform 0.2s ease;
+    }
+
+        .btn-create:hover {
+            background: #218838; /* Darker green on hover */
+            transform: translateY(-2px);
+        }
+
     .action-btn {
         min-width: 80px;
         padding: 8px 12px;
@@ -643,7 +658,7 @@
 
     .table-custom {
         background: #0F1213;
-        color: #FFDAB9;
+        color: #ffffff; /* Default for non-cell elements */
         border-radius: 10px;
         overflow: hidden;
         width: 100%;
@@ -651,7 +666,7 @@
 
         .table-custom th {
             background: #1C2526;
-            color: #FFDAB9;
+            color: #ffffff; /* White text for headers */
             font-weight: 600;
             padding: 12px;
             position: sticky;
@@ -661,12 +676,12 @@
 
         .table-custom td {
             padding: 12px;
-            border-bottom: 1px solid #FFDAB9;
-            color: #FFDAB9;
+            border-bottom: 1px solid #ff0033; /* Red border to match sidebar theme */
+            color: #000000; /* Black text for table cells in admin view */
         }
 
         .table-custom tr:hover {
-            background: rgba(255, 218, 185, 0.1);
+            background: rgba(255, 0, 51, 0.1); /* Light red hover effect to match theme */
         }
 
     .table-container::-webkit-scrollbar {
