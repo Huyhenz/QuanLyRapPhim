@@ -93,12 +93,12 @@
                                         <div class="seat seat-couple mx-2 glow-effect">
                                             <input type="checkbox" name="selectedSeats" value="@seat.SeatId" id="seat-@seat.SeatId" @(seat.Status == "Đã đặt" ? "disabled" : "") />
                                             <label for="seat-@seat.SeatId" class="seat-label">
-                                                <i class="fas fa-chair"></i>
+                                                <i class="fas fa-couch"></i>
                                                 <span class="seat-number">@seat.SeatNumber</span>
                                             </label>
                                             <input type="checkbox" name="selectedSeats" value="@nextSeat.SeatId" id="seat-@nextSeat.SeatId" @(nextSeat.Status == "Đã đặt" ? "disabled" : "") />
                                             <label for="seat-@nextSeat.SeatId" class="seat-label">
-                                                <i class="fas fa-chair"></i>
+                                                <i class="fas fa-couch"></i>
                                                 <span class="seat-number">@nextSeat.SeatNumber</span>
                                             </label>
                                             <div class="cup-holder"></div>
@@ -141,7 +141,7 @@
 
                 // Thêm hàng ghế đôi màu vàng
                 char yellowRowLabel = (char)(lastRowLabel + 1);
-                int yellowCoupleSeats = seatsPerRow / 2; // Số cặp ghế đôi
+                int yellowCoupleSeats = seatsPerRow / 2;
                 int yellowSeatStart = totalSeats + 1;
                 <div class="seat-row d-flex align-items-center mb-3">
                     <span class="row-label text-light me-3 glow-effect">Hàng @yellowRowLabel</span>
@@ -155,12 +155,12 @@
                             <div class="seat seat-couple-yellow mx-2 glow-effect">
                                 <input type="checkbox" name="selectedSeats" value="@firstSeatId" id="seat-@firstSeatId" />
                                 <label for="seat-@firstSeatId" class="seat-label">
-                                    <i class="fas fa-chair"></i>
+                                    <i class="fas fa-couch"></i>
                                     <span class="seat-number">@firstSeatNumber</span>
                                 </label>
                                 <input type="checkbox" name="selectedSeats" value="@secondSeatId" id="seat-@secondSeatId" />
                                 <label for="seat-@secondSeatId" class="seat-label">
-                                    <i class="fas fa-chair"></i>
+                                    <i class="fas fa-couch"></i>
                                     <span class="seat-number">@secondSeatNumber</span>
                                 </label>
                                 <div class="cup-holder"></div>
@@ -185,8 +185,8 @@
                 <span class="badge bg-success me-2 glow-effect"><i class="fas fa-chair me-1"></i> Ghế trống</span>
                 <span class="badge bg-danger me-2 glow-effect"><i class="fas fa-chair me-1"></i> Ghế đã đặt</span>
                 <span class="badge bg-primary me-2 glow-effect"><i class="fas fa-chair me-1"></i> Ghế đang chọn</span>
-                
-                <span class="badge bg-yellow text-dark me-2 glow-effect"><i class="fas fa-chair me-1"></i> Ghế đôi (Vàng)</span>
+       
+                <span class="badge bg-yellow-couple text-light me-2 glow-effect"><i class="fas fa-couch me-1"></i> Ghế đôi (Vàng)</span>
             </p>
         </div>
 
@@ -228,12 +228,12 @@
         }
 
     .glow-effect {
-        box-shadow: 0 0 15px rgba(255, 0, 51, 0.3);
+        box-shadow: 0 0 15px rgba(255, 0, 51, 0.4);
         transition: box-shadow 0.3s ease, transform 0.3s ease;
     }
 
         .glow-effect:hover {
-            box-shadow: 0 0 25px rgba(255, 0, 51, 0.5);
+            box-shadow: 0 0 25px rgba(255, 0, 51, 0.7);
             transform: scale(1.05);
         }
 
@@ -245,10 +245,10 @@
 
     .screen {
         background: linear-gradient(90deg, #333, #555, #333);
-        height: 40px;
-        border-radius: 15px;
+        height: 50px;
+        border-radius: 10px;
         position: relative;
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.6);
         z-index: 2;
     }
 
@@ -258,7 +258,7 @@
         left: 50%;
         transform: translate(-50%, -50%);
         color: #fff;
-        font-weight: 600;
+        font-weight: 700;
         text-transform: uppercase;
         letter-spacing: 2px;
     }
@@ -266,10 +266,10 @@
     .seating-chart {
         max-width: 100%;
         margin: 0 auto;
-        padding: 20px;
-        background-color: #1c1c1c;
+        padding: 25px;
+        background: linear-gradient(145deg, #1c1c1c, #2a2a2a);
         border-radius: 15px;
-        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
         position: relative;
         overflow-x: auto;
     }
@@ -279,10 +279,10 @@
         top: 0;
         left: 50%;
         transform: translateX(-50%);
-        width: 80%;
+        width: 90%;
         height: 100%;
-        background: radial-gradient(circle at top, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0) 70%);
-        filter: blur(20px);
+        background: radial-gradient(circle at top, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0) 70%);
+        filter: blur(25px);
         z-index: 1;
     }
 
@@ -292,23 +292,25 @@
         position: relative;
         z-index: 2;
         min-width: fit-content;
+        margin-bottom: 20px;
     }
 
     .row-label {
-        width: 50px;
-        font-weight: 600;
-        line-height: 40px;
-        color: #b3b3b3;
-        background: #2a2a2a;
-        border-radius: 5px;
+        width: 60px;
+        font-weight: 700;
+        line-height: 45px;
+        color: #ffffff;
+        background: linear-gradient(145deg, #2a2a2a, #3a3a3a);
+        border-radius: 8px;
         text-align: center;
         flex-shrink: 0;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
     }
 
     .seat-container {
         display: flex;
         justify-content: flex-start;
-        gap: 10px;
+        gap: 12px;
         flex-wrap: nowrap;
         min-width: 0;
     }
@@ -320,7 +322,10 @@
         align-items: center;
         justify-content: center;
         position: relative;
-        transition: transform 0.2s ease, box-shadow 0.3s ease;
+        border-radius: 10px;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        background: linear-gradient(145deg, #2a2a2a, #1c1c1c);
+        box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.4);
     }
 
     .seat-available .seat-label i {
@@ -334,27 +339,29 @@
     }
 
     .seat-couple {
-        width: 120px;
-        height: 50px;
+        width: 130px;
+        height: 55px;
         display: flex;
         align-items: center;
         justify-content: space-between;
         position: relative;
-        background-color: #ff3333;
-        border-radius: 5px;
+        background: linear-gradient(145deg, #ff3333, #cc0000);
+        border-radius: 12px;
         overflow: hidden;
+        box-shadow: 0 4px 15px rgba(255, 51, 51, 0.5);
     }
 
     .seat-couple-yellow {
-        width: 120px;
-        height: 50px;
+        width: 130px;
+        height: 55px;
         display: flex;
         align-items: center;
         justify-content: space-between;
         position: relative;
-        background-color: #ffcc00;
-        border-radius: 5px;
+        background: linear-gradient(145deg, #ffcc00, #e6b800);
+        border-radius: 12px;
         overflow: hidden;
+        box-shadow: 0 4px 15px rgba(255, 204, 0, 0.5);
     }
 
         .seat-couple .seat-label,
@@ -365,60 +372,68 @@
             align-items: center;
             justify-content: center;
             position: relative;
+            transition: background 0.3s ease;
         }
 
     .seat-couple .seat-label {
-        background-color: #ff3333;
+        background: linear-gradient(145deg, #ff3333, #cc0000);
     }
 
     .seat-couple-yellow .seat-label {
-        background-color: #ffcc00;
+        background: linear-gradient(145deg, #ffcc00, #e6b800);
     }
 
         .seat-couple .seat-label i,
         .seat-couple-yellow .seat-label i {
             color: #ffffff;
-            font-size: 1.5rem;
+            font-size: 1.8rem;
+            filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.3));
         }
 
     .seat-couple .seat-number,
     .seat-couple-yellow .seat-number {
         position: absolute;
-        font-size: 0.7rem;
-        font-weight: 600;
-        color: #fff;
-        top: 50%;
-        transform: translateY(-50%);
-        background: rgba(0, 0, 0, 0.5);
-        border-radius: 50%;
-        padding: 2px 5px;
+        font-size: 0.8rem;
+        font-weight: 700;
+        color: #ffffff;
+        top: 10px;
+        transform: translateY(0);
+        background: rgba(0, 0, 0, 0.6);
+        border-radius: 10px;
+        padding: 3px 8px;
     }
 
-    .seat-couple input:checked + .seat-label i,
-    .seat-couple-yellow input:checked + .seat-label i {
-        color: #00bfff;
-        transform: scale(1.1);
-        box-shadow: 0 0 10px rgba(0, 191, 255, 0.5);
+    .seat-couple input:checked + .seat-label,
+    .seat-couple-yellow input:checked + .seat-label {
+        background: linear-gradient(145deg, #00bfff, #0099cc);
     }
+
+        .seat-couple input:checked + .seat-label i,
+        .seat-couple-yellow input:checked + .seat-label i {
+            color: #ffffff;
+            transform: scale(1.15);
+            box-shadow: 0 0 15px rgba(0, 191, 255, 0.7);
+        }
 
     .seat-couple .cup-holder,
     .seat-couple-yellow .cup-holder {
-        width: 20px;
-        height: 30px;
-        background-color: #ccc;
+        width: 25px;
+        height: 35px;
+        background: linear-gradient(145deg, #ccc, #aaa);
         position: absolute;
         top: 50%;
         left: 50%;
         transform: translate(-50%, -50%);
-        border-radius: 5px;
+        border-radius: 8px;
         z-index: 1;
+        box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.3);
     }
 
     .seat-couple .seat-divider,
     .seat-couple-yellow .seat-divider {
-        width: 2px;
+        width: 3px;
         height: 100%;
-        background-color: #000;
+        background: #000;
         position: absolute;
         left: 50%;
         transform: translateX(-50%);
@@ -443,83 +458,93 @@
         position: relative;
         width: 100%;
         height: 100%;
-        transition: transform 0.2s ease;
+        transition: transform 0.3s ease, background 0.3s ease;
     }
 
         .seat-label i {
-            font-size: 1.5rem;
-            transition: color 0.3s ease;
+            font-size: 1.6rem;
+            transition: color 0.3s ease, transform 0.3s ease;
         }
 
-    .seat input:checked + .seat-label i {
-        color: #00bfff;
-        transform: scale(1.1);
-        box-shadow: 0 0 10px rgba(0, 191, 255, 0.5);
+    .seat input:checked + .seat-label {
+        background: linear-gradient(145deg, #00bfff, #0099cc);
     }
+
+        .seat input:checked + .seat-label i {
+            color: #ffffff;
+            transform: scale(1.15);
+            box-shadow: 0 0 15px rgba(0, 191, 255, 0.7);
+        }
 
     .seat input:disabled + .seat-label i {
         opacity: 0.5;
     }
 
-    .seat:hover:not(.seat-taken) .seat-label i {
+    .seat:hover:not(.seat-taken) .seat-label {
         transform: scale(1.1);
-        box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+        box-shadow: 0 0 15px rgba(255, 255, 255, 0.4);
     }
 
     .seat-legend .badge {
-        font-size: 1rem;
-        padding: 8px 12px;
-        border-radius: 20px;
-        box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+        font-size: 1.1rem;
+        padding: 10px 15px;
+        border-radius: 25px;
+        box-shadow: 0 0 12px rgba(255, 255, 255, 0.3);
+        font-weight: 600;
     }
 
-    .bg-yellow {
-        background-color: #ffcc00;
+    .bg-red-couple {
+        background: linear-gradient(145deg, #ff3333, #cc0000);
+    }
+
+    .bg-yellow-couple {
+        background: linear-gradient(145deg, #ffcc00, #e6b800);
     }
 
     .selected-seats-info {
         max-width: 600px;
         margin: 0 auto;
-        padding: 20px;
-        background-color: #1c1c1c;
+        padding: 25px;
+        background: linear-gradient(145deg, #1c1c1c, #2a2a2a);
         border-radius: 15px;
-        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
         border: 1px solid #ff0033;
     }
 
         .selected-seats-info h5 {
             margin: 0;
-            font-size: 1.1rem;
-            color: #b3b3b3;
+            font-size: 1.2rem;
+            color: #ffffff;
         }
 
     .btn-primary {
-        background-color: #ff0033;
+        background: linear-gradient(145deg, #ff0033, #cc0000);
         border: none;
-        border-radius: 20px;
-        padding: 10px 30px;
-        font-weight: 600;
-        font-size: 1.2rem;
-        transition: background-color 0.3s ease, transform 0.3s ease;
+        border-radius: 25px;
+        padding: 12px 35px;
+        font-weight: 700;
+        font-size: 1.3rem;
+        transition: background 0.3s ease, transform 0.3s ease;
     }
 
         .btn-primary:hover {
-            background-color: #e6002e;
+            background: linear-gradient(145deg, #e6002e, #b30000);
             transform: scale(1.05);
         }
 
     .btn-secondary {
         border-color: #ff0033;
         color: #ff0033;
-        border-radius: 20px;
-        padding: 8px 20px;
+        background: transparent;
+        border-radius: 25px;
+        padding: 10px 25px;
         font-weight: 600;
-        font-size: 1rem;
-        transition: background-color 0.3s ease, transform 0.3s ease;
+        font-size: 1.1rem;
+        transition: background 0.3s ease, transform 0.3s ease;
     }
 
         .btn-secondary:hover {
-            background-color: #ff0033;
+            background: #ff0033;
             color: #ffffff;
             border-color: #ff0033;
             transform: scale(1.05);
@@ -530,17 +555,46 @@
     }
 
     .alert-danger {
-        background-color: #333;
+        background: linear-gradient(145deg, #333, #2a2a2a);
         color: #fff;
         border: 1px solid #e6002e;
         border-radius: 10px;
     }
 
     .alert-success {
-        background-color: #333;
+        background: linear-gradient(145deg, #333, #2a2a2a);
         color: #fff;
-        border: 1px solid #444;
+        border: 1px solid #00cc00;
         border-radius: 10px;
+    }
+
+    @@media (max-width: 768px) {
+        .seat
+
+    {
+        width: 40px;
+        height: 40px;
+    }
+
+    .seat-couple, .seat-couple-yellow {
+        width: 100px;
+        height: 45px;
+    }
+
+        .seat-couple .seat-label i,
+        .seat-couple-yellow .seat-label i {
+            font-size: 1.4rem;
+        }
+
+    .seat-number {
+        font-size: 0.7rem;
+    }
+
+    .row-label {
+        width: 50px;
+        line-height: 40px;
+    }
+
     }
 </style>
 
