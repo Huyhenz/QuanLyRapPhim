@@ -117,6 +117,10 @@
         .content-inner {
             max-width: 1200px;
             width: 100%;
+            border: 2px solid #ff0033; /* Red border for the content frame */
+            border-radius: 15px;
+            padding: 20px;
+            background-color: #1c1c1c; /* Dark background to match the table */
         }
 
         .page-title {
@@ -258,7 +262,7 @@
                                 <td>@Html.DisplayFor(modelItem => item.Capacity)</td>
                                 <td>
                                     <a asp-action="Edit" asp-route-id="@item.RoomId" class="action-link edit-link">Sửa</a>
-                                    
+
                                     <a asp-action="Delete" asp-route-id="@item.RoomId" class="action-link delete-link">Xóa</a>
                                 </td>
                             </tr>

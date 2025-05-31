@@ -189,7 +189,7 @@
                             double rating = item.Reviews?.Any() == true ? item.Reviews.Average(r => r.Rating) : 0;
                             int fullStars = (int)Math.Floor(rating);
                             bool hasHalfStar = rating % 1 >= 0.5;
-                            int reviewCount = random.Next(0, 51);
+                            int reviewCount = item.Reviews?.Count() ?? 0; // Use actual review count
                             <div class="col-md-6 col-lg-6 mb-4">
                                 <div class="card movie-card d-flex flex-row align-items-stretch">
                                     <div class="poster-container">
@@ -433,8 +433,8 @@
         flex-direction: column;
         background: rgba(51, 51, 51, 0.7); /* Semi-transparent gray */
         border-radius: 20px;
-        border: 4px solid #FFDAB9; /* Wider border */
-        box-shadow: 0 0 15px rgba(255, 218, 185, 0.3);
+        border: 4px solid #ff0000; /* Changed to red border */
+        box-shadow: 0 0 15px rgba(255, 0, 0, 0.3); /* Adjusted shadow to red */
         padding: 30px; /* Increased padding for wider spacing */
         width: 90%;
         margin-left: auto;
@@ -501,8 +501,8 @@
     .movie-card {
         background: #0F1213;
         border-radius: 15px;
-        border: 2px solid #FFDAB9;
-        box-shadow: 0 4px 15px rgba(255, 218, 185, 0.2);
+        border: 2px solid #ff0000; /* Changed to red border */
+        box-shadow: 0 4px 15px rgba(255, 0, 0, 0.2); /* Adjusted shadow to red */
         transition: transform 0.3s ease;
         overflow: hidden;
         height: 250px; /* Increased height for a larger card */
