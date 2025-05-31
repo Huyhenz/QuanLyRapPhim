@@ -108,19 +108,18 @@
                 }
 
         .content {
-            margin-left: 250px;
-            padding: 20px;
+            margin-left: 250px; /* Match sidebar width */
+            padding: 20px 20px 20px 10px; /* Reduced left padding to move table closer */
             flex-grow: 1;
             display: flex;
-            justify-content: center;
+            justify-content: flex-start; /* Align content to the left */
             align-items: flex-start;
+            min-height: 100vh;
         }
 
         .content-inner {
-            max-width: 1200px;
-            width: 100%;
+            width: 100%; /* Use full available width */
         }
-
         .title-gradient {
             background: linear-gradient(90deg, #ff0033, #1c1c1c);
             -webkit-background-clip: text;
@@ -137,50 +136,115 @@
 
         .glow-effect {
             box-shadow: 0 0 15px rgba(255, 0, 51, 0.3);
-            transition: box-shadow 0.3s ease, transform 0.3s ease;
+            transition: box-shadow 0.3s ease;
         }
 
-            .glow-effect:hover {
-                box-shadow: 0 0 25px rgba(255, 0, 51, 0.5);
-                transform: scale(1.05);
-            }
+        .table-dark.glow-effect:hover {
+            box-shadow: 0 0 25px rgba(255, 0, 51, 0.5);
+            transform: none;
+        }
 
         .table-dark {
             background-color: #1c1c1c;
             border-radius: 15px;
             overflow: hidden;
             width: 100%;
-            table-layout: auto;
+            border-collapse: collapse;
+            table-layout: fixed;
         }
+
+            .table-dark th, .table-dark td {
+                border: 1px solid #444;
+                padding: 10px 12px;
+                text-align: center;
+                font-size: 0.95rem;
+                color: white;
+                word-wrap: break-word;
+                white-space: normal;
+                overflow-wrap: break-word;
+                vertical-align: middle;
+            }
 
             .table-dark th {
                 background-color: #2a2a2a;
-                color: #b3b3b3;
                 font-weight: 600;
-                border: 1px solid #444;
-                padding: 12px;
-                text-align: center;
-                white-space: nowrap;
+                position: sticky;
+                top: 0;
+                z-index: 10;
             }
 
-            .table-dark td {
-                background-color: #1c1c1c;
-                color: #ffffff;
-                border: 1px solid #444;
-                padding: 12px;
-                text-align: center;
-                white-space: nowrap;
+                .table-dark td.payment-status,
+                .table-dark td.email-column,
+                .table-dark td.movie-column,
+                .table-dark td.seat-column {
+                    white-space: normal;
+                    word-wrap: break-word;
+                    min-width: 200px;
+                    text-align: left;
+                    overflow: visible;
+                }
+
+
+
+
+
+            .table-dark td.payment-status {
+                text-align: center; /* hoặc left nếu muốn thẳng hàng với nội dung khác */
+                padding: 10px 12px;
             }
+
+        .payment-status .spinner-border {
+            margin-left: 6px;
+        }
 
             .table-dark tr:hover td {
                 background-color: #2a2a2a;
             }
 
+            .table-dark td.email-column,
+            .table-dark th.email-column {
+                max-width: 150px;
+                text-align: left;
+            }
+
+            .table-dark td.movie-column,
+            .table-dark th.movie-column {
+                max-width: 150px;
+                text-align: left;
+            }
+
+            .table-dark td.seat-column,
+            .table-dark th.seat-column {
+                max-width: 180px;
+                text-align: left;
+            }
+
+            .table-dark td.status-column,
+            .table-dark th.status-column {
+                max-width: 130px;
+                min-width: 100px;
+                text-align: center;
+                word-wrap: break-word;
+                white-space: normal;
+            }
+
         .table-container {
             overflow-x: auto;
-            overflow-y: hidden;
-            max-height: calc(100vh - 200px);
+            width: 100%;
         }
+
+            .table-container::-webkit-scrollbar {
+                height: 8px;
+            }
+         
+            .table-container::-webkit-scrollbar-thumb {
+                background: #ff0033;
+                border-radius: 10px;
+            }
+
+            .table-container::-webkit-scrollbar-track {
+                background: #2a2a2a;
+            }
 
         .btn-secondary {
             border-color: #ff0033;
@@ -198,6 +262,24 @@
                 border-color: #ff0033;
                 transform: scale(1.05);
             }
+
+        .badge {
+            padding: 5px 10px;
+            font-size: 0.85rem;
+            border-radius: 8px;
+            white-space: nowrap;
+        }
+
+        .bg-success {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .bg-danger {
+            background-color: #dc3545;
+            color: white;
+        }
+
 
         .text-muted {
             color: #b3b3b3 !important;
@@ -249,30 +331,33 @@
                                 <th>Giờ chiếu</th>
                                 <th>Tổng tiền</th>
                                 <th>Ngày đặt</th>
-                                <th>Trạng thái thanh toán</th>
+                                <th class="status-column">Trạng thái thanh toán</th> <!-- ĐÃ THÊM CLASS -->
                             </tr>
                         </thead>
+
                         <tbody>
                             @foreach (var booking in Model)
                             {
                                 var payment = payments?.FirstOrDefault(p => p.BookingId == booking.BookingId);
                                 <tr data-booking-id="@booking.BookingId">
                                     <td>@booking.BookingId</td>
-                                    <td>@(booking.User?.Email ?? "Khách vãng lai")</td>
-                                    <td>@booking.Showtime.Movie.Title</td>
+                                    <td class="email-column">@(booking.User?.Email ?? "Khách vãng lai")</td>
+                                    <td class="movie-column">@booking.Showtime.Movie.Title</td>
                                     <td>@booking.Showtime.Room.RoomName</td>
-                                    <td>@string.Join(", ", booking.BookingDetails.Select(bd => bd.Seat.SeatNumber))</td>
+                                    <td class="seat-column">@string.Join(", ", booking.BookingDetails.Select(bd => bd.Seat.SeatNumber))</td>
                                     <td>@booking.Showtime.Date.ToString("dd/MM/yyyy")</td>
                                     <td>@booking.Showtime.StartTime</td>
                                     <td>@booking.TotalPrice.ToString("N0") VNĐ</td>
                                     <td>@booking.BookingDate.ToString("dd/MM/yyyy HH:mm")</td>
-                                    <td id="payment-status-@booking.BookingId" class="payment-status">
+                                    <td id="payment-status-@booking.BookingId" class="payment-status status-column">
+                                        <!-- ĐÃ THÊM CLASS -->
                                         <span class="status-text">@(payment?.PaymentStatus ?? "Chưa thanh toán")</span>
                                         <span class="spinner-border spinner-border-sm text-danger d-none" role="status" aria-hidden="true"></span>
                                     </td>
                                 </tr>
                             }
                         </tbody>
+
                     </table>
                 </div>
 
