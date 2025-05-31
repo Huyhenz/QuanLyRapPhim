@@ -16,7 +16,7 @@
         body {
             margin: 0;
             background-color: #0F0F0F; /* Galaxy Black */
-            color: #ffffff;
+            color: #d3d3d3; /* Darkened from #ffffff to light gray for better readability */
             font-family: 'Montserrat', sans-serif;
             overflow-x: hidden;
         }
@@ -29,26 +29,26 @@
         .sidebar {
             width: 250px;
             background-color: #000000; /* Black background */
-            color: #ffffff; /* White text for readability */
+            color: #d3d3d3; /* Darkened from #ffffff to light gray */
             height: 100vh;
             position: fixed;
             top: 0;
             left: 0;
             padding-top: 20px;
-            border-right: 2px solid #ff0033; /* Red border */
+            border-right: 2px solid #ff0000; /* Red border */
             overflow-y: auto;
             z-index: 1000;
         }
 
         .sidebar-header {
             padding: 10px 20px;
-            border-bottom: 1px solid #ff0033; /* Red border */
+            border-bottom: 1px solid #ff0000; /* Red border */
         }
 
         .sidebar-title {
             margin: 0;
             font-size: 1.5em;
-            color: #ff0033; /* Red text for the header */
+            color: #ff0033; /* Kept as red for contrast */
         }
 
         .sidebar-nav {
@@ -61,13 +61,13 @@
             display: flex;
             align-items: center;
             padding: 10px 20px;
-            color: #ffffff; /* White text */
+            color: #d3d3d3; /* Darkened from #ffffff to light gray */
             text-decoration: none;
         }
 
             .nav-item i {
                 margin-right: 10px;
-                color: #ffffff; /* White icons */
+                color: #d3d3d3; /* Darkened from #ffffff to light gray */
             }
 
             .nav-item:hover {
@@ -121,7 +121,7 @@
 
         .page-title {
             background-color: #1c1c1c;
-            color: #fff;
+            color: #d3d3d3; /* Darkened from #fff to light gray */
             padding: 15px;
             text-align: center;
             border-radius: 15px;
@@ -133,8 +133,8 @@
 
         .alert-success {
             background-color: #333;
-            color: #fff;
-            border: 1px solid #444;
+            color: #d3d3d3; /* Darkened from #fff to light gray */
+            border: 1px solid #ff0000; /* Red border */
             border-radius: 10px;
             margin-bottom: 20px;
         }
@@ -143,7 +143,7 @@
             display: inline-block;
             padding: 8px 20px;
             background-color: #00cc00;
-            color: #fff;
+            color: #d3d3d3; /* Darkened from #fff to light gray */
             text-decoration: none;
             border-radius: 20px;
             font-weight: 600;
@@ -163,11 +163,12 @@
             box-shadow: 0 10px 20px rgba(0,0,0,0.3);
             border-radius: 15px;
             overflow: hidden;
+            border: 2px solid #ff0000; /* Red border */
         }
 
             .table thead tr {
                 background-color: #333;
-                color: #fff;
+                color: #d3d3d3; /* Darkened from #fff to light gray */
             }
 
             .table th {
@@ -180,7 +181,7 @@
             .table td {
                 padding: 12px;
                 border: none;
-                color: #b3b3b3;
+                color: #a9a9a9; /* Darkened from #b3b3b3 to a slightly darker gray */
                 font-family: 'Montserrat', sans-serif;
             }
 
@@ -203,12 +204,12 @@
         }
 
         .details-link {
-            color: #fff;
+            color: #d3d3d3; /* Darkened from #fff to light gray */
             background-color: #00bfff;
         }
 
         .delete-link {
-            color: #fff;
+            color: #d3d3d3; /* Darkened from #fff to light gray */
             background-color: #e6002e;
         }
 
@@ -275,7 +276,7 @@
                                 <td>@Html.DisplayFor(modelItem => item.Room.RoomName)</td>
                                 <td>
                                     <a asp-action="Edit" asp-route-id="@item.SeatId" class="action-link edit-link">Sửa</a>
-                                    
+
                                     <a asp-action="Delete" asp-route-id="@item.SeatId" class="action-link delete-link">Xóa</a>
                                 </td>
                             </tr>

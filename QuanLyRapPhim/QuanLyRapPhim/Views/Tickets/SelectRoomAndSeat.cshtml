@@ -63,7 +63,13 @@
             <div class="blur-background"></div>
             @{
                 var seats = Model.Room.Seats.OrderBy(s => s.SeatNumber).ToList();
-                int seatsPerRow = 10;
+                int seatsPerRow = Model.Room.RoomName switch
+                {
+                    "Room 1" => 8,
+                    "Room 2" => 12,
+                    "Room 3" => 10,
+                    _ => 10
+                };
                 int totalSeats = seats.Count;
                 int totalRows = (int)Math.Ceiling((double)totalSeats / seatsPerRow);
                 char lastRowLabel = (char)('A' + totalRows - 1);
@@ -76,13 +82,51 @@
                     <div class="seat-row d-flex align-items-center mb-3">
                         <span class="row-label text-light me-3 glow-effect">Hàng @rowLabel</span>
                         <div class="d-flex justify-content-center flex-grow-1 seat-container">
-                            @foreach (var seat in rowSeats)
+                            @for (int i = 0; i < rowSeats.Count; i++)
                             {
-                                bool isCoupleSeat = isLastRow;
-                                <div class="seat @(seat.Status == "Đã đặt" ? "seat-taken" : "seat-available") @(isCoupleSeat ? "seat-couple" : "") mx-2 glow-effect">
-                                    <input type="checkbox" name="selectedSeats" value="@seat.SeatId" id="seat-@seat.SeatId" @(seat.Status == "Đã đặt" ? "disabled" : "") />
-                                    <label for="seat-@seat.SeatId" class="seat-label">@seat.SeatNumber</label>
-                                </div>
+                                var seat = rowSeats[i];
+                                if (isLastRow && int.TryParse(seat.SeatNumber, out int seatNumber) && seatNumber % 2 == 0 && i + 1 < rowSeats.Count)
+                                {
+                                    var nextSeat = rowSeats[i + 1];
+                                    if (int.TryParse(nextSeat.SeatNumber, out int nextSeatNumber) && nextSeatNumber % 2 == 1)
+                                    {
+                                        <div class="seat seat-couple mx-2 glow-effect">
+                                            <input type="checkbox" name="selectedSeats" value="@seat.SeatId" id="seat-@seat.SeatId" @(seat.Status == "Đã đặt" ? "disabled" : "") />
+                                            <label for="seat-@seat.SeatId" class="seat-label">
+                                                <i class="fas fa-chair"></i>
+                                                <span class="seat-number">@seat.SeatNumber</span>
+                                            </label>
+                                            <input type="checkbox" name="selectedSeats" value="@nextSeat.SeatId" id="seat-@nextSeat.SeatId" @(nextSeat.Status == "Đã đặt" ? "disabled" : "") />
+                                            <label for="seat-@nextSeat.SeatId" class="seat-label">
+                                                <i class="fas fa-chair"></i>
+                                                <span class="seat-number">@nextSeat.SeatNumber</span>
+                                            </label>
+                                            <div class="cup-holder"></div>
+                                            <div class="seat-divider"></div>
+                                        </div>
+                                        i++;
+                                    }
+                                    else
+                                    {
+                                        <div class="seat @(seat.Status == "Đã đặt" ? "seat-taken" : "seat-available") mx-2 glow-effect">
+                                            <input type="checkbox" name="selectedSeats" value="@seat.SeatId" id="seat-@seat.SeatId" @(seat.Status == "Đã đặt" ? "disabled" : "") />
+                                            <label for="seat-@seat.SeatId" class="seat-label">
+                                                <i class="fas fa-chair"></i>
+                                                <span class="seat-number">@seat.SeatNumber</span>
+                                            </label>
+                                        </div>
+                                    }
+                                }
+                                else
+                                {
+                                    <div class="seat @(seat.Status == "Đã đặt" ? "seat-taken" : "seat-available") mx-2 glow-effect">
+                                        <input type="checkbox" name="selectedSeats" value="@seat.SeatId" id="seat-@seat.SeatId" @(seat.Status == "Đã đặt" ? "disabled" : "") />
+                                        <label for="seat-@seat.SeatId" class="seat-label">
+                                            <i class="fas fa-chair"></i>
+                                            <span class="seat-number">@seat.SeatNumber</span>
+                                        </label>
+                                    </div>
+                                }
                             }
                             @if (rowSeats.Count < seatsPerRow)
                             {
@@ -94,6 +138,44 @@
                         </div>
                     </div>
                 }
+
+                // Thêm hàng ghế đôi màu vàng
+                char yellowRowLabel = (char)(lastRowLabel + 1);
+                int yellowCoupleSeats = seatsPerRow / 2; // Số cặp ghế đôi
+                int yellowSeatStart = totalSeats + 1;
+                <div class="seat-row d-flex align-items-center mb-3">
+                    <span class="row-label text-light me-3 glow-effect">Hàng @yellowRowLabel</span>
+                    <div class="d-flex justify-content-center flex-grow-1 seat-container">
+                        @for (int i = 0; i < yellowCoupleSeats; i++)
+                        {
+                            int firstSeatNumber = yellowSeatStart + (i * 2);
+                            int secondSeatNumber = firstSeatNumber + 1;
+                            string firstSeatId = $"yellow-{firstSeatNumber}";
+                            string secondSeatId = $"yellow-{secondSeatNumber}";
+                            <div class="seat seat-couple-yellow mx-2 glow-effect">
+                                <input type="checkbox" name="selectedSeats" value="@firstSeatId" id="seat-@firstSeatId" />
+                                <label for="seat-@firstSeatId" class="seat-label">
+                                    <i class="fas fa-chair"></i>
+                                    <span class="seat-number">@firstSeatNumber</span>
+                                </label>
+                                <input type="checkbox" name="selectedSeats" value="@secondSeatId" id="seat-@secondSeatId" />
+                                <label for="seat-@secondSeatId" class="seat-label">
+                                    <i class="fas fa-chair"></i>
+                                    <span class="seat-number">@secondSeatNumber</span>
+                                </label>
+                                <div class="cup-holder"></div>
+                                <div class="seat-divider"></div>
+                            </div>
+                        }
+                        @if (yellowCoupleSeats * 2 < seatsPerRow)
+                        {
+                            @for (int i = 0; i < seatsPerRow - (yellowCoupleSeats * 2); i++)
+                            {
+                                <div class="seat seat-placeholder mx-2"></div>
+                            }
+                        }
+                    </div>
+                </div>
             }
         </div>
 
@@ -103,7 +185,8 @@
                 <span class="badge bg-success me-2 glow-effect"><i class="fas fa-chair me-1"></i> Ghế trống</span>
                 <span class="badge bg-danger me-2 glow-effect"><i class="fas fa-chair me-1"></i> Ghế đã đặt</span>
                 <span class="badge bg-primary me-2 glow-effect"><i class="fas fa-chair me-1"></i> Ghế đang chọn</span>
-                <span class="badge bg-warning text-dark me-2 glow-effect"><i class="fas fa-chair me-1"></i> Ghế đôi</span>
+                
+                <span class="badge bg-yellow text-dark me-2 glow-effect"><i class="fas fa-chair me-1"></i> Ghế đôi (Vàng)</span>
             </p>
         </div>
 
@@ -146,16 +229,17 @@
 
     .glow-effect {
         box-shadow: 0 0 15px rgba(255, 0, 51, 0.3);
-        transition: box-shadow 0.3s ease;
+        transition: box-shadow 0.3s ease, transform 0.3s ease;
     }
 
         .glow-effect:hover {
             box-shadow: 0 0 25px rgba(255, 0, 51, 0.5);
+            transform: scale(1.05);
         }
 
     .screen-container {
         margin: 0 auto;
-        max-width: 600px;
+        max-width: 800px;
         position: relative;
     }
 
@@ -180,14 +264,14 @@
     }
 
     .seating-chart {
-        max-width: 600px;
+        max-width: 100%;
         margin: 0 auto;
         padding: 20px;
         background-color: #1c1c1c;
         border-radius: 15px;
         box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
         position: relative;
-        overflow: hidden;
+        overflow-x: auto;
     }
 
     .blur-background {
@@ -207,6 +291,7 @@
         align-items: center;
         position: relative;
         z-index: 2;
+        min-width: fit-content;
     }
 
     .row-label {
@@ -217,51 +302,132 @@
         background: #2a2a2a;
         border-radius: 5px;
         text-align: center;
+        flex-shrink: 0;
     }
 
     .seat-container {
         display: flex;
-        justify-content: center;
-        flex-grow: 1;
+        justify-content: flex-start;
         gap: 10px;
+        flex-wrap: nowrap;
+        min-width: 0;
     }
 
     .seat {
-        width: 40px;
-        height: 40px;
-        border-radius: 8px;
+        width: 50px;
+        height: 50px;
         display: flex;
         align-items: center;
         justify-content: center;
-        transition: transform 0.2s ease, box-shadow 0.3s ease;
         position: relative;
-        overflow: hidden;
+        transition: transform 0.2s ease, box-shadow 0.3s ease;
     }
 
-    .seat-available {
-        background-color: #00cc00;
+    .seat-available .seat-label i {
+        color: #00cc00;
         cursor: pointer;
     }
 
-    .seat-taken {
-        background-color: #e6002e;
+    .seat-taken .seat-label i {
+        color: #e6002e;
         cursor: not-allowed;
     }
 
     .seat-couple {
-        width: 80px;
-        background-color: #ffcc00;
-        border: 2px solid #fff;
-        border-radius: 10px;
+        width: 120px;
+        height: 50px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        position: relative;
+        background-color: #ff3333;
+        border-radius: 5px;
+        overflow: hidden;
     }
 
-        .seat-couple input:checked + .seat-label {
-            background-color: #ffca2c;
+    .seat-couple-yellow {
+        width: 120px;
+        height: 50px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        position: relative;
+        background-color: #ffcc00;
+        border-radius: 5px;
+        overflow: hidden;
+    }
+
+        .seat-couple .seat-label,
+        .seat-couple-yellow .seat-label {
+            width: 50%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
         }
 
+    .seat-couple .seat-label {
+        background-color: #ff3333;
+    }
+
+    .seat-couple-yellow .seat-label {
+        background-color: #ffcc00;
+    }
+
+        .seat-couple .seat-label i,
+        .seat-couple-yellow .seat-label i {
+            color: #ffffff;
+            font-size: 1.5rem;
+        }
+
+    .seat-couple .seat-number,
+    .seat-couple-yellow .seat-number {
+        position: absolute;
+        font-size: 0.7rem;
+        font-weight: 600;
+        color: #fff;
+        top: 50%;
+        transform: translateY(-50%);
+        background: rgba(0, 0, 0, 0.5);
+        border-radius: 50%;
+        padding: 2px 5px;
+    }
+
+    .seat-couple input:checked + .seat-label i,
+    .seat-couple-yellow input:checked + .seat-label i {
+        color: #00bfff;
+        transform: scale(1.1);
+        box-shadow: 0 0 10px rgba(0, 191, 255, 0.5);
+    }
+
+    .seat-couple .cup-holder,
+    .seat-couple-yellow .cup-holder {
+        width: 20px;
+        height: 30px;
+        background-color: #ccc;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        border-radius: 5px;
+        z-index: 1;
+    }
+
+    .seat-couple .seat-divider,
+    .seat-couple-yellow .seat-divider {
+        width: 2px;
+        height: 100%;
+        background-color: #000;
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 2;
+    }
+
     .seat-placeholder {
-        width: 40px;
-        height: 40px;
+        width: 50px;
+        height: 50px;
         margin: 5px;
         visibility: hidden;
     }
@@ -271,31 +437,31 @@
     }
 
     .seat-label {
-        color: #fff;
-        font-size: 0.9rem;
-        font-weight: 600;
-        display: block;
-        margin: 0;
-        text-align: center;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
         width: 100%;
         height: 100%;
-        line-height: 40px;
-        border-radius: 8px;
-        transition: background-color 0.3s ease;
+        transition: transform 0.2s ease;
     }
 
-    .seat input:checked + .seat-label {
-        background-color: #00bfff;
-        border-radius: 8px;
+        .seat-label i {
+            font-size: 1.5rem;
+            transition: color 0.3s ease;
+        }
+
+    .seat input:checked + .seat-label i {
+        color: #00bfff;
         transform: scale(1.1);
         box-shadow: 0 0 10px rgba(0, 191, 255, 0.5);
     }
 
-    .seat input:disabled + .seat-label {
+    .seat input:disabled + .seat-label i {
         opacity: 0.5;
     }
 
-    .seat:hover:not(.seat-taken) {
+    .seat:hover:not(.seat-taken) .seat-label i {
         transform: scale(1.1);
         box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
     }
@@ -305,6 +471,10 @@
         padding: 8px 12px;
         border-radius: 20px;
         box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+    }
+
+    .bg-yellow {
+        background-color: #ffcc00;
     }
 
     .selected-seats-info {
@@ -385,14 +555,17 @@
         const totalPriceElement = document.getElementById('total-price');
         const normalPrice = 50000;
         const couplePrice = 100000;
+        const yellowCouplePrice = 120000;
 
         function updateSelectedSeats() {
             const selectedSeats = Array.from(seatCheckboxes)
                 .filter(checkbox => checkbox.checked)
                 .map(checkbox => {
                     const label = checkbox.nextElementSibling;
+                    const numberSpan = label.querySelector('.seat-number');
                     const isCouple = checkbox.closest('.seat').classList.contains('seat-couple');
-                    return { number: label.textContent, isCouple };
+                    const isYellowCouple = checkbox.closest('.seat').classList.contains('seat-couple-yellow');
+                    return { number: numberSpan.textContent, isCouple, isYellowCouple };
                 });
 
             selectedSeatsList.textContent = selectedSeats.length > 0
@@ -400,7 +573,13 @@
                 : 'Chưa chọn ghế';
 
             const totalPrice = selectedSeats.reduce((total, seat) => {
-                return total + (seat.isCouple ? couplePrice : normalPrice);
+                if (seat.isYellowCouple) {
+                    return total + yellowCouplePrice;
+                } else if (seat.isCouple) {
+                    return total + couplePrice;
+                } else {
+                    return total + normalPrice;
+                }
             }, 0);
 
             totalPriceElement.textContent = totalPrice.toLocaleString();
