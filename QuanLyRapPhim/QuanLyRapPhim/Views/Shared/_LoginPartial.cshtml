@@ -9,25 +9,37 @@
     @if (SignInManager.IsSignedIn(User))
     {
         var user = await UserManager.GetUserAsync(User);
-        <!-- Thêm icon lịch sử đặt vé ngay trước nút đăng xuất -->
-        <li class="nav-item">
-            <a href="/History/TicketHistory" class="nav-link btn btn-outline-secondary d-flex align-items-center justify-content-center" style="height: 100%;" title="Lịch sử đặt vé">
-                <i class="fas fa-history fa-fw"></i> Lịch sử thanh toán 
-            </a>
-        </li>
-        <!-- Hiển thị tên người dùng -->
-        <li class="nav-item">
-            <a id="manage" class="nav-link text-white btn btn-outline-primary" asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">
-                <i class="fas fa-user"></i> @user.FullName <!-- Hiển thị họ tên -->
-            </a>
-        </li>
-        <li class="nav-item">
-            <form id="logoutForm" class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
-                <button id="logout" type="submit" class="nav-link btn btn-outline-danger border-0">
-                    <i class="fas fa-sign-out-alt"></i>
-                </button>
-            </form>
-        </li>
+        if (user != null)
+        {
+            <!-- Thêm icon lịch sử đặt vé ngay trước nút đăng xuất -->
+            <li class="nav-item">
+                <a href="/History/TicketHistory" class="nav-link btn btn-outline-secondary d-flex align-items-center justify-content-center" style="height: 100%;" title="Lịch sử đặt vé">
+                    <i class="fas fa-history fa-fw"></i> Lịch sử thanh toán 
+                </a>
+            </li>
+            <!-- Hiển thị tên người dùng -->
+            <li class="nav-item">
+                <a id="manage" class="nav-link text-white btn btn-outline-primary" asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">
+                    <i class="fas fa-user"></i> @user.FullName <!-- Hiển thị họ tên -->
+                </a>
+            </li>
+            <li class="nav-item">
+                <form id="logoutForm" class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
+                    <button id="logout" type="submit" class="nav-link btn btn-outline-danger border-0">
+                        <i class="fas fa-sign-out-alt"></i>
+                    </button>
+                </form>
+            </li>
+        }
+        else
+        {
+            <!-- Handle case when user is null -->
+            <li class="nav-item">
+                <a class="nav-link text-white btn btn-outline-light me-2" id="login" asp-area="Identity" asp-page="/Account/Login">
+                    Đăng nhập <i class="fas fa-sign-in-alt"></i>
+                </a>
+            </li>
+        }
     }
     else
     {
