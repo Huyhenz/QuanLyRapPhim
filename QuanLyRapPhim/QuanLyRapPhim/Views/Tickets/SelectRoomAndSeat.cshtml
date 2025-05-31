@@ -90,19 +90,20 @@
                                     var nextSeat = rowSeats[i + 1];
                                     if (int.TryParse(nextSeat.SeatNumber, out int nextSeatNumber) && nextSeatNumber % 2 == 1)
                                     {
-                                        <div class="seat seat-couple mx-2 glow-effect">
-                                            <input type="checkbox" name="selectedSeats" value="@seat.SeatId" id="seat-@seat.SeatId" @(seat.Status == "Đã đặt" ? "disabled" : "") />
-                                            <label for="seat-@seat.SeatId" class="seat-label">
-                                                <i class="fas fa-couch"></i>
-                                                <span class="seat-number">@seat.SeatNumber</span>
+                                        <div class="seat seat-couple mx-2 glow-effect @(seat.Status == "Đã đặt" || nextSeat.Status == "Đã đặt" ? "seat-taken" : "")">
+                                            <input type="checkbox" name="selectedSeats" value="@seat.SeatId,@nextSeat.SeatId" id="seat-pair-@seat.SeatId" @(seat.Status == "Đã đặt" || nextSeat.Status == "Đã đặt" ? "disabled" : "") />
+                                            <label for="seat-pair-@seat.SeatId" class="seat-label">
+                                                <div class="seat-inner">
+                                                    <i class="fas fa-couch"></i>
+                                                    <span class="seat-number">@seat.SeatNumber</span>
+                                                </div>
+                                                <div class="seat-inner">
+                                                    <i class="fas fa-couch"></i>
+                                                    <span class="seat-number">@nextSeat.SeatNumber</span>
+                                                </div>
+                                                <div class="cup-holder"></div>
+                                                <div class="seat-divider"></div>
                                             </label>
-                                            <input type="checkbox" name="selectedSeats" value="@nextSeat.SeatId" id="seat-@nextSeat.SeatId" @(nextSeat.Status == "Đã đặt" ? "disabled" : "") />
-                                            <label for="seat-@nextSeat.SeatId" class="seat-label">
-                                                <i class="fas fa-couch"></i>
-                                                <span class="seat-number">@nextSeat.SeatNumber</span>
-                                            </label>
-                                            <div class="cup-holder"></div>
-                                            <div class="seat-divider"></div>
                                         </div>
                                         i++;
                                     }
@@ -150,21 +151,21 @@
                         {
                             int firstSeatNumber = yellowSeatStart + (i * 2);
                             int secondSeatNumber = firstSeatNumber + 1;
-                            string firstSeatId = $"yellow-{firstSeatNumber}";
-                            string secondSeatId = $"yellow-{secondSeatNumber}";
+                            string pairId = $"yellow-pair-{firstSeatNumber}";
                             <div class="seat seat-couple-yellow mx-2 glow-effect">
-                                <input type="checkbox" name="selectedSeats" value="@firstSeatId" id="seat-@firstSeatId" />
-                                <label for="seat-@firstSeatId" class="seat-label">
-                                    <i class="fas fa-couch"></i>
-                                    <span class="seat-number">@firstSeatNumber</span>
+                                <input type="checkbox" name="selectedSeats" value="yellow-@firstSeatNumber,yellow-@secondSeatNumber" id="seat-@pairId" />
+                                <label for="seat-@pairId" class="seat-label">
+                                    <div class="seat-inner">
+                                        <i class="fas fa-couch"></i>
+                                        <span class="seat-number">@firstSeatNumber</span>
+                                    </div>
+                                    <div class="seat-inner">
+                                        <i class="fas fa-couch"></i>
+                                        <span class="seat-number">@secondSeatNumber</span>
+                                    </div>
+                                    <div class="cup-holder"></div>
+                                    <div class="seat-divider"></div>
                                 </label>
-                                <input type="checkbox" name="selectedSeats" value="@secondSeatId" id="seat-@secondSeatId" />
-                                <label for="seat-@secondSeatId" class="seat-label">
-                                    <i class="fas fa-couch"></i>
-                                    <span class="seat-number">@secondSeatNumber</span>
-                                </label>
-                                <div class="cup-holder"></div>
-                                <div class="seat-divider"></div>
                             </div>
                         }
                         @if (yellowCoupleSeats * 2 < seatsPerRow)
@@ -185,7 +186,6 @@
                 <span class="badge bg-success me-2 glow-effect"><i class="fas fa-chair me-1"></i> Ghế trống</span>
                 <span class="badge bg-danger me-2 glow-effect"><i class="fas fa-chair me-1"></i> Ghế đã đặt</span>
                 <span class="badge bg-primary me-2 glow-effect"><i class="fas fa-chair me-1"></i> Ghế đang chọn</span>
-       
                 <span class="badge bg-yellow-couple text-light me-2 glow-effect"><i class="fas fa-couch me-1"></i> Ghế đôi (Vàng)</span>
             </p>
         </div>
@@ -364,15 +364,30 @@
         box-shadow: 0 4px 15px rgba(255, 204, 0, 0.5);
     }
 
+        .seat-couple.seat-taken,
+        .seat-couple-yellow.seat-taken {
+            background: linear-gradient(145deg, #e6002e, #b30000);
+        }
+
         .seat-couple .seat-label,
         .seat-couple-yellow .seat-label {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            transition: background 0.3s ease;
+        }
+
+        .seat-couple .seat-inner,
+        .seat-couple-yellow .seat-inner {
             width: 50%;
             height: 100%;
             display: flex;
             align-items: center;
             justify-content: center;
             position: relative;
-            transition: background 0.3s ease;
         }
 
     .seat-couple .seat-label {
@@ -383,12 +398,12 @@
         background: linear-gradient(145deg, #ffcc00, #e6b800);
     }
 
-        .seat-couple .seat-label i,
-        .seat-couple-yellow .seat-label i {
-            color: #ffffff;
-            font-size: 1.8rem;
-            filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.3));
-        }
+    .seat-couple .seat-inner i,
+    .seat-couple-yellow .seat-inner i {
+        color: #ffffff;
+        font-size: 1.8rem;
+        filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.3));
+    }
 
     .seat-couple .seat-number,
     .seat-couple-yellow .seat-number {
@@ -408,8 +423,8 @@
         background: linear-gradient(145deg, #00bfff, #0099cc);
     }
 
-        .seat-couple input:checked + .seat-label i,
-        .seat-couple-yellow input:checked + .seat-label i {
+        .seat-couple input:checked + .seat-label .seat-inner i,
+        .seat-couple-yellow input:checked + .seat-label .seat-inner i {
             color: #ffffff;
             transform: scale(1.15);
             box-shadow: 0 0 15px rgba(0, 191, 255, 0.7);
@@ -493,10 +508,6 @@
         font-weight: 600;
     }
 
-    .bg-red-couple {
-        background: linear-gradient(145deg, #ff3333, #cc0000);
-    }
-
     .bg-yellow-couple {
         background: linear-gradient(145deg, #ffcc00, #e6b800);
     }
@@ -518,7 +529,7 @@
         }
 
     .btn-primary {
-        background: linear-gradient(145deg, #ff0033, #cc0000);
+        background: linear-gradient(145deg, #ff3333, #cc0000);
         border: none;
         border-radius: 25px;
         padding: 12px 35px;
@@ -581,8 +592,8 @@
         height: 45px;
     }
 
-        .seat-couple .seat-label i,
-        .seat-couple-yellow .seat-label i {
+        .seat-couple .seat-inner i,
+        .seat-couple-yellow .seat-inner i {
             font-size: 1.4rem;
         }
 
@@ -616,14 +627,19 @@
                 .filter(checkbox => checkbox.checked)
                 .map(checkbox => {
                     const label = checkbox.nextElementSibling;
-                    const numberSpan = label.querySelector('.seat-number');
                     const isCouple = checkbox.closest('.seat').classList.contains('seat-couple');
                     const isYellowCouple = checkbox.closest('.seat').classList.contains('seat-couple-yellow');
-                    return { number: numberSpan.textContent, isCouple, isYellowCouple };
+                    if (isCouple || isYellowCouple) {
+                        const seatNumbers = checkbox.value.split(',').map(num => num.split('-').pop());
+                        return { numbers: seatNumbers, isCouple, isYellowCouple };
+                    } else {
+                        const numberSpan = label.querySelector('.seat-number');
+                        return { numbers: [numberSpan.textContent], isCouple, isYellowCouple };
+                    }
                 });
 
             selectedSeatsList.textContent = selectedSeats.length > 0
-                ? selectedSeats.map(s => s.number).join(', ')
+                ? selectedSeats.flatMap(s => s.numbers).join(', ')
                 : 'Chưa chọn ghế';
 
             const totalPrice = selectedSeats.reduce((total, seat) => {
