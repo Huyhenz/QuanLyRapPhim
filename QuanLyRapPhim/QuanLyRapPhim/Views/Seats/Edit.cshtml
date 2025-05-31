@@ -5,41 +5,309 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h1>Edit</h1>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" />
+    <style>
+        body {
+            margin: 0;
+            background-color: #0F0F0F; /* Galaxy Black */
+            color: #ffffff;
+            font-family: 'Montserrat', sans-serif;
+            overflow-x: hidden;
+        }
 
-<h4>Seat</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Edit">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="SeatId" />
-            <div class="form-group">
-                <label asp-for="RoomId" class="control-label"></label>
-                <select asp-for="RoomId" class="form-control" asp-items="ViewBag.RoomId"></select>
-                <span asp-validation-for="RoomId" class="text-danger"></span>
+        .admin-dashboard {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 250px;
+            background-color: #000000; /* Black background */
+            color: #ffffff; /* White text for readability */
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            padding-top: 20px;
+            border-right: 2px solid #ff0033; /* Red border */
+            overflow-y: auto;
+            z-index: 1000;
+        }
+
+        .sidebar-header {
+            padding: 10px 20px;
+            border-bottom: 1px solid #ff0033; /* Red border */
+        }
+
+        .sidebar-title {
+            margin: 0;
+            font-size: 1.5em;
+            color: #ff0033; /* Red text for the header */
+        }
+
+        .sidebar-nav {
+            list-style: none;
+            padding: 0;
+            margin: 20px 0;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 10px 20px;
+            color: #ffffff; /* White text */
+            text-decoration: none;
+        }
+
+            .nav-item i {
+                margin-right: 10px;
+                color: #ffffff; /* White icons */
+            }
+
+            .nav-item:hover {
+                background-color: #ff0033; /* Red on hover */
+                color: #000000; /* Black text on hover for contrast */
+            }
+
+                .nav-item:hover i {
+                    color: #000000; /* Black icons on hover */
+                }
+
+            .nav-item.active {
+                background-color: #ff0033; /* Red for active item */
+                color: #000000; /* Black text for active item */
+            }
+
+                .nav-item.active i {
+                    color: #000000; /* Black icons for active item */
+                }
+
+        .social-item {
+            color: #ff0033; /* Red for social media icons and text */
+        }
+
+            .social-item i {
+                color: #ff0033; /* Red icons for social media */
+            }
+
+            .social-item:hover {
+                background-color: #ff0033;
+                color: #000000; /* Black text on hover */
+            }
+
+                .social-item:hover i {
+                    color: #000000; /* Black icons on hover for social items */
+                }
+
+        .content {
+            margin-left: 250px;
+            padding: 20px;
+            flex-grow: 1;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+        }
+
+        .content-inner {
+            max-width: 1200px;
+            width: 100%;
+        }
+
+        .page-title {
+            background-color: #1c1c1c;
+            color: #fff;
+            padding: 15px;
+            text-align: center;
+            border-radius: 15px;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 700;
+            text-transform: uppercase;
+            margin-bottom: 20px;
+        }
+
+        .form-container {
+            background-color: #1c1c1c;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+            width: 100%;
+            max-width: 500px;
+        }
+
+        .form-group label {
+            color: #ffffff;
+            font-weight: 600;
+            margin-bottom: 5px;
+            display: block;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            background-color: #333;
+            color: #b3b3b3;
+            font-family: 'Montserrat', sans-serif;
+        }
+
+            .form-group input:focus,
+            .form-group select:focus {
+                outline: none;
+                background-color: #444;
+                color: #ffffff;
+            }
+
+        .text-danger {
+            color: #e6002e;
+            font-size: 0.9em;
+            margin-top: 5px;
+        }
+
+        .btn-primary {
+            display: inline-block;
+            padding: 8px 20px;
+            background-color: #00cc00;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 20px;
+            font-weight: 600;
+            font-family: 'Montserrat', sans-serif;
+            border: none;
+            cursor: pointer;
+        }
+
+            .btn-primary:hover {
+                transform: scale(1.05);
+                transition: transform 0.3s ease;
+            }
+
+        .back-link {
+            display: inline-block;
+            padding: 8px 20px;
+            background-color: #00bfff;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 20px;
+            font-weight: 600;
+            font-family: 'Montserrat', sans-serif;
+            margin-top: 20px;
+        }
+
+            .back-link:hover {
+                transform: scale(1.05);
+                transition: transform 0.3s ease;
+            }
+
+        @@media (max-width: 768px) {
+            .sidebar
+
+        {
+            width: 200px;
+        }
+
+        .content {
+            margin-left: 200px;
+        }
+
+        }
+
+        @@media (max-width: 576px) {
+            .admin-dashboard
+
+        {
+            flex-direction: column;
+        }
+
+        .sidebar {
+            position: relative;
+            width: 100%;
+            height: auto;
+        }
+
+        .content {
+            margin-left: 0;
+        }
+
+        .form-container {
+            max-width: 100%;
+        }
+
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-dashboard">
+        @if (User.IsInRole("Admin"))
+        {
+            <aside class="sidebar">
+                <div class="sidebar-header">
+                    <h3 class="sidebar-title">CinemaX Admin</h3>
+                </div>
+                <nav class="sidebar-nav">
+                    <a href="/Movies" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Movies" ? "active" : "")"><i class="fas fa-film"></i> Manage Movies</a>
+                    <a href="/Showtimes" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Showtimes" ? "active" : "")"><i class="fas fa-clock"></i> Manage Showtimes</a>
+                    <a href="/Rooms" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Rooms" ? "active" : "")"><i class="fas fa-door-open"></i> Manage Rooms</a>
+                    <a href="/Seats" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Seats" ? "active" : "")"><i class="fas fa-chair"></i> Manage Seats</a>
+                    <a href="/Admin/ManageBookings" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Admin" && ViewContext.RouteData.Values["Action"]?.ToString() == "ManageBookings" ? "active" : "")"><i class="fas fa-ticket-alt"></i> Manage Bookings</a>
+                    <a href="/Admin/RevenueStatistics" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Admin" && ViewContext.RouteData.Values["Action"]?.ToString() == "RevenueStatistics" ? "active" : "")"><i class="fas fa-chart-bar"></i> Revenue Statistics</a>
+                    <div class="nav-divider"></div>
+                    <a href="#" class="nav-item social-item"><i class="fab fa-facebook"></i> Facebook</a>
+                    <a href="#" class="nav-item social-item"><i class="fab fa-twitter"></i> Twitter</a>
+                    <a href="#" class="nav-item social-item"><i class="fab fa-google"></i> Google</a>
+                </nav>
+            </aside>
+        }
+
+        <div class="content">
+            <div class="content-inner">
+                <div class="page-title">Edit Seat</div>
+
+                <div class="form-container">
+                    <form asp-action="Edit">
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                        <input type="hidden" asp-for="SeatId" />
+                        <div class="form-group">
+                            <label asp-for="RoomId" class="control-label"></label>
+                            <select asp-for="RoomId" class="form-control" asp-items="ViewBag.RoomId"></select>
+                            <span asp-validation-for="RoomId" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="SeatNumber" class="control-label"></label>
+                            <input asp-for="SeatNumber" class="form-control" />
+                            <span asp-validation-for="SeatNumber" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="Status" class="control-label"></label>
+                            <input asp-for="Status" class="form-control" />
+                            <span asp-validation-for="Status" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <input type="submit" value="Lưu" class="btn btn-primary" />
+                        </div>
+                    </form>
+                </div>
+
+                <div>
+                    <a asp-action="Index" class="back-link">Quay lại trang trước</a>
+                </div>
             </div>
-            <div class="form-group">
-                <label asp-for="SeatNumber" class="control-label"></label>
-                <input asp-for="SeatNumber" class="form-control" />
-                <span asp-validation-for="SeatNumber" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Status" class="control-label"></label>
-                <input asp-for="Status" class="form-control" />
-                <span asp-validation-for="Status" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
-            </div>
-        </form>
+        </div>
     </div>
-</div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }
