@@ -1,7 +1,7 @@
 ﻿@model dynamic
 
 @{
-    ViewData["Title"] = "Revenue Statistics";
+    ViewData["Title"] = "Báo các thống kê";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
@@ -13,12 +13,12 @@
         </div>
         <nav class="sidebar-nav">
             @* <a href="/Admin/Index" class="nav-item"><i class="fas fa-tachometer-alt"></i> Dashboard</a> *@
-            <a href="/Movies" class="nav-item"><i class="fas fa-film"></i> Manage Movies</a>
-            <a href="/Showtimes" class="nav-item"><i class="fas fa-clock"></i> Manage Showtimes</a>
-            <a href="/Rooms" class="nav-item"><i class="fas fa-door-open"></i> Manage Rooms</a>
-            <a href="/Seats" class="nav-item"><i class="fas fa-chair"></i> Manage Seats</a>
-            <a href="/Admin/ManageBookings" class="nav-item"><i class="fas fa-ticket-alt"></i> Manage Bookings</a>
-            <a href="/Admin/RevenueStatistics" class="nav-item active"><i class="fas fa-chart-bar"></i> Revenue Statistics</a>
+            <a href="/Movies" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Movies" ? "active" : "")"><i class="fas fa-film"></i> Quản lý phim</a>
+            <a href="/Showtimes" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Showtimes" ? "active" : "")"><i class="fas fa-clock"></i> Quản lý lịch chiếu</a>
+            <a href="/Rooms" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Rooms" ? "active" : "")"><i class="fas fa-door-open"></i> Quản lý phòng</a>
+            <a href="/Seats" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Seats" ? "active" : "")"><i class="fas fa-chair"></i> Quản lý ghế</a>
+            <a href="/Admin/ManageBookings" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Admin" && ViewContext.RouteData.Values["Action"]?.ToString() == "ManageBookings" ? "active" : "")"><i class="fas fa-ticket-alt"></i> Quản lý đặt vé</a>
+            <a href="/Admin/RevenueStatistics" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Admin" && ViewContext.RouteData.Values["Action"]?.ToString() == "RevenueStatistics" ? "active" : "")"><i class="fas fa-chart-bar"></i> Báo cáo thống kê</a>
             <div class="nav-divider"></div>
             <a href="#" class="nav-item"><i class="fab fa-facebook"></i> Facebook</a>
             <a href="#" class="nav-item"><i class="fab fa-twitter"></i> Twitter</a>
@@ -29,9 +29,9 @@
     <!-- Main Content -->
     <main class="content">
         <div class="content-inner">
-            <h2 class="page-title">Revenue Statistics</h2>
+            <h2 class="page-title">Báo cáo thống kê</h2>
             <div class="header-actions">
-                <span class="order-count">Revenue Data Overview</span>
+                <span class="order-count">Tổng quan về dữ liệu doanh thu</span>
                 <div class="date-filter">
                     <span>From</span>
                     <input type="date" class="date-input" value="2025-05-25">
@@ -45,21 +45,21 @@
 
             <!-- Revenue Summary -->
             <div class="admin-section">
-                <h3 class="section-subtitle">Summary</h3>
+                <h3 class="section-subtitle">Bản tóm tắt</h3>
                 <div class="summary-card">
-                    <h4>Total Revenue: @(((dynamic)ViewBag.RevenueData)?.TotalRevenue.ToString("C", new System.Globalization.CultureInfo("vi-VN")) ?? "N/A")</h4>
+                    <h4>Tổng doanh thu: @(((dynamic)ViewBag.RevenueData)?.TotalRevenue.ToString("C", new System.Globalization.CultureInfo("vi-VN")) ?? "N/A")</h4>
                 </div>
             </div>
 
             <!-- Revenue by Movie -->
             <div class="admin-section">
-                <h3 class="section-subtitle">Revenue by Movie</h3>
+                <h3 class="section-subtitle">Doanh thu của phim</h3>
                 <div class="table-responsive">
                     <table class="table table-custom">
                         <thead>
                             <tr>
-                                <th>Movie Title</th>
-                                <th>Revenue (VND)</th>
+                                <th>Tiêu đề phim</th>
+                                <th>Doanh Thu (VND)</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -78,7 +78,7 @@
                                 else
                                 {
                                     <tr>
-                                        <td colspan="2" class="text-center">No revenue data available.</td>
+                                        <td colspan="2" class="text-center">Không có dữ liệu doanh thu.</td>
                                     </tr>
                                 }
                             }
@@ -89,7 +89,7 @@
 
             <!-- Revenue Chart -->
             <div class="admin-section">
-                <h3 class="section-subtitle">Revenue by Date</h3>
+                <h3 class="section-subtitle">Doanh Thu trong ngày</h3>
                 <canvas id="revenueChart" width="400" height="200"></canvas>
             </div>
         </div>

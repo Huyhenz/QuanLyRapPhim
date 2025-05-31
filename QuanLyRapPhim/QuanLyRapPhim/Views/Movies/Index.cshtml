@@ -10,7 +10,8 @@
 }
 
 <!-- Main Container -->
-<div class="container-fluid vh-100 d-flex position-relative overflow-hidden">
+<div class="container-fluid d-flex position-relative">
+
     <!-- Admin Sidebar (Visible only to Admins) -->
     @if (isAdmin)
     {
@@ -19,12 +20,12 @@
                 <h3 class="sidebar-title">CinemaX Admin</h3>
             </div>
             <nav class="sidebar-nav">
-                <a href="/Movies" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Movies" ? "active" : "")"><i class="fas fa-film"></i> Manage Movies</a>
-                <a href="/Showtimes" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Showtimes" ? "active" : "")"><i class="fas fa-clock"></i> Manage Showtimes</a>
-                <a href="/Rooms" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Rooms" ? "active" : "")"><i class="fas fa-door-open"></i> Manage Rooms</a>
-                <a href="/Seats" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Seats" ? "active" : "")"><i class="fas fa-chair"></i> Manage Seats</a>
-                <a href="/Admin/ManageBookings" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Admin" && ViewContext.RouteData.Values["Action"]?.ToString() == "ManageBookings" ? "active" : "")"><i class="fas fa-ticket-alt"></i> Manage Bookings</a>
-                <a href="/Admin/RevenueStatistics" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Admin" && ViewContext.RouteData.Values["Action"]?.ToString() == "RevenueStatistics" ? "active" : "")"><i class="fas fa-chart-bar"></i> Revenue Statistics</a>
+                <a href="/Movies" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Movies" ? "active" : "")"><i class="fas fa-film"></i> Quản lý phim</a>
+                <a href="/Showtimes" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Showtimes" ? "active" : "")"><i class="fas fa-clock"></i> Quản lý lịch chiếu</a>
+                <a href="/Rooms" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Rooms" ? "active" : "")"><i class="fas fa-door-open"></i> Quản lý phòng</a>
+                <a href="/Seats" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Seats" ? "active" : "")"><i class="fas fa-chair"></i> Quản lý ghế</a>
+                <a href="/Admin/ManageBookings" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Admin" && ViewContext.RouteData.Values["Action"]?.ToString() == "ManageBookings" ? "active" : "")"><i class="fas fa-ticket-alt"></i> Quản lý đặt vé</a>
+                <a href="/Admin/RevenueStatistics" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Admin" && ViewContext.RouteData.Values["Action"]?.ToString() == "RevenueStatistics" ? "active" : "")"><i class="fas fa-chart-bar"></i> Báo cáo thống kê</a>
                 <div class="nav-divider"></div>
                 <a href="#" class="nav-item"><i class="fab fa-facebook"></i> Facebook</a>
                 <a href="#" class="nav-item"><i class="fab fa-twitter"></i> Twitter</a>
@@ -35,6 +36,7 @@
 
     <!-- Frame Wrapper -->
     <div class="frame-wrapper flex-grow-1 @(isAdmin ? "admin-view" : "user-view")">
+
         <!-- Header -->
         <div class="d-flex justify-content-between align-items-center mb-4">
             <div>
@@ -67,10 +69,9 @@
             <div id="alert-container" class="mb-4"></div>
         }
 
-        <!-- Movie Display -->
+        <!-- Admin Section -->
         @if (isAdmin)
         {
-            <!-- Admin Table View with Vertical Scrollbar -->
             <div class="admin-section">
                 <h3 class="section-subtitle title-gradient">Danh sách phim (Quản lý)</h3>
                 <div class="table-container">
@@ -175,131 +176,73 @@
                 </div>
             </div>
         }
-        else
+
+        <!-- User Section -->
+        @if (!isAdmin)
         {
-            <!-- User Card View -->
-            <div id="movieCarousel" class="carousel slide movie-row" data-bs-ride="carousel">
-                <div class="carousel-inner">
-                    @{
-                        var movies = Model.ToList();
-                        var itemsPerSlide = 4; // Number of cards per slide
-                        var slideCount = (int)Math.Ceiling((double)movies.Count / itemsPerSlide);
-                        if (movies.Any())
+            <div class="movie-grid">
+                @if (Model.Any())
+                {
+                    <div class="row">
+                        @foreach (var item in Model)
                         {
-                            for (int i = 0; i < slideCount; i++)
-                            {
-                                <div class="carousel-item @(i == 0 ? "active" : "")">
-                                    <div class="row">
-                                        @for (int j = i * itemsPerSlide; j < Math.Min((i + 1) * itemsPerSlide, movies.Count); j++)
-                                        {
-                                            var item = movies[j];
-                                            double rating = item.Reviews?.Any() == true ? item.Reviews.Average(r => r.Rating) : 0;
-                                            int fullStars = (int)Math.Floor(rating);
-                                            bool hasHalfStar = rating % 1 >= 0.5;
-                                            int reviewCount = random.Next(0, 51);
-                                            <div class="col-md-3 col-lg-3 mb-3">
-                                                <div class="card movie-card">
-                                                    <div class="poster-container">
-                                                        <img src="@item.Poster" class="card-img-top movie-poster" alt="@item.Title" />
-                                                    </div>
-                                                    <div class="card-body">
-                                                        <h5 class="card-title text-white text-ellipsis">@item.Title</h5>
-                                                        <p class="card-text text-description text-ellipsis">
-                                                            <strong>Mô tả:</strong>
-                                                            @if (string.IsNullOrEmpty(item.Description))
-                                                            {
-                                                                <span>Chưa có mô tả</span>
-                                                            }
-                                                            else
-                                                            {
-                                                                @item.Description
-                                                            }
-                                                        </p>
-                                                        <div class="star-rating mb-2">
-                                                            @for (int k = 1; k <= 5; k++)
-                                                            {
-                                                                if (k <= fullStars)
-                                                                {
-                                                                    <span class="fas fa-star rated"></span>
-                                                                }
-                                                                else if (k == fullStars + 1 && hasHalfStar)
-                                                                {
-                                                                    <span class="fas fa-star-half-alt rated"></span>
-                                                                }
-                                                                else
-                                                                {
-                                                                    <span class="fas fa-star"></span>
-                                                                }
-                                                            }
-                                                            <span class="rating-text"> (@(rating > 0 ? rating.ToString("F1") : "Chưa có đánh giá")/5) (@reviewCount đánh giá)</span>
-                                                        </div>
-                                                        <p class="card-text text-description text-ellipsis"><strong>Thể loại:</strong> @(item.Genre ?? "N/A")</p>
-                                                        <p class="card-text text-description"><strong>Thời lượng:</strong> @(item.Duration != 0 ? $"{item.Duration} phút" : "N/A")</p>
-                                                        <p class="card-text text-description text-ellipsis"><strong>Đạo diễn:</strong> @(item.Director ?? "N/A")</p>
-                                                        <p class="card-text text-description text-ellipsis">
-                                                            <strong>Diễn viên:</strong>
-                                                            @if (string.IsNullOrEmpty(item.Actors))
-                                                            {
-                                                                <span>N/A</span>
-                                                            }
-                                                            else
-                                                            {
-                                                                @item.Actors
-                                                            }
-                                                        </p>
-                                                        <p class="card-text text-description">
-                                                            <strong>Trailer:</strong>
-                                                            @if (string.IsNullOrEmpty(item.TrailerUrl))
-                                                            {
-                                                                <span>Chưa có trailer</span>
-                                                            }
-                                                            else
-                                                            {
-                                                                <a href="@item.TrailerUrl" target="_blank" class="text-white">Xem Trailer</a>
-                                                            }
-                                                        </p>
-                                                    </div>
-                                                    <div class="card-footer d-flex justify-content-between">
-                                                        <a asp-action="Details" asp-route-id="@item.MovieId" class="btn btn-create btn-sm">Chi tiết</a>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        }
+                            double rating = item.Reviews?.Any() == true ? item.Reviews.Average(r => r.Rating) : 0;
+                            int fullStars = (int)Math.Floor(rating);
+                            bool hasHalfStar = rating % 1 >= 0.5;
+                            int reviewCount = random.Next(0, 51);
+                            <div class="col-md-6 col-lg-6 mb-4">
+                                <div class="card movie-card d-flex flex-row align-items-stretch">
+                                    <div class="poster-container">
+                                        <img src="@item.Poster" class="card-img-left movie-poster" alt="@item.Title" />
                                     </div>
-                                </div>
-                            }
-                        }
-                        else
-                        {
-                            <div class="carousel-item active">
-                                <div class="row">
-                                    <div class="col-12 text-center">
-                                        <p class="text-white">Không có phim nào.</p>
+                                    <div class="card-body d-flex flex-column justify-content-between p-3">
+                                        <div>
+                                            <h5 class="card-title text-white mb-2">@item.Title</h5>
+                                            <div class="star-rating mb-2">
+                                                @for (int k = 1; k <= 5; k++)
+                                                {
+                                                    if (k <= fullStars)
+                                                    {
+                                                        <span class="fas fa-star text-warning"></span>
+                                                    }
+                                                    else if (k == fullStars + 1 && hasHalfStar)
+                                                    {
+                                                        <span class="fas fa-star-half-alt text-warning"></span>
+                                                    }
+                                                    else
+                                                    {
+                                                        <span class="fas fa-star text-secondary"></span>
+                                                    }
+                                                }
+                                                <span class="rating-text text-white ms-2">(Đánh giá: @reviewCount)</span>
+                                            </div>
+                                            <p class="card-text text-white mb-1"><strong>Thời lượng:</strong> @(item.Duration != 0 ? $"{item.Duration} phút" : "N/A")</p>
+                                            <p class="card-text text-white mb-1"><strong>Mô tả:</strong> @(string.IsNullOrEmpty(item.Description) ? "Chưa có mô tả" : item.Description.Length > 50 ? item.Description.Substring(0, 50) + "..." : item.Description)</p>
+                                        </div>
+                                        <div>
+                                            <a href="@item.TrailerUrl" target="_blank" class="btn btn-danger btn-sm me-2">Xem Trailer</a>
+                                            <a asp-action="Details" asp-route-id="@item.MovieId" class="btn btn-primary btn-sm">Chi tiết</a>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         }
-                    }
-                </div>
-                <button class="carousel-control-prev" type="button" data-bs-target="#movieCarousel" data-bs-slide="prev">
-                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                    <span class="visually-hidden">Previous</span>
-                </button>
-                <button class="carousel-control-next" type="button" data-bs-target="#movieCarousel" data-bs-slide="next">
-                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                    <span class="visually-hidden">Next</span>
-                </button>
+                    </div>
+                }
+                else
+                {
+                    <div class="row">
+                        <div class="col-12 text-center">
+                            <p class="text-white">Không có phim nào.</p>
+                        </div>
+                    </div>
+                }
             </div>
         }
-
-        <!-- Footer -->
-        <footer class="footer text-center py-3 @(isAdmin ? "admin-view" : "user-view")">
-            <p class="text-white mb-0">© 2025 CinemaX. All rights reserved. | Last updated: 11:25 PM +07, May 30, 2025</p>
-        </footer>
     </div>
 </div>
 
-<!-- Add Movie Modal (Admin Only) and Edit Movie Modal -->
+<!-- Admin Modals -->
 @if (isAdmin)
 {
     <!-- Add Movie Modal -->
@@ -405,46 +348,41 @@
 <!-- CSS Styles -->
 <style>
     body {
-        background-color: #0F0F0F;
+        background-color: #1C2526; /* Màu nền Smoke Black */
         margin: 0;
-        font-family: 'Montserrat', sans-serif;
-        overflow: hidden;
-    }
-
-    .vh-100 {
-        height: 100vh;
+        font-family: 'Roboto', sans-serif;
     }
 
     .container-fluid {
         display: flex;
         width: 100%;
-        height: 100%;
+        min-height: calc(100vh - 150px); /* Adjust for navbar and footer */
     }
 
-    /* Sidebar from Room Dashboard */
+    /* Sidebar */
     .sidebar {
         width: 250px;
-        background-color: #000000; /* Black background */
-        color: #ffffff;
+        background-color: #0F1213; /* Màu Smoke Black đậm hơn */
+        color: #FFDAB9; /* Màu đào nhạt */
         height: 100vh;
         position: fixed;
         top: 0;
         left: 0;
         padding-top: 20px;
-        border-right: 2px solid #ff0033; /* Red border */
+        border-right: 1px solid #FFDAB9; /* Viền phải màu đào nhạt */
         overflow-y: auto;
         z-index: 999;
     }
 
     .sidebar-header {
         padding: 10px 20px;
-        border-bottom: 1px solid #ff0033;
+        border-bottom: 1px solid #FFDAB9;
     }
 
     .sidebar-title {
         margin: 0;
         font-size: 1.5em;
-        color: #ff0033; /* Red text */
+        color: #FFDAB9;
     }
 
     .sidebar-nav {
@@ -457,114 +395,88 @@
         display: flex;
         align-items: center;
         padding: 10px 20px;
-        color: #ffffff;
+        color: #FFDAB9;
         text-decoration: none;
     }
 
         .nav-item i {
             margin-right: 10px;
-            color: #ffffff;
+            color: #FFDAB9;
         }
 
         .nav-item:hover {
-            background-color: #ff0033;
-            color: #000000;
+            background-color: #FFDAB9;
+            color: #0F1213;
         }
 
             .nav-item:hover i {
-                color: #000000;
+                color: #0F1213;
             }
 
         .nav-item.active {
-            background-color: #ff0033;
-            color: #000000;
+            background-color: #FFDAB9;
+            color: #0F1213;
         }
 
             .nav-item.active i {
-                color: #000000;
-            }
-
-    .social-item {
-        color: #ff0033;
-    }
-
-        .social-item i {
-            color: #ff0033;
-        }
-
-        .social-item:hover {
-            background-color: #ff0033;
-            color: #000000;
-        }
-
-            .social-item:hover i {
-                color: #000000;
+                color: #0F1213;
             }
 
     .nav-divider {
-        border-top: 1px solid #ff0033;
+        border-top: 1px solid #FFDAB9;
         margin: 10px 0;
     }
 
-    /* Frame Wrapper for Admin and User Views */
+    /* Frame Wrapper */
     .frame-wrapper {
         display: flex;
         flex-direction: column;
-        height: 100%;
-        background: #2e2e2e;
+        background: rgba(51, 51, 51, 0.7); /* Semi-transparent gray */
         border-radius: 20px;
-        border: 4px solid #2e2e2e;
-        box-shadow: 0 0 25px rgba(46, 46, 46, 0.5);
-        overflow: hidden;
-        padding: 20px;
+        border: 4px solid #FFDAB9; /* Wider border */
+        box-shadow: 0 0 15px rgba(255, 218, 185, 0.3);
+        padding: 30px; /* Increased padding for wider spacing */
+        width: 90%;
+        margin-left: auto;
+        margin-right: auto;
+        margin-bottom: 20px;
     }
 
         .frame-wrapper.admin-view {
-            width: clamp(60%, calc(100% - 250px), 90%);
-            max-width: 1200px;
-            margin-left: 250px; /* Fixed margin to match sidebar width */
+            width: clamp(70%, calc(100% - 250px), 95%);
+            max-width: 1400px;
+            margin-left: 250px;
         }
 
         .frame-wrapper.user-view {
-            width: 100%;
-            max-width: 100%;
+            width: 90%;
+            max-width: 1400px;
             margin-left: 0;
             margin-right: 0;
-            padding: 0 20px;
+            padding: 30px; /* Increased padding for wider spacing */
         }
 
-    .movie-row {
-        height: calc(100% - 100px); /* Adjust height to fit within frame */
-        overflow: hidden; /* Remove scrollbar */
+    .movie-grid {
+        flex-grow: 1;
+        overflow-y: auto;
+        padding-bottom: 20px;
     }
 
-    .carousel-item .row {
-        display: flex;
-        flex-wrap: nowrap;
-        justify-content: center;
-        margin: 0 -8px;
+    .row {
+        margin: 0 -10px;
     }
 
-    .carousel-item .col-md-3, .carousel-item .col-lg-3 {
-        flex: 0 0 25%;
-        max-width: 25%;
-        padding: 0 8px;
-    }
-
-    .carousel-item .movie-card {
-        width: 100%;
-        height: 100%;
-        display: flex;
-        flex-direction: column;
+    .col-md-6, .col-lg-6 {
+        padding: 10px;
     }
 
     .title-gradient {
         font-size: 2rem;
         font-weight: 700;
-        color: #ffffff;
+        color: #FFDAB9;
         text-transform: uppercase;
         margin-bottom: 10px;
-        background: linear-gradient(90deg, #ff0033 0%, #e50914 100%);
+        background: linear-gradient(90deg, #FFDAB9 0%, #F5A89A 100%);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
     }
@@ -574,28 +486,30 @@
     }
 
     .form-select {
-        background: #1c1c1c;
-        border: 1px solid #cc0022;
-        color: #ffffff;
+        background: #0F1213;
+        border: 1px solid #FFDAB9;
+        color: #FFDAB9;
         border-radius: 8px;
         padding: 5px 10px;
     }
 
         .form-select:focus {
-            border-color: #ff0033;
-            box-shadow: 0 0 10px rgba(255, 0, 51, 0.5);
+            border-color: #F5A89A;
+            box-shadow: 0 0 10px rgba(245, 168, 154, 0.5);
         }
 
     .movie-card {
-        background: #1c1c1c;
-        border-radius: 12px;
-        border: 1px solid transparent;
-        background-image: linear-gradient(rgba(28, 28, 28, 0.9), rgba(28, 28, 28, 0.9)), linear-gradient(45deg, #e50914, #0F0F0F);
-        background-origin: border-box;
-        background-clip: padding-box, border-box;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        background: #0F1213;
+        border-radius: 15px;
+        border: 2px solid #FFDAB9;
+        box-shadow: 0 4px 15px rgba(255, 218, 185, 0.2);
         transition: transform 0.3s ease;
         overflow: hidden;
+        height: 250px; /* Increased height for a larger card */
+        width: 100%;
+        display: flex;
+        flex-direction: row;
+        align-items: stretch;
     }
 
         .movie-card:hover {
@@ -603,10 +517,12 @@
         }
 
     .poster-container {
+        width: 180px; /* Wider poster to match the image */
+        height: 100%;
         overflow: hidden;
-        border-radius: 12px 12px 0 0;
+        border-radius: 15px 0 0 15px;
         position: relative;
-        flex-shrink: 0; /* Prevent poster from shrinking */
+        flex-shrink: 0;
     }
 
         .poster-container:hover::after {
@@ -616,14 +532,14 @@
             left: 0;
             width: 100%;
             height: 100%;
-            border-radius: 12px 12px 0 0;
-            border: 2px solid rgba(255, 0, 51, 0.5);
-            box-shadow: 0 0 12px rgba(255, 0, 51, 0.3);
+            border-radius: 15px 0 0 15px;
+            border: 2px solid #F5A89A;
+            box-shadow: 0 0 10px rgba(245, 168, 154, 0.5);
         }
 
     .movie-poster {
         width: 100%;
-        height: 200px; /* Fixed poster height */
+        height: 100%;
         object-fit: cover;
         transition: transform 0.3s ease;
     }
@@ -634,17 +550,18 @@
 
     .card-body {
         padding: 15px;
-        flex-grow: 1; /* Allow body to grow to fill available space */
-        min-height: 280px; /* Fixed minimum height for consistency */
+        flex-grow: 1;
         display: flex;
         flex-direction: column;
         justify-content: space-between;
+        color: #FFDAB9;
     }
 
     .card-title {
-        font-size: 1.1rem;
+        font-size: 1.2rem;
         font-weight: 700;
-        margin-bottom: 10px;
+        margin-bottom: 8px;
+        color: #FFDAB9;
     }
 
     .text-ellipsis {
@@ -653,84 +570,61 @@
         text-overflow: ellipsis;
     }
 
-    .text-description {
-        font-size: 0.75rem;
-        color: #cccccc;
-        margin-bottom: 6px;
-        line-height: 1.3;
-    }
-
     .star-rating {
-        font-size: 0.8rem;
-        color: #ffca28;
+        font-size: 0.9rem;
+        color: #FFDAB9;
     }
 
         .star-rating .fas {
             margin-right: 2px;
         }
 
-        .star-rating .rated {
-            color: #ffca28;
+        .star-rating .text-warning {
+            color: #FFC107; /* Yellow stars */
         }
 
-        .star-rating .fa-star-half-alt {
-            color: #ffca28;
+        .star-rating .text-secondary {
+            color: #6c757d; /* Gray for empty stars */
         }
 
     .rating-text {
-        font-size: 0.7rem;
-        color: #cccccc;
+        font-size: 0.8rem;
+        color: #FFDAB9;
         margin-left: 4px;
     }
 
-    .card-footer {
-        background: transparent;
-        padding: 10px;
-        border-top: 1px solid #444;
-        flex-shrink: 0; /* Prevent footer from shrinking */
-    }
-
-    .btn-create, .btn-primary {
-        background: linear-gradient(90deg, #ff0033 0%, #e50914 100%);
+    .btn-primary {
+        background: #F5A89A;
         border: none;
         border-radius: 8px;
-        padding: 8px 15px;
+        padding: 6px 12px;
         font-size: 14px;
-        color: #ffffff;
+        color: #0F1213;
         font-weight: 600;
         transition: background 0.3s ease, transform 0.2s ease;
     }
 
-        .btn-create:hover, .btn-primary:hover {
-            background: linear-gradient(90deg, #e6002e 0%, #d30912 100%);
+        .btn-primary:hover {
+            background: #FFDAB9;
             transform: translateY(-2px);
         }
 
-    .btn-warning {
-        background-color: #ffca28;
-        color: #000;
-        border: none;
-        border-radius: 8px;
-        padding: 8px 15px;
-    }
-
-        .btn-warning:hover {
-            background-color: #ffb300;
-        }
-
     .btn-danger {
-        background-color: #ff4444;
-        color: #fff;
+        background: #DC3545;
         border: none;
         border-radius: 8px;
-        padding: 8px 15px;
+        padding: 6px 12px;
+        font-size: 14px;
+        color: #FFFFFF;
+        font-weight: 600;
+        transition: background 0.3s ease, transform 0.2s ease;
     }
 
         .btn-danger:hover {
-            background-color: #cc0000;
+            background: #C82333;
+            transform: translateY(-2px);
         }
 
-    /* Action Buttons in Admin Table */
     .action-btn {
         min-width: 80px;
         padding: 8px 12px;
@@ -741,27 +635,6 @@
         line-height: 1.5;
     }
 
-    /* Carousel Controls */
-    .carousel-control-prev,
-    .carousel-control-next {
-        width: 5%;
-        background: rgba(0, 0, 0, 0.5);
-        border-radius: 8px;
-    }
-
-    .carousel-control-prev-icon,
-    .carousel-control-next-icon {
-        background-color: #ff0033;
-        border-radius: 50%;
-        padding: 20px;
-    }
-
-    .carousel-control-prev:hover,
-    .carousel-control-next:hover {
-        background: rgba(0, 0, 0, 0.7);
-    }
-
-    /* Admin Table with Vertical Scrollbar */
     .table-container {
         max-height: calc(100vh - 300px);
         overflow-y: auto;
@@ -769,16 +642,16 @@
     }
 
     .table-custom {
-        background: #1c1c1c;
-        color: #ffffff;
+        background: #0F1213;
+        color: #FFDAB9;
         border-radius: 10px;
         overflow: hidden;
         width: 100%;
     }
 
         .table-custom th {
-            background: #ff0033;
-            color: #ffffff;
+            background: #1C2526;
+            color: #FFDAB9;
             font-weight: 600;
             padding: 12px;
             position: sticky;
@@ -788,12 +661,12 @@
 
         .table-custom td {
             padding: 12px;
-            border-bottom: 1px solid #444;
-            color: #cccccc;
+            border-bottom: 1px solid #FFDAB9;
+            color: #FFDAB9;
         }
 
         .table-custom tr:hover {
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(255, 218, 185, 0.1);
         }
 
     .table-container::-webkit-scrollbar {
@@ -801,20 +674,19 @@
     }
 
     .table-container::-webkit-scrollbar-track {
-        background: #2e2e2e;
+        background: #1C2526;
         border-radius: 10px;
     }
 
     .table-container::-webkit-scrollbar-thumb {
-        background: #ff0033;
+        background: #FFDAB9;
         border-radius: 10px;
     }
 
         .table-container::-webkit-scrollbar-thumb:hover {
-            background: #e6002e;
+            background: #F5A89A;
         }
 
-    /* Pagination */
     .pagination {
         display: flex;
         justify-content: space-between;
@@ -828,9 +700,9 @@
     }
 
     .btn-pag {
-        background: #1c1c1c;
-        color: #ffffff;
-        border: 1px solid #cc0022;
+        background: #0F1213;
+        color: #FFDAB9;
+        border: 1px solid #FFDAB9;
         padding: 5px 10px;
         border-radius: 5px;
         cursor: pointer;
@@ -839,144 +711,95 @@
 
         .btn-pag:hover,
         .btn-pag.active {
-            background: #ff0033;
-            border-color: #ff0033;
+            background: #FFDAB9;
+            color: #0F1213;
         }
 
-    /* Glow Effect */
     .glow-effect {
         transition: box-shadow 0.3s ease;
     }
 
         .glow-effect:hover {
-            box-shadow: 0 0 15px rgba(255, 0, 51, 0.5);
+            box-shadow: 0 0 15px rgba(245, 168, 154, 0.5);
         }
 
-    /* Footer */
-    .footer {
-        background: #1a1a1a;
-        border-top: 1px solid #2e2e2e;
-        border-radius: 0 0 20px 20px;
-    }
-
-        .footer.admin-view {
-            width: clamp(60%, calc(100% - 250px), 90%);
-            max-width: 1200px;
-            margin-left: 250px;
-            margin-right: auto;
-        }
-
-        .footer.user-view {
-            width: 100%;
-            max-width: 100%;
-            margin-left: 0;
-            margin-right: 0;
-        }
-
-        .footer p {
-            font-size: 12px;
-            color: #cccccc;
-        }
-
-    /* Alerts */
     .alert {
         border-radius: 8px;
         padding: 10px;
         font-size: 14px;
     }
 
-    /* Modal */
     .modal-content {
-        background: #2e2e2e;
-        color: #ffffff;
+        background: #1C2526;
+        color: #FFDAB9;
         border-radius: 15px;
     }
 
     .modal-header, .modal-body {
-        border-color: #444;
+        border-color: #FFDAB9;
     }
 
     .form-control {
-        background: #1c1c1c;
-        border: 1px solid #cc0022;
-        color: #ffffff;
+        background: #0F1213;
+        border: 1px solid #FFDAB9;
+        color: #FFDAB9;
         border-radius: 8px;
     }
 
         .form-control:focus {
-            border-color: #ff0033;
-            box-shadow: 0 0 10px rgba(255, 0, 51, 0.5);
-            background: #1c1c1c;
-            color: #ffffff;
+            border-color: #F5A89A;
+            box-shadow: 0 0 10px rgba(245, 168, 154, 0.5);
+            background: #0F1213;
+            color: #FFDAB9;
         }
 
-    /* Order Count */
     .order-count {
         font-size: 14px;
-        color: #cccccc;
+        color: #FFDAB9;
     }
 
     /* Responsive Adjustments */
     @@media (max-width: 768px) {
-        .carousel-item .col-md-3, .carousel-item .col-lg-3 {
-            flex: 0 0 50%;
-            max-width: 50%;
-        }
+        .col-md-6, .col-lg-6
 
-        .movie-poster {
-            height: 180px;
-        }
+    {
+        flex: 0 0 100%;
+        max-width: 100%;
+    }
 
-        .card-body {
-            min-height: 260px;
-        }
+    .movie-card {
+        height: auto;
+        flex-direction: column;
+    }
 
-        .card-title {
-            font-size: 1rem;
-        }
+    .poster-container {
+        width: 100%;
+        height: 250px;
+        border-radius: 15px 15px 0 0;
+    }
 
-        .text-description {
-            font-size: 0.7rem;
-        }
+    .frame-wrapper.user-view {
+        width: 95%;
+    }
 
-        .star-rating {
-            font-size: 0.75rem;
-        }
-
-        .rating-text {
-            font-size: 0.65rem;
-        }
     }
 
     @@media (max-width: 576px) {
-        .carousel-item .col-md-3, .carousel-item .col-lg-3 {
-            flex: 0 0 100%;
-            max-width: 100%;
-        }
+        .col-md-6, .col-lg-6
 
-        .movie-poster {
-            height: 160px;
-        }
+    {
+        flex: 0 0 100%;
+        max-width: 100%;
+    }
 
-        .card-body {
-            min-height: 240px;
-        }
+    .poster-container {
+        height: 200px;
+    }
 
-        .card-title {
-            font-size: 0.9rem;
-        }
+    .frame-wrapper.user-view {
+        width: 98%;
+    }
 
-        .text-description {
-            font-size: 0.65rem;
-        }
-
-        .star-rating {
-            font-size: 0.7rem;
-        }
-
-        .rating-text {
-            font-size: 0.6rem;
-        }
     }
 </style>
 
