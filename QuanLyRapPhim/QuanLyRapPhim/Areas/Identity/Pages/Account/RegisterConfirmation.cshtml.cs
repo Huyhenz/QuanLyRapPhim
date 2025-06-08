@@ -1,80 +1,101 @@
-﻿// Licensed to the .NET Foundation under one or more agreements.
-// The .NET Foundation licenses this file to you under the MIT license.
-#nullable disable
-
-using System;
-using System.Text;
+﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.AspNetCore.WebUtilities;
+using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Logging;
 using QuanLyRapPhim.Models;
 
 namespace QuanLyRapPhim.Areas.Identity.Pages.Account
 {
-    [AllowAnonymous]
     public class RegisterConfirmationModel : PageModel
     {
         private readonly UserManager<User> _userManager;
-        private readonly IEmailSender _sender;
+        private readonly SignInManager<User> _signInManager;
+        private readonly IUserStore<User> _userStore;
+        private readonly IUserEmailStore<User> _emailStore;
+        private readonly IMemoryCache _memoryCache;
+        private readonly ILogger<RegisterConfirmationModel> _logger;
 
-        public RegisterConfirmationModel(UserManager<User> userManager, IEmailSender sender)
+        public RegisterConfirmationModel(
+            UserManager<User> userManager,
+            SignInManager<User> signInManager,
+            IUserStore<User> userStore,
+            IMemoryCache memoryCache,
+            ILogger<RegisterConfirmationModel> logger)
         {
             _userManager = userManager;
-            _sender = sender;
+            _signInManager = signInManager;
+            _userStore = userStore;
+            _emailStore = GetEmailStore();
+            _memoryCache = memoryCache;
+            _logger = logger;
         }
 
-        /// <summary>
-        ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-        ///     directly from your code. This API may change or be removed in future releases.
-        /// </summary>
         public string Email { get; set; }
+        public string ReturnUrl { get; set; }
 
-        /// <summary>
-        ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-        ///     directly from your code. This API may change or be removed in future releases.
-        /// </summary>
-        public bool DisplayConfirmAccountLink { get; set; }
-
-        /// <summary>
-        ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-        ///     directly from your code. This API may change or be removed in future releases.
-        /// </summary>
-        public string EmailConfirmationUrl { get; set; }
-
-        public async Task<IActionResult> OnGetAsync(string email, string returnUrl = null)
+        public IActionResult OnGet(string email, string token, string returnUrl = null)
         {
-            if (email == null)
+            if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(token))
             {
-                return RedirectToPage("/Index");
-            }
-            returnUrl = returnUrl ?? Url.Content("~/");
-
-            var user = await _userManager.FindByEmailAsync(email);
-            if (user == null)
-            {
-                return NotFound($"Unable to load user with email '{email}'.");
+                return RedirectToPage("./Register");
             }
 
             Email = email;
-            // Once you add a real email sender, you should remove this code that lets you confirm the account
-            DisplayConfirmAccountLink = true;
-            if (DisplayConfirmAccountLink)
+            ReturnUrl = returnUrl ?? Url.Content("~/");
+
+            var cacheKey = $"ConfirmToken_{email}";
+            if (!_memoryCache.TryGetValue(cacheKey, out var cachedData))
             {
-                var userId = await _userManager.GetUserIdAsync(user);
-                var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-                code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
-                EmailConfirmationUrl = Url.Page(
-                    "/Account/ConfirmEmail",
-                    pageHandler: null,
-                    values: new { area = "Identity", userId = userId, code = code, returnUrl = returnUrl },
-                    protocol: Request.Scheme);
+                ModelState.AddModelError(string.Empty, "Liên kết xác nhận đã hết hạn hoặc không hợp lệ. Vui lòng đăng ký lại.");
+                return Page();
+            }
+
+            var cached = (dynamic)cachedData;
+            if (cached.Token != token)
+            {
+                ModelState.AddModelError(string.Empty, "Liên kết xác nhận không hợp lệ.");
+                return Page();
+            }
+
+            // Tạo tài khoản nếu token hợp lệ (không đăng nhập tự động)
+            var user = Activator.CreateInstance<User>();
+            user.FullName = cached.Name;
+            user.DateOfBirth = DateOnly.FromDateTime(cached.DOB);
+
+            _userStore.SetUserNameAsync(user, cached.Email, CancellationToken.None).GetAwaiter().GetResult();
+            _emailStore.SetEmailAsync(user, cached.Email, CancellationToken.None).GetAwaiter().GetResult();
+            var result = _userManager.CreateAsync(user, cached.Password).GetAwaiter().GetResult();
+
+            if (result.Succeeded)
+            {
+                _logger.LogInformation("User created a new account with password for {Email}", (string)cached.Email);
+                _userManager.AddToRoleAsync(user, "User").GetAwaiter().GetResult(); // Gán quyền mặc định
+
+                // Xóa cache sau khi đăng ký thành công
+                _memoryCache.Remove(cacheKey);
+
+                return Page();
+            }
+
+            foreach (var error in result.Errors)
+            {
+                ModelState.AddModelError(string.Empty, error.Description);
             }
 
             return Page();
+        }
+
+        private IUserEmailStore<User> GetEmailStore()
+        {
+            if (!_userManager.SupportsUserEmail)
+            {
+                throw new NotSupportedException("The default UI requires a user store with email support.");
+            }
+            return (IUserEmailStore<User>)_userStore;
         }
     }
 }

@@ -12,6 +12,7 @@ using Microsoft.Extensions.Logging;
 using MimeKit;
 using MailKit.Net.Smtp;
 using QuanLyRapPhim.Models;
+using System.Text.Encodings.Web;
 
 namespace QuanLyRapPhim.Areas.Identity.Pages.Account
 {
@@ -86,11 +87,11 @@ namespace QuanLyRapPhim.Areas.Identity.Pages.Account
 
             if (ModelState.IsValid)
             {
-                // Generate a unique token
+                // Tạo mã token duy nhất
                 var token = Guid.NewGuid().ToString();
                 var cacheKey = $"ConfirmToken_{Input.Email}";
 
-                // Store user input and token in cache (expires in 5 minutes)
+                // Lưu trữ thông tin người dùng trong cache (hết hạn sau 5 phút)
                 var cacheEntry = new
                 {
                     Input.Name,
@@ -101,14 +102,14 @@ namespace QuanLyRapPhim.Areas.Identity.Pages.Account
                 };
                 _memoryCache.Set(cacheKey, cacheEntry, TimeSpan.FromMinutes(5));
 
-                // Generate verification link
+                // Tạo liên kết xác nhận
                 var verificationLink = Url.Page(
-                    "/Account/ConfirmEmail",
+                    "/Account/RegisterConfirmation",
                     pageHandler: null,
                     values: new { email = Input.Email, token, returnUrl },
                     protocol: Request.Scheme);
 
-                // Send verification email
+                // Gửi email xác nhận
                 var smtpSettings = _configuration.GetSection("SmtpSettings");
                 var message = new MimeMessage();
                 message.From.Add(new MailboxAddress(smtpSettings["SenderName"], smtpSettings["SenderEmail"]));
@@ -118,8 +119,8 @@ namespace QuanLyRapPhim.Areas.Identity.Pages.Account
                 {
                     HtmlBody = $"<p>Chào {Input.Name},</p>" +
                                $"<p>Vui lòng xác nhận đăng ký tài khoản bằng cách nhấp vào liên kết sau:</p>" +
-                               $"<p><a href='{verificationLink}'>Xác nhận đăng ký</a></p>" +
-                               $"<p>Liên kết này có hiệu lực trong 5 phút.</p>" +
+                               $"<p><a href='{HtmlEncoder.Default.Encode(verificationLink)}'>Xác nhận đăng ký</a></p>" +
+                               $"<p>Liên kết này có hiệu lực trong 5 phút (gửi lúc 06:12 PM +07 on Sunday, June 08, 2025).</p>" +
                                $"<p>Trân trọng,<br/>Đội ngũ CinemaX</p>"
                 };
                 message.Body = bodyBuilder.ToMessageBody();
@@ -140,7 +141,7 @@ namespace QuanLyRapPhim.Areas.Identity.Pages.Account
                     return Page();
                 }
 
-                // Redirect to ConfirmEmail page to show "check your email" message
+                // Chuyển hướng đến trang ConfirmEmail
                 return RedirectToPage("./ConfirmEmail", new { email = Input.Email, returnUrl });
             }
 
