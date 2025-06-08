@@ -12,14 +12,26 @@
         <div class="left-section">
             <div class="card shadow-lg border-0 register-card p-4">
                 <h2 class="mb-3 text-white">Xác nhận Email</h2>
-                <p class="text-white">Một email chứa liên kết xác nhận đã được gửi đến <strong>@Model.Email</strong>. Vui lòng kiểm tra hộp thư (bao gồm thư mục spam) và nhấp vào liên kết để hoàn tất đăng ký. Liên kết có hiệu lực trong 5 phút.</p>
-                <div asp-validation-summary="All" class="text-danger" role="alert"></div>
-                <!-- Liên kết gửi lại email -->
-                <div class="text-center">
-                    <p class="text-white">
-                        Không nhận được email? <a asp-page="./Register" asp-route-returnUrl="@Model.ReturnUrl" class="text-light-red">Gửi lại liên kết</a>
-                    </p>
-                </div>
+                @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+                {
+                    <p class="text-danger">@Model.ErrorMessage</p>
+                    <div class="text-center">
+                        <p class="text-white">
+                            <a asp-page="./Register" asp-route-returnUrl="@Model.ReturnUrl" class="text-light-red">Quay lại đăng ký</a>
+                        </p>
+                    </div>
+                }
+                else
+                {
+                    <p class="text-white">Một email chứa liên kết xác nhận đã được gửi đến <strong>@Model.Email</strong>. Vui lòng kiểm tra hộp thư (bao gồm thư mục spam) và nhấp vào liên kết để hoàn tất đăng ký. Liên kết có hiệu lực trong 5 phút.</p>
+                    <div asp-validation-summary="All" class="text-danger" role="alert"></div>
+                    <!-- Liên kết gửi lại email -->
+                    <div class="text-center">
+                        <p class="text-white">
+                            Không nhận được email? <a asp-page="./Register" asp-route-returnUrl="@Model.ReturnUrl" class="text-light-red">Gửi lại liên kết</a>
+                        </p>
+                    </div>
+                }
             </div>
         </div>
 

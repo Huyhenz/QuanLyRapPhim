@@ -10,6 +10,11 @@
         public bool Success { get; set; }
         public string Token { get; set; }
         public string VnPayResponseCode { get; set; }
+        public int BookingId { get; set; }
+        public int ShowtimeId { get; set; }
+        public DateTime BookingDate { get; set; }
+        public string Title { get; set; }
+        public List<int> SeatIds { get; set; }
 
     }
 }

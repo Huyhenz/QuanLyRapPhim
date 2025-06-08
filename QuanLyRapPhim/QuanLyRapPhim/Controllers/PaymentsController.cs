@@ -44,7 +44,7 @@ namespace QuanLyRapPhim.Controllers
         [HttpGet]
         public async Task<IActionResult> PaymentCallbackVnpay()
         {
-            _logger.LogInformation("PaymentCallbackVnpay called at {Time}", DateTime.Now); // 11:06 PM +07, May 25, 2025
+            _logger.LogInformation("PaymentCallbackVnpay called at {Time}", DateTime.Now);
 
             var response = _vnPayService.PaymentExecute(Request.Query);
 
@@ -62,7 +62,7 @@ namespace QuanLyRapPhim.Controllers
 
             // Find the booking
             var booking = await _context.Bookings
-                .AsNoTracking() // Prevent entity tracking issues
+                .AsNoTracking()
                 .FirstOrDefaultAsync(b => b.BookingId == bookingId);
             if (booking == null)
             {
@@ -71,6 +71,18 @@ namespace QuanLyRapPhim.Controllers
             }
 
             _logger.LogInformation("Booking found: BookingId={BookingId}, TotalPrice={TotalPrice}", booking.BookingId, booking.TotalPrice);
+
+            // Retrieve SeatIds from BookingDetails
+            var bookingDetails = await _context.BookingDetails
+                .Where(bd => bd.BookingId == bookingId)
+                .Select(bd => bd.SeatId)
+                .ToListAsync();
+
+            _logger.LogInformation("Retrieved {SeatCount} SeatIds for BookingId: {BookingId}", bookingDetails.Count, bookingId);
+
+            // Store BookingId and SeatIds in ViewBag
+            ViewBag.BookingId = bookingId;
+            ViewBag.SeatIds = bookingDetails;
 
             using (var transaction = await _context.Database.BeginTransactionAsync())
             {
@@ -85,7 +97,7 @@ namespace QuanLyRapPhim.Controllers
                             BookingId = bookingId,
                             Amount = booking.TotalPrice,
                             PaymentMethod = "VNPay",
-                            PaymentDate = DateTime.Now, // 11:06 PM +07, May 25, 2025
+                            PaymentDate = DateTime.Now,
                             PaymentStatus = response.Success ? "Completed" : "Failed"
                         };
                         _context.Payments.Add(payment);
@@ -120,8 +132,8 @@ namespace QuanLyRapPhim.Controllers
                 }
             }
 
-            // Redirect to the VNPayResponse view with the response data
-            return View("VNPayResponse", response);
+            // Pass the response to the VNPayResponse view
+            return View("PaymentCallbackVnpay", response);
         }
 
         // GET: Payments

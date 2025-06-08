@@ -1,4 +1,7 @@
 ﻿@model QuanLyRapPhim.Models.VNPay.PaymentResponseModel
+@using System.Net.Mail
+@using Microsoft.Extensions.Configuration
+@inject IConfiguration Configuration
 
 @{
     ViewData["Title"] = "Thanh toán VNPAY";
@@ -7,6 +10,50 @@
     var orderDescriptionParts = Model.OrderDescription.Split(" Thanh toán VNPay ");
     var email = orderDescriptionParts.Length > 0 ? orderDescriptionParts[0] : "Không xác định";
     var amount = orderDescriptionParts.Length > 1 ? orderDescriptionParts[1] : "Không xác định";
+
+    // Send email notification
+    try
+    {
+        var smtpSettings = Configuration.GetSection("SmtpSettings");
+        var senderEmail = smtpSettings["SenderEmail"];
+        var senderName = smtpSettings["SenderName"];
+        var smtpServer = smtpSettings["Server"];
+        var smtpPort = int.Parse(smtpSettings["Port"]);
+        var username = smtpSettings["Username"];
+        var password = smtpSettings["Password"];
+
+        using (var client = new SmtpClient(smtpServer, smtpPort))
+        {
+            client.EnableSsl = true;
+            client.Credentials = new System.Net.NetworkCredential(username, password);
+
+            var mailMessage = new MailMessage
+{
+            From = new MailAddress(senderEmail, senderName),
+            Subject = "Thông báo thanh toán VNPAY",
+            Body = $@"<h2>Thông báo thanh toán VNPAY</h2>
+            <p>Cảm ơn bạn đã thanh toán tại CinemaX!</p>
+            <p>Chi tiết giao dịch:</p>
+            <ul>
+                <li><strong>Mã giao dịch:</strong> {Model.TransactionId}</li>
+                <li><strong>Email:</strong> {email}</li>
+                <li><strong>Số tiền:</strong> {amount} VNĐ</li>
+                <li><strong>Cách thức thanh toán:</strong> {Model.PaymentMethod}</li>
+                <li><strong>Tình trạng:</strong> {(Model.Success ? "Thành công" : "Thất bại@")}</li>
+            </ul>
+            <p>Truy cập <a href=""http://localhost:5082/Movies/Index"">CinemaX</a> để xem thêm các bộ phim!</p>",
+            IsBodyHtml = true
+            };
+            mailMessage.To.Add(email);
+
+            client.Send(mailMessage);
+        }
+    }
+    catch (Exception ex)
+    {
+        // Log the error (you can replace this with proper logging)
+        Console.WriteLine($"Error sending email: {ex.Message}");
+    }
 }
 
 <div class="container my-5">
@@ -16,8 +63,6 @@
                 <div class="card-body">
                     <h5 class="title-gradient mb-4">Thanh toán VNPAY @(Model.Success ? "Thành công" : "Thất bại")</h5>
                     <dl class="row">
-                        @* <dt class="col-sm-4 text-muted">Mã đặt vé</dt> *@
-                        @* <dd class="col-sm-8">@(ViewBag.BookingId ?? "Không xác định")</dd> *@
                         <dt class="col-sm-4 text-muted">Mã giao dịch</dt>
                         <dd class="col-sm-8">@Model.TransactionId</dd>
 
@@ -29,8 +74,6 @@
 
                         <dt class="col-sm-4 text-muted">Cách thức thanh toán</dt>
                         <dd class="col-sm-8">@Model.PaymentMethod</dd>
-
-                        
 
                         <dt class="col-sm-4 text-muted">Tình trạng</dt>
                         <dd class="col-sm-8">@(Model.Success ? "Thành công" : "Thất bại")</dd>
