@@ -7,9 +7,7 @@
 
 <!-- Đăng ký -->
 <div class="container-fluid vh-100 d-flex align-items-center justify-content-center position-relative overflow-hidden">
-    <!-- Khung bao quanh -->
     <div class="frame-wrapper">
-        <!-- Form đăng ký bên trái -->
         <div class="left-section">
             <div class="card shadow-lg border-0 register-card p-4">
                 <h2 class="mb-3 text-white">Đăng ký</h2>
@@ -19,21 +17,21 @@
                     <!-- Name -->
                     <div class="mb-3">
                         <label asp-for="Input.Name" class="form-label text-white">Họ và tên</label>
-                        <input asp-for="Input.Name" class="form-control" placeholder="Họ và tên" />
+                        <input asp-for="Input.Name" class="form-control" placeholder="Enter your full name" />
                         <span asp-validation-for="Input.Name" class="text-danger"></span>
                     </div>
 
                     <!-- Date of Birth -->
                     <div class="mb-3">
                         <label asp-for="Input.DOB" class="form-label text-white">Ngày sinh</label>
-                        <input asp-for="Input.DOB" type="date" class="form-control" placeholder="Ngày sinh" />
+                        <input asp-for="Input.DOB" type="date" class="form-control" placeholder="Select date of birth" />
                         <span asp-validation-for="Input.DOB" class="text-danger"></span>
                     </div>
 
                     <!-- Email -->
                     <div class="mb-3">
                         <label asp-for="Input.Email" class="form-label text-white">Email</label>
-                        <input asp-for="Input.Email" class="form-control" autocomplete="username" aria-required="true" placeholder="username@gmail.com" />
+                        <input asp-for="Input.Email" class="form-control" autocomplete="username" aria-required="true" placeholder="username@example.com" />
                         <span asp-validation-for="Input.Email" class="text-danger"></span>
                     </div>
 
@@ -64,7 +62,6 @@
                     </div>
                 </form>
 
-                <!-- Đăng ký bằng dịch vụ bên ngoài -->
                 @if ((Model.ExternalLogins?.Count ?? 0) > 0)
                 {
                     <hr class="my-4 border-light" />
@@ -83,7 +80,6 @@
             </div>
         </div>
 
-        <!-- Phần hình ảnh bên phải -->
         <div class="right-section">
             <div class="intro-text">
                 <h2 class="text-white">CinemaX</h2>
@@ -94,9 +90,9 @@
 </div>
 
 <!-- CSS tùy chỉnh -->
-<style>
+<style scoped>
     body {
-        background-color: #0F0F0F; /* Đen */
+        background-color: #0F0F0F;
         margin: 0;
         font-family: 'Montserrat', sans-serif;
         overflow: hidden;
@@ -114,20 +110,18 @@
         justify-content: center;
     }
 
-    /* Khung bao quanh */
     .frame-wrapper {
         display: flex;
         width: 90%;
         max-width: 1200px;
         height: 80%;
-        background: #2e2e2e; /* Nền sáng hơn */
+        background: #2e2e2e;
         border-radius: 15px;
-        border: 4px solid #2e2e2e; /* Viền cùng màu với nền */
-        box-shadow: 0 0 20px rgba(46, 46, 46, 0.4); /* Bóng đổ khớp với nền */
+        border: 4px solid #2e2e2e;
+        box-shadow: 0 0 20px rgba(46, 46, 46, 0.4);
         overflow: hidden;
     }
 
-    /* Phần form bên trái */
     .left-section {
         flex: 1;
         display: flex;
@@ -163,7 +157,7 @@
         padding: 12px;
         font-size: 16px;
         border: 1px solid #cc0022;
-        background: #2a2a2a;
+        background: #2a2e2e;
         color: #ffffff;
         transition: border-color 0.3s ease, box-shadow 0.3s ease;
     }
@@ -249,10 +243,9 @@
         border-color: #cc0022 !important;
     }
 
-    /* Phần hình ảnh bên phải */
     .right-section {
         flex: 1;
-        background: url('https://i.pinimg.com/originals/40/21/94/402194c8db6bf41861c1aef74a457117.gif') no-repeat center center/cover; /* Sử dụng ảnh từ form đăng nhập */
+        background: url('https://i.pinimg.com/originals/40/21/94/402194c8db6bf41861c1aef74a457117.gif') no-repeat center center/cover;
         position: relative;
         display: flex;
         align-items: center;
