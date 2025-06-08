@@ -3,13 +3,11 @@ using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
 using QuanLyRapPhim.Data;
 using QuanLyRapPhim.Models;
-using QuanLyRapPhim.Service.Momo;
 using QuanLyRapPhim.Service.VNPay;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.Configure<MomoOptionModel>(builder.Configuration.GetSection("MomoAPI"));
-builder.Services.AddScoped<IMomoService, MomoService>();
+//builder.Services.Configure<MomoOptionModel>(builder.Configuration.GetSection("MomoAPI"));
 
 
 

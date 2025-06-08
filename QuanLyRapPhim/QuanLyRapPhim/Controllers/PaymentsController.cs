@@ -9,7 +9,6 @@ using Microsoft.EntityFrameworkCore;
 using QuanLyRapPhim.Data;
 using QuanLyRapPhim.Models;
 using QuanLyRapPhim.Models.VNPay;
-using QuanLyRapPhim.Service.Momo;
 using QuanLyRapPhim.Service.VNPay;
 using Microsoft.Extensions.Logging;
 using Microsoft.EntityFrameworkCore.Storage; // For transaction management
@@ -19,16 +18,14 @@ namespace QuanLyRapPhim.Controllers
     public class PaymentsController : Controller
     {
         private readonly IVnPayService _vnPayService;
-        private readonly IMomoService _momoService;
         private readonly DBContext _context;
         private readonly UserManager<User> _userManager;
         private readonly ILogger<PaymentsController> _logger;
 
-        public PaymentsController(DBContext context, UserManager<User> userManager, IMomoService momoService, IVnPayService vnPayService, ILogger<PaymentsController> logger)
+        public PaymentsController(DBContext context, UserManager<User> userManager, IVnPayService vnPayService, ILogger<PaymentsController> logger)
         {
             _context = context;
             _userManager = userManager;
-            _momoService = momoService;
             _vnPayService = vnPayService;
             _logger = logger;
         }
@@ -125,21 +122,6 @@ namespace QuanLyRapPhim.Controllers
 
             // Redirect to the VNPayResponse view with the response data
             return View("VNPayResponse", response);
-        }
-
-        [HttpPost]
-        [Route("CreatePaymentUrl")]
-        public async Task<IActionResult> CreatePaymentMomo(OrderInfoModel model)
-        {
-            var response = await _momoService.CreatePaymentMomo(model);
-            return Redirect(response.PayUrl);
-        }
-
-        [HttpGet]
-        public IActionResult PaymentCallBack()
-        {
-            var response = _momoService.PaymentExecuteAsync(HttpContext.Request.Query);
-            return View(response);
         }
 
         // GET: Payments
