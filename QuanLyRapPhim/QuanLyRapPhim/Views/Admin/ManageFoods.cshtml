@@ -1,0 +1,552 @@
+﻿@{
+    ViewData["Title"] = "Quản lý đồ ăn & nước uống";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" />
+    <style>
+        body {
+            margin: 0;
+            background-color: #0F0F0F;
+            color: #ffffff;
+            font-family: 'Montserrat', sans-serif;
+            overflow-x: hidden;
+        }
+
+        .admin-dashboard {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 250px;
+            background-color: #000000;
+            color: #ffffff;
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            padding-top: 20px;
+            border-right: 2px solid #ff0033;
+            overflow-y: auto;
+            z-index: 1000;
+        }
+
+        .sidebar-header {
+            padding: 10px 20px;
+            border-bottom: 1px solid #ff0033;
+        }
+
+        .sidebar-title {
+            margin: 0;
+            font-size: 1.5em;
+            color: #ff0033;
+        }
+
+        .sidebar-nav {
+            list-style: none;
+            padding: 0;
+            margin: 20px 0;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 10px 20px;
+            color: #ffffff;
+            text-decoration: none;
+        }
+
+            .nav-item i {
+                margin-right: 10px;
+                color: #ffffff;
+            }
+
+            .nav-item:hover {
+                background-color: #ff0033;
+                color: #000000;
+            }
+
+                .nav-item:hover i {
+                    color: #000000;
+                }
+
+            .nav-item.active {
+                background-color: #ff0033;
+                color: #000000;
+            }
+
+                .nav-item.active i {
+                    color: #000000;
+                }
+
+        .content {
+            margin-left: 250px;
+            padding: 20px;
+            flex-grow: 1;
+            display: flex;
+            justify-content: flex-start;
+            align-items: flex-start;
+            min-height: 100vh;
+        }
+
+        .content-inner {
+            width: 100%;
+        }
+
+        .page-title {
+            background-color: #1c1c1c;
+            color: #fff;
+            padding: 15px;
+            text-align: center;
+            border-radius: 15px;
+            font-weight: 700;
+            text-transform: uppercase;
+            margin-bottom: 20px;
+        }
+
+        .glow-effect {
+            box-shadow: 0 0 15px rgba(255, 0, 51, 0.3);
+            transition: box-shadow 0.3s ease, transform 0.3s ease;
+        }
+
+            .glow-effect:hover {
+                box-shadow: 0 0 25px rgba(255, 0, 51, 0.5);
+                transform: translateY(-2px);
+            }
+
+        .table-dark {
+            background-color: #1c1c1c;
+            border-radius: 15px;
+            overflow: hidden;
+            width: 100%;
+            border-collapse: collapse;
+            table-layout: fixed;
+        }
+
+            .table-dark th, .table-dark td {
+                border: 1px solid #444;
+                padding: 12px;
+                text-align: center;
+                font-size: 0.95rem;
+                color: white;
+                vertical-align: middle;
+            }
+
+            .table-dark th {
+                background-color: #2a2a2a;
+                font-weight: 600;
+                position: sticky;
+                top: 0;
+                z-index: 10;
+            }
+
+            .table-dark tr:hover td {
+                background-color: #2a2a2a;
+            }
+
+            .table-dark td img {
+                border-radius: 8px;
+                object-fit: cover;
+            }
+
+        .badge {
+            padding: 5px 10px;
+            font-size: 0.85rem;
+            border-radius: 8px;
+            white-space: nowrap;
+        }
+
+        .bg-success {
+            background-color: #28a745;
+        }
+
+        .bg-warning {
+            background-color: #ffc107;
+            color: #000;
+        }
+
+        .bg-primary {
+            background-color: #0d6efd;
+        }
+
+        .bg-info {
+            background-color: #17a2b8;
+        }
+
+        .text-warning {
+            color: #ffc107 !important;
+        }
+
+        .btn-success, .btn-primary, .btn-warning, .btn-danger {
+            border-radius: 20px;
+            font-weight: 600;
+        }
+
+        .modal-content {
+            background-color: #1c1c1c;
+            color: #fff;
+            border: 1px solid #ff0033;
+            border-radius: 15px;
+        }
+
+        .modal-header, .modal-footer {
+            border-color: #ff0033;
+        }
+
+        .form-control, .form-select {
+            background-color: #2a2a2a;
+            border: 1px solid #ff0033;
+            color: #fff;
+        }
+
+            .form-control:focus, .form-select:focus {
+                background-color: #333;
+                border-color: #ff0033;
+                box-shadow: 0 0 0 0.2rem rgba(255, 0, 51, 0.25);
+                color: #fff;
+            }
+
+        .text-muted {
+            color: #b3b3b3 !important;
+        }
+
+        .img-thumbnail {
+            max-height: 80px;
+        }
+
+        .alert {
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .alert-success {
+            background-color: #1c1c1c;
+            color: #28a745;
+            border-color: #28a745;
+        }
+
+        .alert-danger {
+            background-color: #1c1c1c;
+            color: #dc3545;
+            border-color: #dc3545;
+        }
+
+        @@media (max-width: 768px) {
+            .sidebar
+
+        {
+            width: 200px;
+        }
+
+        .content {
+            margin-left: 200px;
+        }
+
+        }
+        @@media (max-width: 576px) {
+            .admin-dashboard
+
+        {
+            flex-direction: column;
+        }
+
+        .sidebar {
+            position: relative;
+            width: 100%;
+            height: auto;
+        }
+
+        .content {
+            margin-left: 0;
+            width: 100%;
+        }
+
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-dashboard">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h3 class="sidebar-title">CinemaX Admin</h3>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="/Movies" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Movies" ? "active" : "")"><i class="fas fa-film"></i> Quản lý phim</a>
+                <a href="/Showtimes" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Showtimes" ? "active" : "")"><i class="fas fa-clock"></i> Quản lý lịch chiếu</a>
+                <a href="/Rooms" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Rooms" ? "active" : "")"><i class="fas fa-door-open"></i> Quản lý phòng</a>
+                <a href="/Seats" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Seats" ? "active" : "")"><i class="fas fa-chair"></i> Quản lý ghế</a>
+                <a href="/Admin/ManageFoods" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "ManageFoods" ? "active" : "")"><i class="fas fa-utensils"></i> Quản lý đồ ăn</a>
+                <a href="/Admin/ManageBookings" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Admin" && ViewContext.RouteData.Values["Action"]?.ToString() == "ManageBookings" ? "active" : "")"><i class="fas fa-ticket-alt"></i> Quản lý đặt vé</a>
+                <a href="/Admin/RevenueStatistics" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Admin" && ViewContext.RouteData.Values["Action"]?.ToString() == "RevenueStatistics" ? "active" : "")"><i class="fas fa-chart-bar"></i> Báo cáo thống kê</a>
+                <div class="nav-divider"></div>
+                <a href="#" class="nav-item">Facebook</a>
+                <a href="#" class="nav-item">Twitter</a>
+                <a href="#" class="nav-item">Google</a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="content">
+            <div class="content-inner">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2 class="page-title">Quản lý đồ ăn & nước uống</h2>
+                    <button class="btn btn-success rounded-pill px-4 glow-effect" data-bs-toggle="modal" data-bs-target="#createFoodModal">
+                        Thêm món mới
+                    </button>
+                </div>
+
+                <div id="alert-container"></div>
+
+                <div class="table-responsive">
+                    <table class="table table-dark table-striped glow-effect" id="foodsTable">
+                        <thead class="table-danger">
+                            <tr>
+                                <th style="width: 80px;">Ảnh</th>
+                                <th>Tên món</th>
+                                <th style="width: 60px;">Size</th>
+                                <th style="width: 120px;">Giá</th>
+                                <th style="width: 100px;">Loại</th>
+                                <th style="width: 140px;" class="text-center">Hành động</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal: Create -->
+    <div class="modal fade" id="createFoodModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <form id="createFoodForm" enctype="multipart/form-data">
+                <div class="modal-content">
+                    <div class="modal-header border-secondary">
+                        <h5 class="modal-title">Thêm món mới</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Tên món</label>
+                                <input type="text" name="Name" class="form-control" required />
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Kích thước</label>
+                                <select name="Size" class="form-select">
+                                    <option value="S">S</option>
+                                    <option value="M" selected>M</option>
+                                    <option value="L">L</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Giá (VNĐ)</label>
+                                <input type="number" name="Price" class="form-control" min="0" required />
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Loại</label>
+                                <select name="Category" class="form-select">
+                                    <option value="Bắp">Bắp rang</option>
+                                    <option value="Nước">Nước uống</option>
+                                    <option value="Combo">Combo</option>
+                                </select>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">Hình ảnh</label>
+                                <input type="file" name="imageFile" class="form-control" accept="image/*" />
+                                <small class="text-muted">Tối đa 2MB, JPG/PNG</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer border-secondary">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                        <button type="submit" class="btn btn-success">Thêm</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal: Edit -->
+    <div class="modal fade" id="editFoodModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <form id="editFoodForm" enctype="multipart/form-data">
+                <input type="hidden" name="foodItemId" />
+                <div class="modal-content">
+                    <div class="modal-header border-secondary">
+                        <h5 class="modal-title">Sửa món ăn</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Tên món</label>
+                                <input type="text" name="name" class="form-control" required />
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Kích thước</label>
+                                <select name="size" class="form-select">
+                                    <option value="S">S</option>
+                                    <option value="M">M</option>
+                                    <option value="L">L</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Giá (VNĐ)</label>
+                                <input type="number" name="price" class="form-control" min="0" step="1000" required />
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Loại</label>
+                                <select name="category" class="form-select">
+                                    <option value="Bắp">Bắp rang</option>
+                                    <option value="Nước">Nước uống</option>
+                                    <option value="Combo">Combo</option>
+                                </select>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">Hình ảnh hiện tại</label>
+                                <div id="currentImage" class="mb-2"></div>
+                                <input type="file" name="imageFile" class="form-control" accept="image/*" />
+                                <small class="text-muted">Để trống nếu không đổi</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer border-secondary">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                        <button type="submit" class="btn btn-primary">Cập nhật</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    @section Scripts {
+        <script>
+            function showAlert(msg, type = 'success') {
+                $('#alert-container').html(`
+                    <div class="alert alert-${type} alert-dismissible fade show" role="alert">
+                        ${msg}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>`);
+                setTimeout(() => $('.alert').alert('close'), 4000);
+            }
+
+            function loadFoods() {
+                $.get('/Admin/GetFoodItems', data => {
+                    $('#foodsTable tbody').empty();
+                    data.forEach(f => {
+                        const img = f.imageUrl
+                            ? `<img src="${f.imageUrl}" class="img-thumbnail" style="width:50px;height:50px;object-fit:cover;">`
+                            : `<div class="bg-secondary text-white d-flex align-items-center justify-content-center rounded" style="width:50px;height:50px;"><i class="fas fa-utensils"></i></div>`;
+                        const badge = f.category === 'Combo' ? 'warning' : f.category === 'Bắp' ? 'success' : 'primary';
+                        $('#foodsTable tbody').append(`
+                            <tr data-id="${f.foodItemId}">
+                                <td>${img}</td>
+                                <td class="fw-bold">${f.name}</td>
+                                <td><span class="badge bg-info">${f.size}</span></td>
+                                <td class="text-warning">${f.price.toLocaleString()}đ</td>
+                                <td><span class="badge bg-${badge}">${f.category}</span></td>
+                                <td class="text-center">
+                                    <button class="btn btn-warning btn-sm edit-btn me-1 glow-effect">Sửa</button>
+                                    <button class="btn btn-danger btn-sm delete-btn glow-effect">Xóa</button>
+                                </td>
+                            </tr>
+                        `);
+                    });
+                }).fail(() => showAlert('Lỗi tải dữ liệu!', 'danger'));
+            }
+
+            // Create
+            $('#createFoodForm').submit(function (e) {
+                e.preventDefault();
+                const formData = new FormData(this);
+                $.ajax({
+                    url: '/Admin/CreateFood',
+                    type: 'POST',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: res => {
+                        if (res.success) {
+                            $('#createFoodModal').modal('hide');
+                            this.reset();
+                            loadFoods();
+                            showAlert(res.message);
+                        } else {
+                            showAlert(res.message, 'danger');
+                        }
+                    },
+                    error: () => showAlert('Lỗi server!', 'danger')
+                });
+            });
+
+            // Edit - Load data
+            $(document).on('click', '.edit-btn', function () {
+                const id = $(this).closest('tr').data('id');
+                $.get('/Admin/GetFoodItem?id=' + id, food => {
+                    $('#editFoodForm [name="foodItemId"]').val(food.foodItemId);
+                    $('#editFoodForm [name="name"]').val(food.name);
+                    $('#editFoodForm [name="size"]').val(food.size);
+                    $('#editFoodForm [name="price"]').val(food.price);
+                    $('#editFoodForm [name="category"]').val(food.category);
+                    $('#currentImage').html(
+                        food.imageUrl
+                            ? `<img src="${food.imageUrl}" class="img-thumbnail" style="max-height: 80px;">`
+                            : '<em class="text-muted">Không có ảnh</em>'
+                    );
+                    $('#editFoodModal').modal('show');
+                }).fail(() => showAlert('Lỗi tải món ăn!', 'danger'));
+            });
+
+            // Edit - Submit
+            $('#editFoodForm').submit(function (e) {
+                e.preventDefault();
+                const formData = new FormData(this);
+                $.ajax({
+                    url: '/Admin/EditFood',
+                    type: 'POST',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: res => {
+                        if (res.success) {
+                            $('#editFoodModal').modal('hide');
+                            loadFoods();
+                            showAlert(res.message);
+                        } else {
+                            showAlert(res.message || 'Cập nhật thất bại!', 'danger');
+                        }
+                    },
+                    error: () => showAlert('Lỗi server!', 'danger')
+                });
+            });
+
+            // Delete
+            $(document).on('click', '.delete-btn', function () {
+                const id = $(this).closest('tr').data('id');
+                if (confirm('Xóa món ăn này? Dữ liệu sẽ mất vĩnh viễn!')) {
+                    $.post('/Admin/DeleteFood', { id }, res => {
+                        if (res.success) {
+                            loadFoods();
+                            showAlert(res.message);
+                        } else {
+                            showAlert(res.message || 'Xóa thất bại!', 'danger');
+                        }
+                    }).fail(() => showAlert('Lỗi xóa!', 'danger'));
+                }
+            });
+
+            // Load on start
+            $(document).ready(loadFoods);
+        </script>
+    }
+</body>
+</html>

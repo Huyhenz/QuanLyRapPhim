@@ -8,10 +8,11 @@ namespace QuanLyRapPhim.Models
         public int BookingId { get; set; }
         public int ShowtimeId { get; set; }
         public DateTime BookingDate { get; set; }
-        public decimal TotalPrice { get; set; }
-        public string? UserId { get; set; } // Thêm trường UserId
-        public User? User { get; set; } // Thêm mối quan hệ với User
+        public decimal TotalPrice { get; set; } // Bao gồm cả vé + đồ ăn
+        public string? UserId { get; set; }
+        public User? User { get; set; }
         public Showtime? Showtime { get; set; }
         public ICollection<BookingDetail>? BookingDetails { get; set; }
+        public ICollection<BookingFood>? BookingFoods { get; set; } // Thêm
     }
 }

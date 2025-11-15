@@ -1,0 +1,312 @@
+﻿@model QuanLyRapPhim.Models.Showtime
+@{
+    ViewData["Title"] = "Chọn đồ ăn & nước uống";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var bookingId = TempData["BookingId"];
+    var selectedSeats = TempData["SelectedSeats"] as string ?? "Chưa chọn";
+    var seatCount = TempData["SeatCount"] as int? ?? 0;
+}
+
+<div class="container my-5">
+    <!-- Thông tin phim và lịch chiếu -->
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1 class="text-white mb-2 title-gradient">Chọn đồ ăn & nước uống</h1>
+            <h4 class="text-muted mb-3">Phim: @Model.Movie.Title</h4>
+            <div class="d-flex flex-wrap text-light">
+                <p class="me-4">
+                    <i class="fas fa-door-open text-primary me-2"></i>
+                    <strong>Phòng:</strong> @Model.Room.RoomName
+                </p>
+                <p class="me-4">
+                    <i class="fas fa-calendar-alt text-primary me-2"></i>
+                    <strong>Ngày chiếu:</strong> @Model.Date.ToString("dd/MM/yyyy")
+                </p>
+                <p>
+                    <i class="fas fa-clock text-primary me-2"></i>
+                    <strong>Giờ chiếu:</strong> @Model.StartTime.ToString(@"hh\:mm")
+                </p>
+            </div>
+            <p class="text-success">
+                <i class="fas fa-chair text-warning me-2"></i>
+                <strong>Ghế đã chọn:</strong> @selectedSeats (@seatCount ghế)
+            </p>
+        </div>
+        <div class="col-md-4 text-end">
+            <a asp-action="SelectRoomAndSeat"
+               asp-route-showtimeId="@Model.ShowtimeId"
+               class="btn btn-secondary glow-effect">
+                Quay lại chọn ghế
+            </a>
+        </div>
+    </div>
+
+    <!-- Thông báo -->
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger glow-effect" role="alert">
+            @TempData["ErrorMessage"]
+        </div>
+    }
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success glow-effect" role="alert">
+            @TempData["SuccessMessage"]
+        </div>
+    }
+
+    <!-- Form chọn đồ ăn -->
+    <form asp-action="ConfirmFood" method="post">
+        <input type="hidden" name="bookingId" value="@bookingId" />
+        <input type="hidden" name="showtimeId" value="@Model.ShowtimeId" />
+
+        <!-- Màn hình chiếu (giữ nguyên phong cách) -->
+        <div class="screen-container text-center mb-5">
+            <div class="screen title-gradient glow-effect">
+                <span class="screen-label">Quầy đồ ăn</span>
+            </div>
+        </div>
+
+        <!-- Danh sách món ăn -->
+        <div class="row g-4 mb-5">
+            @foreach (var food in ViewBag.FoodItems as List<QuanLyRapPhim.Models.FoodItem>)
+            {
+                <div class="col-md-6 col-lg-4 col-xl-3">
+                    <div class="card h-100 food-card glow-effect @(food.Category == "Combo" ? "border-warning" : food.Category == "Bắp" ? "border-success" : "border-primary")">
+                        @if (!string.IsNullOrEmpty(food.ImageUrl))
+                        {
+                            <img src="@food.ImageUrl" class="card-img-top" alt="@food.Name" style="height:160px; object-fit:cover; border-radius:15px 15px 0 0;" />
+                        }
+                        else
+                        {
+                            <div class="bg-dark text-center p-5 d-flex align-items-center justify-content-center" style="height:160px;">
+                                <i class="fas fa-utensils fa-3x text-muted"></i>
+                            </div>
+                        }
+                        <div class="card-body d-flex flex-column p-3">
+                            <h6 class="card-title mb-1 fw-bold">@food.Name</h6>
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="badge bg-info">@food.Size</span>
+                                <span class="badge @(food.Category == "Combo" ? "bg-warning text-dark" : food.Category == "Bắp" ? "bg-success" : "bg-primary")">
+                                    @food.Category
+                                </span>
+                            </div>
+                            <p class="card-text text-warning fw-bold mb-3">@food.Price.ToString("N0")đ</p>
+                            <div class="input-group mt-auto">
+                                <button type="button" class="btn btn-outline-secondary btn-sm minus glow-effect">-</button>
+                                <input type="number"
+                                       name="quantities[@food.FoodItemId]"
+                                       value="0"
+                                       min="0"
+                                       max="10"
+                                       class="form-control text-center qty fw-bold"
+                                       style="max-width:70px;" />
+                                <button type="button" class="btn btn-outline-secondary btn-sm plus glow-effect">+</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <!-- Chú thích loại món -->
+        <div class="seat-legend text-center mb-4">
+            <p class="text-light">
+                <span class="badge bg-success me-2 glow-effect">Bắp rang</span>
+                <span class="badge bg-primary me-2 glow-effect">Nước uống</span>
+                <span class="badge bg-warning text-dark me-2 glow-effect">Combo</span>
+            </p>
+        </div>
+
+        <!-- Tổng tiền đồ ăn -->
+        <div class="selected-seats-info text-light mb-4 glow-effect p-4">
+            <h5 class="mb-3">Đơn hàng đồ ăn:</h5>
+            <div id="food-order-list" class="mb-3 text-muted small"></div>
+            <h5 class="text-warning">Tổng tiền đồ ăn: <span id="food-total">0</span> VNĐ</h5>
+        </div>
+
+        <!-- Nút xác nhận -->
+        <div class="text-center">
+            <button type="submit" class="btn btn-success btn-lg px-5 glow-effect title-gradient">
+                Tiếp tục thanh toán
+            </button>
+        </div>
+    </form>
+</div>
+
+<!-- CSS đồng nhất với SelectSeat -->
+<style>
+    body {
+        background-color: #0F0F0F;
+        color: #ffffff;
+        font-family: 'Montserrat', sans-serif;
+    }
+
+    .title-gradient {
+        background: linear-gradient(90deg, #ff0033, #1c1c1c);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    .glow-effect {
+        box-shadow: 0 0 15px rgba(255, 0, 51, 0.3);
+        transition: all 0.3s ease;
+    }
+
+        .glow-effect:hover {
+            box-shadow: 0 0 25px rgba(255, 0, 51, 0.5);
+            transform: translateY(-3px) scale(1.02);
+        }
+
+    .screen-container {
+        max-width: 800px;
+        margin: 0 auto;
+        position: relative;
+    }
+
+    .screen {
+        background: linear-gradient(90deg, #333, #555, #333);
+        height: 50px;
+        border-radius: 25px;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.6);
+    }
+
+    .screen-label {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-weight: 700;
+        font-size: 1.1rem;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+    }
+
+    .food-card {
+        background-color: #1c1c1c;
+        border-radius: 15px;
+        overflow: hidden;
+        transition: all 0.3s ease;
+        border: 2px solid transparent;
+    }
+
+        .food-card:hover {
+            border-color: #ff0033;
+        }
+
+    .input-group .btn {
+        border-radius: 50%;
+        width: 36px;
+        height: 36px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+    }
+
+    .qty {
+        background-color: #2a2a2a;
+        border: 1px solid #ff0033;
+        color: #fff;
+    }
+
+    .seat-legend .badge {
+        font-size: 1rem;
+        padding: 8px 16px;
+        border-radius: 20px;
+    }
+
+    .selected-seats-info {
+        max-width: 600px;
+        margin: 0 auto;
+        background-color: #1c1c1c;
+        border-radius: 15px;
+        border: 1px solid #ff0033;
+    }
+
+    .btn-success {
+        background-color: #ff0033;
+        border: none;
+        border-radius: 25px;
+        padding: 12px 40px;
+        font-weight: 600;
+        font-size: 1.2rem;
+    }
+
+        .btn-success:hover {
+            background-color: #e6002e;
+            transform: scale(1.05);
+        }
+
+    .btn-secondary {
+        border-color: #ff0033;
+        color: #ff0033;
+        border-radius: 20px;
+        padding: 8px 20px;
+        font-weight: 600;
+    }
+
+        .btn-secondary:hover {
+            background-color: #ff0033;
+            color: #fff;
+        }
+
+    .text-muted {
+        color: #b3b3b3 !important;
+    }
+
+    .alert {
+        border-radius: 12px;
+    }
+</style>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            const foodData = @Html.Raw(Json.Serialize(ViewBag.FoodItems));
+            const $orderList = $('#food-order-list');
+            const $foodTotal = $('#food-total');
+
+            function updateOrder() {
+                let total = 0;
+                let items = [];
+
+                $('.qty').each(function () {
+                    const qty = parseInt($(this).val()) || 0;
+                    if (qty > 0) {
+                        const foodId = $(this).attr('name').match(/\d+/)[0];
+                        const food = foodData.find(f => f.foodItemId == foodId);
+                        if (food) {
+                            const price = food.price * qty;
+                            total += price;
+                            items.push(`${food.name} x${qty} = ${price.toLocaleString()}đ`);
+                        }
+                    }
+                });
+
+                $orderList.html(items.length > 0 ? items.join('<br>') : '<em>Chưa chọn món</em>');
+                $foodTotal.text(total.toLocaleString());
+            }
+
+            $('.minus').click(function () {
+                const $input = $(this).siblings('.qty');
+                let val = parseInt($input.val());
+                if (val > 0) $input.val(val - 1).trigger('change');
+            });
+
+            $('.plus').click(function () {
+                const $input = $(this).siblings('.qty');
+                let val = parseInt($input.val());
+                if (val < 10) $input.val(val + 1).trigger('change');
+            });
+
+            $('.qty').on('change input', updateOrder);
+
+            // Khởi tạo
+            updateOrder();
+        });
+    </script>
+}

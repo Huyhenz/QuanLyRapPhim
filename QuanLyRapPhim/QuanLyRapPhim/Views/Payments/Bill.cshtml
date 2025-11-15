@@ -50,6 +50,29 @@
                 </div>
             </div>
 
+            <!-- PHẦN MỚI: ĐỒ ĂN & NƯỚC UỐNG -->
+            @if (booking.BookingFoods != null && booking.BookingFoods.Any())
+            {
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <h5>Đồ ăn & nước uống</h5>
+                        <ul class="list-unstyled">
+                            @foreach (var bf in booking.BookingFoods)
+                            {
+                                var totalFoodPrice = bf.UnitPrice * bf.Quantity;
+                                <li>
+                                    @bf.FoodItem.Name (@bf.FoodItem.Size) × @bf.Quantity
+                                    <span class="text-success fw-bold float-end">@totalFoodPrice.ToString("N0")đ</span>
+                                </li>
+                            }
+                        </ul>
+                        <hr class="border-light" />
+                        <p class="text-end fw-bold text-warning">
+                            Tổng đồ ăn: @booking.BookingFoods.Sum(bf => bf.UnitPrice * bf.Quantity):N0đ
+                        </p>
+                    </div>
+                </div>
+            }
             <!-- Thông tin thanh toán -->
             <div class="row mb-4">
                 <div class="col-md-6">

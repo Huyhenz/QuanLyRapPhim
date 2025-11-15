@@ -1,0 +1,50 @@
+﻿@model IEnumerable<QuanLyRapPhim.Models.FoodItem>
+
+@{
+    ViewData["Title"] = "Quản lý đồ ăn";
+}
+
+<h2>Quản lý đồ ăn & nước uống</h2>
+
+<p>
+    <a asp-action="Create" class="btn btn-success">Thêm món mới</a>
+</p>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+}
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Hình ảnh</th>
+            <th>Tên món</th>
+            <th>Kích thước</th>
+            <th>Giá</th>
+            <th>Loại</th>
+            <th>Hành động</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @if (!string.IsNullOrEmpty(item.ImageUrl))
+                    {
+                        <img src="@item.ImageUrl" alt="@item.Name" style="width:50px; height:50px; object-fit:cover;" />
+                    }
+                </td>
+                <td>@item.Name</td>
+                <td>@item.Size</td>
+                <td>@item.Price.ToString("N0")đ</td>
+                <td>@item.Category</td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.FoodItemId" class="btn btn-sm btn-warning">Sửa</a>
+                    <a asp-action="Delete" asp-route-id="@item.FoodItemId" class="btn btn-sm btn-danger">Xóa</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

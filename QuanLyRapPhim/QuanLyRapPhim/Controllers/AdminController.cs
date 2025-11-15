@@ -5,6 +5,7 @@ using Newtonsoft.Json;
 using QuanLyRapPhim.Data;
 using QuanLyRapPhim.Models;
 using System;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -14,12 +15,10 @@ namespace QuanLyRapPhim.Controllers
     public class AdminController : Controller
     {
         private readonly DBContext _context;
-
         public AdminController(DBContext context)
         {
             _context = context;
         }
-
         // GET: Admin Dashboard
         public IActionResult Index()
         {
@@ -33,14 +32,12 @@ namespace QuanLyRapPhim.Controllers
             ViewBag.Rooms = _context.Rooms.ToList(); // Để populate dropdown trong modal
             return View();
         }
-
         public IActionResult Movies()
         {
             var movies = _context.Movies.ToList();
             ViewBag.Movies = movies; // Pass movies to the view via ViewBag
             return View();
         }
-
         // Other actions like CreateMovie, EditMovie, DeleteMovie, etc.
         [HttpPost]
         public IActionResult CreateMovie(Movie movie)
@@ -53,7 +50,6 @@ namespace QuanLyRapPhim.Controllers
             }
             return Json(new { success = false, message = "Error adding movie.", errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage) });
         }
-
         [HttpPost]
         public IActionResult EditMovie(Movie movie)
         {
@@ -62,7 +58,6 @@ namespace QuanLyRapPhim.Controllers
                 var existingMovie = _context.Movies.Find(movie.MovieId);
                 if (existingMovie == null)
                     return Json(new { success = false, message = "Movie not found." });
-
                 existingMovie.Title = movie.Title;
                 existingMovie.Genre = movie.Genre;
                 existingMovie.Duration = movie.Duration;
@@ -71,20 +66,17 @@ namespace QuanLyRapPhim.Controllers
                 existingMovie.Description = movie.Description;
                 existingMovie.Actors = movie.Actors;
                 existingMovie.TrailerUrl = movie.TrailerUrl;
-
                 _context.SaveChanges();
                 return Json(new { success = true, message = "Movie updated successfully!" });
             }
             return Json(new { success = false, message = "Error updating movie.", errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage) });
         }
-
         [HttpPost]
         public IActionResult DeleteMovie(int id)
         {
             var movie = _context.Movies.Find(id);
             if (movie == null)
                 return Json(new { success = false, message = "Movie not found." });
-
             _context.Movies.Remove(movie);
             _context.SaveChanges();
             return Json(new { success = true, message = "Movie deleted successfully!" });
@@ -109,7 +101,6 @@ namespace QuanLyRapPhim.Controllers
                 trailerUrl = movie.TrailerUrl
             });
         }
-
         public IActionResult ManageShowtimes()
         {
             ViewBag.Showtimes = _context.Showtimes.Include(s => s.Movie).Include(s => s.Room).ToList();
@@ -146,7 +137,6 @@ namespace QuanLyRapPhim.Controllers
             var errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).ToList();
             return Json(new { success = false, message = "Failed to add showtime.", errors });
         }
-
         // GET: Get Showtime Details
         [HttpGet]
         public IActionResult GetShowtimeDetails(int id)
@@ -185,18 +175,16 @@ namespace QuanLyRapPhim.Controllers
         [HttpPost]
         //public IActionResult EditShowtime(int ShowtimeId, int MovieId, string Title, string Poster, int RoomId, DateTime Date, string StartTime)
         //{
-        //    var showtime = _context.Showtimes.Find(ShowtimeId);
-        //    if (showtime == null) return Json(new { success = false, message = "Showtime not found." });
-
-        //    showtime.MovieId = MovieId;
-        //    showtime.Title = Title;
-        //    showtime.Poster = Poster;
-        //    showtime.RoomId = RoomId;
-        //    showtime.Date = Date;
-        //    showtime.StartTime = TimeSpan.Parse(StartTime); // Ensure StartTime is a TimeSpan in the model
-
-        //    _context.SaveChanges();
-        //    return Json(new { success = true, message = "Showtime updated successfully!" });
+        // var showtime = _context.Showtimes.Find(ShowtimeId);
+        // if (showtime == null) return Json(new { success = false, message = "Showtime not found." });
+        // showtime.MovieId = MovieId;
+        // showtime.Title = Title;
+        // showtime.Poster = Poster;
+        // showtime.RoomId = RoomId;
+        // showtime.Date = Date;
+        // showtime.StartTime = TimeSpan.Parse(StartTime); // Ensure StartTime is a TimeSpan in the model
+        // _context.SaveChanges();
+        // return Json(new { success = true, message = "Showtime updated successfully!" });
         //}
         // POST: Edit Showtime
         [HttpPost]
@@ -220,14 +208,12 @@ namespace QuanLyRapPhim.Controllers
                     {
                         return Json(new { success = false, message = "Invalid room selected." });
                     }
-
                     existingShowtime.MovieId = showtime.MovieId;
                     existingShowtime.RoomId = showtime.RoomId;
                     existingShowtime.Title = showtime.Title;
                     existingShowtime.Poster = showtime.Poster;
                     existingShowtime.StartTime = showtime.StartTime;
                     existingShowtime.Date = showtime.Date;
-
                     _context.Update(existingShowtime);
                     await _context.SaveChangesAsync();
                     return Json(new { success = true, message = "Showtime updated successfully!" });
@@ -248,7 +234,6 @@ namespace QuanLyRapPhim.Controllers
             var errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).ToList();
             return Json(new { success = false, message = "Failed to update showtime.", errors });
         }
-
         // POST: Delete Showtime
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -274,7 +259,6 @@ namespace QuanLyRapPhim.Controllers
                 return Json(new { success = false, message = $"Failed to delete showtime: {ex.Message}" });
             }
         }
-
         // GET: Get Payment Statuses
         [HttpGet]
         public async Task<IActionResult> GetPaymentStatuses()
@@ -284,7 +268,6 @@ namespace QuanLyRapPhim.Controllers
                 .ToListAsync();
             return Json(payments);
         }
-
         // POST: Update Payment Status
         [HttpPost]
         public async Task<IActionResult> UpdatePaymentStatus(int bookingId)
@@ -297,7 +280,6 @@ namespace QuanLyRapPhim.Controllers
             }
             return Json(new { success = false, message = "No payment record found." });
         }
-
         // GET: Manage Bookings
         public IActionResult ManageBookings()
         {
@@ -310,7 +292,6 @@ namespace QuanLyRapPhim.Controllers
             ViewBag.Payments = _context.Payments.ToList();
             return View(bookings);
         }
-
         // GET: Revenue Statistics
         public IActionResult RevenueStatistics()
         {
@@ -318,9 +299,7 @@ namespace QuanLyRapPhim.Controllers
                 .Include(b => b.Showtime)
                 .ThenInclude(s => s.Movie)
                 .ToList();
-
             var totalRevenue = bookings.Sum(b => b.TotalPrice);
-
             var revenueByMovie = bookings
                 .GroupBy(b => b.Showtime.Movie.Title)
                 .Select(g => new
@@ -330,7 +309,6 @@ namespace QuanLyRapPhim.Controllers
                 })
                 .OrderByDescending(x => x.Revenue)
                 .ToList();
-
             var revenueByDate = bookings
                 .GroupBy(b => b.BookingDate.Date)
                 .Select(g => new
@@ -340,24 +318,157 @@ namespace QuanLyRapPhim.Controllers
                 })
                 .OrderBy(x => x.Date)
                 .ToList();
-
             var revenueData = new
             {
                 TotalRevenue = totalRevenue,
                 RevenueByMovie = revenueByMovie,
                 RevenueByDate = revenueByDate
             };
-
             var formattedRevenueByDate = revenueData.RevenueByDate.Select(x => new
             {
                 Date = x.Date.ToString("dd/MM/yyyy"),
                 Revenue = x.Revenue
             }).ToList();
-
             ViewBag.RevenueData = revenueData;
             ViewBag.FormattedRevenueByDate = JsonConvert.SerializeObject(formattedRevenueByDate);
-
             return View();
+        }
+
+        // ========================================
+        // QUẢN LÝ ĐỒ ĂN & NƯỚC UỐNG (FOOD ITEMS)
+        // ========================================
+        public IActionResult ManageFoods()
+        {
+            return View();
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetFoodItems()
+        {
+            var foods = await _context.FoodItems
+                .Select(f => new
+                {
+                    foodItemId = f.FoodItemId,
+                    name = f.Name,
+                    size = f.Size,
+                    price = f.Price,
+                    category = f.Category,
+                    imageUrl = f.ImageUrl
+                })
+                .ToListAsync();
+
+            return Json(foods);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetFoodItem(int id)
+        {
+            var food = await _context.FoodItems.FindAsync(id);
+            if (food == null) return NotFound();
+
+            return Json(new
+            {
+                foodItemId = food.FoodItemId,
+                name = food.Name,
+                size = food.Size,
+                price = food.Price,
+                category = food.Category,
+                imageUrl = food.ImageUrl
+            });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> CreateFood([FromForm] FoodItem food, IFormFile imageFile)
+        {
+            if (!ModelState.IsValid)
+                return Json(new { success = false, message = "Dữ liệu không hợp lệ." });
+
+            if (imageFile != null && imageFile.Length > 0)
+            {
+                var fileName = Guid.NewGuid() + Path.GetExtension(imageFile.FileName);
+                var uploadPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", "food");
+                Directory.CreateDirectory(uploadPath);
+                var filePath = Path.Combine(uploadPath, fileName);
+
+                using var stream = new FileStream(filePath, FileMode.Create);
+                await imageFile.CopyToAsync(stream);
+
+                food.ImageUrl = "/images/food/" + fileName;
+            }
+
+            _context.FoodItems.Add(food);
+            await _context.SaveChangesAsync();
+            return Json(new { success = true, message = "Thêm món thành công!" });
+        }
+        [HttpPost]
+        public async Task<IActionResult> EditFood(
+            [FromForm] int foodItemId,
+            [FromForm] string name,
+            [FromForm] string size,
+            [FromForm] decimal price,
+            [FromForm] string category,
+            [FromForm] IFormFile imageFile)
+        {
+            if (string.IsNullOrWhiteSpace(name) || price < 0)
+                return Json(new { success = false, message = "Dữ liệu không hợp lệ." });
+
+            var existing = await _context.FoodItems.FindAsync(foodItemId);
+            if (existing == null)
+                return Json(new { success = false, message = "Không tìm thấy món ăn." });
+
+            existing.Name = name.Trim();
+            existing.Size = size;
+            existing.Price = price;
+            existing.Category = category;
+
+            if (imageFile != null && imageFile.Length > 0)
+            {
+                // Xóa ảnh cũ
+                if (!string.IsNullOrEmpty(existing.ImageUrl))
+                {
+                    var oldPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", existing.ImageUrl.TrimStart('/'));
+                    if (System.IO.File.Exists(oldPath))
+                        System.IO.File.Delete(oldPath);
+                }
+
+                var fileName = Guid.NewGuid() + Path.GetExtension(imageFile.FileName);
+                var uploadPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", "food");
+                Directory.CreateDirectory(uploadPath);
+                var filePath = Path.Combine(uploadPath, fileName);
+                using var stream = new FileStream(filePath, FileMode.Create);
+                await imageFile.CopyToAsync(stream);
+                existing.ImageUrl = "/images/food/" + fileName;
+            }
+
+            try
+            {
+                await _context.SaveChangesAsync();
+                return Json(new { success = true, message = "Cập nhật thành công!" });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = "Lỗi lưu dữ liệu: " + ex.Message });
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> DeleteFood(int id)
+        {
+            var food = await _context.FoodItems.FindAsync(id);
+            if (food == null)
+                return Json(new { success = false, message = "Không tìm thấy món ăn." });
+
+            // Xóa ảnh
+            if (!string.IsNullOrEmpty(food.ImageUrl))
+            {
+                var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", food.ImageUrl.TrimStart('/'));
+                if (System.IO.File.Exists(filePath))
+                    System.IO.File.Delete(filePath);
+            }
+
+            _context.FoodItems.Remove(food);
+            await _context.SaveChangesAsync();
+            return Json(new { success = true, message = "Xóa thành công!" });
         }
     }
 
