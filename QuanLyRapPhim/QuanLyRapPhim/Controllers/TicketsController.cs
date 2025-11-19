@@ -323,6 +323,7 @@ namespace QuanLyRapPhim.Controllers
             var booking = await _context.Bookings
                 .Include(b => b.BookingDetails).ThenInclude(bd => bd.Seat)
                 .Include(b => b.BookingFoods)
+                .Include(b => b.Payment)
                 .FirstOrDefaultAsync(b => b.BookingId == bookingId);
 
             if (booking == null)
@@ -334,52 +335,53 @@ namespace QuanLyRapPhim.Controllers
             using var transaction = await _context.Database.BeginTransactionAsync();
             try
             {
-                // 1. Xóa hết bắp nước
-                if (booking.BookingFoods?.Any() == true)
-                    _context.BookingFoods.RemoveRange(booking.BookingFoods);
-
-                // 2. Nếu có ghế → mở khóa ghế + xóa BookingDetail
-                bool hasSeats = booking.BookingDetails?.Any() == true;
-                if (hasSeats)
+                // 1. Mở khóa ghế (nếu có)
+                if (booking.BookingDetails?.Any() == true)
                 {
                     var seatIds = booking.BookingDetails.Select(bd => bd.SeatId).ToList();
-                    _context.BookingDetails.RemoveRange(booking.BookingDetails);
-
                     foreach (var seatId in seatIds)
                     {
                         var seat = await _context.Seats.FindAsync(seatId);
-                        if (seat != null)
-                            seat.Status = "Trống";
+                        if (seat != null) seat.Status = "Trống";
                     }
+                    _context.BookingDetails.RemoveRange(booking.BookingDetails);
                 }
 
-                // Quan trọng: KHÔNG xóa Booking, chỉ reset lại
+                // 2. Xóa hết đồ ăn
+                if (booking.BookingFoods?.Any() == true)
+                    _context.BookingFoods.RemoveRange(booking.BookingFoods);
+
+                // 3. Xóa Payment nếu đã tạo nhầm (dự phòng)
+                if (booking.Payment != null)
+                    _context.Payments.Remove(booking.Payment);
+
+                // 4. Reset lại Booking: giữ nguyên ID, giữ ShowtimeId (nếu có), nhưng tiền = 0
                 booking.TotalPrice = 0;
-                // Nếu chỉ mua bắp nước thì giữ nguyên ShowtimeId = null
-                // Nếu có ghế thì giữ nguyên ShowtimeId để sau quay lại chọn ghế được
+                booking.BookingDetails = new List<BookingDetail>();   // để không bị lỗi khi load lại
+                booking.BookingFoods = new List<BookingFood>();       // sạch sẽ
 
                 await _context.SaveChangesAsync();
                 await transaction.CommitAsync();
 
-                TempData["SuccessMessage"] = "Đã hủy thành công! Bạn có thể chọn lại.";
-
-                // CHUYỂN HƯỚNG ĐÚNG LUÔN
-                if (hasSeats && booking.ShowtimeId.HasValue)
-                {
-                    // Có phim + ghế → quay lại chọn ghế
-                    return RedirectToAction("SelectRoomAndSeat", new { showtimeId = booking.ShowtimeId.Value });
-                }
-                else
-                {
-                    // Chỉ mua bắp nước → quay lại trang chọn bắp nước (booking vẫn còn → không 404)
-                    return RedirectToAction("SelectFood", new { bookingId = booking.BookingId });
-                }
+                TempData["SuccessMessage"] = "Đã hủy thành công! Bạn có thể chọn lại ghế và đồ ăn.";
             }
             catch (Exception ex)
             {
                 await transaction.RollbackAsync();
-                TempData["ErrorMessage"] = "Lỗi khi hủy: " + ex.Message;
+                TempData["ErrorMessage"] = "Lỗi khi hủy đơn hàng: " + ex.Message;
                 return RedirectToAction("Index", "Home");
+            }
+
+            // QUAN TRỌNG: Quay lại đúng trang người dùng đang ở
+            if (booking.ShowtimeId.HasValue)
+            {
+                // Có suất chiếu → quay lại trang chọn ghế (với cùng suất chiếu)
+                return RedirectToAction("SelectRoomAndSeat", new { showtimeId = booking.ShowtimeId.Value });
+            }
+            else
+            {
+                // Chỉ đặt đồ ăn nhanh → quay lại trang chọn đồ ăn (với BookingId cũ)
+                return RedirectToAction("SelectFood", new { bookingId = booking.BookingId });
             }
         }
     }

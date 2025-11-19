@@ -33,7 +33,8 @@ namespace QuanLyRapPhim.Controllers
                 .Include(b => b.Payment)
                 .Where(b => b.UserId == userId &&
                            b.Payment != null &&
-                           b.Payment.PaymentStatus == "Completed") // CHỈ HIỂN THỊ ĐÃ THANH TOÁN
+                           b.Payment.PaymentStatus == "Completed"
+                           && b.TotalPrice > 0) 
                 .OrderByDescending(b => b.BookingDate)
                 .ToListAsync();
 

@@ -280,16 +280,17 @@ namespace QuanLyRapPhim.Controllers
             }
             return Json(new { success = false, message = "No payment record found." });
         }
-        // GET: Manage Bookings
         public async Task<IActionResult> ManageBookings()
         {
             var bookings = await _context.Bookings
+                .Include(b => b.User)
                 .Include(b => b.Showtime).ThenInclude(s => s.Movie)
                 .Include(b => b.Showtime).ThenInclude(s => s.Room)
                 .Include(b => b.BookingDetails).ThenInclude(bd => bd.Seat)
-                .Include(b => b.BookingFoods).ThenInclude(bf => bf.FoodItem)
-                .Include(b => b.User)
-                .Include(b => b.Payment)  // QUAN TRỌNG: KHÔNG ĐƯỢC THIẾU
+                .Include(b => b.Payment)
+                .Where(b => b.Payment != null
+                            && b.Payment.PaymentStatus == "Completed"
+                            && b.TotalPrice > 0)
                 .OrderByDescending(b => b.BookingDate)
                 .ToListAsync();
 
