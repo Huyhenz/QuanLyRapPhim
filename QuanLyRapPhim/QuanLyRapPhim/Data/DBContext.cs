@@ -18,5 +18,6 @@ namespace QuanLyRapPhim.Data
         public DbSet<Review> Reviews { get; set; }
         public DbSet<FoodItem> FoodItems { get; set; }
         public DbSet<BookingFood> BookingFoods { get; set; }
+
     }
 }

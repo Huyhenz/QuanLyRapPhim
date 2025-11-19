@@ -168,32 +168,28 @@ namespace QuanLyRapPhim.Controllers
             return View(payment);
         }
 
+        [HttpGet]
         public async Task<IActionResult> Create(int bookingId)
         {
             var booking = await _context.Bookings
-                .Include(b => b.Showtime)
-                .ThenInclude(s => s.Movie)
-                .Include(b => b.Showtime)
-                .ThenInclude(s => s.Room)
-                .Include(b => b.BookingDetails)
-                .ThenInclude(bd => bd.Seat)
+                .Include(b => b.Showtime).ThenInclude(s => s.Movie)
+                .Include(b => b.Showtime).ThenInclude(s => s.Room)
+                .Include(b => b.BookingDetails).ThenInclude(bd => bd.Seat)
+                .Include(b => b.BookingFoods).ThenInclude(bf => bf.FoodItem)
                 .FirstOrDefaultAsync(b => b.BookingId == bookingId);
 
-            if (booking == null)
-            {
-                return NotFound();
-            }
+            if (booking == null) return NotFound();
+
+            ViewBag.Booking = booking;
 
             var payment = new Payment
             {
                 BookingId = bookingId,
                 Amount = booking.TotalPrice,
                 PaymentDate = DateTime.Now,
-                PaymentStatus = "Pending",
-                PaymentMethod = "Cash"
+                PaymentStatus = "Completed"
             };
 
-            ViewBag.Booking = booking;
             return View(payment);
         }
 
@@ -203,7 +199,7 @@ namespace QuanLyRapPhim.Controllers
         {
             if (ModelState.IsValid)
             {
-                payment.PaymentStatus = "Completed";
+                payment.PaymentStatus = "Completed"; // CHỈ KHI THANH TOÁN THÀNH CÔNG
                 _context.Add(payment);
                 await _context.SaveChangesAsync();
                 TempData["SuccessMessage"] = "Thanh toán thành công!";

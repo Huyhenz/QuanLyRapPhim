@@ -281,35 +281,43 @@ namespace QuanLyRapPhim.Controllers
             return Json(new { success = false, message = "No payment record found." });
         }
         // GET: Manage Bookings
-        public IActionResult ManageBookings()
+        public async Task<IActionResult> ManageBookings()
         {
-            var bookings = _context.Bookings
+            var bookings = await _context.Bookings
                 .Include(b => b.Showtime).ThenInclude(s => s.Movie)
                 .Include(b => b.Showtime).ThenInclude(s => s.Room)
                 .Include(b => b.BookingDetails).ThenInclude(bd => bd.Seat)
+                .Include(b => b.BookingFoods).ThenInclude(bf => bf.FoodItem)
                 .Include(b => b.User)
-                .ToList();
-            ViewBag.Payments = _context.Payments.ToList();
+                .Include(b => b.Payment)  // QUAN TRỌNG: KHÔNG ĐƯỢC THIẾU
+                .OrderByDescending(b => b.BookingDate)
+                .ToListAsync();
+
             return View(bookings);
         }
-        // GET: Revenue Statistics
         public IActionResult RevenueStatistics()
         {
-            var bookings = _context.Bookings
+            // Lấy bookings có Showtime và Movie hợp lệ
+            var validBookings = _context.Bookings
                 .Include(b => b.Showtime)
-                .ThenInclude(s => s.Movie)
+                    .ThenInclude(s => s.Movie)
+                .AsEnumerable() // Chuyển sang LINQ-to-Objects để xử lý null an toàn
+                .Where(b => b.Showtime != null && b.Showtime.Movie != null)
                 .ToList();
-            var totalRevenue = bookings.Sum(b => b.TotalPrice);
-            var revenueByMovie = bookings
+
+            var totalRevenue = validBookings.Sum(b => b.TotalPrice);
+
+            var revenueByMovie = validBookings
                 .GroupBy(b => b.Showtime.Movie.Title)
                 .Select(g => new
                 {
-                    MovieTitle = g.Key,
+                    MovieTitle = g.Key ?? "Không xác định",
                     Revenue = g.Sum(b => b.TotalPrice)
                 })
                 .OrderByDescending(x => x.Revenue)
                 .ToList();
-            var revenueByDate = bookings
+
+            var revenueByDate = validBookings
                 .GroupBy(b => b.BookingDate.Date)
                 .Select(g => new
                 {
@@ -318,22 +326,25 @@ namespace QuanLyRapPhim.Controllers
                 })
                 .OrderBy(x => x.Date)
                 .ToList();
+
             var revenueData = new
             {
                 TotalRevenue = totalRevenue,
                 RevenueByMovie = revenueByMovie,
                 RevenueByDate = revenueByDate
             };
+
             var formattedRevenueByDate = revenueData.RevenueByDate.Select(x => new
             {
                 Date = x.Date.ToString("dd/MM/yyyy"),
                 Revenue = x.Revenue
             }).ToList();
+
             ViewBag.RevenueData = revenueData;
             ViewBag.FormattedRevenueByDate = JsonConvert.SerializeObject(formattedRevenueByDate);
+
             return View();
         }
-
         // ========================================
         // QUẢN LÝ ĐỒ ĂN & NƯỚC UỐNG (FOOD ITEMS)
         // ========================================

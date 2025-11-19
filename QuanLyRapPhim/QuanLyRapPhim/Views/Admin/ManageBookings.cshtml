@@ -1,149 +1,112 @@
 ﻿@model IEnumerable<QuanLyRapPhim.Models.Booking>
-
+@using System.Linq
 @{
     ViewData["Title"] = "Quản lý đặt vé";
     Layout = "~/Views/Shared/_Layout.cshtml";
-
-    var payments = ViewBag.Payments as List<QuanLyRapPhim.Models.Payment>;
 }
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý đặt vé</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" />
     <style>
         body {
             margin: 0;
-            background-color: #0F0F0F; /* Galaxy Black */
+            background-color: #0F0F0F;
             color: #ffffff;
             font-family: 'Montserrat', sans-serif;
             overflow-x: hidden;
         }
-
         .admin-dashboard {
             display: flex;
             min-height: 100vh;
         }
-
         .sidebar {
             width: 250px;
-            background-color: #000000; /* Black background */
-            color: #ffffff; /* White text for readability */
+            background-color: #000000;
+            color: #ffffff;
             height: 100vh;
             position: fixed;
             top: 0;
             left: 0;
             padding-top: 20px;
-            border-right: 2px solid #ff0033; /* Red border */
+            border-right: 2px solid #ff0033;
             overflow-y: auto;
             z-index: 1000;
         }
-
         .sidebar-header {
             padding: 10px 20px;
-            border-bottom: 1px solid #ff0033; /* Red border */
+            border-bottom: 1px solid #ff0033;
         }
-
         .sidebar-title {
             margin: 0;
             font-size: 1.5em;
-            color: #ff0033; /* Red text for the header */
+            color: #ff0033;
         }
-
         .sidebar-nav {
             list-style: none;
             padding: 0;
             margin: 20px 0;
         }
-
         .nav-item {
             display: flex;
             align-items: center;
             padding: 10px 20px;
-            color: #ffffff; /* White text */
+            color: #ffffff;
             text-decoration: none;
         }
-
             .nav-item i {
                 margin-right: 10px;
-                color: #ffffff; /* White icons */
+                color: #ffffff;
             }
-
             .nav-item:hover {
-                background-color: #ff0033; /* Red on hover */
-                color: #000000; /* Black text on hover for contrast */
-            }
-
-                .nav-item:hover i {
-                    color: #000000; /* Black icons on hover */
-                }
-
-            .nav-item.active {
-                background-color: #ff0033; /* Red for active item */
-                color: #000000; /* Black text for active item */
-            }
-
-                .nav-item.active i {
-                    color: #000000; /* Black icons for active item */
-                }
-
-        .social-item {
-            color: #ff0033; /* Red for social media icons and text */
-        }
-
-            .social-item i {
-                color: #ff0033; /* Red icons for social media */
-            }
-
-            .social-item:hover {
                 background-color: #ff0033;
-                color: #000000; /* Black text on hover */
+                color: #000000;
             }
-
-                .social-item:hover i {
-                    color: #000000; /* Black icons on hover for social items */
+                .nav-item:hover i {
+                    color: #000000;
                 }
-
+            .nav-item.active {
+                background-color: #ff0033;
+                color: #000000;
+            }
+                .nav-item.active i {
+                    color: #000000;
+                }
         .content {
-            margin-left: 250px; /* Match sidebar width */
-            padding: 20px 20px 20px 10px; /* Reduced left padding to move table closer */
+            margin-left: 250px;
+            padding: 20px 20px 20px 10px;
             flex-grow: 1;
             display: flex;
-            justify-content: flex-start; /* Align content to the left */
+            justify-content: flex-start;
             align-items: flex-start;
             min-height: 100vh;
         }
-
         .content-inner {
-            width: 100%; /* Use full available width */
+            width: 100%;
         }
         .title-gradient {
             background: linear-gradient(90deg, #ff0033, #1c1c1c);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
-            color: transparent;
+            font-size: 2.2rem;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 30px;
         }
-
-            .title-gradient:not(h1) {
-                -webkit-text-fill-color: inherit;
-                background-clip: inherit;
-                color: #fff;
-            }
-
         .glow-effect {
             box-shadow: 0 0 15px rgba(255, 0, 51, 0.3);
             transition: box-shadow 0.3s ease;
         }
-
         .table-dark.glow-effect:hover {
             box-shadow: 0 0 25px rgba(255, 0, 51, 0.5);
             transform: none;
         }
-
         .table-dark {
             background-color: #1c1c1c;
             border-radius: 15px;
@@ -152,7 +115,6 @@
             border-collapse: collapse;
             table-layout: fixed;
         }
-
             .table-dark th, .table-dark td {
                 border: 1px solid #444;
                 padding: 10px 12px;
@@ -164,7 +126,6 @@
                 overflow-wrap: break-word;
                 vertical-align: middle;
             }
-
             .table-dark th {
                 background-color: #2a2a2a;
                 font-weight: 600;
@@ -172,119 +133,75 @@
                 top: 0;
                 z-index: 10;
             }
-
-                .table-dark td.payment-status,
-                .table-dark td.email-column,
-                .table-dark td.movie-column,
-                .table-dark td.seat-column {
-                    white-space: normal;
-                    word-wrap: break-word;
-                    min-width: 200px;
-                    text-align: left;
-                    overflow: visible;
-                }
-
-
-
-
-
+            .table-dark td.payment-status,
+            .table-dark td.email-column,
+            .table-dark td.movie-column,
+            .table-dark td.seat-column {
+                white-space: normal;
+                word-wrap: break-word;
+                min-width: 200px;
+                text-align: left;
+                overflow: visible;
+            }
             .table-dark td.payment-status {
-                text-align: center; /* hoặc left nếu muốn thẳng hàng với nội dung khác */
+                text-align: center;
                 padding: 10px 12px;
             }
-
-        .payment-status .spinner-border {
-            margin-left: 6px;
-        }
-
             .table-dark tr:hover td {
                 background-color: #2a2a2a;
             }
-
             .table-dark td.email-column,
             .table-dark th.email-column {
                 max-width: 150px;
                 text-align: left;
             }
-
             .table-dark td.movie-column,
             .table-dark th.movie-column {
                 max-width: 150px;
                 text-align: left;
             }
-
             .table-dark td.seat-column,
             .table-dark th.seat-column {
                 max-width: 180px;
                 text-align: left;
             }
-
             .table-dark td.status-column,
             .table-dark th.status-column {
                 max-width: 130px;
                 min-width: 100px;
                 text-align: center;
-                word-wrap: break-word;
-                white-space: normal;
             }
-
         .table-container {
             overflow-x: auto;
             width: 100%;
         }
-
             .table-container::-webkit-scrollbar {
                 height: 8px;
             }
-         
             .table-container::-webkit-scrollbar-thumb {
                 background: #ff0033;
                 border-radius: 10px;
             }
-
             .table-container::-webkit-scrollbar-track {
                 background: #2a2a2a;
             }
-
         .btn-secondary {
-            border-color: #ff0033;
-            color: #ff0033;
-            border-radius: 20px;
-            padding: 10px 30px;
+            background-color: #ff0033;
+            border: none;
+            color: white;
+            border-radius: 25px;
+            padding: 12px 30px;
             font-weight: 600;
-            font-size: 1rem;
-            transition: background-color 0.3s ease, transform 0.3s ease;
+            transition: all 0.3s ease;
         }
-
             .btn-secondary:hover {
-                background-color: #ff0033;
-                color: #ffffff;
-                border-color: #ff0033;
+                background-color: #cc002a;
                 transform: scale(1.05);
             }
-
-        .badge {
-            padding: 5px 10px;
-            font-size: 0.85rem;
-            border-radius: 8px;
-            white-space: nowrap;
-        }
-
-        .bg-success {
-            background-color: #28a745;
-            color: white;
-        }
-
-        .bg-danger {
-            background-color: #dc3545;
-            color: white;
-        }
-
-
         .text-muted {
             color: #b3b3b3 !important;
+            font-style: italic;
         }
-
         .payment-status .spinner-border {
             margin-left: 5px;
         }
@@ -299,7 +216,6 @@
                     <h3 class="sidebar-title">CinemaX Admin</h3>
                 </div>
                 <nav class="sidebar-nav">
-                    @* <a href="/Admin/Index" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Admin" && ViewContext.RouteData.Values["Action"]?.ToString() == "Index" ? "active" : "")"><i class="fas fa-tachometer-alt"></i> Dashboard</a> *@
                     <a href="/Movies" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Movies" ? "active" : "")"><i class="fas fa-film"></i> Quản lý phim</a>
                     <a href="/Showtimes" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Showtimes" ? "active" : "")"><i class="fas fa-clock"></i> Quản lý lịch chiếu</a>
                     <a href="/Rooms" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Rooms" ? "active" : "")"><i class="fas fa-door-open"></i> Quản lý phòng</a>
@@ -317,7 +233,7 @@
 
         <div class="content">
             <div class="content-inner">
-                <h1 class="text-white mb-4 title-gradient">Quản lý đặt vé</h1>
+                <h1 class="title-gradient">Quản lý đặt vé</h1>
 
                 <div class="table-container">
                     <table class="table table-dark table-bordered glow-effect">
@@ -332,38 +248,112 @@
                                 <th>Giờ chiếu</th>
                                 <th>Tổng tiền</th>
                                 <th>Ngày đặt</th>
-                                <th class="status-column">Trạng thái thanh toán</th> <!-- ĐÃ THÊM CLASS -->
+                                <th class="status-column">Trạng thái thanh toán</th>
                             </tr>
                         </thead>
-
                         <tbody>
-                            @foreach (var booking in Model)
+                            @if (Model?.Any() == true)
                             {
-                                var payment = payments?.FirstOrDefault(p => p.BookingId == booking.BookingId);
-                                <tr data-booking-id="@booking.BookingId">
-                                    <td>@booking.BookingId</td>
-                                    <td class="email-column">@(booking.User?.Email ?? "Khách vãng lai")</td>
-                                    <td class="movie-column">@booking.Showtime.Movie.Title</td>
-                                    <td>@booking.Showtime.Room.RoomName</td>
-                                    <td class="seat-column">@string.Join(", ", booking.BookingDetails.Select(bd => bd.Seat.SeatNumber))</td>
-                                    <td>@booking.Showtime.Date.ToString("dd/MM/yyyy")</td>
-                                    <td>@booking.Showtime.StartTime</td>
-                                    <td>@booking.TotalPrice.ToString("N0") VNĐ</td>
-                                    <td>@booking.BookingDate.ToString("dd/MM/yyyy HH:mm")</td>
-                                    <td id="payment-status-@booking.BookingId" class="payment-status status-column">
-                                        <!-- ĐÃ THÊM CLASS -->
-                                        <span class="status-text">@(payment?.PaymentStatus ?? "Chưa thanh toán")</span>
-                                        <span class="spinner-border spinner-border-sm text-danger d-none" role="status" aria-hidden="true"></span>
+                                @foreach (var booking in Model)
+                                {
+                                    var payment = booking.Payment;
+                                    var showtime = booking.Showtime;
+                                    var isFoodOnly = showtime == null;
+
+                                    <tr data-booking-id="@booking.BookingId">
+                                        <td class="fw-bold">@booking.BookingId</td>
+
+                                        <td class="email-column">@(booking.User?.Email ?? "Khách vãng lai")</td>
+
+                                        <!-- Phim -->
+                                        <td class="movie-column">
+                                            @if (!isFoodOnly && showtime?.Movie != null)
+                                            {
+                                                @showtime.Movie.Title
+                                            }
+                                            else
+                                            {
+                                                <em class="text-muted">Chỉ đặt đồ ăn</em>
+                                            }
+                                        </td>
+
+                                        <!-- Phòng -->
+                                        <td>
+                                            @if (!isFoodOnly && showtime?.Room != null)
+                                            {
+                                                @showtime.Room.RoomName
+                                            }
+                                            else
+                                            {
+                                                <em class="text-muted">—</em>
+                                            }
+                                        </td>
+
+                                        <!-- Ghế -->
+                                        <td class="seat-column">
+                                            @if (booking.BookingDetails?.Any() == true)
+                                            {
+                                                @string.Join(", ", booking.BookingDetails.Select(bd => bd.Seat?.SeatNumber ?? "N/A"))
+                                            }
+                                            else
+                                            {
+                                                <em class="text-muted">Không chọn</em>
+                                            }
+                                        </td>
+
+                                        <!-- Ngày chiếu -->
+                                        <td>
+                                            @if (!isFoodOnly && showtime?.Date != null)
+                                            {
+                                                @showtime.Date.ToString("dd/MM/yyyy")
+                                            }
+                                            else
+                                            {
+                                                <em class="text-muted">—</em>
+                                            }
+                                        </td>
+
+                                        <!-- Giờ chiếu -->
+                                        <td>
+                                            @if (!isFoodOnly && showtime?.StartTime != null)
+                                            {
+                                                @showtime.StartTime.ToString(@"hh\:mm")
+                                            }
+                                            else
+                                            {
+                                                <em class="text-muted">—</em>
+                                            }
+                                        </td>
+
+                                        <td class="text-end text-warning fw-bold" style="font-size: 1.05rem;">
+                                            @string.Format("{0:N0}", booking.TotalPrice) <small class="text-white-50">VNĐ</small>
+                                        </td>
+                                        <td>@booking.BookingDate.ToString("dd/MM/yyyy HH:mm")</td>
+
+                                        <!-- Trạng thái thanh toán -->
+                                        <td id="payment-status-@booking.BookingId" class="payment-status status-column">
+                                            <span class="status-text">
+                                                @(payment?.PaymentStatus ?? "Chưa thanh toán")
+                                            </span>
+                                            <span class="spinner-border spinner-border-sm text-danger d-none" role="status"></span>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td colspan="10" class="text-center py-5">
+                                        <em class="text-muted">Chưa có đặt vé nào.</em>
                                     </td>
                                 </tr>
                             }
                         </tbody>
-
                     </table>
                 </div>
 
-                <div class="text-center mt-4">
-                    <a asp-controller="Home" asp-action="Index" class="btn btn-secondary rounded-pill px-4 glow-effect">
+                <div class="text-center mt-5">
+                    <a asp-controller="Home" asp-action="Index" class="btn btn-secondary glow-effect">
                         <i class="fas fa-arrow-left me-1"></i> Quay lại trang chủ
                     </a>
                 </div>
@@ -372,7 +362,6 @@
     </div>
 
     <script>
-        // Function to fetch and update payment statuses
         function updatePaymentStatuses() {
             document.querySelectorAll('.payment-status').forEach(cell => {
                 const spinner = cell.querySelector('.spinner-border');
@@ -385,56 +374,38 @@
 
             fetch('/Admin/GetPaymentStatuses')
                 .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Network response was not ok: ' + response.statusText);
-                    }
+                    if (!response.ok) throw new Error('Lỗi mạng: ' + response.statusText);
                     return response.json();
                 })
                 .then(data => {
-                    console.log('Fetched payment statuses:', data);
-                    data.forEach(payment => {
-                        const statusCell = document.getElementById(`payment-status-${payment.bookingId}`);
-                        if (statusCell) {
-                            const statusText = statusCell.querySelector('.status-text');
-                            const spinner = statusCell.querySelector('.spinner-border');
+                    data.forEach(p => {
+                        const cell = document.getElementById(`payment-status-${p.bookingId}`);
+                        if (cell) {
+                            const statusText = cell.querySelector('.status-text');
+                            const spinner = cell.querySelector('.spinner-border');
                             if (statusText && spinner) {
-                                statusText.textContent = payment.paymentStatus || "Chưa thanh toán";
+                                statusText.textContent = p.paymentStatus || "Chưa thanh toán";
                                 statusText.classList.remove('text-muted');
                                 spinner.classList.add('d-none');
                             }
                         }
                     });
-
-                    document.querySelectorAll('tr[data-booking-id]').forEach(row => {
-                        const bookingId = row.getAttribute('data-booking-id');
-                        const statusCell = document.getElementById(`payment-status-${bookingId}`);
-                        const statusText = statusCell?.querySelector('.status-text');
-                        const spinner = statusCell?.querySelector('.spinner-border');
-                        if (statusText && spinner && !data.some(p => p.bookingId == bookingId)) {
-                            statusText.textContent = "Chưa thanh toán";
-                            statusText.classList.remove('text-muted');
-                            spinner.classList.add('d-none');
-                        }
-                    });
                 })
-                .catch(error => {
-                    console.error('Error fetching payment statuses:', error);
+                .catch(err => {
+                    console.error('Lỗi:', err);
                     document.querySelectorAll('.payment-status').forEach(cell => {
-                        const spinner = cell.querySelector('.spinner-border');
                         const statusText = cell.querySelector('.status-text');
-                        if (spinner && statusText) {
-                            spinner.classList.add('d-none');
+                        const spinner = cell.querySelector('.spinner-border');
+                        if (statusText && spinner) {
+                            statusText.textContent = "Lỗi tải";
                             statusText.classList.remove('text-muted');
-                            statusText.textContent = "Lỗi tải trạng thái";
+                            spinner.classList.add('d-none');
                         }
                     });
                 });
         }
 
-        // Initial call to update statuses
         updatePaymentStatuses();
-
-        // Set interval to update statuses every 5 seconds
         setInterval(updatePaymentStatuses, 5000);
     </script>
 </body>

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using QuanLyRapPhim.Data;
 
@@ -11,9 +12,11 @@ using QuanLyRapPhim.Data;
 namespace QuanLyRapPhim.Migrations
 {
     [DbContext(typeof(DBContext))]
-    partial class DBContextModelSnapshot : ModelSnapshot
+    [Migration("20251116134801_MakeShowtimeIdNullableInBooking")]
+    partial class MakeShowtimeIdNullableInBooking
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -343,8 +346,7 @@ namespace QuanLyRapPhim.Migrations
 
                     b.HasKey("PaymentId");
 
-                    b.HasIndex("BookingId")
-                        .IsUnique();
+                    b.HasIndex("BookingId");
 
                     b.ToTable("Payments");
                 });
@@ -646,8 +648,8 @@ namespace QuanLyRapPhim.Migrations
             modelBuilder.Entity("QuanLyRapPhim.Models.Payment", b =>
                 {
                     b.HasOne("QuanLyRapPhim.Models.Booking", "Booking")
-                        .WithOne("Payment")
-                        .HasForeignKey("QuanLyRapPhim.Models.Payment", "BookingId")
+                        .WithMany()
+                        .HasForeignKey("BookingId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -708,8 +710,6 @@ namespace QuanLyRapPhim.Migrations
                     b.Navigation("BookingDetails");
 
                     b.Navigation("BookingFoods");
-
-                    b.Navigation("Payment");
                 });
 
             modelBuilder.Entity("QuanLyRapPhim.Models.Movie", b =>

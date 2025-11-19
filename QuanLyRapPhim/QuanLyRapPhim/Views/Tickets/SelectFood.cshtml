@@ -1,8 +1,13 @@
-﻿@model QuanLyRapPhim.Models.Showtime
+﻿@model QuanLyRapPhim.Models.Booking
 @{
     ViewData["Title"] = "Chọn đồ ăn & nước uống";
     Layout = "~/Views/Shared/_Layout.cshtml";
-    var bookingId = TempData["BookingId"];
+
+    var booking = Model;
+    var showtime = Model.Showtime;
+    var isQuickFoodOnly = showtime == null;
+
+    var bookingId = booking.BookingId;
     var selectedSeats = TempData["SelectedSeats"] as string ?? "Chưa chọn";
     var seatCount = TempData["SeatCount"] as int? ?? 0;
 }
@@ -12,32 +17,54 @@
     <div class="row mb-4">
         <div class="col-md-8">
             <h1 class="text-white mb-2 title-gradient">Chọn đồ ăn & nước uống</h1>
-            <h4 class="text-muted mb-3">Phim: @Model.Movie.Title</h4>
-            <div class="d-flex flex-wrap text-light">
-                <p class="me-4">
-                    <i class="fas fa-door-open text-primary me-2"></i>
-                    <strong>Phòng:</strong> @Model.Room.RoomName
-                </p>
-                <p class="me-4">
-                    <i class="fas fa-calendar-alt text-primary me-2"></i>
-                    <strong>Ngày chiếu:</strong> @Model.Date.ToString("dd/MM/yyyy")
-                </p>
-                <p>
-                    <i class="fas fa-clock text-primary me-2"></i>
-                    <strong>Giờ chiếu:</strong> @Model.StartTime.ToString(@"hh\:mm")
-                </p>
-            </div>
+
+            @if (!isQuickFoodOnly)
+            {
+                <h4 class="text-muted mb-3">Phim: @showtime.Movie.Title</h4>
+                <div class="d-flex flex-wrap text-light">
+                    <p class="me-4">
+                        <i class="fas fa-door-open text-primary me-2"></i>
+                        <strong>Phòng:</strong> @showtime.Room.RoomName
+                    </p>
+                    <p class="me-4">
+                        <i class="fas fa-calendar-alt text-primary me-2"></i>
+                        <strong>Ngày chiếu:</strong> @showtime.Date.ToString("dd/MM/yyyy")
+                    </p>
+                    <p>
+                        <i class="fas fa-clock text-primary me-2"></i>
+                        <strong>Giờ chiếu:</strong> @showtime.StartTime.ToString(@"hh\:mm")
+                    </p>
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-info text-center glow-effect mb-3">
+                    <i class="fas fa-info-circle"></i>
+                    <strong>Chỉ đặt đồ ăn & nước uống</strong> – Bạn chưa chọn vé xem phim.
+                </div>
+            }
+
             <p class="text-success">
                 <i class="fas fa-chair text-warning me-2"></i>
-                <strong>Ghế đã chọn:</strong> @selectedSeats (@seatCount ghế)
+                <strong>Ghế đã chọn:</strong>
+                @(seatCount > 0 ? $"{selectedSeats} ({seatCount} ghế)" : "Không chọn ghế")
             </p>
         </div>
         <div class="col-md-4 text-end">
-            <a asp-action="SelectRoomAndSeat"
-               asp-route-showtimeId="@Model.ShowtimeId"
-               class="btn btn-secondary glow-effect">
-                Quay lại chọn ghế
-            </a>
+            @if (!isQuickFoodOnly)
+            {
+                <a asp-action="SelectRoomAndSeat"
+                   asp-route-showtimeId="@showtime.ShowtimeId"
+                   class="btn btn-secondary glow-effect">
+                    Quay lại chọn ghế
+                </a>
+            }
+            else
+            {
+                <a asp-action="Index" asp-controller="Movies" class="btn btn-secondary glow-effect">
+                    Quay lại chọn phim
+                </a>
+            }
         </div>
     </div>
 
@@ -58,9 +85,8 @@
     <!-- Form chọn đồ ăn -->
     <form asp-action="ConfirmFood" method="post">
         <input type="hidden" name="bookingId" value="@bookingId" />
-        <input type="hidden" name="showtimeId" value="@Model.ShowtimeId" />
 
-        <!-- Màn hình chiếu (giữ nguyên phong cách) -->
+        <!-- Màn hình chiếu -->
         <div class="screen-container text-center mb-5">
             <div class="screen title-gradient glow-effect">
                 <span class="screen-label">Quầy đồ ăn</span>
@@ -71,6 +97,13 @@
         <div class="row g-4 mb-5">
             @foreach (var food in ViewBag.FoodItems as List<QuanLyRapPhim.Models.FoodItem>)
             {
+                var currentQty = 0;
+                if (ViewBag.CurrentQuantities is Dictionary<int, int> dict &&
+                dict.TryGetValue(food.FoodItemId, out var qty))
+                {
+                    currentQty = qty;
+                }
+
                 <div class="col-md-6 col-lg-4 col-xl-3">
                     <div class="card h-100 food-card glow-effect @(food.Category == "Combo" ? "border-warning" : food.Category == "Bắp" ? "border-success" : "border-primary")">
                         @if (!string.IsNullOrEmpty(food.ImageUrl))
@@ -96,7 +129,7 @@
                                 <button type="button" class="btn btn-outline-secondary btn-sm minus glow-effect">-</button>
                                 <input type="number"
                                        name="quantities[@food.FoodItemId]"
-                                       value="0"
+                                       value="@currentQty"
                                        min="0"
                                        max="10"
                                        class="form-control text-center qty fw-bold"
@@ -134,44 +167,38 @@
     </form>
 </div>
 
-<!-- CSS đồng nhất với SelectSeat -->
+<!-- CSS -->
 <style>
     body {
         background-color: #0F0F0F;
         color: #ffffff;
         font-family: 'Montserrat', sans-serif;
     }
-
     .title-gradient {
         background: linear-gradient(90deg, #ff0033, #1c1c1c);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         background-clip: text;
     }
-
     .glow-effect {
         box-shadow: 0 0 15px rgba(255, 0, 51, 0.3);
         transition: all 0.3s ease;
     }
-
         .glow-effect:hover {
             box-shadow: 0 0 25px rgba(255, 0, 51, 0.5);
             transform: translateY(-3px) scale(1.02);
         }
-
     .screen-container {
         max-width: 800px;
         margin: 0 auto;
         position: relative;
     }
-
     .screen {
         background: linear-gradient(90deg, #333, #555, #333);
         height: 50px;
         border-radius: 25px;
         box-shadow: 0 5px 20px rgba(0, 0, 0, 0.6);
     }
-
     .screen-label {
         position: absolute;
         top: 50%;
@@ -182,7 +209,6 @@
         letter-spacing: 2px;
         text-transform: uppercase;
     }
-
     .food-card {
         background-color: #1c1c1c;
         border-radius: 15px;
@@ -190,11 +216,9 @@
         transition: all 0.3s ease;
         border: 2px solid transparent;
     }
-
         .food-card:hover {
             border-color: #ff0033;
         }
-
     .input-group .btn {
         border-radius: 50%;
         width: 36px;
@@ -204,19 +228,16 @@
         justify-content: center;
         font-weight: bold;
     }
-
     .qty {
         background-color: #2a2a2a;
         border: 1px solid #ff0033;
         color: #fff;
     }
-
     .seat-legend .badge {
         font-size: 1rem;
         padding: 8px 16px;
         border-radius: 20px;
     }
-
     .selected-seats-info {
         max-width: 600px;
         margin: 0 auto;
@@ -224,7 +245,6 @@
         border-radius: 15px;
         border: 1px solid #ff0033;
     }
-
     .btn-success {
         background-color: #ff0033;
         border: none;
@@ -233,12 +253,10 @@
         font-weight: 600;
         font-size: 1.2rem;
     }
-
         .btn-success:hover {
             background-color: #e6002e;
             transform: scale(1.05);
         }
-
     .btn-secondary {
         border-color: #ff0033;
         color: #ff0033;
@@ -246,16 +264,13 @@
         padding: 8px 20px;
         font-weight: 600;
     }
-
         .btn-secondary:hover {
             background-color: #ff0033;
             color: #fff;
         }
-
     .text-muted {
         color: #b3b3b3 !important;
     }
-
     .alert {
         border-radius: 12px;
     }
@@ -273,7 +288,6 @@
             function updateOrder() {
                 let total = 0;
                 let items = [];
-
                 $('.qty').each(function () {
                     const qty = parseInt($(this).val()) || 0;
                     if (qty > 0) {
@@ -286,7 +300,6 @@
                         }
                     }
                 });
-
                 $orderList.html(items.length > 0 ? items.join('<br>') : '<em>Chưa chọn món</em>');
                 $foodTotal.text(total.toLocaleString());
             }
@@ -304,8 +317,6 @@
             });
 
             $('.qty').on('change input', updateOrder);
-
-            // Khởi tạo
             updateOrder();
         });
     </script>

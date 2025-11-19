@@ -1,8 +1,11 @@
 ﻿@model QuanLyRapPhim.Models.Payment
-
 @{
     ViewData["Title"] = "Thanh toán";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
     var booking = ViewBag.Booking as QuanLyRapPhim.Models.Booking;
+    var showtime = booking?.Showtime;
+    var isQuickFoodOnly = showtime == null;
 }
 
 <div class="container my-5">
@@ -12,78 +15,99 @@
     <div class="card showtime-card text-light mb-4 glow-effect rounded-3">
         <div class="card-body">
             <h4 class="card-title">Thông tin đặt vé</h4>
-            <p><strong>Phim:</strong> @booking.Showtime.Movie.Title</p>
-            <p><strong>Phòng:</strong> @booking.Showtime.Room.RoomName</p>
-            <p><strong>Ngày chiếu:</strong> @booking.Showtime.Date.ToString("dd/MM/yyyy")</p>
-            <p><strong>Giờ chiếu:</strong> @booking.Showtime.StartTime</p>
-            <p><strong>Ghế đã chọn:</strong> @string.Join(", ", booking.BookingDetails.Select(bd => bd.Seat.SeatNumber))</p>
-            <p><strong>Tổng tiền:</strong> @booking.TotalPrice.ToString("N0") VNĐ</p>
+
+            @if (!isQuickFoodOnly)
+            {
+                <p><strong>Phim:</strong> @showtime.Movie.Title</p>
+                <p><strong>Phòng:</strong> @showtime.Room.RoomName</p>
+                <p><strong>Ngày chiếu:</strong> @showtime.Date.ToString("dd/MM/yyyy")</p>
+                <p><strong>Giờ chiếu:</strong> @showtime.StartTime.ToString(@"hh\:mm")</p>
+            }
+            else
+            {
+                <div class="alert alert-info glow-effect mb-3">
+                    <i class="fas fa-info-circle me-2"></i>
+                    <strong>Chỉ đặt đồ ăn & nước uống</strong> – Bạn chưa chọn vé xem phim.
+                </div>
+            }
+
+            @if (booking?.BookingDetails?.Any() == true)
+            {
+                <p>
+                    <strong>Ghế đã chọn:</strong>
+                    @string.Join(", ", booking.BookingDetails.Select(bd => bd.Seat.SeatNumber))
+                </p>
+            }
+            else
+            {
+                <p><strong>Ghế đã chọn:</strong> Không chọn ghế</p>
+            }
+
+            <p><strong>Tổng tiền:</strong> @booking?.TotalPrice.ToString("N0") VNĐ</p>
         </div>
     </div>
 
-    @* <!-- Form thanh toán nội bộ --> *@
-    @* <form asp-action="Create" method="post"> *@
-    @*     <input type="hidden" asp-for="PaymentId" /> *@
-    @*     <input type="hidden" asp-for="BookingId" /> *@
-    @*     <input type="hidden" asp-for="Amount" /> *@
-    @*     <input type="hidden" asp-for="PaymentDate" /> *@
-    @*     <input type="hidden" asp-for="PaymentStatus" /> *@
+    <!-- Danh sách đồ ăn -->
+    @if (booking?.BookingFoods?.Any() == true)
+    {
+        <div class="card food-card text-light mb-4 glow-effect rounded-3">
+            <div class="card-body">
+                <h4 class="card-title">Đồ ăn & nước uống</h4>
+                <ul class="list-unstyled">
+                    @foreach (var bf in booking.BookingFoods)
+                    {
+                        <li class="d-flex justify-content-between mb-2">
+                            <span><strong>@bf.FoodItem.Name</strong> x @bf.Quantity</span>
+                            <span class="text-warning">@(bf.UnitPrice * bf.Quantity):N0 VNĐ</span>
+                        </li>
+                    }
+                </ul>
+            </div>
+        </div>
+    }
 
-    @*     <div class="mb-3"> *@
-    @*         <label asp-for="PaymentMethod" class="form-label text-light">Phương thức thanh toán</label> *@
-    @*         <select asp-for="PaymentMethod" class="form-select bg-dark text-light border-secondary glow-effect"> *@
-    @*             <option value="Momo">MoMo</option> *@
-    @*         </select> *@
-    @*         <span asp-validation-for="PaymentMethod" class="text-danger"></span> *@
-    @*     </div> *@
-
-    @*     <div class="text-center mb-3"> *@
-    @*         <button type="submit" class="btn btn-primary btn-lg rounded-pill px-4 glow-effect title-gradient"> *@
-    @*             <i class="fas fa-credit-card me-1"></i> Thanh toán *@
-    @*         </button> *@
-    @*         <a asp-controller="Tickets" asp-action="SelectRoomAndSeat" asp-route-showtimeId="@booking.ShowtimeId" class="btn btn-secondary rounded-pill px-4 glow-effect ms-3"> *@
-    @*             <i class="fas fa-arrow-left me-1"></i> Quay lại chọn ghế *@
-    @*         </a> *@
-    @*     </div> *@
-    @* </form> *@
-
-    <!-- Form thanh toán MoMo (API) -->
+    <!-- Form thanh toán MoMo -->
     <form method="POST" asp-action="CreatePaymentMomo" asp-controller="Payments" class="mb-3">
         <input type="hidden" name="FullName" value="@User.Identity.Name" />
         <input type="hidden" name="Amount" value="@Model.Amount" />
-        <input type="hidden" name="OrderInfo" value="Thanh toán Momo" />
-        <button class="btn btn-primary btn-lg rounded-pill px-4 glow-effect title-gradient" type="submit">
-            <i class="fas fa-wallet me-1"></i> Thanh toán bằng MoMo
-        </button>
+        <input type="hidden" name="OrderInfo" value="Thanh toán Momo - Booking #@booking?.BookingId" />
+        <div class="text-center">
+            <button class="btn btn-primary btn-lg rounded-pill px-5 glow-effect title-gradient" type="submit">
+                <i class="fas fa-wallet me-2"></i> Thanh toán bằng MoMo
+            </button>
+        </div>
     </form>
 
-    <!-- Form thanh toán VNPay (API) -->
+    <!-- Form thanh toán VNPay -->
     <form method="POST" asp-action="CreatePaymentUrlVnpay" asp-controller="Payments" class="mb-3">
         <input type="hidden" name="Name" value="@User.Identity.Name" />
         <input type="hidden" name="Amount" value="@Model.Amount" />
-        <input type="hidden" name="OrderDescription" value="Thanh toán VNPay" />
+        <input type="hidden" name="OrderDescription" value="Thanh toán VNPay - Booking #@booking?.BookingId" />
         <input type="hidden" name="OrderType" value="2500" />
-        <button class="btn btn-primary btn-lg rounded-pill px-4 glow-effect title-gradient" type="submit">
-            <i class="fas fa-wallet me-1"></i> Thanh toán bằng VNPay
-        </button>
+        <div class="text-center">
+            <button class="btn btn-primary btn-lg rounded-pill px-5 glow-effect title-gradient" type="submit">
+                <i class="fas fa-wallet me-2"></i> Thanh toán bằng VNPay
+            </button>
+        </div>
     </form>
 
-    <!-- Form hủy đặt vé -->
-    <form asp-controller="Tickets" asp-action="CancelBooking" method="post">
+    <!-- Form hủy đặt - đã fix 404 -->
+    <form asp-controller="Tickets" asp-action="CancelBooking" method="post"
+          onsubmit="return confirm('Bạn có chắc muốn hủy và chọn lại từ đầu không?');">
         <input type="hidden" name="bookingId" value="@booking.BookingId" />
-        <input type="hidden" name="showtimeId" value="@booking.ShowtimeId" />
-        <div class="text-center">
-            <button type="submit" class="btn btn-secondary btn-lg rounded-pill px-4 glow-effect">
-                <i class="fas fa-arrow-left me-1"></i> Hủy và chọn lại ghế
+        <div class="text-center mt-4">
+            <button type="submit" class="btn btn-danger btn-lg rounded-pill px-5 glow-effect">
+                <i class="fas fa-times-circle me-2"></i>
+                Hủy đặt & chọn lại
             </button>
         </div>
     </form>
 </div>
 
-<!-- CSS tùy chỉnh -->
+<!-- CSS -->
 <style>
     body {
-        background-color: #0F0F0F; /* Galaxy Black */
+        background-color: #0F0F0F;
         color: #ffffff;
         font-family: 'Montserrat', sans-serif;
     }
@@ -93,18 +117,11 @@
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         background-clip: text;
-        color: transparent;
     }
-
-        .title-gradient:not(h1) {
-            -webkit-text-fill-color: inherit;
-            background-clip: inherit;
-            color: #fff;
-        }
 
     .glow-effect {
         box-shadow: 0 0 15px rgba(255, 0, 51, 0.3);
-        transition: box-shadow 0.3s ease, transform 0.3s ease;
+        transition: all 0.3s ease;
     }
 
         .glow-effect:hover {
@@ -112,16 +129,11 @@
             transform: scale(1.05);
         }
 
-    .showtime-card {
+    .showtime-card, .food-card {
         background-color: #1c1c1c;
-        border: none;
+        border: 1px solid #ff0033;
         border-radius: 15px;
     }
-
-        .showtime-card .card-body {
-            background-color: #1c1c1c;
-            border-radius: 15px;
-        }
 
     .card-title {
         font-size: 1.25rem;
@@ -129,67 +141,54 @@
         color: #fff;
     }
 
-    .showtime-card p {
-        color: #b3b3b3;
-        font-size: 1rem;
-        margin-bottom: 0.5rem;
+    .alert {
+        border-radius: 12px;
     }
-
-    .form-select {
-        background-color: #2a2a2a;
-        border: 1px solid #444;
-        border-radius: 8px;
-        color: #ffffff;
-        padding: 8px;
-    }
-
-        .form-select:focus {
-            border-color: #ff0033;
-            box-shadow: 0 0 10px rgba(255, 0, 51, 0.3);
-        }
 
     .btn-primary {
         background-color: #ff0033;
         border: none;
-        border-radius: 20px;
-        padding: 10px 30px;
         font-weight: 600;
-        font-size: 1rem;
-        transition: background-color 0.3s ease, transform 0.3s ease;
     }
 
         .btn-primary:hover {
             background-color: #e6002e;
-            transform: scale(1.05);
         }
 
     .btn-secondary {
         border-color: #ff0033;
         color: #ff0033;
-        border-radius: 20px;
-        padding: 10px 30px;
         font-weight: 600;
-        font-size: 1rem;
-        transition: background-color 0.3s ease, transform 0.3s ease;
     }
 
         .btn-secondary:hover {
             background-color: #ff0033;
-            color: #ffffff;
-            border-color: #ff0033;
-            transform: scale(1.05);
+            color: #fff;
         }
 
-    .text-muted {
-        color: #b3b3b3 !important;
+    .btn-warning {
+        background-color: #ff8c00;
+        border: none;
+        color: white;
+        font-weight: 600;
     }
 
-    .text-danger {
-        color: #e6002e !important;
+        .btn-warning:hover {
+            background-color: #e07b00;
+        }
+
+    .btn-danger {
+        background-color: #dc3545;
+        border: none;
+        color: white;
+        font-weight: 600;
     }
+
+        .btn-danger:hover {
+            background-color: #c82333;
+        }
 </style>
 
-<!-- Thêm Font Awesome -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
 
 @section Scripts {

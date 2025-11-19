@@ -1,13 +1,10 @@
 ﻿@model IEnumerable<QuanLyRapPhim.Models.Movie>
-
 @{
     ViewData["Title"] = "Trang chủ";
     Layout = "~/Views/Shared/_Layout.cshtml";
-
     // Loại bỏ phim trùng lặp dựa trên Title
     var distinctMovies = Model?.GroupBy(m => m.Title).Select(g => g.First()).ToList();
 }
-
 <!-- Navbar -->
 <header>
     <nav class="navbar navbar-expand-lg navbar-dark bottom-nav">
@@ -17,69 +14,52 @@
                 <img src="https://i.pinimg.com/736x/dc/e2/4e/dce24e1753323e14dc6b39527dc53e32.jpg" alt="CinemaX Logo" height="60" />
                 <span class="logo-text">CinemaX</span>
             </a>
-
             <!-- Navbar Toggler -->
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
-
             <!-- Navbar Items -->
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto nav-icons">
                     @if (User.IsInRole("Admin"))
                     {
-                        <claim class="nav-item">
-                        <a class="nav-link nav-icon" href="/Admin/Index">
-                            <i class="fas fa-tachometer-alt"></i>
-                            <span class="nav-text">Admin Dashboard</span>
-                        </a>
-                        </claim>
+                        <li class="nav-item">
+                            <a class="nav-link nav-icon" href="/Admin/Index">
+                                <i class="fas fa-tachometer-alt"></i>
+                                <span class="nav-text">Admin Dashboard</span>
+                            </a>
+                        </li>
                     }
                 </ul>
                 <!-- Right Side Actions -->
-                <div class="d-flex align-items-center">
-                    <a href="@(User.Identity.IsAuthenticated ? "/Movies" : "/Identity/Account/Login")" class="btn btn-primary book-btn me-2">ĐẶT VÉ NGAY</a>
-                    <form class="d-flex me-2" asp-action="Search" asp-controller="Home" method="get">
-                        <input class="form-control search-input me-2" type="search"
-                               name="searchString"
-                               value="@ViewData["CurrentSearch"]"
-                               placeholder="Tìm phim"
-                               aria-label="Search"
-                               id="searchInput">
-                        <button class="btn btn-outline-light search-btn" type="submit">
-                            <i class="fas fa-search"></i>
-                        </button>
+                <div class="d-flex align-items-center gap-3">
+                    <!-- NÚT ĐẶT BẮP NƯỚC -->
+                    <a href="@(User.Identity.IsAuthenticated
+                ? Url.Action("QuickFoodBooking", "Tickets")
+                : "/Identity/Account/Login")"
+                       class="btn book-btn popcorn-btn">
+                        ĐẶT<br>BẮP<br>NƯỚC
+                    </a>
+                    <!-- NÚT ĐẶT VÉ NGAY -->
+                    <a href="@(User.Identity.IsAuthenticated ? "/Movies" : "/Identity/Account/Login")"
+                       class="btn book-btn ticket-btn">
+                        ĐẶT VÉ<br>NGAY
+                    </a>
+                    <!-- Ô TÌM KIẾM -->
+                    <form class="d-flex align-items-center" asp-action="Search" asp-controller="Home" method="get">
+                        <div class="search-box">
+                            <input type="search" name="searchString" value="@ViewData["CurrentSearch"]"
+                                   placeholder="Tìm phim" class="search-input" id="searchInput">
+                            <button type="submit" class="search-btn">
+                                <i class="fas fa-search text-danger"></i>
+                            </button>
+                        </div>
                     </form>
-                    
-                    <!-- Nút đăng xuất -->
-                    @* <a href="/Identity/Account/Logout" class="nav-icon" title="Đăng xuất"> *@
-                    @*     <i class="fas fa-sign-out-alt"></i> *@
-                    @* </a> *@
                 </div>
             </div>
         </div>
     </nav>
 </header>
-
-@* @if (User.IsInRole("Admin")) *@
-@* { *@
-@*     <button id="toggleDashboard" class="dashboard-toggle"><i class="fas fa-bars"></i></button> *@
-@*     <aside id="adminDashboard" class="admin-dashboard"> *@
-@*         <div class="dashboard-header"> *@
-@*             <h4><i class="fas fa-user-shield"></i> Quản lý Admin</h4> *@
-@*         </div> *@
-@*         <ul class="dashboard-menu"> *@
-@*             <li><a href="/Admin/Index"><i class="fas fa-tachometer-alt"></i> Admin Dashboard</a></li> *@
-@*             <li><a href="/Movies"><i class="fas fa-film"></i> Danh sách phim</a></li> *@
-@*             <li><a href="/Showtimes"><i class="fas fa-clock"></i> Lịch chiếu</a></li> *@
-@*             <li><a href="/Rooms"><i class="fas fa-door-open"></i> Quản lý phòng</a></li> *@
-@*             <li><a href="/Seats"><i class="fas fa-chair"></i> Quản lý ghế</a></li> *@
-@*             <li><a href="/Admin/ManageBookings"><i class="fas fa-ticket-alt"></i> Quản lý đặt vé</a></li> *@
-@*             <li><a href="/Admin/RevenueStatistics"><i class="fas fa-file-alt"></i> Báo cáo thống kê</a></li> *@
-@*         </ul> *@
-@*     </aside> *@
-@* } *@
-
 <!-- Banner Carousel -->
 <section>
     <div id="movieCarousel" class="carousel slide" data-bs-ride="carousel">
@@ -125,7 +105,6 @@
         </button>
     </div>
 </section>
-
 <!-- Now Showing Movies -->
 <section class="now-showing-section container my-5">
     <h2 class="section-title text-white mb-4">PHIM ĐANG CHIẾU</h2>
@@ -188,7 +167,6 @@
                     <h3>Ghế Ngồi Thoải Mái</h3>
                     <p>Ghế da cao cấp với khoảng cách rộng rãi, mang đến trải nghiệm xem phim tuyệt vời nhất.</p>
                 </div>
-
                 <div class="feature-card">
                     <div class="feature-icon">
                         <i class="fas fa-volume-up"></i>
@@ -196,7 +174,6 @@
                     <h3>Âm Thanh Dolby Atmos</h3>
                     <p>Hệ thống âm thanh vòm 3D tiên tiến, mang đến âm thanh sống động và chân thực.</p>
                 </div>
-
                 <div class="feature-card">
                     <div class="feature-icon">
                         <i class="fas fa-tv"></i>
@@ -204,7 +181,6 @@
                     <h3>Màn Hình 4K</h3>
                     <p>Màn hình chiếu 4K Ultra HD với độ phân giải cao, mang đến hình ảnh rõ nét và sống động.</p>
                 </div>
-
                 <div class="feature-card">
                     <div class="feature-icon">
                         <i class="fas fa-mobile-alt"></i>
@@ -216,14 +192,12 @@
         </div>
     </section>
 </section>
-
 <style>
     body {
         background-color: #0F0F0F; /* Galaxy Black */
         color: #ffffff;
         font-family: 'Montserrat', sans-serif;
     }
-
     /* Navbar */
     .bottom-nav {
         background-color: #B22222 !important; /* Brick Red */
@@ -402,7 +376,6 @@
                 .dashboard-menu li a:hover {
                     background: #ff4040;
                 }
-
     /* Carousel Styling */
     .carousel {
         position: relative;
@@ -562,7 +535,6 @@
         --gradient-primary: linear-gradient(135deg, #e50914 0%, #f40612 100%);
         --gradient-dark: linear-gradient(135deg, #000000 0%, #1a1a1a 100%);
     }
-
     /* Features Section */
     .features-section {
         padding: 80px 0;
@@ -614,15 +586,136 @@
         color: var(--text-secondary);
         line-height: 1.6;
     }
-</style>
 
+    /* === 2 NÚT CHÍNH: ĐẶT BẮP NƯỚC & ĐẶT VÉ NGAY === */
+    .book-btn {
+        width: 80px;
+        height: 70px;
+        border-radius: 16px;
+        font-weight: 700;
+        font-size: 0.78rem;
+        line-height: 1.1;
+        text-align: center;
+        display: inline-flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.25);
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
+        border: none;
+    }
+
+        .book-btn:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.35);
+        }
+
+    .popcorn-btn {
+        background: linear-gradient(135deg, #FFD700, #FFC107);
+        color: #000;
+    }
+
+        .popcorn-btn:hover {
+            background: linear-gradient(135deg, #FFC107, #FFB300);
+        }
+
+    .ticket-btn {
+        background: linear-gradient(135deg, #ff0033, #e6002e);
+        color: #fff;
+    }
+
+        .ticket-btn:hover {
+            background: linear-gradient(135deg, #e6002e, #cc0029);
+        }
+
+    /* === Ô TÌM KIẾM NHỎ GỌN === */
+    .search-box {
+        position: relative;
+        display: flex;
+        align-items: center;
+    }
+
+    .search-input {
+        background-color: #2a2a2a !important;
+        border: none !important;
+        color: #ccc !important;
+        border-radius: 50px !important;
+        font-size: 0.85rem;
+        padding: 8px 16px 8px 16px;
+        width: 110px;
+        height: 36px;
+        outline: none;
+        transition: all 0.3s ease;
+    }
+
+        .search-input::placeholder {
+            color: #777;
+            font-style: italic;
+        }
+
+        .search-input:focus {
+            background-color: #333 !important;
+            color: #fff !important;
+            width: 140px;
+            box-shadow: 0 0 0 2px #ff0033;
+        }
+
+    .search-btn {
+        position: absolute;
+        right: 2px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: transparent !important;
+        border: none !important;
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+    }
+
+        .search-btn:hover {
+            background: #ff0033 !important;
+        }
+
+        .search-btn i {
+            font-size: 0.9rem;
+        }
+
+    /* Responsive */
+    @@media (max-width: 576px) {
+        .book-btn
+
+    {
+        width: 70px;
+        height: 60px;
+        font-size: 0.7rem;
+    }
+
+    .search-input {
+        width: 90px;
+        font-size: 0.8rem;
+    }
+
+        .search-input:focus {
+            width: 110px;
+        }
+
+    .gap-3 {
+        gap: 1rem !important;
+    }
+
+    }
+</style>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-
     document.getElementById("toggleDashboard").addEventListener("click", function() {
         let dashboard = document.getElementById("adminDashboard");
         let toggleButton = document.getElementById("toggleDashboard");
-
         if (dashboard.style.left === "-300px") {
             dashboard.style.left = "0";
             toggleButton.style.left = "310px";
@@ -631,20 +724,16 @@
             toggleButton.style.left = "10px";
         }
     });
-
     document.getElementById('searchInput').addEventListener('input', function(e) {
         if (e.target.value === '') {
-            // Lấy URL từ Razor (render sẵn server-side)
             var url = '@Url.Action("Search", "Home", new { searchString = "" })';
             window.location.href = url;
         }
     });
     document.addEventListener('DOMContentLoaded', function () {
         const searchInput = document.getElementById('searchInput');
-
         searchInput.addEventListener('input', function (e) {
             if (e.target.value === '') {
-                // Khi ô tìm kiếm rỗng, tự động gửi yêu cầu tìm kiếm với chuỗi rỗng
                 const url = '@Url.Action("Search", "Home")';
                 window.location.href = url;
             }
