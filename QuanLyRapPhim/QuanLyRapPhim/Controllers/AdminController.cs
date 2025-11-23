@@ -5,9 +5,11 @@ using Newtonsoft.Json;
 using QuanLyRapPhim.Data;
 using QuanLyRapPhim.Models;
 using System;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Collections.Generic;
 
 namespace QuanLyRapPhim.Controllers
 {
@@ -15,6 +17,7 @@ namespace QuanLyRapPhim.Controllers
     public class AdminController : Controller
     {
         private readonly DBContext _context;
+
         public AdminController(DBContext context)
         {
             _context = context;
@@ -293,56 +296,128 @@ namespace QuanLyRapPhim.Controllers
                             && b.TotalPrice > 0)
                 .OrderByDescending(b => b.BookingDate)
                 .ToListAsync();
-
             return View(bookings);
         }
-        public IActionResult RevenueStatistics()
+        public IActionResult RevenueStatistics(DateTime? fromDate, DateTime? toDate)
         {
-            // Lấy bookings có Showtime và Movie hợp lệ
+            // Mặc định lấy dữ liệu 1 tháng gần nhất nếu không có filter
+            fromDate ??= DateTime.Now.AddMonths(-1).Date;
+            toDate ??= DateTime.Now.Date;
+
+            // Lấy bookings hợp lệ với đầy đủ include để tính doanh thu riêng biệt
             var validBookings = _context.Bookings
-                .Include(b => b.Showtime)
-                    .ThenInclude(s => s.Movie)
-                .AsEnumerable() // Chuyển sang LINQ-to-Objects để xử lý null an toàn
+                .Include(b => b.Showtime).ThenInclude(s => s.Movie)
+                .Include(b => b.BookingDetails!).ThenInclude(bd => bd.Seat)
+                .Include(b => b.BookingFoods!).ThenInclude(bf => bf.FoodItem)
+                .Include(b => b.Payment)
+                .Where(b => b.Payment != null
+                            && b.Payment.PaymentStatus == "Completed"
+                            && b.TotalPrice > 0
+                            && b.BookingDate >= fromDate
+                            && b.BookingDate <= toDate)
+                .AsEnumerable()
                 .Where(b => b.Showtime != null && b.Showtime.Movie != null)
                 .ToList();
 
+            // Tính tổng doanh thu
+            var totalTicketRevenue = validBookings.Sum(b => b.BookingDetails?.Sum(bd => bd.Price) ?? 0m);
+            var totalFoodRevenue = validBookings.Sum(b => b.BookingFoods?.Sum(bf => (bf.FoodItem?.Price ?? 0m) * bf.Quantity) ?? 0m);
             var totalRevenue = validBookings.Sum(b => b.TotalPrice);
 
+            // Doanh thu theo phim
             var revenueByMovie = validBookings
                 .GroupBy(b => b.Showtime.Movie.Title)
                 .Select(g => new
                 {
                     MovieTitle = g.Key ?? "Không xác định",
-                    Revenue = g.Sum(b => b.TotalPrice)
+                    TicketRevenue = g.Sum(b => b.BookingDetails?.Sum(bd => bd.Price) ?? 0m),
+                    TotalRevenue = g.Sum(b => b.TotalPrice)
                 })
-                .OrderByDescending(x => x.Revenue)
+                .OrderByDescending(x => x.TotalRevenue)
                 .ToList();
 
+            // Doanh thu theo ngày (sử dụng Models.RevenueByDateItem)
             var revenueByDate = validBookings
                 .GroupBy(b => b.BookingDate.Date)
+                .Select(g => new RevenueByDateItem
+                {
+                    Date = g.Key,
+                    TicketRevenue = g.Sum(b => b.BookingDetails?.Sum(bd => bd.Price) ?? 0m),
+                    FoodRevenue = g.Sum(b => b.BookingFoods?.Sum(bf => (bf.FoodItem?.Price ?? 0m) * bf.Quantity) ?? 0m),
+                    TotalRevenue = g.Sum(b => b.TotalPrice)
+                })
+                .OrderBy(x => x.Date)
+                .ToList();
+
+            // Doanh thu theo tháng (sử dụng Models.RevenueByMonthItem)
+            var revenueByMonth = validBookings
+                .GroupBy(b => new { b.BookingDate.Year, b.BookingDate.Month })
+                .Select(g => new RevenueByMonthItem
+                {
+                    Year = g.Key.Year,
+                    Month = g.Key.Month,
+                    MonthName = CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(g.Key.Month),
+                    TicketRevenue = g.Sum(b => b.BookingDetails?.Sum(bd => bd.Price) ?? 0m),
+                    FoodRevenue = g.Sum(b => b.BookingFoods?.Sum(bf => (bf.FoodItem?.Price ?? 0m) * bf.Quantity) ?? 0m),
+                    TotalRevenue = g.Sum(b => b.TotalPrice)
+                })
+                .OrderBy(x => x.Year).ThenBy(x => x.Month)
+                .ToList();
+
+            // Doanh thu thức ăn theo category và ngày (sử dụng Models.FoodRevenueByDateItem)
+            var allBookingFoods = validBookings
+                .SelectMany(b => b.BookingFoods ?? new List<BookingFood>());
+            var revenueByFoodCategoryByDate = allBookingFoods
+                .GroupBy(bf => new { Date = bf.Booking.BookingDate.Date, Category = bf.FoodItem?.Category ?? "Không xác định" })
+                .Select(g => new FoodRevenueByDateItem
+                {
+                    Date = g.Key.Date,
+                    Category = g.Key.Category,
+                    Revenue = g.Sum(bf => (bf.FoodItem?.Price ?? 0m) * bf.Quantity)
+                })
+                .GroupBy(item => item.Date)
                 .Select(g => new
                 {
                     Date = g.Key,
-                    Revenue = g.Sum(b => b.TotalPrice)
+                    Categories = g.ToList()
                 })
                 .OrderBy(x => x.Date)
                 .ToList();
 
             var revenueData = new
             {
+                FromDate = fromDate.Value.ToString("yyyy-MM-dd"),
+                ToDate = toDate.Value.ToString("yyyy-MM-dd"),
+                TotalTicketRevenue = totalTicketRevenue,
+                TotalFoodRevenue = totalFoodRevenue,
                 TotalRevenue = totalRevenue,
                 RevenueByMovie = revenueByMovie,
-                RevenueByDate = revenueByDate
+                RevenueByDate = revenueByDate,
+                RevenueByMonth = revenueByMonth,
+                RevenueByFoodCategoryByDate = revenueByFoodCategoryByDate
             };
 
-            var formattedRevenueByDate = revenueData.RevenueByDate.Select(x => new
+            // Format cho chart (JSON)
+            var formattedRevenueByDateForChart = revenueByDate.Select(x => new
             {
                 Date = x.Date.ToString("dd/MM/yyyy"),
-                Revenue = x.Revenue
+                TicketRevenue = x.TicketRevenue,
+                FoodRevenue = x.FoodRevenue,
+                TotalRevenue = x.TotalRevenue
+            }).ToList();
+
+            var formattedRevenueByMonthForChart = revenueByMonth.Select(x => new
+            {
+                Month = $"{x.MonthName} {x.Year}",
+                TicketRevenue = x.TicketRevenue,
+                FoodRevenue = x.FoodRevenue,
+                TotalRevenue = x.TotalRevenue
             }).ToList();
 
             ViewBag.RevenueData = revenueData;
-            ViewBag.FormattedRevenueByDate = JsonConvert.SerializeObject(formattedRevenueByDate);
+            ViewBag.FormattedRevenueByDate = JsonConvert.SerializeObject(formattedRevenueByDateForChart);
+            ViewBag.FormattedRevenueByMonth = JsonConvert.SerializeObject(formattedRevenueByMonthForChart);
+            ViewBag.FormattedFoodByDate = JsonConvert.SerializeObject(revenueByFoodCategoryByDate);
 
             return View();
         }
@@ -353,7 +428,6 @@ namespace QuanLyRapPhim.Controllers
         {
             return View();
         }
-
         [HttpGet]
         public async Task<IActionResult> GetFoodItems()
         {
@@ -368,16 +442,13 @@ namespace QuanLyRapPhim.Controllers
                     imageUrl = f.ImageUrl
                 })
                 .ToListAsync();
-
             return Json(foods);
         }
-
         [HttpGet]
         public async Task<IActionResult> GetFoodItem(int id)
         {
             var food = await _context.FoodItems.FindAsync(id);
             if (food == null) return NotFound();
-
             return Json(new
             {
                 foodItemId = food.FoodItemId,
@@ -388,26 +459,21 @@ namespace QuanLyRapPhim.Controllers
                 imageUrl = food.ImageUrl
             });
         }
-
         [HttpPost]
         public async Task<IActionResult> CreateFood([FromForm] FoodItem food, IFormFile imageFile)
         {
             if (!ModelState.IsValid)
                 return Json(new { success = false, message = "Dữ liệu không hợp lệ." });
-
             if (imageFile != null && imageFile.Length > 0)
             {
                 var fileName = Guid.NewGuid() + Path.GetExtension(imageFile.FileName);
                 var uploadPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", "food");
                 Directory.CreateDirectory(uploadPath);
                 var filePath = Path.Combine(uploadPath, fileName);
-
                 using var stream = new FileStream(filePath, FileMode.Create);
                 await imageFile.CopyToAsync(stream);
-
                 food.ImageUrl = "/images/food/" + fileName;
             }
-
             _context.FoodItems.Add(food);
             await _context.SaveChangesAsync();
             return Json(new { success = true, message = "Thêm món thành công!" });
@@ -423,16 +489,13 @@ namespace QuanLyRapPhim.Controllers
         {
             if (string.IsNullOrWhiteSpace(name) || price < 0)
                 return Json(new { success = false, message = "Dữ liệu không hợp lệ." });
-
             var existing = await _context.FoodItems.FindAsync(foodItemId);
             if (existing == null)
                 return Json(new { success = false, message = "Không tìm thấy món ăn." });
-
             existing.Name = name.Trim();
             existing.Size = size;
             existing.Price = price;
             existing.Category = category;
-
             if (imageFile != null && imageFile.Length > 0)
             {
                 // Xóa ảnh cũ
@@ -442,7 +505,6 @@ namespace QuanLyRapPhim.Controllers
                     if (System.IO.File.Exists(oldPath))
                         System.IO.File.Delete(oldPath);
                 }
-
                 var fileName = Guid.NewGuid() + Path.GetExtension(imageFile.FileName);
                 var uploadPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", "food");
                 Directory.CreateDirectory(uploadPath);
@@ -451,7 +513,6 @@ namespace QuanLyRapPhim.Controllers
                 await imageFile.CopyToAsync(stream);
                 existing.ImageUrl = "/images/food/" + fileName;
             }
-
             try
             {
                 await _context.SaveChangesAsync();
@@ -462,14 +523,12 @@ namespace QuanLyRapPhim.Controllers
                 return Json(new { success = false, message = "Lỗi lưu dữ liệu: " + ex.Message });
             }
         }
-
         [HttpPost]
         public async Task<IActionResult> DeleteFood(int id)
         {
             var food = await _context.FoodItems.FindAsync(id);
             if (food == null)
                 return Json(new { success = false, message = "Không tìm thấy món ăn." });
-
             // Xóa ảnh
             if (!string.IsNullOrEmpty(food.ImageUrl))
             {
@@ -477,17 +536,36 @@ namespace QuanLyRapPhim.Controllers
                 if (System.IO.File.Exists(filePath))
                     System.IO.File.Delete(filePath);
             }
-
             _context.FoodItems.Remove(food);
             await _context.SaveChangesAsync();
             return Json(new { success = true, message = "Xóa thành công!" });
         }
     }
-
     // Helper class for revenue statistics
     public class RevenueByDateItem
     {
         public DateTime Date { get; set; }
+        public decimal TicketRevenue { get; set; }
+        public decimal FoodRevenue { get; set; }
+        public decimal TotalRevenue { get; set; }
+    }
+
+    // Helper class for revenue statistics by month
+    public class RevenueByMonthItem
+    {
+        public int Year { get; set; }
+        public int Month { get; set; }
+        public string MonthName { get; set; }
+        public decimal TicketRevenue { get; set; }
+        public decimal FoodRevenue { get; set; }
+        public decimal TotalRevenue { get; set; }
+    }
+
+    // Helper class for food revenue by category and date
+    public class FoodRevenueByDateItem
+    {
+        public DateTime Date { get; set; }
+        public string Category { get; set; }
         public decimal Revenue { get; set; }
     }
 }

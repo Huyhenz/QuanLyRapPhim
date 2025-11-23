@@ -1,31 +1,32 @@
 ﻿@model dynamic
-
+@using Newtonsoft.Json
+@using System.Collections.Generic
+@using System.Globalization
+@using System.Linq
 @{
-    ViewData["Title"] = "Báo các thống kê";
+    ViewData["Title"] = "Báo cáo thống kê";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
-
 <div class="admin-dashboard">
-    <!-- Sidebar -->
+    <!-- Sidebar (giữ nguyên) -->
     <aside class="sidebar">
         <div class="sidebar-header">
             <h3 class="sidebar-title">CinemaX Admin</h3>
         </div>
         <nav class="sidebar-nav">
-            @* <a href="/Admin/Index" class="nav-item"><i class="fas fa-tachometer-alt"></i> Dashboard</a> *@
             <a href="/Movies" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Movies" ? "active" : "")"><i class="fas fa-film"></i> Quản lý phim</a>
             <a href="/Showtimes" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Showtimes" ? "active" : "")"><i class="fas fa-clock"></i> Quản lý lịch chiếu</a>
             <a href="/Rooms" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Rooms" ? "active" : "")"><i class="fas fa-door-open"></i> Quản lý phòng</a>
             <a href="/Seats" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Seats" ? "active" : "")"><i class="fas fa-chair"></i> Quản lý ghế</a>
-            <a href="/Admin/ManageFoods" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "ManageFoods" ? "active" : "")"><i class="fas fa-utensils"></i> Quản lý đồ ăn</a>            <a href="/Admin/ManageBookings" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Admin" && ViewContext.RouteData.Values["Action"]?.ToString() == "ManageBookings" ? "active" : "")"><i class="fas fa-ticket-alt"></i> Quản lý đặt vé</a>
-            <a href="/Admin/RevenueStatistics" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Admin" && ViewContext.RouteData.Values["Action"]?.ToString() == "RevenueStatistics" ? "active" : "")"><i class="fas fa-chart-bar"></i> Báo cáo thống kê</a>
+            <a href="/Admin/ManageFoods" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "ManageFoods" ? "active" : "")"><i class="fas fa-utensils"></i> Quản lý đồ ăn</a>
+            <a href="/Admin/ManageBookings" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Admin" && ViewContext.RouteData.Values["Action"]?.ToString() == "ManageBookings" ? "active" : "")"><i class="fas fa-ticket-alt"></i> Quản lý đặt vé</a>
+            <a href="/Admin/RevenueStatistics" class="nav-item active"><i class="fas fa-chart-bar"></i> Báo cáo thống kê</a>
             <div class="nav-divider"></div>
             <a href="#" class="nav-item"><i class="fab fa-facebook"></i> Facebook</a>
             <a href="#" class="nav-item"><i class="fab fa-twitter"></i> Twitter</a>
             <a href="#" class="nav-item"><i class="fab fa-google"></i> Google</a>
         </nav>
     </aside>
-
     <!-- Main Content -->
     <main class="content">
         <div class="content-inner">
@@ -33,33 +34,40 @@
             <div class="header-actions">
                 <span class="order-count">Tổng quan về dữ liệu doanh thu</span>
                 <div class="date-filter">
-                    <span>From</span>
-                    <input type="date" class="date-input" value="2025-05-25">
-                    <span>to</span>
-                    <input type="date" class="date-input" value="2025-05-28">
+                    <form id="dateFilterForm" method="get" action="@Url.Action("RevenueStatistics")">
+                        <input type="hidden" name="fromDate" id="fromDateInput" value="@(((dynamic)ViewBag.RevenueData)?.FromDate ?? DateTime.Now.AddMonths(-1).ToString("yyyy-MM-dd"))">
+                        <input type="hidden" name="toDate" id="toDateInput" value="@(((dynamic)ViewBag.RevenueData)?.ToDate ?? DateTime.Now.ToString("yyyy-MM-dd"))">
+                        <span>From</span>
+                        <input type="date" class="date-input" id="fromDate" onchange="updateFilter()">
+                        <span>to</span>
+                        <input type="date" class="date-input" id="toDate" onchange="updateFilter()">
+                        <button type="submit" class="filter-btn">Lọc</button>
+                    </form>
                 </div>
             </div>
-
-            <!-- Alerts for Success/Error Messages -->
+            <!-- Alerts -->
             <div id="alert-container" class="mb-4"></div>
-
             <!-- Revenue Summary -->
             <div class="admin-section">
                 <h3 class="section-subtitle">Bản tóm tắt</h3>
                 <div class="summary-card">
-                    <h4>Tổng doanh thu: @(((dynamic)ViewBag.RevenueData)?.TotalRevenue.ToString("C", new System.Globalization.CultureInfo("vi-VN")) ?? "N/A")</h4>
+                    <div class="summary-row">
+                        <span>Tổng doanh thu vé: @(((dynamic)ViewBag.RevenueData)?.TotalTicketRevenue.ToString("C", new System.Globalization.CultureInfo("vi-VN")) ?? "N/A")</span>
+                        <span>Tổng doanh thu thức ăn: @(((dynamic)ViewBag.RevenueData)?.TotalFoodRevenue.ToString("C", new System.Globalization.CultureInfo("vi-VN")) ?? "N/A")</span>
+                        <span>Tổng doanh thu: @(((dynamic)ViewBag.RevenueData)?.TotalRevenue.ToString("C", new System.Globalization.CultureInfo("vi-VN")) ?? "N/A")</span>
+                    </div>
                 </div>
             </div>
-
             <!-- Revenue by Movie -->
             <div class="admin-section">
-                <h3 class="section-subtitle">Doanh thu của phim</h3>
+                <h3 class="section-subtitle">Doanh thu theo phim (Vé + Thức ăn)</h3>
                 <div class="table-responsive">
                     <table class="table table-custom">
                         <thead>
                             <tr>
                                 <th>Tiêu đề phim</th>
-                                <th>Doanh Thu (VND)</th>
+                                <th>Doanh thu vé (VND)</th>
+                                <th>Tổng doanh thu (VND)</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -71,31 +79,159 @@
                                     {
                                         <tr>
                                             <td>@(item.MovieTitle ?? "N/A")</td>
-                                            <td>@(item.Revenue != null ? item.Revenue.ToString("C", new System.Globalization.CultureInfo("vi-VN")) : "N/A")</td>
+                                            <td>@(item.TicketRevenue?.ToString("C", new System.Globalization.CultureInfo("vi-VN")) ?? "N/A")</td>
+                                            <td>@(item.TotalRevenue?.ToString("C", new System.Globalization.CultureInfo("vi-VN")) ?? "N/A")</td>
                                         </tr>
                                     }
                                 }
                                 else
                                 {
-                                    <tr>
-                                        <td colspan="2" class="text-center">Không có dữ liệu doanh thu.</td>
-                                    </tr>
+                                    <tr><td colspan="3" class="text-center">Không có dữ liệu.</td></tr>
                                 }
                             }
                         </tbody>
                     </table>
                 </div>
             </div>
-
-            <!-- Revenue Chart -->
+            <!-- Revenue by Date Table -->
             <div class="admin-section">
-                <h3 class="section-subtitle">Doanh Thu trong ngày</h3>
-                <canvas id="revenueChart" width="400" height="200"></canvas>
+                <h3 class="section-subtitle">Doanh thu theo ngày</h3>
+                <div class="table-responsive">
+                    <table class="table table-custom">
+                        <thead>
+                            <tr>
+                                <th>Ngày</th>
+                                <th>Doanh thu vé (VND)</th>
+                                <th>Doanh thu thức ăn (VND)</th>
+                                <th>Tổng (VND)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @{
+                                var revenueByDate = ((dynamic)ViewBag.RevenueData)?.RevenueByDate as IEnumerable<dynamic> ?? new List<dynamic>();
+                                if (revenueByDate.Any())
+                                {
+                                    foreach (var item in revenueByDate)
+                                    {
+                                        <tr>
+                                            <td>@(((dynamic)item).Date?.ToString("dd/MM/yyyy") ?? "N/A")</td>
+                                            <td>@(((dynamic)item).TicketRevenue?.ToString("C", new System.Globalization.CultureInfo("vi-VN")) ?? "N/A")</td>
+                                            <td>@(((dynamic)item).FoodRevenue?.ToString("C", new System.Globalization.CultureInfo("vi-VN")) ?? "N/A")</td>
+                                            <td>@(((dynamic)item).TotalRevenue?.ToString("C", new System.Globalization.CultureInfo("vi-VN")) ?? "N/A")</td>
+                                        </tr>
+                                    }
+                                }
+                                else
+                                {
+                                    <tr><td colspan="4" class="text-center">Không có dữ liệu.</td></tr>
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <!-- Revenue by Month Table -->
+            <div class="admin-section">
+                <h3 class="section-subtitle">Doanh thu theo tháng</h3>
+                <div class="table-responsive">
+                    <table class="table table-custom">
+                        <thead>
+                            <tr>
+                                <th>Tháng</th>
+                                <th>Doanh thu vé (VND)</th>
+                                <th>Doanh thu thức ăn (VND)</th>
+                                <th>Tổng (VND)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @{
+                                var revenueByMonth = ((dynamic)ViewBag.RevenueData)?.RevenueByMonth as IEnumerable<dynamic> ?? new List<dynamic>();
+                                if (revenueByMonth.Any())
+                                {
+                                    foreach (var item in revenueByMonth)
+                                    {
+                                        <tr>
+                                            <td>@(((dynamic)item).MonthName + " " + ((dynamic)item).Year)</td>
+                                            <td>@(((dynamic)item).TicketRevenue?.ToString("C", new System.Globalization.CultureInfo("vi-VN")) ?? "N/A")</td>
+                                            <td>@(((dynamic)item).FoodRevenue?.ToString("C", new System.Globalization.CultureInfo("vi-VN")) ?? "N/A")</td>
+                                            <td>@(((dynamic)item).TotalRevenue?.ToString("C", new System.Globalization.CultureInfo("vi-VN")) ?? "N/A")</td>
+                                        </tr>
+                                    }
+                                }
+                                else
+                                {
+                                    <tr><td colspan="4" class="text-center">Không có dữ liệu.</td></tr>
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <!-- Food Revenue by Category by Date -->
+            <div class="admin-section">
+                <h3 class="section-subtitle">Doanh thu thức ăn theo category và ngày</h3>
+                <div class="table-responsive">
+                    <table class="table table-custom">
+                        <thead>
+                            <tr>
+                                <th>Ngày</th>
+                                <th>Category</th>
+                                <th>Doanh thu (VND)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @{
+                                var formattedFoodByDate = ViewBag.FormattedFoodByDate?.ToString() ?? "[]";
+                                var foodByDate = JsonConvert.DeserializeObject<List<dynamic>>(formattedFoodByDate);
+                                if (foodByDate != null && foodByDate.Count > 0)
+                                {
+                                    foreach (var dateGroup in foodByDate)
+                                    {
+                                        dynamic dg = dateGroup;
+                                        var categories = dg.Categories as IEnumerable<dynamic>;
+                                        if (categories != null)
+                                        {
+                                            foreach (var item in categories)
+                                            {
+                                                <tr>
+                                                    <td>@(dg.Date?.ToString("dd/MM/yyyy") ?? "N/A")</td>
+                                                    <td>@(item.Category ?? "N/A")</td>
+                                                    <td>@(item.Revenue?.ToString("C", new System.Globalization.CultureInfo("vi-VN")) ?? "N/A")</td>
+                                                </tr>
+                                            }
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    <tr><td colspan="3" class="text-center">Không có dữ liệu.</td></tr>
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <!-- Charts -->
+            <div class="admin-section">
+                <h3 class="section-subtitle">Biểu đồ doanh thu theo ngày</h3>
+                <canvas id="revenueByDateChart" width="400" height="200"></canvas>
+            </div>
+            <div class="admin-section">
+                <h3 class="section-subtitle">Biểu đồ doanh thu theo tháng</h3>
+                <canvas id="revenueByMonthChart" width="400" height="200"></canvas>
+            </div>
+            <!-- Additional Small Charts for Monthly Revenue -->
+            <div class="admin-section">
+                <h3 class="section-subtitle">Biểu đồ nhỏ - Doanh thu vé theo tháng</h3>
+                <canvas id="monthlyTicketChart" width="300" height="150"></canvas>
+            </div>
+            <div class="admin-section">
+                <h3 class="section-subtitle">Biểu đồ nhỏ - Doanh thu thức ăn theo tháng</h3>
+                <canvas id="monthlyFoodChart" width="300" height="150"></canvas>
             </div>
         </div>
     </main>
 </div>
-
 <style>
     body {
         margin: 0;
@@ -318,6 +454,36 @@
         border-color: #dc3545;
     }
 
+    .summary-row {
+        display: flex;
+        justify-content: space-around;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+        .summary-row span {
+            background: #000000;
+            padding: 10px;
+            border-radius: 10px;
+            border: 1px solid #ff0033;
+            flex: 1;
+            min-width: 200px;
+            text-align: center;
+        }
+
+    .filter-btn {
+        padding: 8px 12px;
+        background: #ff0033;
+        color: #000;
+        border: none;
+        border-radius: 12px;
+        cursor: pointer;
+        margin-left: 10px;
+    }
+
+        .filter-btn:hover {
+            background: #cc0026;
+        }
     /* Media Queries */
     @@media (max-width: 768px) {
         .sidebar
@@ -333,7 +499,6 @@
     }
 
     }
-
     @@media (max-width: 576px) {
         .admin-dashboard
 
@@ -360,73 +525,215 @@
 
     }
 </style>
-
 @section Scripts {
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         $(document).ready(function () {
-            // Show Alert
-            function showAlert(message, type) {
-                var alertHtml = `<div class="alert alert-${type} alert-dismissible fade show" role="alert">
-                    ${message}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>`;
-                $('#alert-container').html(alertHtml);
+            // Set initial date values
+            $('#fromDate').val('@(((dynamic)ViewBag.RevenueData)?.FromDate ?? DateTime.Now.AddMonths(-1).ToString("yyyy-MM-dd"))');
+            $('#toDate').val('@(((dynamic)ViewBag.RevenueData)?.ToDate ?? DateTime.Now.ToString("yyyy-MM-dd"))');
+
+            // Update hidden inputs on date change
+            function updateFilter() {
+                $('#fromDateInput').val($('#fromDate').val());
+                $('#toDateInput').val($('#toDate').val());
             }
 
-            // Parse the pre-serialized JSON data
-            var revenueByDate = JSON.parse('@Html.Raw(ViewBag.FormattedRevenueByDate)');
+            // Parse JSON data for charts
+            var revenueByDateData = JSON.parse('@Html.Raw(ViewBag.FormattedRevenueByDate ?? "[]")');
+            var revenueByMonthData = JSON.parse('@Html.Raw(ViewBag.FormattedRevenueByMonth ?? "[]")');
 
-            // Extract labels (dates) and data (revenues)
-            var labels = revenueByDate.map(item => item.Date);
-            var data = revenueByDate.map(item => item.Revenue);
-
-            // Revenue Chart
-            var ctx = document.getElementById('revenueChart').getContext('2d');
-            var revenueChart = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        label: 'Revenue (VND)',
-                        data: data,
-                        backgroundColor: 'rgba(255, 0, 51, 0.2)', // Adjusted to match red theme
-                        borderColor: 'rgba(255, 0, 51, 1)',
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            ticks: {
-                                callback: function(value) {
-                                    return value.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' });
-                                },
-                                color: '#FFFFFF'
+            // Chart theo ngày
+            if (revenueByDateData.length > 0) {
+                var ctxDate = document.getElementById('revenueByDateChart').getContext('2d');
+                new Chart(ctxDate, {
+                    type: 'bar',
+                    data: {
+                        labels: revenueByDateData.map(item => item.Date),
+                        datasets: [
+                            {
+                                label: 'Vé (VND)',
+                                data: revenueByDateData.map(item => item.TicketRevenue),
+                                backgroundColor: 'rgba(0, 123, 255, 0.2)',
+                                borderColor: 'rgba(0, 123, 255, 1)',
+                                borderWidth: 1
                             },
-                            grid: {
-                                color: 'rgba(255, 255, 255, 0.1)'
+                            {
+                                label: 'Thức ăn (VND)',
+                                data: revenueByDateData.map(item => item.FoodRevenue),
+                                backgroundColor: 'rgba(255, 193, 7, 0.2)',
+                                borderColor: 'rgba(255, 193, 7, 1)',
+                                borderWidth: 1
+                            },
+                            {
+                                label: 'Tổng (VND)',
+                                data: revenueByDateData.map(item => item.TotalRevenue),
+                                backgroundColor: 'rgba(255, 0, 51, 0.2)',
+                                borderColor: 'rgba(255, 0, 51, 1)',
+                                borderWidth: 1
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    callback: function(value) {
+                                        return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(value);
+                                    },
+                                    color: '#FFFFFF'
+                                },
+                                grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                            },
+                            x: {
+                                ticks: { color: '#FFFFFF' },
+                                grid: { color: 'rgba(255, 255, 255, 0.1)' }
                             }
                         },
-                        x: {
-                            ticks: {
-                                color: '#FFFFFF'
-                            },
-                            grid: {
-                                color: 'rgba(255, 255, 255, 0.1)'
-                            }
-                        }
-                    },
-                    plugins: {
-                        legend: {
-                            labels: {
-                                color: '#FFFFFF'
-                            }
+                        plugins: {
+                            legend: { labels: { color: '#FFFFFF' } }
                         }
                     }
-                }
-            });
+                });
+            }
+
+            // Chart theo tháng
+            if (revenueByMonthData.length > 0) {
+                var ctxMonth = document.getElementById('revenueByMonthChart').getContext('2d');
+                new Chart(ctxMonth, {
+                    type: 'line',
+                    data: {
+                        labels: revenueByMonthData.map(item => item.Month),
+                        datasets: [
+                            {
+                                label: 'Vé (VND)',
+                                data: revenueByMonthData.map(item => item.TicketRevenue),
+                                borderColor: 'rgba(0, 123, 255, 1)',
+                                backgroundColor: 'rgba(0, 123, 255, 0.2)',
+                                tension: 0.1
+                            },
+                            {
+                                label: 'Thức ăn (VND)',
+                                data: revenueByMonthData.map(item => item.FoodRevenue),
+                                borderColor: 'rgba(255, 193, 7, 1)',
+                                backgroundColor: 'rgba(255, 193, 7, 0.2)',
+                                tension: 0.1
+                            },
+                            {
+                                label: 'Tổng (VND)',
+                                data: revenueByMonthData.map(item => item.TotalRevenue),
+                                borderColor: 'rgba(255, 0, 51, 1)',
+                                backgroundColor: 'rgba(255, 0, 51, 0.2)',
+                                tension: 0.1
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    callback: function(value) {
+                                        return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(value);
+                                    },
+                                    color: '#FFFFFF'
+                                },
+                                grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                            },
+                            x: {
+                                ticks: { color: '#FFFFFF' },
+                                grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                            }
+                        },
+                        plugins: {
+                            legend: { labels: { color: '#FFFFFF' } }
+                        }
+                    }
+                });
+            }
+
+            // Biểu đồ nhỏ - Doanh thu vé theo tháng
+            if (revenueByMonthData.length > 0) {
+                var ctxTicket = document.getElementById('monthlyTicketChart').getContext('2d');
+                new Chart(ctxTicket, {
+                    type: 'bar',
+                    data: {
+                        labels: revenueByMonthData.map(item => item.Month),
+                        datasets: [{
+                            label: 'Doanh thu vé (VND)',
+                            data: revenueByMonthData.map(item => item.TicketRevenue),
+                            backgroundColor: 'rgba(0, 123, 255, 0.6)',
+                            borderColor: 'rgba(0, 123, 255, 1)',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    callback: function(value) {
+                                        return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(value);
+                                    },
+                                    color: '#FFFFFF'
+                                },
+                                grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                            },
+                            x: {
+                                ticks: { color: '#FFFFFF' },
+                                grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                            }
+                        },
+                        plugins: {
+                            legend: { labels: { color: '#FFFFFF' } }
+                        }
+                    }
+                });
+            }
+
+            // Biểu đồ nhỏ - Doanh thu thức ăn theo tháng
+            if (revenueByMonthData.length > 0) {
+                var ctxFood = document.getElementById('monthlyFoodChart').getContext('2d');
+                new Chart(ctxFood, {
+                    type: 'bar',
+                    data: {
+                        labels: revenueByMonthData.map(item => item.Month),
+                        datasets: [{
+                            label: 'Doanh thu thức ăn (VND)',
+                            data: revenueByMonthData.map(item => item.FoodRevenue),
+                            backgroundColor: 'rgba(255, 193, 7, 0.6)',
+                            borderColor: 'rgba(255, 193, 7, 1)',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    callback: function(value) {
+                                        return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(value);
+                                    },
+                                    color: '#FFFFFF'
+                                },
+                                grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                            },
+                            x: {
+                                ticks: { color: '#FFFFFF' },
+                                grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                            }
+                        },
+                        plugins: {
+                            legend: { labels: { color: '#FFFFFF' } }
+                        }
+                    }
+                });
+            }
         });
     </script>
 }
