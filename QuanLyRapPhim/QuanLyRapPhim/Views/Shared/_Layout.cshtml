@@ -1,4 +1,7 @@
-﻿<!DOCTYPE html>
+﻿@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -12,7 +15,7 @@
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
 
-    <!-- Font Awesome (cho icon tìm kiếm và mạng xã hội) -->
+    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
 
     <!-- Custom CSS -->
@@ -22,30 +25,91 @@
     <style>
         body {
             font-family: 'Roboto', sans-serif;
-            background-color: #F5A89A; /* Màu nền tối giống giao diện */
+            background-color: #F5A89A;
         }
 
         .navbar {
-            background-color: #1C2526 !important; /* Màu Smoke Black */
-            border-bottom: 1px solid #0F1213; /* Viền dưới Smoke Black đậm hơn */
+            background-color: #1C2526 !important;
+            border-bottom: 1px solid #0F1213;
         }
 
         .navbar-brand {
-            color: #FFDAB9 !important; /* Màu đào nhạt cho logo */
+            color: #FFDAB9 !important;
             font-weight: bold;
         }
 
         .nav-link {
-            color: #FFDAB9 !important; /* Màu đào nhạt cho liên kết */
-            transition: color 0.3s ease; /* Hiệu ứng chuyển màu mượt */
+            color: #FFDAB9 !important;
+            transition: color 0.3s ease;
         }
 
             .nav-link:hover {
-                color: #FFFFFF !important; /* Trắng khi hover */
+                color: #FFFFFF !important;
             }
 
         .navbar-toggler-icon {
-            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='%23FFDAB9' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e") !important; /* Màu đào nhạt cho icon toggler */
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='%23FFDAB9' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e") !important;
+        }
+
+        /* Language Switcher */
+        .language-switcher {
+            display: flex;
+            align-items: center;
+        }
+
+        .btn-language {
+            background-color: transparent;
+            border: 2px solid #FFDAB9;
+            color: #FFDAB9 !important;
+            padding: 5px 15px;
+            font-size: 14px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            transition: all 0.3s ease;
+            border-radius: 0;
+        }
+
+            .btn-language:first-child {
+                border-top-left-radius: 20px;
+                border-bottom-left-radius: 20px;
+                border-right: 1px solid #FFDAB9;
+            }
+
+            .btn-language:last-child {
+                border-top-right-radius: 20px;
+                border-bottom-right-radius: 20px;
+                border-left: 1px solid #FFDAB9;
+            }
+
+            .btn-language:hover {
+                background-color: rgba(255, 218, 185, 0.1);
+                color: #FFFFFF !important;
+                border-color: #FFFFFF;
+            }
+
+            .btn-language.active {
+                background-color: #FFDAB9;
+                color: #1C2526 !important;
+                border-color: #FFDAB9;
+            }
+
+        .flag-icon {
+            width: 20px;
+            height: 15px;
+            object-fit: cover;
+            border-radius: 2px;
+        }
+
+        @@media (max-width: 991px) {
+            .language-switcher
+
+        {
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+
         }
     </style>
 </head>
@@ -54,6 +118,7 @@
     <header>
         <nav class="navbar navbar-expand-lg shadow">
             <div class="container">
+
                 <!-- Logo -->
                 <a class="navbar-brand fw-bold" asp-area="" asp-controller="Home" asp-action="Index">
                     <i class="fas fa-film"></i> CinemaX
@@ -64,19 +129,39 @@
                         aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
+
                 <div class="collapse navbar-collapse" id="navbarNav">
+
+                    <!-- Menu -->
                     <ul class="navbar-nav me-auto">
                         <li class="nav-item">
                             <a class="nav-link active" asp-area="" asp-controller="Home" asp-action="Index">
-                                <i class="fas fa-home"></i> Trang chủ
+                                <i class="fas fa-home"></i> @Localizer["Home"]
                             </a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Privacy">
-                                <i class="fas fa-shield-alt"></i> Chính sách
+                                <i class="fas fa-shield-alt"></i> @Localizer["Privacy"]
                             </a>
                         </li>
                     </ul>
+
+                    <!-- NÚT CHUYỂN ĐỔI NGÔN NGỮ -->
+                    <div class="language-switcher me-3">
+                        <div class="btn-group" role="group">
+                            <button type="button" class="btn btn-language @(System.Globalization.CultureInfo.CurrentCulture.Name == "vi" ? "active" : "")"
+                                    onclick="changeLanguage('vi')">
+                                <img src="https://flagcdn.com/w20/vn.png" alt="VN" class="flag-icon" /> VN
+                            </button>
+                            <button type="button" class="btn btn-language @(System.Globalization.CultureInfo.CurrentCulture.Name == "en" ? "active" : "")"
+                                    onclick="changeLanguage('en')">
+                                <img src="https://flagcdn.com/w20/us.png" alt="EN" class="flag-icon" /> ENG
+                            </button>
+                        </div>
+                    </div>
+
+
+                    <!-- Login Partial -->
                     <partial name="_LoginPartial" />
                 </div>
             </div>
@@ -92,38 +177,56 @@
     <footer class="bg-dark text-white py-5">
         <div class="container">
             <div class="row">
+
                 <!-- Logo and Slogan -->
                 <div class="col-md-3">
                     <img src="https://i.pinimg.com/736x/84/bb/7d/84bb7dc83f72e12a7098a5e31c484baf.jpg" alt="CinemaX Logo" height="50" />
                     <h5>CinemaX</h5>
                     <p>BE HAPPY, BE A STAR</p>
-                    <p class="mt-3">Ngôn ngữ: <img src="https://i.pinimg.com/736x/4d/01/84/4d01846694471249d81d3ddfafbfa031.jpg" alt="VN Flag" height="20" /> VN</p>
                 </div>
-
 
                 <!-- Tài khoản -->
                 <div class="col-md-2">
-                    <h5>TÀI KHOẢN</h5>
+                    <h5>@Localizer["Account"]</h5>
                     <ul class="list-unstyled">
                         @if (User.Identity.IsAuthenticated)
                         {
                             <li>
                                 <span style="color: white !important; opacity: 1;">
-                                    <i class="fas fa-user-circle me-1"></i> Xin chào, @User.Identity.Name
+                                    <i class="fas fa-user-circle me-1"></i> @Localizer["Hello"], @User.Identity.Name
                                 </span>
                             </li>
-                            <li><a href="/Identity/Account/Manage/Index" class="btn btn-outline-secondary">Profile</a></li>
-                            <li><a href="/Identity/Account/Logout" class="text-white text-decoration-none">Đăng xuất</a></li>
+                            <li>
+                                <a href="/Identity/Account/Manage/Index" class="btn btn-outline-secondary">
+                                    @Localizer["Profile"]
+                                </a>
+                            </li>
+                            <li>
+                                <a href="/Identity/Account/Logout" class="text-white text-decoration-none">
+                                    @Localizer["Logout"]
+                                </a>
+                            </li>
                         }
                         else
                         {
-                            <li><a href="/Identity/Account/Login" class="text-white text-decoration-none">Đăng nhập</a></li>
-                            <li><a href="/Identity/Account/Register" class="text-white text-decoration-none">Đăng ký</a></li>
+                            <li>
+                                <a href="/Identity/Account/Login" class="text-white text-decoration-none">
+                                    @Localizer["Login"]
+                                </a>
+                            </li>
+                            <li>
+                                <a href="/Identity/Account/Register" class="text-white text-decoration-none">
+                                    @Localizer["Register"]
+                                </a>
+                            </li>
                         }
-                        <li><a href="#" class="text-white text-decoration-none">Membership</a></li>
+                        <li>
+                            <a href="#" class="text-white text-decoration-none">
+                                @Localizer["Membership"]
+                            </a>
+                        </li>
                     </ul>
                 </div>
-
             </div>
         </div>
     </footer>
@@ -132,7 +235,14 @@
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+
+    <script>
+        function changeLanguage(culture) {
+            var currentUrl = window.location.pathname + window.location.search;
+            window.location.href = '/Localization/SetLanguage?culture=' + culture + '&returnUrl=' + encodeURIComponent(currentUrl);
+        }
+    </script>
+
     @await RenderSectionAsync("Scripts", required: false)
 </body>
-
 </html>

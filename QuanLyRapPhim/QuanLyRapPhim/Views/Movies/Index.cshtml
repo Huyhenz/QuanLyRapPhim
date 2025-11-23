@@ -1,5 +1,7 @@
 ﻿@using System.Linq
 @model IEnumerable<QuanLyRapPhim.Models.Movie>
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
 
 @{
     ViewData["Title"] = "Danh sách phim";
@@ -19,13 +21,13 @@
                 <h3 class="sidebar-title">CinemaX Admin</h3>
             </div>
             <nav class="sidebar-nav">
-                <a href="/Movies" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Movies" ? "active" : "")"><i class="fas fa-film"></i> Quản lý phim</a>
-                <a href="/Showtimes" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Showtimes" ? "active" : "")"><i class="fas fa-clock"></i> Quản lý lịch chiếu</a>
-                <a href="/Rooms" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Rooms" ? "active" : "")"><i class="fas fa-door-open"></i> Quản lý phòng</a>
-                <a href="/Seats" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Seats" ? "active" : "")"><i class="fas fa-chair"></i> Quản lý ghế</a>
-                <a href="/Admin/ManageFoods" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "ManageFoods" ? "active" : "")"><i class="fas fa-utensils"></i> Quản lý đồ ăn</a>
-                <a href="/Admin/ManageBookings" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Admin" && ViewContext.RouteData.Values["Action"]?.ToString() == "ManageBookings" ? "active" : "")"><i class="fas fa-ticket-alt"></i> Quản lý đặt vé</a>
-                <a href="/Admin/RevenueStatistics" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Admin" && ViewContext.RouteData.Values["Action"]?.ToString() == "RevenueStatistics" ? "active" : "")"><i class="fas fa-chart-bar"></i> Báo cáo thống kê</a>
+                <a href="/Movies" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Movies" ? "active" : "")"><i class="fas fa-film"></i> @Localizer["ManageMovies"]</a>
+                <a href="/Showtimes" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Showtimes" ? "active" : "")"><i class="fas fa-clock"></i> @Localizer["ManageShowtimes"]</a>
+                <a href="/Rooms" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Rooms" ? "active" : "")"><i class="fas fa-door-open"></i> @Localizer["ManageRooms"]</a>
+                <a href="/Seats" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Seats" ? "active" : "")"><i class="fas fa-chair"></i> @Localizer["ManageSeats"]</a>
+                <a href="/Admin/ManageFoods" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "ManageFoods" ? "active" : "")"><i class="fas fa-utensils"></i> @Localizer["ManageFoods"]</a>
+                <a href="/Admin/ManageBookings" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Admin" && ViewContext.RouteData.Values["Action"]?.ToString() == "ManageBookings" ? "active" : "")"><i class="fas fa-ticket-alt"></i> @Localizer["ManageBookings"]</a>
+                <a href="/Admin/RevenueStatistics" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Admin" && ViewContext.RouteData.Values["Action"]?.ToString() == "RevenueStatistics" ? "active" : "")"><i class="fas fa-chart-bar"></i> @Localizer["RevenueStatistics"]</a>
                 <div class="nav-divider"></div>
                 <a href="#" class="nav-item"><i class="fab fa-facebook"></i> Facebook</a>
                 <a href="#" class="nav-item"><i class="fab fa-twitter"></i> Twitter</a>
@@ -40,25 +42,14 @@
         <!-- Header -->
         <div class="d-flex justify-content-between align-items-center mb-4">
             <div>
-                <h1 class="title-gradient">Danh sách phim</h1>
-                <div class="date-selection mb-2">
-                    <label class="text-white me-2">Chọn ngày:</label>
-                    <select id="dateSelect" class="form-select form-select-sm w-auto d-inline-block">
-                        <option value="2025-05-26">Mon, May 26, 2025</option>
-                        <option value="2025-05-27">Tue, May 27, 2025</option>
-                        <option value="2025-05-28">Wed, May 28, 2025</option>
-                        <option value="2025-05-29">Thu, May 29, 2025</option>
-                        <option value="2025-05-30" selected>Fri, May 30, 2025</option>
-                        <option value="2025-05-31">Sat, May 31, 2025</option>
-                        <option value="2025-06-01">Sun, Jun 01, 2025</option>
-                    </select>
-                </div>
+                <h1 class="title-gradient">@Localizer["MovieList"]</h1>
+                
             </div>
             @if (isAdmin)
             {
                 <div class="header-actions">
-                    <button class="btn btn-create glow-effect" data-bs-toggle="modal" data-bs-target="#addMovieModal">Thêm phim mới</button>
-                    <span class="order-count ms-3">@Model.Count() phim được tìm thấy</span>
+                    <button class="btn btn-create glow-effect" data-bs-toggle="modal" data-bs-target="#addMovieModal">@Localizer["AddNewMovie"]</button>
+                    <span class="order-count ms-3">@Model.Count() @Localizer["MoviesFound"]</span>
                 </div>
             }
         </div>
@@ -78,15 +69,15 @@
                     <table class="table table-custom">
                         <thead>
                             <tr>
-                                <th>Tên Phim</th>
-                                <th>Poster</th>
-                                <th>Thể loại</th>
-                                <th>Thời lượng</th>
-                                <th>Đạo diễn</th>
-                                <th>Diễn viên</th>
-                                <th>Mô tả</th>
-                                <th>URL Trailer</th>
-                                <th>Hành động</th>
+                                <th>@Localizer["MovieName"]</th>
+                                <th>@Localizer["Poster"]</th>
+                                <th>@Localizer["Genre"]</th>
+                                <th>@Localizer["Duration"]</th>
+                                <th>@Localizer["Director"]</th>
+                                <th>@Localizer["Actors"]</th>
+                                <th>@Localizer["Description"]</th>
+                                <th>@Localizer["TrailerURL"]</th>
+                                <th>@Localizer["Actions"]</th>
                             </tr>
                         </thead>
                         <tbody id="movies-table">
@@ -107,7 +98,7 @@
                                             }
                                         </td>
                                         <td>@(movie.Genre ?? "N/A")</td>
-                                        <td>@(movie.Duration != 0 ? $"{movie.Duration} phút" : "N/A")</td>
+                                        <td>@(movie.Duration != 0 ? $"{movie.Duration} {Localizer["Minutes"]}" : "N/A")</td>
                                         <td>@(movie.Director ?? "N/A")</td>
                                         <td>
                                             @if (string.IsNullOrEmpty(movie.Actors))
@@ -144,13 +135,13 @@
                                             }
                                             else
                                             {
-                                                <a href="@movie.TrailerUrl" target="_blank" class="text-white">Xem Trailer</a>
+                                                <a href="@movie.TrailerUrl" target="_blank" class="text-white">@Localizer["ViewTrailer"]</a>
                                             }
                                         </td>
                                         <td>
-                                            <a asp-action="Details" asp-route-id="@movie.MovieId" class="btn btn-sm btn-create glow-effect action-btn">Chi tiết</a>
-                                            <button class="btn btn-sm btn-warning glow-effect action-btn edit-movie-btn" data-id="@movie.MovieId">Sửa</button>
-                                            <button class="btn btn-sm btn-danger glow-effect action-btn delete-movie-btn" data-id="@movie.MovieId">Xóa</button>
+                                            <a asp-action="Details" asp-route-id="@movie.MovieId" class="btn btn-sm btn-create glow-effect action-btn">@Localizer["Details"]</a>
+                                            <button class="btn btn-sm btn-warning glow-effect action-btn edit-movie-btn" data-id="@movie.MovieId">@Localizer["Edit"]</button>
+                                            <button class="btn btn-sm btn-danger glow-effect action-btn delete-movie-btn" data-id="@movie.MovieId">@Localizer["Delete"]</button>
                                         </td>
                                     </tr>
                                 }
@@ -158,14 +149,14 @@
                             else
                             {
                                 <tr>
-                                    <td colspan="9" class="text-center">Không có phim nào.</td>
+                                    <td colspan="9" class="text-center">@Localizer["NoMovies"]</td>
                                 </tr>
                             }
                         </tbody>
                     </table>
                 </div>
                 <div class="pagination">
-                    <span>Hiển thị 01-@Model.Count() của @Model.Count()</span>
+                    <span>@Localizer["Showing"] 01-@Model.Count() @Localizer["Of"] @Model.Count()</span>
                     <div class="pagination-controls">
                         <button class="btn-pag glow-effect"><i class="fas fa-angle-left"></i></button>
                         <button class="btn-pag active glow-effect">1</button>
@@ -214,14 +205,14 @@
                                                         <span class="fas fa-star text-secondary"></span>
                                                     }
                                                 }
-                                                <span class="rating-text text-white ms-2">(Đánh giá: @reviewCount)</span>
+                                                <span class="rating-text text-white ms-2">(@Localizer["Rating"]: @reviewCount)</span>
                                             </div>
-                                            <p class="card-text text-white mb-1"><strong>Thời lượng:</strong> @(item.Duration != 0 ? $"{item.Duration} phút" : "N/A")</p>
-                                            <p class="card-text text-white mb-1"><strong>Mô tả:</strong> @(string.IsNullOrEmpty(item.Description) ? "Chưa có mô tả" : item.Description.Length > 50 ? item.Description.Substring(0, 50) + "..." : item.Description)</p>
+                                            <p class="card-text text-white mb-1"><strong>@Localizer["Duration"]:</strong> @(item.Duration != 0 ? $"{item.Duration} {Localizer["Minutes"]}" : "N/A")</p>
+                                            <p class="card-text text-white mb-1"><strong>@Localizer["Description"]:</strong> @(string.IsNullOrEmpty(item.Description) ? Localizer["NoDescription"] : item.Description.Length > 50 ? item.Description.Substring(0, 50) + "..." : item.Description)</p>
                                         </div>
                                         <div>
-                                            <a href="@item.TrailerUrl" target="_blank" class="btn btn-danger btn-sm me-2">Xem Trailer</a>
-                                            <a asp-action="Details" asp-route-id="@item.MovieId" class="btn btn-primary btn-sm">Chi tiết</a>
+                                            <a href="@item.TrailerUrl" target="_blank" class="btn btn-danger btn-sm me-2">@Localizer["ViewTrailer"]</a>
+                                            <a asp-action="Details" asp-route-id="@item.MovieId" class="btn btn-primary btn-sm">@Localizer["Details"]</a>
                                         </div>
                                     </div>
                                 </div>
@@ -233,7 +224,7 @@
                 {
                     <div class="row">
                         <div class="col-12 text-center">
-                            <p class="text-white">Không có phim nào.</p>
+                            <p class="text-white">@Localizer["NoMovies"]</p>
                         </div>
                     </div>
                 }
@@ -250,44 +241,44 @@
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title title-gradient" id="addMovieModalLabel">Thêm Phim Mới</h5>
+                    <h5 class="modal-title title-gradient" id="addMovieModalLabel">@Localizer["AddMovie"]</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <form id="add-movie-form">
                         <div class="mb-3">
-                            <label for="addTitle" class="form-label">Tên Phim</label>
+                            <label for="addTitle" class="form-label">@Localizer["MovieName"]</label>
                             <input type="text" class="form-control glow-effect" id="addTitle" name="Title" required />
                         </div>
                         <div class="mb-3">
-                            <label for="addDescription" class="form-label">Mô tả</label>
+                            <label for="addDescription" class="form-label">@Localizer["Description"]</label>
                             <textarea class="form-control glow-effect" id="addDescription" name="Description" rows="3"></textarea>
                         </div>
                         <div class="mb-3">
-                            <label for="addDuration" class="form-label">Thời lượng (phút)</label>
+                            <label for="addDuration" class="form-label">@Localizer["Duration"] (@Localizer["Minutes"])</label>
                             <input type="number" class="form-control glow-effect" id="addDuration" name="Duration" required />
                         </div>
                         <div class="mb-3">
-                            <label for="addPoster" class="form-label">URL Poster</label>
+                            <label for="addPoster" class="form-label">@Localizer["Poster"] URL</label>
                             <input type="url" class="form-control glow-effect" id="addPoster" name="Poster" />
                         </div>
                         <div class="mb-3">
-                            <label for="addGenre" class="form-label">Thể loại</label>
+                            <label for="addGenre" class="form-label">@Localizer["Genre"]</label>
                             <input type="text" class="form-control glow-effect" id="addGenre" name="Genre" />
                         </div>
                         <div class="mb-3">
-                            <label for="addDirector" class="form-label">Đạo diễn</label>
+                            <label for="addDirector" class="form-label">@Localizer["Director"]</label>
                             <input type="text" class="form-control glow-effect" id="addDirector" name="Director" />
                         </div>
                         <div class="mb-3">
-                            <label for="addActors" class="form-label">Diễn viên</label>
+                            <label for="addActors" class="form-label">@Localizer["Actors"]</label>
                             <input type="text" class="form-control glow-effect" id="addActors" name="Actors" />
                         </div>
                         <div class="mb-3">
-                            <label for="addTrailerUrl" class="form-label">URL Trailer (YouTube)</label>
+                            <label for="addTrailerUrl" class="form-label">@Localizer["TrailerURL"] (YouTube)</label>
                             <input type="url" class="form-control glow-effect" id="addTrailerUrl" name="TrailerUrl" placeholder="e.g., https://www.youtube.com/watch?v=VIDEO_ID" />
                         </div>
-                        <button type="submit" class="btn btn-primary glow-effect">Thêm Phim</button>
+                        <button type="submit" class="btn btn-primary glow-effect">@Localizer["AddMovie"]</button>
                     </form>
                 </div>
             </div>
@@ -299,45 +290,45 @@
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title title-gradient" id="editMovieModalLabel">Sửa Phim</h5>
+                    <h5 class="modal-title title-gradient" id="editMovieModalLabel">@Localizer["EditMovie"]</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <form id="edit-movie-form">
                         <input type="hidden" id="editMovieId" name="MovieId" />
                         <div class="mb-3">
-                            <label for="editTitle" class="form-label">Tên Phim</label>
+                            <label for="addTitle" class="form-label">@Localizer["MovieName"]</label>
                             <input type="text" class="form-control glow-effect" id="editTitle" name="Title" required />
                         </div>
                         <div class="mb-3">
-                            <label for="editDescription" class="form-label">Mô tả</label>
+                            <label for="addDescription" class="form-label">@Localizer["Description"]</label>
                             <textarea class="form-control glow-effect" id="editDescription" name="Description" rows="3"></textarea>
                         </div>
                         <div class="mb-3">
-                            <label for="editDuration" class="form-label">Thời lượng (phút)</label>
+                            <label for="addDuration" class="form-label">@Localizer["Duration"] (@Localizer["Minutes"])</label>
                             <input type="number" class="form-control glow-effect" id="editDuration" name="Duration" required />
                         </div>
                         <div class="mb-3">
-                            <label for="editPoster" class="form-label">URL Poster</label>
+                            <label for="addPoster" class="form-label">@Localizer["Poster"] URL</label>
                             <input type="url" class="form-control glow-effect" id="editPoster" name="Poster" />
                         </div>
                         <div class="mb-3">
-                            <label for="editGenre" class="form-label">Thể loại</label>
+                            <label for="addGenre" class="form-label">@Localizer["Genre"]</label>
                             <input type="text" class="form-control glow-effect" id="editGenre" name="Genre" />
                         </div>
                         <div class="mb-3">
-                            <label for="editDirector" class="form-label">Đạo diễn</label>
+                            <label for="addDirector" class="form-label">@Localizer["Director"]</label>
                             <input type="text" class="form-control glow-effect" id="editDirector" name="Director" />
                         </div>
                         <div class="mb-3">
-                            <label for="editActors" class="form-label">Diễn viên</label>
+                            <label for="addActors" class="form-label">@Localizer["Actors"]</label>
                             <input type="text" class="form-control glow-effect" id="editActors" name="Actors" />
                         </div>
                         <div class="mb-3">
-                            <label for="editTrailerUrl" class="form-label">URL Trailer (YouTube)</label>
+                            <label for="addTrailerUrl" class="form-label">@Localizer["TrailerURL"] (YouTube)</label>
                             <input type="url" class="form-control glow-effect" id="editTrailerUrl" name="TrailerUrl" placeholder="e.g., https://www.youtube.com/watch?v=VIDEO_ID" />
                         </div>
-                        <button type="submit" class="btn btn-primary glow-effect">Lưu Thay đổi</button>
+                        <button type="submit" class="btn btn-primary glow-effect">@Localizer["SaveChanges"]</button>
                     </form>
                 </div>
             </div>
@@ -911,7 +902,7 @@
 
             // Delete Movie
             $(document).on('click', '.delete-movie-btn', function () {
-                if (!confirm('Bạn có chắc chắn muốn xóa phim này?')) return;
+               if (!confirm('@Localizer["ConfirmDelete"]')) return;
                 var movieId = $(this).data('id');
                 $.ajax({
                     url: '@Url.Action("DeleteMovie", "Admin")',

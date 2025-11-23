@@ -1,8 +1,9 @@
 ﻿@using Microsoft.AspNetCore.Identity
 @using QuanLyRapPhim.Models
-
+@using Microsoft.AspNetCore.Mvc.Localization
 @inject SignInManager<User> SignInManager
 @inject UserManager<User> UserManager
+@inject IViewLocalizer Localizer
 
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 <ul class="navbar-nav">
@@ -13,8 +14,8 @@
         {
             <!-- Thêm icon lịch sử đặt vé ngay trước nút đăng xuất -->
             <li class="nav-item">
-                <a href="/History/TicketHistory" class="nav-link btn btn-outline-secondary d-flex align-items-center justify-content-center" style="height: 100%;" title="Lịch sử đặt vé">
-                    <i class="fas fa-history fa-fw"></i> Lịch sử thanh toán 
+                <a href="/History/TicketHistory" class="nav-link btn btn-outline-secondary d-flex align-items-center justify-content-center" style="height: 100%;" title="@Localizer["PaymentHistory"]">
+                    <i class="fas fa-history fa-fw"></i> @Localizer["PaymentHistory"]
                 </a>
             </li>
             <!-- Hiển thị tên người dùng -->
@@ -45,12 +46,12 @@
     {
         <li class="nav-item">
             <a class="nav-link text-white btn btn-outline-light me-2" id="login" asp-area="Identity" asp-page="/Account/Login">
-                Đăng nhập <i class="fas fa-sign-in-alt"></i>
+                @Localizer["Login"] <i class="fas fa-sign-in-alt"></i>
             </a>
         </li>
         <li class="nav-item">
             <a class="nav-link text-white btn btn-warning" id="register" asp-area="Identity" asp-page="/Account/Register">
-                Đăng ký <i class="fas fa-user-plus"></i>
+                @Localizer["Register"] <i class="fas fa-user-plus"></i>
             </a>
         </li>
     }

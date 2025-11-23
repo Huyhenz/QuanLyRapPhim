@@ -1,4 +1,6 @@
 ﻿@model IEnumerable<QuanLyRapPhim.Models.Movie>
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
 @{
     ViewData["Title"] = "Trang chủ";
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -26,7 +28,7 @@
                         <li class="nav-item">
                             <a class="nav-link nav-icon" href="/Admin/Index">
                                 <i class="fas fa-tachometer-alt"></i>
-                                <span class="nav-text">Admin Dashboard</span>
+                                <span class="nav-text">@Localizer["AdminDashboard"]</span>
                             </a>
                         </li>
                     }
@@ -35,21 +37,21 @@
                 <div class="d-flex align-items-center gap-3">
                     <!-- NÚT ĐẶT BẮP NƯỚC -->
                     <a href="@(User.Identity.IsAuthenticated
-                ? Url.Action("QuickFoodBooking", "Tickets")
-                : "/Identity/Account/Login")"
+    ? Url.Action("QuickFoodBooking", "Tickets")
+    : "/Identity/Account/Login")"
                        class="btn book-btn popcorn-btn">
-                        ĐẶT<br>BẮP<br>NƯỚC
+                        @Html.Raw(Localizer["OrderFood"].Value)
                     </a>
                     <!-- NÚT ĐẶT VÉ NGAY -->
                     <a href="@(User.Identity.IsAuthenticated ? "/Movies" : "/Identity/Account/Login")"
                        class="btn book-btn ticket-btn">
-                        ĐẶT VÉ<br>NGAY
+                        @Html.Raw(Localizer["BookTickets"].Value.Replace(" ", "<br>"))
                     </a>
                     <!-- Ô TÌM KIẾM -->
                     <form class="d-flex align-items-center" asp-action="Search" asp-controller="Home" method="get">
                         <div class="search-box">
                             <input type="search" name="searchString" value="@ViewData["CurrentSearch"]"
-                                   placeholder="Tìm phim" class="search-input" id="searchInput">
+                                   placeholder="@Localizer["Search"]" class="search-input" id="searchInput">
                             <button type="submit" class="search-btn">
                                 <i class="fas fa-search text-danger"></i>
                             </button>
@@ -70,7 +72,7 @@
                 <div class="carousel-caption d-none d-md-block text-start">
                     <h1 class="carousel-title">The Batman</h1>
                     <div class="carousel-meta">
-                        <span>Hành động • 2022</span>
+                        <span>@Localizer["ActionMovie"] • 2022</span>
                     </div>
                 </div>
             </div>
@@ -80,7 +82,7 @@
                 <div class="carousel-caption d-none d-md-block text-start">
                     <h1 class="carousel-title">Inception</h1>
                     <div class="carousel-meta">
-                        <span>Khoa học viễn tưởng • 2010</span>
+                        <span>@Localizer["SciFiMovie"] • 2010</span>
                     </div>
                 </div>
             </div>
@@ -90,24 +92,24 @@
                 <div class="carousel-caption d-none d-md-block text-start">
                     <h1 class="carousel-title">Interstellar</h1>
                     <div class="carousel-meta">
-                        <span>Khoa học viễn tưởng • 2014</span>
+                        <span>@Localizer["SciFiMovie"] • 2014</span>
                     </div>
                 </div>
             </div>
         </div>
         <button class="carousel-control-prev" type="button" data-bs-target="#movieCarousel" data-bs-slide="prev">
             <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-            <span class="visually-hidden">Trước</span>
+            <span class="visually-hidden">@Localizer["Previous"]</span>
         </button>
         <button class="carousel-control-next" type="button" data-bs-target="#movieCarousel" data-bs-slide="next">
             <span class="carousel-control-next-icon" aria-hidden="true"></span>
-            <span class="visually-hidden">Tiếp</span>
+            <span class="visually-hidden">@Localizer["Next"]</span>
         </button>
     </div>
 </section>
 <!-- Now Showing Movies -->
 <section class="now-showing-section container my-5">
-    <h2 class="section-title text-white mb-4">PHIM ĐANG CHIẾU</h2>
+    <h2 class="section-title text-white mb-4">@Localizer["NowShowing"]</h2>
     @if (Model != null && Model.Any())
     {
         <div class="row row-cols-1 row-cols-md-4 g-4">
@@ -146,7 +148,7 @@
                                     <span class="rating-text"> @(rating > 0 ? rating.ToString("F1") : "Chưa có đánh giá")/5</span>
                                 </span>
                             </div>
-                            <a href="@(User.Identity.IsAuthenticated ? $"/Movies/Details/{movie.MovieId}" : "/Identity/Account/Login")" class="btn btn-primary book-btn">Đặt vé ngay</a>
+                            <a href="@(User.Identity.IsAuthenticated ? $"/Movies/Details/{movie.MovieId}" : "/Identity/Account/Login")" class="btn btn-primary book-btn">@Localizer["BookNow"]</a>
                         </div>
                     </div>
                 </div>
@@ -155,7 +157,7 @@
     }
     else
     {
-        <p class="text-center text-white no-movie-message">Hiện tại không có phim nào đang chiếu hoặc không tìm thấy kết quả phù hợp.</p>
+        <p class="text-center text-white no-movie-message">@Localizer["NoMovies"]</p>
     }
     <section class="features-section">
         <div class="container">
@@ -164,29 +166,29 @@
                     <div class="feature-icon">
                         <i class="fas fa-couch"></i>
                     </div>
-                    <h3>Ghế Ngồi Thoải Mái</h3>
-                    <p>Ghế da cao cấp với khoảng cách rộng rãi, mang đến trải nghiệm xem phim tuyệt vời nhất.</p>
+                    <h3>@Localizer["ComfortableSeats"]</h3>
+                    <p>@Localizer["ComfortableSeatsDesc"]</p>
                 </div>
                 <div class="feature-card">
                     <div class="feature-icon">
                         <i class="fas fa-volume-up"></i>
                     </div>
-                    <h3>Âm Thanh Dolby Atmos</h3>
-                    <p>Hệ thống âm thanh vòm 3D tiên tiến, mang đến âm thanh sống động và chân thực.</p>
+                    <h3>@Localizer["DolbySound"]</h3>
+                    <p>@Localizer["DolbySoundDesc"]</p>
                 </div>
                 <div class="feature-card">
                     <div class="feature-icon">
                         <i class="fas fa-tv"></i>
                     </div>
-                    <h3>Màn Hình 4K</h3>
-                    <p>Màn hình chiếu 4K Ultra HD với độ phân giải cao, mang đến hình ảnh rõ nét và sống động.</p>
+                    <h3>@Localizer["4KScreen"]</h3>
+                    <p>@Localizer["4KScreenDesc"]</p>
                 </div>
                 <div class="feature-card">
                     <div class="feature-icon">
                         <i class="fas fa-mobile-alt"></i>
                     </div>
-                    <h3>Đặt Vé Online</h3>
-                    <p>Đặt vé nhanh chóng và tiện lợi qua website hoặc ứng dụng di động của chúng tôi.</p>
+                    <h3>@Localizer["OnlineBooking"]</h3>
+                    <p>@Localizer["OnlineBookingDesc"]</p>
                 </div>
             </div>
         </div>
