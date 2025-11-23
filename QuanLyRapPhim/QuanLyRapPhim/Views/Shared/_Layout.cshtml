@@ -231,6 +231,105 @@
         </div>
     </footer>
 
+    <!-- CHATBOT ĐẸP NHƯ ẢNH – CHỈ THAY NÚT CHAT & SEND BẰNG ICON -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    <div id="chatbot-container" style="position:fixed;bottom:20px;right:20px;z-index:9999;font-family:'Segoe UI',Roboto,sans-serif;">
+        <!-- Nút mở chatbot: icon robot thay chữ "Chat" -->
+        <div id="chatbot-toggle"
+             style="background:#e50914;color:white;width:56px;height:56px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 6px 20px rgba(229,9,20,0.4);font-size:28px;transition:transform 0.3s;">
+            <i class="fas fa-robot"></i>
+        </div>
+
+        <!-- Hộp chat -->
+        <div id="chatbot-box" style="display:none;position:absolute;bottom:76px;right:0;width:360px;height:520px;background:#fff;border-radius:18px;overflow:hidden;box-shadow:0 10px 35px rgba(0,0,0,0.2);border:1px solid #eee;flex-direction:column;">
+            <!-- Header đỏ -->
+            <div style="background:#e50914;color:white;padding:16px;text-align:center;font-weight:600;font-size:17px;position:relative;">
+                Trợ lý đặt vé CinemaX
+                <div style="position:absolute;top:12px;right:16px;font-size:22px;cursor:pointer;" onclick="document.getElementById('chatbot-box').style.display='none'">
+                    x
+                </div>
+            </div>
+
+            <!-- Tin nhắn -->
+            <div id="chat-messages" style="flex:1;padding:16px;overflow-y:auto;background:#f8f9fa;display:flex;flex-direction:column;gap:12px;"></div>
+
+            <!-- Ô nhập + nút gửi icon máy bay -->
+            <div style="padding:12px 16px;background:#fff;border-top:1px solid #eee;display:flex;align-items:center;gap:10px;">
+                <input type="text" id="chat-input" placeholder="Nhập tin nhắn..."
+                       style="flex:1;padding:12px 16px;border-radius:30px;border:1px solid #ddd;outline:none;font-size:15px;background:#f9f9f9;">
+                <button onclick="sendMessage()"
+                        style="background:#e50914;color:white;width:42px;height:42px;border-radius:50%;border:none;cursor:pointer;font-size:19px;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 15px rgba(229,9,20,0.4);">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Mở/đóng chatbot
+        document.getElementById('chatbot-toggle').onclick = () => {
+            const box = document.getElementById('chatbot-box');
+            box.style.display = box.style.display === 'flex' ? 'none' : 'flex';
+            if (box.style.display === 'flex') {
+                document.getElementById('chat-input').focus();
+            }
+        };
+
+        // Thêm tin nhắn
+        function addMessage(text, isUser = false) {
+            const container = document.getElementById('chat-messages');
+            const bubble = document.createElement('div');
+            bubble.style.cssText = `
+                max-width: 78%;
+                padding: 11px 16px;
+                border-radius: 18px;
+                margin-bottom: 8px;
+                word-wrap: break-word;
+                font-size: 14.5px;
+                line-height: 1.4;
+                align-self: ${isUser ? 'flex-end' : 'flex-start'};
+                background: ${isUser ? '#e50914' : '#ffffff'};
+                color: ${isUser ? 'white' : '#333'};
+                box-shadow: 0 2px 8px rgba(0,0,0,${isUser ? '0.15' : '0.08'});
+            `;
+            bubble.innerHTML = text;
+            container.appendChild(bubble);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        // Gửi tin nhắn
+        async function sendMessage() {
+            const input = document.getElementById('chat-input');
+            const msg = input.value.trim();
+            if (!msg) return;
+            addMessage(msg, true);
+            input.value = '';
+            const res = await fetch('/api/chatbot/ask', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ Message: msg })
+            });
+            const data = await res.json();
+            addMessage(data.reply || "Xin lỗi, mình chưa hiểu. Bạn hỏi lại nhé!");
+        }
+
+        // Enter để gửi
+        document.getElementById('chat-input').addEventListener('keypress', e => {
+            if (e.key === 'Enter') sendMessage();
+        });
+
+        // Lời chào khi mở lần đầu
+        document.getElementById('chatbot-toggle').addEventListener('click', function firstGreeting() {
+            if (document.getElementById('chat-messages').children.length === 0) {
+                setTimeout(() => {
+                    addMessage("Chào bạn! Mình là trợ lý đặt vé CinemaX<br>Hôm nay bạn muốn xem phim gì nào?");
+                }, 600);
+            }
+            this.removeEventListener('click', firstGreeting);
+        });
+    </script>
+
     <!-- Scripts -->
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>

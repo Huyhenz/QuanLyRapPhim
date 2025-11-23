@@ -7,8 +7,19 @@ using QuanLyRapPhim.Models;
 using QuanLyRapPhim.Service.Momo;
 using QuanLyRapPhim.Service.VNPay;
 using System.Globalization;
+using QuanLyRapPhim.Service;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Thay 2 dòng cũ bằng 2 dòng mới này:
+builder.Services.AddHttpClient<GroqService>();
+
+builder.Services.AddScoped<GroqService>(sp =>
+{
+    var httpClient = sp.GetRequiredService<HttpClient>();
+    var config = sp.GetRequiredService<IConfiguration>();
+    return new GroqService(httpClient, config);
+});
 
 builder.Services.AddLocalization(options => options.ResourcesPath = "Resources");
 
