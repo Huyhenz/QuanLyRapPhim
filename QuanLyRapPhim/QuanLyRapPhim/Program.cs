@@ -11,7 +11,9 @@ using QuanLyRapPhim.Service;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Thay 2 dòng cũ bằng 2 dòng mới này:
+// =============================
+// HTTP Client services
+// =============================
 builder.Services.AddHttpClient<GroqService>();
 
 builder.Services.AddScoped<GroqService>(sp =>
@@ -21,15 +23,14 @@ builder.Services.AddScoped<GroqService>(sp =>
     return new GroqService(httpClient, config);
 });
 
+// =============================
+// LOCALIZATION
+// =============================
 builder.Services.AddLocalization(options => options.ResourcesPath = "Resources");
-
-builder.Services.AddControllersWithViews()
-    .AddViewLocalization(Microsoft.AspNetCore.Mvc.Razor.LanguageViewLocationExpanderFormat.Suffix)
-    .AddDataAnnotationsLocalization();
 
 builder.Services.Configure<RequestLocalizationOptions>(options =>
 {
-    var supportedCultures = new[]
+    var supportedCultures = new List<CultureInfo>
     {
         new CultureInfo("vi"),
         new CultureInfo("en")
@@ -38,33 +39,34 @@ builder.Services.Configure<RequestLocalizationOptions>(options =>
     options.DefaultRequestCulture = new RequestCulture("vi");
     options.SupportedCultures = supportedCultures;
     options.SupportedUICultures = supportedCultures;
+
+    // Ưu tiên cookie trước
+    options.RequestCultureProviders.Insert(0, new CookieRequestCultureProvider());
 });
 
+// =============================
+// MVC / Razor
+// =============================
+builder.Services.AddControllersWithViews()
+    .AddViewLocalization(Microsoft.AspNetCore.Mvc.Razor.LanguageViewLocationExpanderFormat.Suffix)
+    .AddDataAnnotationsLocalization();
+
+// =============================
+// Momo & VNPay
+// =============================
 builder.Services.Configure<MomoOptionModel>(builder.Configuration.GetSection("MomoAPI"));
 builder.Services.AddScoped<IMomoService, MomoService>();
+builder.Services.AddScoped<IVnPayService, VnPayService>();
 
 // =============================
-// 🔥 THÊM PHẦN LOCALIZATION
+// DbContext
 // =============================
-builder.Services.AddLocalization(options => options.ResourcesPath = "Resources");
-
-builder.Services.Configure<RequestLocalizationOptions>(options =>
-{
-    var supportedCultures = new[] { "vi", "en" };
-    options.SetDefaultCulture("vi")
-        .AddSupportedCultures(supportedCultures)
-        .AddSupportedUICultures(supportedCultures);
-});
-// =============================
-
-// Add services to the container.
-builder.Services.AddControllersWithViews();
-
-// Cấu hình DbContext
 builder.Services.AddDbContext<DBContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DB")));
 
-// Cấu hình Identity
+// =============================
+// Identity
+// =============================
 builder.Services.AddIdentity<User, IdentityRole>(options =>
 {
     options.Password.RequiredLength = 6;
@@ -78,19 +80,19 @@ builder.Services.AddIdentity<User, IdentityRole>(options =>
 .AddEntityFrameworkStores<DBContext>();
 
 builder.Services.AddTransient<IEmailSender, EmailSender>();
-
 builder.Services.AddRazorPages();
 
-builder.Services.AddScoped<IVnPayService, VnPayService>();
-
-// Build the application
+// Build app
 var app = builder.Build();
 
+// =============================
 // Tạo Roles mặc định
+// =============================
 using (var scope = app.Services.CreateScope())
 {
     var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
     string[] roles = { "Admin", "User", "Manager" };
+
     foreach (var role in roles)
     {
         if (!await roleManager.RoleExistsAsync(role))
@@ -100,7 +102,9 @@ using (var scope = app.Services.CreateScope())
     }
 }
 
-// Configure the HTTP request pipeline.
+// =============================
+// Pipeline
+// =============================
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
@@ -108,25 +112,19 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.MapStaticAssets();
 
-// =======================================
-// 🔥 THÊM Middleware Localization ở đây!
-// =======================================
-var locOptions = app.Services.GetRequiredService<Microsoft.Extensions.Options.IOptions<RequestLocalizationOptions>>();
-app.UseRequestLocalization(locOptions.Value);
-// =======================================
-// THÊM DÒNG NÀY - ĐẶT TRƯỚC UseRouting()
+// 👉 Localization phải đặt TRƯỚC UseRouting()
 app.UseRequestLocalization();
 
+// Routing
 app.UseRouting();
-
 app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapRazorPages();
 
-app.MapStaticAssets();
-
+// Default Route
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}")

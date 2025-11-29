@@ -1,0 +1,135 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+	<xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+		<xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+		<xsd:element name="root" msdata:IsDataSet="true">
+			<xsd:complexType>
+				<xsd:choice maxOccurs="unbounded">
+					<xsd:element name="data">
+						<xsd:complexType>
+							<xsd:sequence>
+								<xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+								<xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+							</xsd:sequence>
+							<xsd:attribute name="name" type="xsd:string" msdata:Ordinal="1" />
+							<xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" default="System.String" />
+							<xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+							<xsd:attribute name="xml:space" type="preserve" />
+						</xsd:complexType>
+					</xsd:element>
+					<xsd:element name="schema" />
+					<xsd:element name="connection" />
+				</xsd:choice>
+			</xsd:complexType>
+		</xsd:element>
+	</xsd:schema>
+	<msdata:Properties>
+		<msdata:Property ref="generator" msdata:Value="System.Data.Dataset" />
+		<msdata:Property ref="version" msdata:Value="1.0" />
+		<msdata:Property ref="encoding" msdata:Value="utf-8" />
+	</msdata:Properties>
+	<data name="SelectShowtime" xml:space="preserve">
+    <value>Chọn lịch chiếu</value>
+    <comment>Page title for selecting showtimes</comment>
+  </data>
+	<data name="UnknownMovie" xml:space="preserve">
+    <value>Phim không xác định</value>
+    <comment>Fallback for undefined movie title</comment>
+  </data>
+	<data name="Movie" xml:space="preserve">
+    <value>Phim:</value>
+    <comment>Label for movie title in showtime selection</comment>
+  </data>
+	<data name="EnterMovieName" xml:space="preserve">
+    <value>Nhập tên phim...</value>
+    <comment>Placeholder for search title input</comment>
+  </data>
+	<data name="FromDate" xml:space="preserve">
+    <value>Từ ngày</value>
+    <comment>Placeholder for start date input</comment>
+  </data>
+	<data name="ToDate" xml:space="preserve">
+    <value>Đến ngày</value>
+    <comment>Placeholder for end date input</comment>
+  </data>
+	<data name="SelectGenre" xml:space="preserve">
+    <value>Chọn thể loại</value>
+    <comment>Placeholder for genre select</comment>
+  </data>
+	<data name="Action" xml:space="preserve">
+    <value>Hành động</value>
+    <comment>Genre: Action</comment>
+  </data>
+	<data name="Romance" xml:space="preserve">
+    <value>Tình cảm</value>
+    <comment>Genre: Romance</comment>
+  </data>
+	<data name="Horror" xml:space="preserve">
+    <value>Kinh dị</value>
+    <comment>Genre: Horror</comment>
+  </data>
+	<data name="Animation" xml:space="preserve">
+    <value>Hoạt hình</value>
+    <comment>Genre: Animation</comment>
+  </data>
+	<data name="SciFi" xml:space="preserve">
+    <value>Khoa học viễn tưởng</value>
+    <comment>Genre: Science Fiction</comment>
+  </data>
+	<data name="War" xml:space="preserve">
+    <value>Chiến tranh</value>
+    <comment>Genre: War</comment>
+  </data>
+	<data name="Comedy" xml:space="preserve">
+    <value>Hài hước</value>
+    <comment>Genre: Comedy</comment>
+  </data>
+	<data name="Fantasy" xml:space="preserve">
+    <value>Viễn tưởng</value>
+    <comment>Genre: Fantasy</comment>
+  </data>
+	<data name="Search" xml:space="preserve">
+    <value>Tìm kiếm</value>
+    <comment>Search button text</comment>
+  </data>
+	<data name="ReloadPage" xml:space="preserve">
+    <value>Load lại trang</value>
+    <comment>Reload button text</comment>
+  </data>
+	<data name="ShowDate" xml:space="preserve">
+    <value>Ngày chiếu:</value>
+    <comment>Label for showtime date</comment>
+  </data>
+	<data name="ShowTime" xml:space="preserve">
+    <value>Giờ chiếu:</value>
+    <comment>Label for showtime time</comment>
+  </data>
+	<data name="Room" xml:space="preserve">
+    <value>Phòng:</value>
+    <comment>Label for room name</comment>
+  </data>
+	<data name="SelectThisShowtime" xml:space="preserve">
+    <value>Chọn lịch này</value>
+    <comment>Button to select showtime</comment>
+  </data>
+	<data name="Edit" xml:space="preserve">
+    <value>Sửa</value>
+    <comment>Edit button</comment>
+  </data>
+	<data name="Delete" xml:space="preserve">
+    <value>Xóa</value>
+    <comment>Delete button</comment>
+  </data>
+	<data name="NoShowtimesAvailable" xml:space="preserve">
+    <value>Không có lịch chiếu nào cho phim này!</value>
+    <comment>Alert when no showtimes</comment>
+  </data>
+	<data name="CreateNewShowtime" xml:space="preserve">
+    <value>Tạo lịch chiếu mới</value>
+    <comment>Create showtime button</comment>
+  </data>
+	<data name="BackToMovieList" xml:space="preserve">
+    <value>Quay lại danh sách phim</value>
+    <comment>Back button</comment>
+  </data>
+</root>

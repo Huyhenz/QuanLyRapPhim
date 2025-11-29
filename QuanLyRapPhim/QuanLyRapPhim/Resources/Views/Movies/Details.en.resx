@@ -1,0 +1,78 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+	<data name="MovieDetails" xml:space="preserve">
+    <value>Movie Details</value>
+  </data>
+	<data name="NoPoster" xml:space="preserve">
+    <value>No poster available</value>
+  </data>
+	<data name="Description" xml:space="preserve">
+    <value>Description</value>
+  </data>
+	<data name="Genre" xml:space="preserve">
+    <value>Genre</value>
+  </data>
+	<data name="Director" xml:space="preserve">
+    <value>Director</value>
+  </data>
+	<data name="Actors" xml:space="preserve">
+    <value>Actors</value>
+  </data>
+	<data name="Duration" xml:space="preserve">
+    <value>Duration</value>
+  </data>
+	<data name="Minutes" xml:space="preserve">
+    <value>minutes</value>
+  </data>
+	<data name="BackToList" xml:space="preserve">
+    <value>Back to List</value>
+  </data>
+	<data name="BookTicket" xml:space="preserve">
+    <value>Book Ticket</value>
+  </data>
+	<data name="Edit" xml:space="preserve">
+    <value>Edit</value>
+  </data>
+	<data name="Delete" xml:space="preserve">
+    <value>Delete</value>
+  </data>
+	<data name="Trailer" xml:space="preserve">
+    <value>Trailer</value>
+  </data>
+	<data name="TrailerTitle" xml:space="preserve">
+    <value>Movie Trailer</value>
+  </data>
+	<data name="InvalidTrailerLink" xml:space="preserve">
+    <value>Cannot display trailer: Invalid link.</value>
+  </data>
+	<data name="WriteReview" xml:space="preserve">
+    <value>Write a Review</value>
+  </data>
+	<data name="Comment" xml:space="preserve">
+    <value>Comment</value>
+  </data>
+	<data name="Rating" xml:space="preserve">
+    <value>Rating</value>
+  </data>
+	<data name="PleaseSelectRating" xml:space="preserve">
+    <value>Please select a star rating.</value>
+  </data>
+	<data name="AlreadyReviewed" xml:space="preserve">
+    <value>You have already reviewed this movie. Each user can only review once.</value>
+  </data>
+	<data name="PleaseLoginToReview" xml:space="preserve">
+    <value>Please log in to write a review</value>
+  </data>
+	<data name="Login" xml:space="preserve">
+    <value>log in</value>
+  </data>
+	<data name="SubmitReview" xml:space="preserve">
+    <value>Submit Review</value>
+  </data>
+	<data name="UserReviews" xml:space="preserve">
+    <value>User Reviews</value>
+  </data>
+	<data name="NoReviewsYet" xml:space="preserve">
+    <value>No reviews yet for this movie.</value>
+  </data>
+</root>

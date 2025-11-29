@@ -118,7 +118,7 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="BookTickets" xml:space="preserve">
-    <value>Đặt Vé Ngay</value>
+    <value>ĐẶT VÉ&lt;br&gt;NGAY</value>
   </data>
   <data name="BookNow" xml:space="preserve">
     <value>Đặt vé ngay</value>
@@ -143,5 +143,35 @@
   </data>
   <data name="Next" xml:space="preserve">
     <value>Tiếp</value>
+  </data>
+  <data name="Search" xml:space="preserve">
+    <value>Tìm phim</value>
+  </data>
+  <data name="AdminDashboard" xml:space="preserve">
+    <value>Admin Dashboard</value>
+  </data>
+  <data name="NowShowing" xml:space="preserve">
+    <value>PHIM ĐANG CHIẾU</value>
+  </data>
+  <data name="NoMovies" xml:space="preserve">
+    <value>Hiện tại không có phim nào đang chiếu hoặc không tìm thấy kết quả phù hợp.</value>
+  </data>
+  <data name="NoRating" xml:space="preserve">
+    <value>Chưa có đánh giá</value>
+  </data>
+  <data name="ComfortableSeats" xml:space="preserve">
+    <value>Ghế Ngồi Thoải Mái</value>
+  </data>
+  <data name="ComfortableSeatsDesc" xml:space="preserve">
+    <value>Ghế da cao cấp với khoảng cách rộng rãi, mang đến trải nghiệm xem phim tuyệt vời nhất.</value>
+  </data>
+  <data name="DolbySound" xml:space="preserve">
+    <value>Âm Thanh Dolby Atmos</value>
+  </data>
+  <data name="DolbySoundDesc" xml:space="preserve">
+    <value>Hệ thống âm thanh vòm 3D tiên tiến, mang đến âm thanh sống động và chân thực.</value>
+  </data>
+  <data name="Screen4K" xml:space="preserve">
+    <value>Màn hình 4k</value>
   </data>
 </root>

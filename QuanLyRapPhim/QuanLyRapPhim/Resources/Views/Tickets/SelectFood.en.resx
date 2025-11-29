@@ -1,0 +1,66 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+	<data name="SelectFoodAndDrinks" xml:space="preserve">
+    <value>Select Food &amp; Drinks</value>
+  </data>
+	<data name="Movie" xml:space="preserve">
+    <value>Movie</value>
+  </data>
+	<data name="Room" xml:space="preserve">
+    <value>Room</value>
+  </data>
+	<data name="ShowDate" xml:space="preserve">
+    <value>Show Date</value>
+  </data>
+	<data name="ShowTime" xml:space="preserve">
+    <value>Show Time</value>
+  </data>
+	<data name="OnlyFoodAndDrinks" xml:space="preserve">
+    <value>Food &amp; Drinks Only</value>
+  </data>
+	<data name="NoTicketSelected" xml:space="preserve">
+    <value>You have not selected a movie ticket</value>
+  </data>
+	<data name="SelectedSeats" xml:space="preserve">
+    <value>Selected Seats</value>
+  </data>
+	<data name="Seats" xml:space="preserve">
+    <value>seats</value>
+  </data>
+	<data name="NoSeatsSelected" xml:space="preserve">
+    <value>No seats selected</value>
+  </data>
+	<data name="NotSelected" xml:space="preserve">
+    <value>Not selected</value>
+  </data>
+	<data name="BackToSeatSelection" xml:space="preserve">
+    <value>Back to Seat Selection</value>
+  </data>
+	<data name="BackToMovieSelection" xml:space="preserve">
+    <value>Back to Movie Selection</value>
+  </data>
+	<data name="FoodCounter" xml:space="preserve">
+    <value>Food Counter</value>
+  </data>
+	<data name="Popcorn" xml:space="preserve">
+    <value>Popcorn</value>
+  </data>
+	<data name="Drinks" xml:space="preserve">
+    <value>Drinks</value>
+  </data>
+	<data name="Combo" xml:space="preserve">
+    <value>Combo</value>
+  </data>
+	<data name="FoodOrder" xml:space="preserve">
+    <value>Food Order</value>
+  </data>
+	<data name="TotalFoodAmount" xml:space="preserve">
+    <value>Total Food Amount</value>
+  </data>
+	<data name="ProceedToPayment" xml:space="preserve">
+    <value>Proceed to Payment</value>
+  </data>
+	<data name="NoItemsSelected" xml:space="preserve">
+    <value>No items selected</value>
+  </data>
+</root>

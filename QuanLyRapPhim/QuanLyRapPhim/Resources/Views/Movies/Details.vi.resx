@@ -1,0 +1,78 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+	<data name="MovieDetails" xml:space="preserve">
+    <value>Chi tiết phim</value>
+  </data>
+	<data name="NoPoster" xml:space="preserve">
+    <value>Không có poster</value>
+  </data>
+	<data name="Description" xml:space="preserve">
+    <value>Mô tả</value>
+  </data>
+	<data name="Genre" xml:space="preserve">
+    <value>Thể loại</value>
+  </data>
+	<data name="Director" xml:space="preserve">
+    <value>Đạo diễn</value>
+  </data>
+	<data name="Actors" xml:space="preserve">
+    <value>Diễn viên</value>
+  </data>
+	<data name="Duration" xml:space="preserve">
+    <value>Thời lượng</value>
+  </data>
+	<data name="Minutes" xml:space="preserve">
+    <value>phút</value>
+  </data>
+	<data name="BackToList" xml:space="preserve">
+    <value>Quay lại danh sách</value>
+  </data>
+	<data name="BookTicket" xml:space="preserve">
+    <value>Đặt vé</value>
+  </data>
+	<data name="Edit" xml:space="preserve">
+    <value>Sửa</value>
+  </data>
+	<data name="Delete" xml:space="preserve">
+    <value>Xóa</value>
+  </data>
+	<data name="Trailer" xml:space="preserve">
+    <value>Trailer</value>
+  </data>
+	<data name="TrailerTitle" xml:space="preserve">
+    <value>Trailer phim</value>
+  </data>
+	<data name="InvalidTrailerLink" xml:space="preserve">
+    <value>Không thể hiển thị trailer: Link không hợp lệ.</value>
+  </data>
+	<data name="WriteReview" xml:space="preserve">
+    <value>Viết nhận xét</value>
+  </data>
+	<data name="Comment" xml:space="preserve">
+    <value>Nhận xét</value>
+  </data>
+	<data name="Rating" xml:space="preserve">
+    <value>Đánh giá</value>
+  </data>
+	<data name="PleaseSelectRating" xml:space="preserve">
+    <value>Vui lòng chọn số sao để đánh giá.</value>
+  </data>
+	<data name="AlreadyReviewed" xml:space="preserve">
+    <value>Bạn đã đánh giá phim này rồi. Mỗi người dùng chỉ được đánh giá một lần.</value>
+  </data>
+	<data name="PleaseLoginToReview" xml:space="preserve">
+    <value>Vui lòng đăng nhập để viết nhận xét</value>
+  </data>
+	<data name="Login" xml:space="preserve">
+    <value>đăng nhập</value>
+  </data>
+	<data name="SubmitReview" xml:space="preserve">
+    <value>Gửi nhận xét</value>
+  </data>
+	<data name="UserReviews" xml:space="preserve">
+    <value>Nhận xét từ người dùng</value>
+  </data>
+	<data name="NoReviewsYet" xml:space="preserve">
+    <value>Chưa có nhận xét nào cho phim này.</value>
+  </data>
+</root>
