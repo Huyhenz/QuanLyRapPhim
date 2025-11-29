@@ -1,0 +1,104 @@
+﻿@model QuanLyRapPhim.Models.Voucher
+
+@{
+    ViewData["Title"] = "Chỉnh sửa Voucher";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid vh-100 d-flex flex-column justify-content-center position-relative">
+    <div class="frame-wrapper flex-grow-1">
+        <h1 class="text-white mb-4">Chỉnh sửa Voucher</h1>
+        <div class="row">
+            <div class="col-md-6">
+                <form asp-action="Edit" class="p-4 rounded movie-card">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    <input type="hidden" asp-for="VoucherId" />
+
+                    <div class="mb-3">
+                        <label asp-for="Code" class="form-label font-bold text-white">Mã Voucher</label>
+                        <input asp-for="Code" class="form-control" />
+                        <span asp-validation-for="Code" class="text-danger"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="DiscountAmount" class="form-label font-bold text-white">Giảm giá cố định (VND)</label>
+                        <input asp-for="DiscountAmount" class="form-control" />
+                        <span asp-validation-for="DiscountAmount" class="text-danger"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="DiscountPercentage" class="form-label font-bold text-white">Giảm giá phần trăm (%)</label>
+                        <input asp-for="DiscountPercentage" class="form-control" />
+                        <span asp-validation-for="DiscountPercentage" class="text-danger"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="ExpiryDate" class="form-label font-bold text-white">Ngày hết hạn</label>
+                        <input asp-for="ExpiryDate" type="date" class="form-control" />
+                        <span asp-validation-for="ExpiryDate" class="text-danger"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="IsActive" class="form-label font-bold text-white">Trạng thái</label>
+                        <div class="form-check">
+                            <input asp-for="IsActive" class="form-check-input" type="checkbox" />
+                            <label class="form-check-label text-white">Active</label>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="UsageLimit" class="form-label font-bold text-white">Giới hạn sử dụng</label>
+                        <input asp-for="UsageLimit" class="form-control" />
+                        <span asp-validation-for="UsageLimit" class="text-danger"></span>
+                    </div>
+                    <div class="text-center">
+                        <button type="submit" class="btn btn-create px-4 py-2">Lưu</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="mt-4">
+            <a asp-action="Index" class="btn btn-create">Quay lại danh sách</a>
+        </div>
+    </div>
+</div>
+
+<!-- Style giống Edit Movie -->
+<style>
+    /* Copy toàn bộ style từ Edit.cshtml của Movie */
+    body {
+        background-color: #0F0F0F;
+        font-family: 'Montserrat',sans-serif;
+    }
+
+    .frame-wrapper {
+        max-height: 80vh;
+        overflow-y: auto;
+        background: #2e2e2e;
+        border-radius: 20px;
+        padding: 20px;
+    }
+
+    .movie-card {
+        background: #1c1c1c;
+        border-radius: 15px;
+    }
+
+    .form-control {
+        background: #333;
+        border: 1px solid #444;
+        color: #fff;
+    }
+
+        .form-control:focus {
+            border-color: #ff0033;
+            box-shadow: 0 0 10px rgba(255,0,51,0.5);
+        }
+
+    .btn-create {
+        background: linear-gradient(90deg,#ff0033 0%,#e50914 100%);
+        border: none;
+        color: #fff;
+    }
+</style>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

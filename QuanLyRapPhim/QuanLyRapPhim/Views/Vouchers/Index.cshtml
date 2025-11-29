@@ -1,0 +1,184 @@
+﻿@model IEnumerable<QuanLyRapPhim.Models.Voucher>
+
+@{
+    ViewData["Title"] = "Danh sách Voucher";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    bool isAdmin = User.IsInRole("Admin");
+}
+
+<div class="container-fluid d-flex position-relative">
+    <!-- Admin Sidebar -->
+    @if (isAdmin)
+    {
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h3 class="sidebar-title">CinemaX Admin</h3>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="/Movies" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Movies" ? "active" : "")"><i class="fas fa-film"></i> Quản lý phim</a>
+                <a href="/Showtimes" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Showtimes" ? "active" : "")"><i class="fas fa-clock"></i> Quản lý lịch chiếu</a>
+                <a href="/Rooms" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Rooms" ? "active" : "")"><i class="fas fa-door-open"></i> Quản lý phòng</a>
+                <a href="/Seats" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Seats" ? "active" : "")"><i class="fas fa-chair"></i> Quản lý ghế</a>
+                <a href="/Admin/ManageFoods" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "ManageFoods" ? "active" : "")"><i class="fas fa-utensils"></i> Quản lý đồ ăn</a>
+                <a href="/Admin/ManageBookings" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Admin" && ViewContext.RouteData.Values["Action"]?.ToString() == "ManageBookings" ? "active" : "")"><i class="fas fa-ticket-alt"></i> Quản lý đặt vé</a>
+                <a href="/Admin/RevenueStatistics" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Admin" && ViewContext.RouteData.Values["Action"]?.ToString() == "RevenueStatistics" ? "active" : "")"><i class="fas fa-chart-bar"></i> Báo cáo thống kê</a>
+                <a href="/Vouchers" class="nav-item active"><i class="fas fa-gift"></i> Quản lý Voucher</a>
+                <div class="nav-divider"></div>
+                <a href="#" class="nav-item"><i class="fab fa-facebook"></i> Facebook</a>
+                <a href="#" class="nav-item"><i class="fab fa-twitter"></i> Twitter</a>
+                <a href="#" class="nav-item"><i class="fab fa-google"></i> Google</a>
+            </nav>
+        </aside>
+    }
+
+    <div class="frame-wrapper flex-grow-1 @(isAdmin ? "admin-view" : "")">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1 class="title-gradient">Danh sách Voucher</h1>
+            @if (isAdmin)
+            {
+                <div class="header-actions">
+                    <a asp-action="Create" class="btn btn-create glow-effect">Thêm Voucher mới</a>
+                    <span class="order-count ms-3">@Model.Count() voucher được tìm thấy</span>
+                </div>
+            }
+        </div>
+
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="alert alert-success alert-dismissible fade show glow-effect" role="alert">
+                @TempData["SuccessMessage"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        }
+        @if (TempData["ErrorMessage"] != null)
+        {
+            <div class="alert alert-danger alert-dismissible fade show glow-effect" role="alert">
+                @TempData["ErrorMessage"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        }
+
+        <div class="table-container">
+            <table class="table table-custom">
+                <thead>
+                    <tr>
+                        <th>Mã Voucher</th>
+                        <th>Giảm cố định (VND)</th>
+                        <th>Giảm phần trăm (%)</th>
+                        <th>Ngày hết hạn</th>
+                        <th>Trạng thái</th>
+                        <th>Giới hạn sử dụng</th>
+                        <th>Đã dùng</th>
+                        <th>Hành động</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td><strong>@item.Code</strong></td>
+                            <td>@(item.DiscountAmount > 0 ? item.DiscountAmount.ToString("N0") : "-")</td>
+                            <td>@(item.DiscountPercentage > 0 ? item.DiscountPercentage + "%" : "-")</td>
+                            <td>@item.ExpiryDate.ToString("dd/MM/yyyy")</td>
+                            <td><span class="badge @(item.IsActive ? "bg-success" : "bg-secondary")">@(item.IsActive ? "Active" : "Inactive")</span></td>
+                            <td>@item.UsageLimit</td>
+                            <td>@item.UsedCount</td>
+                            <td>
+                                <a asp-action="Details" asp-route-id="@item.VoucherId" class="btn btn-sm btn-create glow-effect action-btn">Chi tiết</a>
+                                <a asp-action="Edit" asp-route-id="@item.VoucherId" class="btn btn-sm btn-warning glow-effect action-btn">Sửa</a>
+                                <a asp-action="Delete" asp-route-id="@item.VoucherId" class="btn btn-sm btn-danger glow-effect action-btn">Xóa</a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <footer class="footer text-center py-3">
+        <p class="text-white mb-0">© 2025 CinemaX. All rights reserved. | Last updated: November 29, 2025</p>
+    </footer>
+</div>
+
+<style>
+    /* Giống hệt Movies/Index */
+    body {
+        background-color: #0F0F0F;
+        font-family: 'Montserrat',sans-serif;
+    }
+
+    .sidebar {
+        background: linear-gradient(180deg,#ff0033 0%,#e50914 100%);
+        width: 250px;
+        height: 100vh;
+        position: fixed;
+        left: 0;
+        top: 0;
+        padding: 20px;
+        overflow-y: auto;
+        z-index: 1000;
+    }
+
+    .frame-wrapper.admin-view {
+        margin-left: 250px;
+    }
+
+    .title-gradient {
+        background: linear-gradient(90deg,#ff0033 0%,#e50914 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        font-size: 2rem;
+        font-weight: 700;
+        text-transform: uppercase;
+    }
+
+    .btn-create {
+        background: linear-gradient(90deg,#ff0033 0%,#e50914 100%);
+        border: none;
+        color: #fff;
+        padding: 10px 20px;
+        border-radius: 8px;
+        transition: all .3s;
+    }
+
+        .btn-create:hover {
+            background: linear-gradient(90deg,#e6002e 0%,#d30912 100%);
+            transform: translateY(-2px);
+        }
+
+    .table-custom th {
+        background: #1C2526;
+        color: #fff;
+        position: sticky;
+        top: 0;
+    }
+
+    .table-custom td {
+        border-bottom: 1px solid #ff0033;
+        color: #fff;
+    }
+
+    .glow-effect {
+        transition: box-shadow .3s;
+    }
+
+        .glow-effect:hover {
+            box-shadow: 0 0 15px rgba(255,0,51,0.5);
+        }
+
+    .badge {
+        padding: 5px 10px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+    }
+
+    .action-btn {
+        margin: 0 3px;
+    }
+</style>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

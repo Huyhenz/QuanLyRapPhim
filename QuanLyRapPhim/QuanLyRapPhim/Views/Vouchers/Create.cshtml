@@ -1,0 +1,120 @@
+﻿@model QuanLyRapPhim.Models.Voucher
+
+@{
+    ViewData["Title"] = "Thêm Voucher Mới";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid vh-100 d-flex flex-column justify-content-center position-relative overflow-hidden">
+    <div class="frame-wrapper flex-grow-1">
+        <h1 class="text-white mb-3">Thêm Voucher Mới</h1>
+        <hr class="border-white" />
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="card movie-card p-4">
+                    <form asp-action="Create">
+                        <div asp-validation-summary="ModelOnly" class="text-danger text-center mb-3"></div>
+
+                        <div class="form-group mb-3">
+                            <label asp-for="Code" class="form-label text-white">Mã Voucher</label>
+                            <input asp-for="Code" class="form-control" placeholder="Ví dụ: SALE50" />
+                            <span asp-validation-for="Code" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label asp-for="DiscountAmount" class="form-label text-white">Giảm giá cố định (VND)</label>
+                            <input asp-for="DiscountAmount" type="number" class="form-control" placeholder="0 nếu không dùng" />
+                            <span asp-validation-for="DiscountAmount" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label asp-for="DiscountPercentage" class="form-label text-white">Giảm giá phần trăm (%)</label>
+                            <input asp-for="DiscountPercentage" type="number" class="form-control" placeholder="0 nếu không dùng" />
+                            <span asp-validation-for="DiscountPercentage" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label asp-for="ExpiryDate" class="form-label text-white">Ngày hết hạn</label>
+                            <input asp-for="ExpiryDate" type="date" class="form-control" />
+                            <span asp-validation-for="ExpiryDate" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label asp-for="IsActive" class="form-label text-white">Trạng thái</label>
+                            <div class="form-check">
+                                <input asp-for="IsActive" class="form-check-input" type="checkbox" checked />
+                                <label class="form-check-label text-white">Active</label>
+                            </div>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label asp-for="UsageLimit" class="form-label text-white">Giới hạn sử dụng</label>
+                            <input asp-for="UsageLimit" type="number" class="form-control" />
+                            <span asp-validation-for="UsageLimit" class="text-danger"></span>
+                        </div>
+
+                        <div class="d-flex justify-content-between">
+                            <a asp-action="Index" class="btn btn-secondary">Quay lại</a>
+                            <button type="submit" class="btn btn-create">Thêm Voucher</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <footer class="footer text-center py-3">
+        <p class="text-white mb-0">© 2025 CinemaX. All rights reserved.</p>
+    </footer>
+</div>
+
+<!-- Style giống Create Movie -->
+<style>
+    /* Copy toàn bộ style từ Create.cshtml của Movie */
+    body {
+        background-color: #0F0F0F;
+        margin: 0;
+        font-family: 'Montserrat',sans-serif;
+        overflow: hidden;
+    }
+
+    .frame-wrapper {
+        background: #2e2e2e;
+        border-radius: 20px;
+        border: 4px solid #2e2e2e;
+        box-shadow: 0 0 25px rgba(46,46,46,0.5);
+        padding: 20px;
+    }
+
+    .movie-card {
+        background: #1c1c1c;
+        border-radius: 15px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    }
+
+    .form-control {
+        background: #2a2a2a;
+        border: 1px solid #cc0022;
+        color: #fff;
+    }
+
+        .form-control:focus {
+            border-color: #ff0033;
+            box-shadow: 0 0 10px rgba(255,0,51,0.5);
+        }
+
+    .btn-create {
+        background: linear-gradient(90deg,#ff0033 0%,#e50914 100%);
+        border: none;
+        color: #fff;
+    }
+
+        .btn-create:hover {
+            background: linear-gradient(90deg,#e6002e 0%,#d30912 100%);
+        }
+</style>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

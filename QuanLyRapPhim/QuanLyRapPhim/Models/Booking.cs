@@ -15,5 +15,9 @@ namespace QuanLyRapPhim.Models
         public Payment? Payment { get; set; }
         public ICollection<BookingDetail>? BookingDetails { get; set; }
         public ICollection<BookingFood>? BookingFoods { get; set; } // Thêm
+
+        // Trong Booking.cs, thêm sau các properties hiện có:
+        public int? VoucherId { get; set; }
+        public Voucher? Voucher { get; set; }
     }
 }

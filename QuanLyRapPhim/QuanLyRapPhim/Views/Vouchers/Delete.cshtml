@@ -1,0 +1,70 @@
+﻿@model QuanLyRapPhim.Models.Voucher
+
+@{
+    ViewData["Title"] = "Xóa Voucher";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid vh-100 d-flex flex-column justify-content-center position-relative">
+    <div class="frame-wrapper flex-grow-1">
+        <h1 class="text-white mb-4">Xóa Voucher: @Model.Code</h1>
+        <div class="card movie-card">
+            <div class="card-body">
+                <h3 class="text-danger">Bạn có chắc chắn muốn xóa voucher này?</h3>
+                <hr />
+                <dl class="row">
+                    <dt class="col-sm-4">Mã Voucher</dt>
+                    <dd class="col-sm-8">@Model.Code</dd>
+                    <dt class="col-sm-4">Giảm cố định</dt>
+                    <dd class="col-sm-8">@(Model.DiscountAmount > 0 ? Model.DiscountAmount.ToString("N0") + " VND" : "-")</dd>
+                    <dt class="col-sm-4">Giảm phần trăm</dt>
+                    <dd class="col-sm-8">@(Model.DiscountPercentage > 0 ? Model.DiscountPercentage + "%" : "-")</dd>
+                    <dt class="col-sm-4">Ngày hết hạn</dt>
+                    <dd class="col-sm-8">@Model.ExpiryDate.ToString("dd/MM/yyyy")</dd>
+                    <dt class="col-sm-4">Đã dùng</dt>
+                    <dd class="col-sm-8">@Model.UsedCount lần</dd>
+                </dl>
+
+                <form asp-action="Delete">
+                    <input type="hidden" asp-for="VoucherId" />
+                    <div class="d-flex justify-content-between mt-4">
+                        <input type="submit" value="Xóa" class="btn btn-delete" />
+                        <a asp-action="Index" class="btn btn-back">⏪ Quay lại</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Giống Delete Movie */
+    body {
+        background-color: #0F0F0F;
+        font-family: 'Montserrat',sans-serif;
+    }
+
+    .frame-wrapper {
+        background: #2e2e2e;
+        border-radius: 20px;
+        padding: 20px;
+        overflow-y: auto;
+    }
+
+    .movie-card {
+        background: #1c1c1c;
+        border-radius: 15px;
+    }
+
+    .btn-delete, .btn-back {
+        background: linear-gradient(90deg,#ff0033 0%,#e50914 100%);
+        color: #fff;
+        border: none;
+        border-radius: 8px;
+        padding: 10px 20px;
+    }
+
+        .btn-delete:hover, .btn-back:hover {
+            background: linear-gradient(90deg,#e6002e 0%,#d30912 100%);
+        }
+</style>

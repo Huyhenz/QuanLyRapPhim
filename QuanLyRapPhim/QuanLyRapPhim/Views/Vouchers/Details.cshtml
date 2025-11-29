@@ -1,0 +1,87 @@
+﻿@model QuanLyRapPhim.Models.Voucher
+
+@{
+    ViewData["Title"] = "Chi tiết Voucher";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid d-flex flex-column position-relative">
+    <div class="frame-wrapper flex-grow-1">
+        <h1 class="text-white mb-4">Chi tiết Voucher: @Model.Code</h1>
+
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="alert alert-success alert-dismissible fade show glow-effect" role="alert">
+                @TempData["SuccessMessage"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        }
+
+        <div class="card movie-card text-light">
+            <div class="card-body">
+                <dl class="row">
+                    <dt class="col-sm-4">Mã Voucher</dt>
+                    <dd class="col-sm-8">@Model.Code</dd>
+
+                    <dt class="col-sm-4">Giảm cố định</dt>
+                    <dd class="col-sm-8">@(Model.DiscountAmount > 0 ? Model.DiscountAmount.ToString("N0") + " VND" : "Không")</dd>
+
+                    <dt class="col-sm-4">Giảm phần trăm</dt>
+                    <dd class="col-sm-8">@(Model.DiscountPercentage > 0 ? Model.DiscountPercentage + "%" : "Không")</dd>
+
+                    <dt class="col-sm-4">Ngày hết hạn</dt>
+                    <dd class="col-sm-8">@Model.ExpiryDate.ToString("dd/MM/yyyy")</dd>
+
+                    <dt class="col-sm-4">Trạng thái</dt>
+                    <dd class="col-sm-8">@(Model.IsActive ? "Active" : "Inactive")</dd>
+
+                    <dt class="col-sm-4">Giới hạn sử dụng</dt>
+                    <dd class="col-sm-8">@Model.UsageLimit</dd>
+
+                    <dt class="col-sm-4">Đã sử dụng</dt>
+                    <dd class="col-sm-8">@Model.UsedCount</dd>
+                </dl>
+            </div>
+            <div class="card-footer d-flex justify-content-between">
+                <a asp-action="Index" class="btn btn-back">⏪ Quay lại danh sách</a>
+                <div>
+                    <a asp-action="Edit" asp-route-id="@Model.VoucherId" class="btn btn-warning">Sửa</a>
+                    <a asp-action="Delete" asp-route-id="@Model.VoucherId" class="btn btn-danger">Xóa</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <footer class="footer text-center py-3">
+        <p class="text-white mb-0">© 2025 CinemaX. All rights reserved.</p>
+    </footer>
+</div>
+
+<style>
+    /* Giống Details Movie */
+    body {
+        background-color: #0F0F0F;
+        font-family: 'Montserrat',sans-serif;
+        overflow: auto;
+    }
+
+    .frame-wrapper {
+        background: #2e2e2e;
+        border-radius: 20px;
+        padding: 20px;
+    }
+
+    .movie-card {
+        background: #1c1c1c;
+        border-radius: 15px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    }
+
+    .btn-back {
+        background: linear-gradient(90deg,#ff0033 0%,#e50914 100%);
+        color: #fff;
+    }
+
+    .glow-effect {
+        box-shadow: 0 0 15px rgba(255,0,51,0.3);
+    }
+</style>
