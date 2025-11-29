@@ -1,0 +1,87 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+	<data name="FoodItemList" xml:space="preserve">
+    <value>Food and Beverage List</value>
+  </data>
+	<data name="AddFoodItem" xml:space="preserve">
+    <value>Add New Item</value>
+  </data>
+	<data name="Image" xml:space="preserve">
+    <value>Image</value>
+  </data>
+	<data name="Name" xml:space="preserve">
+    <value>Name</value>
+  </data>
+	<data name="Description" xml:space="preserve">
+    <value>Description</value>
+  </data>
+	<data name="Price" xml:space="preserve">
+    <value>Price</value>
+  </data>
+	<data name="Category" xml:space="preserve">
+    <value>Category</value>
+  </data>
+	<data name="Status" xml:space="preserve">
+    <value>Status</value>
+  </data>
+	<data name="Actions" xml:space="preserve">
+    <value>Actions</value>
+  </data>
+	<data name="Available" xml:space="preserve">
+    <value>Available</value>
+  </data>
+	<data name="OutOfStock" xml:space="preserve">
+    <value>Out of Stock</value>
+  </data>
+	<data name="Edit" xml:space="preserve">
+    <value>Edit</value>
+  </data>
+	<data name="Delete" xml:space="preserve">
+    <value>Delete</value>
+  </data>
+	<data name="Previous" xml:space="preserve">
+    <value>Previous</value>
+  </data>
+	<data name="Next" xml:space="preserve">
+    <value>Next</value>
+  </data>
+	<data name="NoFoodItemsAvailable" xml:space="preserve">
+    <value>No food items available</value>
+  </data>
+	<data name="Save" xml:space="preserve">
+    <value>Save</value>
+  </data>
+	<data name="Update" xml:space="preserve">
+    <value>Update</value>
+  </data>
+	<data name="EditFoodItem" xml:space="preserve">
+    <value>Edit Food Item</value>
+  </data>
+	<data name="ImageUrl" xml:space="preserve">
+    <value>Image URL</value>
+  </data>
+	<data name="Drink" xml:space="preserve">
+    <value>Drink</value>
+  </data>
+	<data name="Snack" xml:space="preserve">
+    <value>Snack</value>
+  </data>
+	<data name="Combo" xml:space="preserve">
+    <value>Combo</value>
+  </data>
+	<data name="ErrorAddingFoodItem" xml:space="preserve">
+    <value>Error adding food item</value>
+  </data>
+	<data name="ErrorLoadingFoodItem" xml:space="preserve">
+    <value>Error loading food item</value>
+  </data>
+	<data name="ErrorUpdatingFoodItem" xml:space="preserve">
+    <value>Error updating food item</value>
+  </data>
+	<data name="ErrorDeletingFoodItem" xml:space="preserve">
+    <value>Error deleting food item</value>
+  </data>
+	<data name="ConfirmDelete" xml:space="preserve">
+    <value>Are you sure you want to delete this item?</value>
+  </data>
+</root>

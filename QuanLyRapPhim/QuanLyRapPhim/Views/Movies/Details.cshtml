@@ -1,15 +1,43 @@
 ﻿@model QuanLyRapPhim.Models.Movie
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
 
 @{
-    ViewData["Title"] = "Chi tiết phim";
+    ViewData["Title"] = Localizer["MovieDetails"].Value;
     Layout = "~/Views/Shared/_Layout.cshtml";
+
+    // All variable declarations at the top to avoid nested blocks
+    var videoId = "";
+    if (!string.IsNullOrEmpty(Model.TrailerUrl))
+    {
+        if (Model.TrailerUrl.Contains("youtube.com/watch?v="))
+        {
+            videoId = Model.TrailerUrl.Split("v=")[1];
+            var ampersandPosition = videoId.IndexOf('&');
+            if (ampersandPosition != -1)
+            {
+                videoId = videoId.Substring(0, ampersandPosition);
+            }
+        }
+        else if (Model.TrailerUrl.Contains("youtu.be/"))
+        {
+            videoId = Model.TrailerUrl.Split("youtu.be/")[1];
+            var questionMarkPosition = videoId.IndexOf('?');
+            if (questionMarkPosition != -1)
+            {
+                videoId = videoId.Substring(0, questionMarkPosition);
+            }
+        }
+    }
+
+    var userId = User.Identity.IsAuthenticated ? User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value : null;
+    var existingReview = userId != null ? Model.Reviews.FirstOrDefault(r => r.UserId == userId) : null;
 }
 
 <div class="container-fluid d-flex flex-column position-relative">
     <!-- Khung bao quanh -->
     <div class="frame-wrapper flex-grow-1">
-        <h1 class="text-white mb-4">Chi tiết phim: @Model.Title</h1>
-
+        <h1 class="text-white mb-4">@Localizer["MovieDetails"]: @Model.Title</h1>
         @if (TempData["SuccessMessage"] != null)
         {
             <div class="alert alert-success alert-dismissible fade show glow-effect" role="alert">
@@ -24,7 +52,6 @@
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
         }
-
         <!-- Thông tin phim -->
         <div class="row">
             <!-- Poster phim -->
@@ -35,70 +62,47 @@
                 }
                 else
                 {
-                    <div class="text-center text-muted mb-3" style="height: 500px; line-height: 500px;">Không có poster</div>
+                    <div class="text-center text-muted mb-3" style="height: 500px; line-height: 500px;">@Localizer["NoPoster"]</div>
                 }
             </div>
-
             <!-- Thông tin chi tiết phim -->
             <div class="col-md-6">
                 <div class="card movie-card text-light">
                     <div class="card-body">
                         <h3 class="mb-3">@Model.Title</h3>
-                        <p><strong>Mô tả:</strong> @Model.Description</p>
-                        <p><strong>Thể loại:</strong> @Model.Genre</p>
-                        <p><strong>Đạo diễn:</strong> @Model.Director</p>
-                        <p><strong>Diễn viên:</strong> @Model.Actors</p>
-                        <p><strong>Thời lượng:</strong> @Model.Duration phút</p>
+                        <p><strong>@Localizer["Description"]:</strong> @Model.Description</p>
+                        <p><strong>@Localizer["Genre"]:</strong> @Model.Genre</p>
+                        <p><strong>@Localizer["Director"]:</strong> @Model.Director</p>
+                        <p><strong>@Localizer["Actors"]:</strong> @Model.Actors</p>
+                        <p><strong>@Localizer["Duration"]:</strong> @Model.Duration @Localizer["Minutes"]</p>
                     </div>
                     <div class="card-footer d-flex justify-content-between">
                         <a asp-action="Index" class="btn btn-back">
-                            ⏪ Quay lại danh sách
+                            ⏪ @Localizer["BackToList"]
                         </a>
                         <div>
-                            <a asp-controller="Showtimes" asp-action="Index" asp-route-movieId="@Model.MovieId" class="btn btn-create">Đặt vé</a>
+                            <a asp-controller="Showtimes" asp-action="Index" asp-route-movieId="@Model.MovieId" class="btn btn-create">@Localizer["BookTicket"]</a>
                             @if (User.IsInRole("Admin"))
                             {
-                                <a asp-action="Edit" asp-route-id="@Model.MovieId" class="btn btn-warning">Sửa</a>
-                                <a asp-action="Delete" asp-route-id="@Model.MovieId" class="btn btn-danger">Xóa</a>
+                                <a asp-action="Edit" asp-route-id="@Model.MovieId" class="btn btn-warning">@Localizer["Edit"]</a>
+                                <a asp-action="Delete" asp-route-id="@Model.MovieId" class="btn btn-danger">@Localizer["Delete"]</a>
                             }
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-
         <!-- Trailer Section -->
         @if (!string.IsNullOrEmpty(Model.TrailerUrl))
         {
-            // Convert YouTube URL to embed format
-            var videoId = "";
-            if (Model.TrailerUrl.Contains("youtube.com/watch?v="))
-            {
-                videoId = Model.TrailerUrl.Split("v=")[1];
-                var ampersandPosition = videoId.IndexOf('&');
-                if (ampersandPosition != -1)
-                {
-                    videoId = videoId.Substring(0, ampersandPosition);
-                }
-            }
-            else if (Model.TrailerUrl.Contains("youtu.be/"))
-            {
-                videoId = Model.TrailerUrl.Split("youtu.be/")[1];
-                var questionMarkPosition = videoId.IndexOf('?');
-                if (questionMarkPosition != -1)
-                {
-                    videoId = videoId.Substring(0, questionMarkPosition);
-                }
-            }
-
-            if (!string.IsNullOrEmpty(videoId))
+            @if (!string.IsNullOrEmpty(videoId))
             {
                 <div class="mt-5 mb-5 trailer-section">
-                    <h4 class="text-white mb-3">Trailer</h4>
+                    <h4 class="text-white mb-3">@Localizer["Trailer"]</h4>
                     <div class="embed-responsive embed-responsive-16by9 movie-card glow-effect">
                         <iframe class="embed-responsive-item"
                                 src="https://www.youtube.com/embed/@videoId"
-                                title="Trailer phim @Model.Title"
+                                title="@Localizer["TrailerTitle"] @Model.Title"
                                 frameborder="0"
                                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                                 allowfullscreen></iframe>
@@ -108,30 +112,26 @@
             else
             {
                 <div class="mt-5 mb-5 trailer-section">
-                    <h4 class="text-white mb-3">Trailer</h4>
-                    <p class="text-muted">Không thể hiển thị trailer: Link không hợp lệ.</p>
+                    <h4 class="text-white mb-3">@Localizer["Trailer"]</h4>
+                    <p class="text-muted">@Localizer["InvalidTrailerLink"]</p>
                 </div>
             }
         }
-
         <!-- Form thêm nhận xét -->
         <div class="mt-5 review-section">
-            <h4 class="text-white mb-3">Viết nhận xét</h4>
+            <h4 class="text-white mb-3">@Localizer["WriteReview"]</h4>
             @if (User.Identity.IsAuthenticated)
             {
-                var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
-                var existingReview = Model.Reviews.FirstOrDefault(r => r.UserId == userId);
-
                 @if (existingReview == null)
                 {
                     <form asp-action="AddReview" method="post">
                         <input type="hidden" name="movieId" value="@Model.MovieId" />
                         <div class="form-group mb-3">
-                            <label for="comment" class="text-white">Nhận xét:</label>
+                            <label for="comment" class="text-white">@Localizer["Comment"]:</label>
                             <textarea name="comment" id="comment" class="form-control" rows="3" required maxlength="500"></textarea>
                         </div>
                         <div class="form-group mb-3">
-                            <label class="text-white">Đánh giá (1-5):</label>
+                            <label class="text-white">@Localizer["Rating"] (1-5):</label>
                             <div class="star-rating">
                                 <span class="fa fa-star" data-value="1"></span>
                                 <span class="fa fa-star" data-value="2"></span>
@@ -140,25 +140,24 @@
                                 <span class="fa fa-star" data-value="5"></span>
                             </div>
                             <input type="hidden" name="rating" id="rating" value="0" required />
-                            <div class="text-danger" id="rating-error" style="display: none;">Vui lòng chọn số sao để đánh giá.</div>
+                            <div class="text-danger" id="rating-error" style="display: none;">@Localizer["PleaseSelectRating"]</div>
                         </div>
-                        <button type="submit" class="btn btn-create">Gửi nhận xét</button>
+                        <button type="submit" class="btn btn-create">@Localizer["SubmitReview"]</button>
                     </form>
                 }
                 else
                 {
-                    <p class="text-warning">Bạn đã đánh giá phim này rồi. Mỗi người dùng chỉ được đánh giá một lần.</p>
+                    <p class="text-warning">@Localizer["AlreadyReviewed"]</p>
                 }
             }
             else
             {
-                <p class="text-white">Vui lòng <a href="/Identity/Account/Login">đăng nhập</a> để viết nhận xét.</p>
+                <p class="text-white">@Localizer["PleaseLoginToReview"] <a href="/Identity/Account/Login">@Localizer["Login"]</a>.</p>
             }
         </div>
-
         <!-- Danh sách nhận xét -->
         <div class="mt-5 review-section">
-            <h4 class="text-white mb-3">Nhận xét từ người dùng</h4>
+            <h4 class="text-white mb-3">@Localizer["UserReviews"]</h4>
             @if (Model.Reviews.Any())
             {
                 <div class="list-group">
@@ -171,7 +170,7 @@
                             </div>
                             <p class="mb-1">@review.Comment</p>
                             <small>
-                                Đánh giá:
+                                @Localizer["Rating"]:
                                 @for (int i = 1; i <= 5; i++)
                                 {
                                     if (i <= review.Rating)
@@ -190,17 +189,15 @@
             }
             else
             {
-                <p class="text-white">Chưa có nhận xét nào cho phim này.</p>
+                <p class="text-white">@Localizer["NoReviewsYet"]</p>
             }
         </div>
     </div>
-
     <!-- Footer -->
     <footer class="footer text-center py-3">
         <p class="text-white mb-0">© 2025 CinemaX. All rights reserved. | Last updated: 01:31 AM +07, May 27, 2025</p>
     </footer>
 </div>
-
 <!-- CSS tùy chỉnh -->
 <style>
     body {
@@ -209,7 +206,6 @@
         font-family: 'Montserrat', sans-serif;
         overflow: auto; /* Cho phép cuộn tự nhiên */
     }
-
     .container-fluid {
         display: flex;
         width: 100%;
@@ -219,7 +215,6 @@
         justify-content: flex-start;
         padding: 20px 0;
     }
-
     /* Khung bao quanh */
     .frame-wrapper {
         display: flex;
@@ -232,20 +227,17 @@
         box-shadow: 0 0 25px rgba(46, 46, 46, 0.5);
         padding: 20px;
     }
-
     .row {
         display: flex;
         flex-wrap: wrap;
         margin: 0 -10px;
         height: auto; /* Xóa chiều cao cố định */
     }
-
     .col-md-6 {
         flex: 0 0 50%; /* 50% width for both columns */
         max-width: 50%;
         padding: 0 10px;
     }
-
     h1 {
         font-size: 2rem;
         font-weight: 700;
@@ -255,7 +247,6 @@
         -webkit-text-fill-color: transparent;
         margin-bottom: 20px;
     }
-
     .movie-card {
         background: #1c1c1c;
         border-radius: 15px;
@@ -266,39 +257,32 @@
         box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
         transition: transform 0.3s ease;
     }
-
         .movie-card:hover {
             transform: translateY(-5px);
         }
-
     .movie-poster {
         border-radius: 15px;
         max-height: 500px; /* Giữ nguyên để vừa khung */
         object-fit: cover;
         width: 100%;
     }
-
     .card-body, .list-group-item {
         padding: 20px;
     }
-
     .card-footer {
         background: transparent;
         padding: 15px;
         border-top: 1px solid #444;
     }
-
     .form-group {
         margin-bottom: 1.5rem;
     }
-
     .form-label {
         font-size: 0.9rem;
         font-weight: 500;
         color: #ffffff;
         margin-bottom: 5px;
     }
-
     .form-control, .form-control:focus {
         border-radius: 8px;
         padding: 12px 15px;
@@ -308,17 +292,14 @@
         color: #ffffff;
         transition: border-color 0.3s ease, box-shadow 0.3s ease;
     }
-
         .form-control:focus {
             border-color: #ff0033;
             box-shadow: 0 0 10px rgba(255, 0, 51, 0.5);
             background: #333;
         }
-
         .form-control::placeholder {
             color: rgba(255, 255, 255, 0.5);
         }
-
     .btn-back {
         background: linear-gradient(90deg, #ff0033 0%, #e50914 100%);
         color: #fff;
@@ -332,13 +313,11 @@
         font-weight: bold;
         box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
     }
-
         .btn-back:hover {
             background: linear-gradient(90deg, #e6002e 0%, #d30912 100%);
             transform: scale(1.05);
             box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
         }
-
     .btn-create {
         background: linear-gradient(90deg, #ff0033 0%, #e50914 100%);
         border: none;
@@ -349,12 +328,10 @@
         font-weight: 600;
         transition: background 0.3s ease, transform 0.2s ease;
     }
-
         .btn-create:hover {
             background: linear-gradient(90deg, #e6002e 0%, #d30912 100%);
             transform: translateY(-2px);
         }
-
     .btn-warning {
         background-color: #ffca28;
         color: #000;
@@ -363,11 +340,9 @@
         padding: 10px 20px;
         margin-left: 5px;
     }
-
         .btn-warning:hover {
             background-color: #ffb300;
         }
-
     .btn-danger {
         background-color: #ff4444;
         color: #fff;
@@ -376,43 +351,35 @@
         padding: 10px 20px;
         margin-left: 5px;
     }
-
         .btn-danger:hover {
             background-color: #cc0000;
         }
-
     .text-danger {
         font-size: 0.85rem;
         margin-top: 5px;
     }
-
     .star-rating {
         font-size: 1.5rem;
         cursor: pointer;
         display: flex;
         gap: 5px;
     }
-
         .star-rating .fa-star {
             color: #ccc; /* Màu mặc định của sao (xám) */
             transition: color 0.2s;
         }
-
             .star-rating .fa-star.checked {
                 color: #ffca28; /* Màu vàng khi được chọn */
             }
-
             .star-rating .fa-star:hover,
             .star-rating .fa-star:hover ~ .fa-star {
                 color: #ffca28; /* Màu vàng khi hover */
             }
-
     /* Trailer section */
     .trailer-section {
         width: 100%;
         margin-bottom: 40px; /* Thêm khoảng cách dưới */
     }
-
     .embed-responsive {
         position: relative;
         padding-bottom: 56.25%; /* 16:9 Aspect Ratio */
@@ -421,7 +388,6 @@
         max-width: 100%;
         background: #1c1c1c;
     }
-
         .embed-responsive iframe {
             position: absolute;
             top: 0;
@@ -430,13 +396,11 @@
             height: 100%;
             border: none;
         }
-
     /* Review sections */
     .review-section {
         width: 100%;
         margin-bottom: 40px; /* Thêm khoảng cách dưới */
     }
-
     /* Footer */
     .footer {
         background: #1a1a1a;
@@ -446,23 +410,19 @@
         margin: 0 auto;
         border-radius: 0 0 20px 20px;
     }
-
         .footer p {
             font-size: 12px;
             color: #cccccc;
         }
-
     /* Hiệu ứng sáng (glow) */
     .glow-effect {
         box-shadow: 0 0 15px rgba(255, 0, 51, 0.3);
         transition: box-shadow 0.3s ease;
     }
-
         .glow-effect:hover {
             box-shadow: 0 0 25px rgba(255, 0, 51, 0.5);
         }
 </style>
-
 <!-- JavaScript để xử lý chọn sao -->
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
@@ -471,35 +431,28 @@
             const stars = document.querySelectorAll('.star-rating .fa-star');
             const ratingInput = document.getElementById('rating');
             const ratingError = document.getElementById('rating-error');
-
             const initialRating = parseInt(ratingInput?.value || 0);
             if (initialRating > 0) {
                 for (let i = 0; i < initialRating; i++) {
                     stars[i].classList.add('checked');
                 }
             }
-
             stars.forEach(star => {
                 star.addEventListener('click', function () {
                     const value = this.getAttribute('data-value');
                     ratingInput.value = value;
-
                     stars.forEach(s => s.classList.remove('checked'));
-
                     for (let i = 0; i < value; i++) {
                         stars[i].classList.add('checked');
                     }
-
                     ratingError.style.display = 'none';
                 });
-
                 star.addEventListener('mouseover', function () {
                     const value = this.getAttribute('data-value');
                     for (let i = 0; i < value; i++) {
                         stars[i].classList.add('checked');
                     }
                 });
-
                 star.addEventListener('mouseout', function () {
                     const currentValue = ratingInput.value;
                     stars.forEach(s => s.classList.remove('checked'));
@@ -508,7 +461,6 @@
                     }
                 });
             });
-
             document.querySelector('form')?.addEventListener('submit', function (e) {
                 if (ratingInput.value == '0') {
                     e.preventDefault();

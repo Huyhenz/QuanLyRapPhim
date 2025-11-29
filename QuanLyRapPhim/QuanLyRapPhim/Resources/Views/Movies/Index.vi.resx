@@ -1,0 +1,203 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+	<xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+		<xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+		<xsd:element name="root" msdata:IsDataSet="true">
+			<xsd:complexType>
+				<xsd:choice maxOccurs="unbounded">
+					<xsd:element name="metadata">
+						<xsd:complexType>
+							<xsd:sequence>
+								<xsd:element name="value" type="xsd:string" minOccurs="0" />
+							</xsd:sequence>
+							<xsd:attribute name="name" use="required" type="xsd:string" />
+							<xsd:attribute name="type" type="xsd:string" />
+							<xsd:attribute name="mimetype" type="xsd:string" />
+							<xsd:attribute ref="xml:space" />
+						</xsd:complexType>
+					</xsd:element>
+					<xsd:element name="assembly">
+						<xsd:complexType>
+							<xsd:attribute name="alias" type="xsd:string" />
+							<xsd:attribute name="name" type="xsd:string" />
+						</xsd:complexType>
+					</xsd:element>
+					<xsd:element name="data">
+						<xsd:complexType>
+							<xsd:sequence>
+								<xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+								<xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+							</xsd:sequence>
+							<xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+							<xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+							<xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+							<xsd:attribute ref="xml:space" />
+						</xsd:complexType>
+					</xsd:element>
+					<xsd:element name="resheader">
+						<xsd:complexType>
+							<xsd:sequence>
+								<xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+							</xsd:sequence>
+							<xsd:attribute name="name" type="xsd:string" use="required" />
+						</xsd:complexType>
+					</xsd:element>
+				</xsd:choice>
+			</xsd:complexType>
+		</xsd:element>
+	</xsd:schema>
+	<resheader name="resmimetype">
+		<value>text/microsoft-resx</value>
+	</resheader>
+	<resheader name="version">
+		<value>2.0</value>
+	</resheader>
+	<resheader name="reader">
+		<value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+	</resheader>
+	<resheader name="writer">
+		<value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+	</resheader>
+
+	<!-- Movie List -->
+	<data name="MovieList" xml:space="preserve">
+    <value>Danh sách phim</value>
+  </data>
+	<data name="SelectDate" xml:space="preserve">
+    <value>Chọn ngày</value>
+  </data>
+	<data name="AddNewMovie" xml:space="preserve">
+    <value>Thêm phim mới</value>
+  </data>
+	<data name="MoviesFound" xml:space="preserve">
+    <value>phim được tìm thấy</value>
+  </data>
+	<data name="MovieListManage" xml:space="preserve">
+    <value>Danh sách phim (Quản lý)</value>
+  </data>
+
+	<!-- Table Headers -->
+	<data name="MovieName" xml:space="preserve">
+    <value>Tên Phim</value>
+  </data>
+	<data name="Poster" xml:space="preserve">
+    <value>Poster</value>
+  </data>
+	<data name="Genre" xml:space="preserve">
+    <value>Thể loại</value>
+  </data>
+	<data name="Duration" xml:space="preserve">
+    <value>Thời lượng</value>
+  </data>
+	<data name="Director" xml:space="preserve">
+    <value>Đạo diễn</value>
+  </data>
+	<data name="Actors" xml:space="preserve">
+    <value>Diễn viên</value>
+  </data>
+	<data name="Description" xml:space="preserve">
+    <value>Mô tả</value>
+  </data>
+	<data name="TrailerURL" xml:space="preserve">
+    <value>URL Trailer</value>
+  </data>
+	<data name="Actions" xml:space="preserve">
+    <value>Hành động</value>
+  </data>
+	<data name="Minutes" xml:space="preserve">
+    <value>phút</value>
+  </data>
+
+	<!-- Buttons -->
+	<data name="ViewTrailer" xml:space="preserve">
+    <value>Xem Trailer</value>
+  </data>
+	<data name="Details" xml:space="preserve">
+    <value>Chi tiết</value>
+  </data>
+	<data name="Edit" xml:space="preserve">
+    <value>Sửa</value>
+  </data>
+	<data name="Delete" xml:space="preserve">
+    <value>Xóa</value>
+  </data>
+
+	<!-- Messages -->
+	<data name="Rating" xml:space="preserve">
+    <value>Đánh giá</value>
+  </data>
+	<data name="NoDescription" xml:space="preserve">
+    <value>Chưa có mô tả</value>
+  </data>
+	<data name="NoMovies" xml:space="preserve">
+    <value>Không có phim nào</value>
+  </data>
+
+	<!-- Sidebar -->
+	<data name="ManageMovies" xml:space="preserve">
+    <value>Quản lý phim</value>
+  </data>
+	<data name="ManageShowtimes" xml:space="preserve">
+    <value>Quản lý lịch chiếu</value>
+  </data>
+	<data name="ManageRooms" xml:space="preserve">
+    <value>Quản lý phòng</value>
+  </data>
+	<data name="ManageSeats" xml:space="preserve">
+    <value>Quản lý ghế</value>
+  </data>
+	<data name="ManageFoods" xml:space="preserve">
+    <value>Quản lý đồ ăn</value>
+  </data>
+	<data name="ManageBookings" xml:space="preserve">
+    <value>Quản lý đặt vé</value>
+  </data>
+	<data name="RevenueStatistics" xml:space="preserve">
+    <value>Báo cáo thống kê</value>
+  </data>
+
+	<!-- Pagination -->
+	<data name="Showing" xml:space="preserve">
+    <value>Hiển thị</value>
+  </data>
+	<data name="Of" xml:space="preserve">
+    <value>của</value>
+  </data>
+
+	<!-- Modals -->
+	<data name="AddMovie" xml:space="preserve">
+    <value>Thêm Phim</value>
+  </data>
+	<data name="EditMovie" xml:space="preserve">
+    <value>Sửa Phim</value>
+  </data>
+	<data name="SaveChanges" xml:space="preserve">
+    <value>Lưu Thay đổi</value>
+  </data>
+	<data name="ConfirmDelete" xml:space="preserve">
+    <value>Bạn có chắc chắn muốn xóa phim này?</value>
+  </data>
+
+	<!-- Features -->
+	<data name="ComfortableSeats" xml:space="preserve">
+    <value>Ghế Ngồi Thoải Mái</value>
+  </data>
+	<data name="ComfortableSeatsDesc" xml:space="preserve">
+    <value>Ghế da cao cấp với khoảng cách rộng rãi, mang đến trải nghiệm xem phim tuyệt vời nhất.</value>
+  </data>
+	<data name="DolbySound" xml:space="preserve">
+    <value>Âm Thanh Dolby Atmos</value>
+  </data>
+	<data name="DolbySoundDesc" xml:space="preserve">
+    <value>Hệ thống âm thanh vòm 3D tiên tiến, mang đến âm thanh sống động và chân thực.</value>
+  </data>
+	<data name="Screen4K" xml:space="preserve">
+    <value>Màn Hình 4K.</value>
+  </data>
+	<data name="OnlineBooking" xml:space="preserve">
+    <value>Đặt Vé Online.</value>
+  </data>
+	<data name="OnlineBookingDesc" xml:space="preserve">
+    <value>Đặt vé nhanh chóng và tiện lợi qua website hoặc ứng dụng di động của chúng tôi.</value>
+  </data>
+</root>

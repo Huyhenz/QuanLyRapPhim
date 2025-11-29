@@ -1,12 +1,12 @@
 ﻿@model IEnumerable<QuanLyRapPhim.Models.Showtime>
-
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
 @{
-    ViewData["Title"] = "Chọn lịch chiếu";
+    ViewData["Title"] = Localizer["SelectShowtime"].Value;
     Layout = "~/Views/Shared/_Layout.cshtml";
     var movieId = ViewBag.MovieId;
-    var movieTitle = ViewBag.MovieTitle ?? "Phim không xác định";
+    var movieTitle = ViewBag.MovieTitle ?? Localizer["UnknownMovie"].Value;
 }
-
 <div class="admin-dashboard">
     <!-- Sidebar -->
     @if (User.IsInRole("Admin"))
@@ -16,14 +16,28 @@
                 <h3 class="sidebar-title">CinemaX Admin</h3>
             </div>
             <nav class="sidebar-nav">
-                @* <a href="/Admin/Index" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Admin" && ViewContext.RouteData.Values["Action"]?.ToString() == "Index" ? "active" : "")"><i class="fas fa-tachometer-alt"></i> Dashboard</a> *@
-                <a href="/Movies" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Movies" ? "active" : "")"><i class="fas fa-film"></i> Quản lý phim</a>
-                <a href="/Showtimes" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Showtimes" ? "active" : "")"><i class="fas fa-clock"></i> Quản lý lịch chiếu</a>
-                <a href="/Rooms" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Rooms" ? "active" : "")"><i class="fas fa-door-open"></i> Quản lý phòng</a>
-                <a href="/Seats" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Seats" ? "active" : "")"><i class="fas fa-chair"></i> Quản lý ghế</a>
-                <a href="/Admin/ManageFoods" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "ManageFoods" ? "active" : "")"><i class="fas fa-utensils"></i> Quản lý đồ ăn</a>
-                <a href="/Admin/ManageBookings" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Admin" && ViewContext.RouteData.Values["Action"]?.ToString() == "ManageBookings" ? "active" : "")"><i class="fas fa-ticket-alt"></i> Quản lý đặt vé</a>
-                <a href="/Admin/RevenueStatistics" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Admin" && ViewContext.RouteData.Values["Action"]?.ToString() == "RevenueStatistics" ? "active" : "")"><i class="fas fa-chart-bar"></i> Báo cáo thống kê</a>
+                @* <a href="/Admin/Index" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Admin" && ViewContext.RouteData.Values["Action"]?.ToString() == "Index" ? "active" : "")"><i class="fas fa-tachometer-alt"></i> @Localizer["Dashboard"]</a> *@
+                <a href="/Movies" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Movies" ? "active" : "")">
+                    <i class="fas fa-film"></i> @Localizer["ManageMovies"]
+                </a>
+                <a href="/Showtimes" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Showtimes" ? "active" : "")">
+                    <i class="fas fa-clock"></i> @Localizer["ManageShowtimes"]
+                </a>
+                <a href="/Rooms" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Rooms" ? "active" : "")">
+                    <i class="fas fa-door-open"></i> @Localizer["ManageRooms"]
+                </a>
+                <a href="/Seats" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Seats" ? "active" : "")">
+                    <i class="fas fa-chair"></i> @Localizer["ManageSeats"]
+                </a>
+                <a href="/Admin/ManageFoods" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "ManageFoods" ? "active" : "")">
+                    <i class="fas fa-utensils"></i> @Localizer["ManageFoods"]
+                </a>
+                <a href="/Admin/ManageBookings" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Admin" && ViewContext.RouteData.Values["Action"]?.ToString() == "ManageBookings" ? "active" : "")">
+                    <i class="fas fa-ticket-alt"></i> @Localizer["ManageBookings"]
+                </a>
+                <a href="/Admin/RevenueStatistics" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Admin" && ViewContext.RouteData.Values["Action"]?.ToString() == "RevenueStatistics" ? "active" : "")">
+                    <i class="fas fa-chart-bar"></i> @Localizer["RevenueStatistics"]
+                </a>
                 <div class="nav-divider"></div>
                 <a href="#" class="nav-item"><i class="fab fa-facebook"></i> Facebook</a>
                 <a href="#" class="nav-item"><i class="fab fa-twitter"></i> Twitter</a>
@@ -31,35 +45,41 @@
             </nav>
         </aside>
     }
-
     <!-- Main Content -->
     <main class="content">
         <div class="content-inner">
-            <h2 class="page-title">Chọn lịch chiếu</h2>
-            <h4 class="text-white mb-4">Phim: @movieTitle</h4>
-
+            <h2 class="page-title">@Localizer["SelectShowtime"]</h2>
+            <h4 class="text-white mb-4">@Localizer["Movie"] @movieTitle</h4>
             <!-- Search Form -->
             <form class="search-form d-flex mb-4" asp-controller="Showtimes" asp-action="Search" method="get">
                 <input type="hidden" name="movieId" value="@movieId" />
-                <input class="form-control me-2 search-input" type="text" name="searchTitle" placeholder="Nhập tên phim..."
+                <input class="form-control me-2 search-input" type="text" name="searchTitle" placeholder="@Localizer["EnterMovieName"]..."
                        value="@Context.Request.Query["searchTitle"]">
-                <input class="form-control me-2 search-input" type="date" name="startDate" placeholder="Từ ngày"
+                <input class="form-control me-2 search-input" type="date" name="startDate" placeholder="@Localizer["FromDate"]"
                        value="@Context.Request.Query["startDate"]">
-                <input class="form-control me-2 search-input" type="date" name="endDate" placeholder="Đến ngày"
+                <input class="form-control me-2 search-input" type="date" name="endDate" placeholder="@Localizer["ToDate"]"
                        value="@Context.Request.Query["endDate"]">
                 <select class="form-control me-2 search-input" name="genre">
-                    <option value="">Chọn thể loại...</option>
-                    @foreach (var genre in new[] { "Hành động", "Tình cảm", "Kinh dị", "Hoạt hình", "Khoa học viễn tưởng", "Chiến tranh", "Hài hước", "Viễn tưởng" })
+                    <option value="">@Localizer["SelectGenre"]...</option>
+                    @foreach (var genre in new[] {
+                    Localizer["Action"].Value,
+                    Localizer["Romance"].Value,
+                    Localizer["Horror"].Value,
+                    Localizer["Animation"].Value,
+                    Localizer["SciFi"].Value,
+                    Localizer["War"].Value,
+                    Localizer["Comedy"].Value,
+                    Localizer["Fantasy"].Value
+                    })
                     {
                         <option value="@genre" selected="@(Context.Request.Query["genre"] == genre ? "selected" : null)">
                             @genre
                         </option>
                     }
                 </select>
-                <button class="btn btn-primary me-2 search-btn" type="submit"><i class="fas fa-search"></i> Tìm kiếm</button>
-                <button class="btn btn-secondary search-btn" type="button" onclick="window.location.href='/Showtimes?movieId=@movieId'"><i class="fas fa-sync-alt"></i> Load lại trang</button>
+                <button class="btn btn-primary me-2 search-btn" type="submit"><i class="fas fa-search"></i> @Localizer["Search"]</button>
+                <button class="btn btn-secondary search-btn" type="button" onclick="window.location.href='/Showtimes?movieId=@movieId'"><i class="fas fa-sync-alt"></i> @Localizer["ReloadPage"]</button>
             </form>
-
             <!-- Thông báo lỗi nếu không có lịch chiếu -->
             @if (ViewBag.ErrorMessage != null)
             {
@@ -80,30 +100,30 @@
                                     <h5 class="card-title text-white">@showtime.Title</h5>
                                     <p class="card-text">
                                         <i class="fas fa-calendar-alt text-primary me-2"></i>
-                                        <strong>Ngày chiếu:</strong> @showtime.Date.ToString("dd/MM/yyyy")
+                                        <strong>@Localizer["ShowDate"]:</strong> @showtime.Date.ToString("dd/MM/yyyy")
                                     </p>
                                     <p class="card-text">
                                         <i class="fas fa-clock text-primary me-2"></i>
-                                        <strong>Giờ chiếu:</strong>
+                                        <strong>@Localizer["ShowTime"]:</strong>
                                         @DateTime.Today.Add(showtime.StartTime).ToString("hh:mm tt")
                                     </p>
                                     <p class="card-text">
                                         <i class="fas fa-door-open text-primary me-2"></i>
-                                        <strong>Phòng:</strong> @showtime.Room?.RoomName
+                                        <strong>@Localizer["Room"]:</strong> @showtime.Room?.RoomName
                                     </p>
                                 </div>
                                 <div class="card-footer d-flex justify-content-between">
                                     <a asp-controller="Tickets" asp-action="SelectRoomAndSeat" asp-route-showtimeId="@showtime.ShowtimeId" class="btn btn-primary btn-sm" style="background-color: #ff0033; border: none; border-radius: 20px; padding: 5px 15px; font-weight: 600;">
-                                        <i class="fas fa-ticket-alt me-1"></i> Chọn lịch này
+                                        <i class="fas fa-ticket-alt me-1"></i> @Localizer["SelectThisShowtime"]
                                     </a>
                                     @if (User.IsInRole("Admin"))
                                     {
                                         <div class="d-flex">
                                             <a asp-controller="Showtimes" asp-action="Edit" asp-route-id="@showtime.ShowtimeId" class="btn btn-warning btn-sm me-2" style="background-color: #ffcc00; border: none; border-radius: 20px; padding: 5px 15px; font-weight: 600; color: #000;">
-                                                <i class="fas fa-edit"></i> Sửa
+                                                <i class="fas fa-edit"></i> @Localizer["Edit"]
                                             </a>
                                             <a asp-controller="Showtimes" asp-action="Delete" asp-route-id="@showtime.ShowtimeId" class="btn btn-danger btn-sm" style="background-color: #e6002e; border: none; border-radius: 20px; padding: 5px 15px; font-weight: 600;">
-                                                <i class="fas fa-trash-alt"></i> Xóa
+                                                <i class="fas fa-trash-alt"></i> @Localizer["Delete"]
                                             </a>
                                         </div>
                                     }
@@ -113,30 +133,27 @@
                     }
                 </div>
             }
-
             @if (!Model.Any() && ViewBag.ErrorMessage == null)
             {
                 <div class="alert alert-danger text-center" style="background-color: #1c1c1c; color: #fff; border: 1px solid #e6002e; border-radius: 10px;">
-                    <i class="fas fa-exclamation-circle"></i> Không có lịch chiếu nào cho phim này!
+                    <i class="fas fa-exclamation-circle"></i> @Localizer["NoShowtimesAvailable"]
                 </div>
             }
-
             <!-- Nút quay lại, tạo lịch chiếu và quay lại danh sách phim -->
             <div class="mt-4">
                 @if (User.IsInRole("Admin"))
                 {
                     <a asp-controller="Showtimes" asp-action="Create" asp-route-movieId="@movieId" class="btn btn-success ms-3" style="background-color: #00cc00; border: none; border-radius: 20px; padding: 8px 20px; font-weight: 600;">
-                        <i class="fas fa-plus me-1"></i> Tạo lịch chiếu mới
+                        <i class="fas fa-plus me-1"></i> @Localizer["CreateNewShowtime"]
                     </a>
                 }
                 <a asp-controller="Movies" asp-action="Index" class="btn btn-info ms-3" style="background-color: #00bfff; border: none; border-radius: 20px; padding: 8px 20px; font-weight: 600;">
-                    <i class="fas fa-list me-1"></i> Quay lại danh sách phim
+                    <i class="fas fa-list me-1"></i> @Localizer["BackToMovieList"]
                 </a>
             </div>
         </div>
     </main>
 </div>
-
 <style>
     body {
         margin: 0;
@@ -280,7 +297,6 @@
         border-top: none;
         border-radius: 0 0 15px 15px;
     }
-
     /* Updated Search Form Styles */
     .search-form {
         display: flex;
@@ -401,68 +417,71 @@
         border: 1px solid #e6002e;
         border-radius: 10px;
     }
-
     /* Media Queries */
     @@media (max-width: 768px) {
-        .sidebar {
-            width: 200px;
-            z-index: 1000;
-        }
+        .sidebar
 
-        .content {
-            margin-left: 200px;
-            width: calc(100% - 200px);
-        }
-
-        .search-input {
-            width: 120px; /* Even smaller width for smaller screens */
-            font-size: 0.8rem;
-            height: 28px;
-        }
-
-        .search-btn {
-            font-size: 0.8rem;
-            padding: 4px 10px;
-            height: 28px;
-        }
+    {
+        width: 200px;
+        z-index: 1000;
     }
 
+    .content {
+        margin-left: 200px;
+        width: calc(100% - 200px);
+    }
+
+    .search-input {
+        width: 120px; /* Even smaller width for smaller screens */
+        font-size: 0.8rem;
+        height: 28px;
+    }
+
+    .search-btn {
+        font-size: 0.8rem;
+        padding: 4px 10px;
+        height: 28px;
+    }
+
+    }
     @@media (max-width: 576px) {
-        .admin-dashboard {
-            flex-direction: column;
-        }
+        .admin-dashboard
 
-        .sidebar {
-            position: relative;
-            width: 100%;
-            height: auto;
-        }
+    {
+        flex-direction: column;
+    }
 
-        .content {
-            margin-left: 0;
-            width: 100%;
-            min-height: auto;
-        }
+    .sidebar {
+        position: relative;
+        width: 100%;
+        height: auto;
+    }
 
-        .content-inner {
-            width: 100%;
-            padding: 20px;
-        }
+    .content {
+        margin-left: 0;
+        width: 100%;
+        min-height: auto;
+    }
 
-        .search-form {
-            flex-direction: column;
-            align-items: stretch;
-        }
+    .content-inner {
+        width: 100%;
+        padding: 20px;
+    }
 
-        .search-input, .search-btn {
-            width: 100%; /* Full width on very small screens */
-            margin: 5px 0; /* Add vertical spacing */
-        }
+    .search-form {
+        flex-direction: column;
+        align-items: stretch;
+    }
 
-        .search-btn {
-            justify-content: center;
-        }
+    .search-input, .search-btn {
+        width: 100%; /* Full width on very small screens */
+        margin: 5px 0; /* Add vertical spacing */
+    }
+
+    .search-btn {
+        justify-content: center;
+    }
+
     }
 </style>
-
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

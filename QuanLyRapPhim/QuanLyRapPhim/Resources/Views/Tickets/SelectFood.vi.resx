@@ -1,0 +1,66 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+	<data name="SelectFoodAndDrinks" xml:space="preserve">
+    <value>Chọn đồ ăn &amp; nước uống</value>
+  </data>
+	<data name="Movie" xml:space="preserve">
+    <value>Phim</value>
+  </data>
+	<data name="Room" xml:space="preserve">
+    <value>Phòng</value>
+  </data>
+	<data name="ShowDate" xml:space="preserve">
+    <value>Ngày chiếu</value>
+  </data>
+	<data name="ShowTime" xml:space="preserve">
+    <value>Giờ chiếu</value>
+  </data>
+	<data name="OnlyFoodAndDrinks" xml:space="preserve">
+    <value>Chỉ đặt đồ ăn &amp; nước uống</value>
+  </data>
+	<data name="NoTicketSelected" xml:space="preserve">
+    <value>Bạn chưa chọn vé xem phim</value>
+  </data>
+	<data name="SelectedSeats" xml:space="preserve">
+    <value>Ghế đã chọn</value>
+  </data>
+	<data name="Seats" xml:space="preserve">
+    <value>ghế</value>
+  </data>
+	<data name="NoSeatsSelected" xml:space="preserve">
+    <value>Không chọn ghế</value>
+  </data>
+	<data name="NotSelected" xml:space="preserve">
+    <value>Chưa chọn</value>
+  </data>
+	<data name="BackToSeatSelection" xml:space="preserve">
+    <value>Quay lại chọn ghế</value>
+  </data>
+	<data name="BackToMovieSelection" xml:space="preserve">
+    <value>Quay lại chọn phim</value>
+  </data>
+	<data name="FoodCounter" xml:space="preserve">
+    <value>Quầy đồ ăn</value>
+  </data>
+	<data name="Popcorn" xml:space="preserve">
+    <value>Bắp rang</value>
+  </data>
+	<data name="Drinks" xml:space="preserve">
+    <value>Nước uống</value>
+  </data>
+	<data name="Combo" xml:space="preserve">
+    <value>Combo</value>
+  </data>
+	<data name="FoodOrder" xml:space="preserve">
+    <value>Đơn hàng đồ ăn</value>
+  </data>
+	<data name="TotalFoodAmount" xml:space="preserve">
+    <value>Tổng tiền đồ ăn</value>
+  </data>
+	<data name="ProceedToPayment" xml:space="preserve">
+    <value>Tiếp tục thanh toán</value>
+  </data>
+	<data name="NoItemsSelected" xml:space="preserve">
+    <value>Chưa chọn món</value>
+  </data>
+</root>

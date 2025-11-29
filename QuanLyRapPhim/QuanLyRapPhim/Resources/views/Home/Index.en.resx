@@ -118,7 +118,7 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="BookTickets" xml:space="preserve">
-    <value>BOOK TICKETS NOW</value>
+    <value>BOOK&lt;br&gt;TICKETS</value>
   </data>
   <data name="BookNow" xml:space="preserve">
     <value>Book Now</value>
@@ -143,5 +143,35 @@
   </data>
   <data name="Next" xml:space="preserve">
     <value>Next</value>
+  </data>
+  <data name="Search" xml:space="preserve">
+    <value>Search movies</value>
+  </data>
+  <data name="AdminDashboard" xml:space="preserve">
+    <value>Admin Dashboard</value>
+  </data>
+  <data name="NowShowing" xml:space="preserve">
+    <value>NOW SHOWING</value>
+  </data>
+  <data name="NoMovies" xml:space="preserve">
+    <value>There are currently no movies showing or no matching results found.</value>
+  </data>
+  <data name="NoRating" xml:space="preserve">
+    <value>No rating yet</value>
+  </data>
+  <data name="ComfortableSeats" xml:space="preserve">
+    <value>Comfortable Seats</value>
+  </data>
+  <data name="ComfortableSeatsDesc" xml:space="preserve">
+    <value>Premium leather seats with spacious legroom, providing the best movie experience.</value>
+  </data>
+  <data name="DolbySound" xml:space="preserve">
+    <value>Dolby Atmos Sound</value>
+  </data>
+  <data name="DolbySoundDesc" xml:space="preserve">
+    <value>Advanced 3D surround sound system, delivering vivid and realistic audio.</value>
+  </data>
+  <data name="Screen4K" xml:space="preserve">
+    <value>4KScreen</value>
   </data>
 </root>

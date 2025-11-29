@@ -1,0 +1,206 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+	<xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+		<xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+		<xsd:element name="root" msdata:IsDataSet="true">
+			<xsd:complexType>
+				<xsd:choice maxOccurs="unbounded">
+					<xsd:element name="metadata">
+						<xsd:complexType>
+							<xsd:sequence>
+								<xsd:element name="value" type="xsd:string" minOccurs="0" />
+							</xsd:sequence>
+							<xsd:attribute name="name" use="required" type="xsd:string" />
+							<xsd:attribute name="type" type="xsd:string" />
+							<xsd:attribute name="mimetype" type="xsd:string" />
+							<xsd:attribute ref="xml:space" />
+						</xsd:complexType>
+					</xsd:element>
+					<xsd:element name="assembly">
+						<xsd:complexType>
+							<xsd:attribute name="alias" type="xsd:string" />
+							<xsd:attribute name="name" type="xsd:string" />
+						</xsd:complexType>
+					</xsd:element>
+					<xsd:element name="data">
+						<xsd:complexType>
+							<xsd:sequence>
+								<xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+								<xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+							</xsd:sequence>
+							<xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+							<xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+							<xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+							<xsd:attribute ref="xml:space" />
+						</xsd:complexType>
+					</xsd:element>
+					<xsd:element name="resheader">
+						<xsd:complexType>
+							<xsd:sequence>
+								<xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+							</xsd:sequence>
+							<xsd:attribute name="name" type="xsd:string" use="required" />
+						</xsd:complexType>
+					</xsd:element>
+				</xsd:choice>
+			</xsd:complexType>
+		</xsd:element>
+	</xsd:schema>
+	<resheader name="resmimetype">
+		<value>text/microsoft-resx</value>
+	</resheader>
+	<resheader name="version">
+		<value>2.0</value>
+	</resheader>
+	<resheader name="reader">
+		<value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+	</resheader>
+	<resheader name="writer">
+		<value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+	</resheader>
+
+	<!-- Movie List -->
+	<data name="MovieList" xml:space="preserve">
+    <value>MOVIELIST</value>
+  </data>
+	<data name="SelectDate" xml:space="preserve">
+    <value>SelectDate</value>
+  </data>
+	<data name="AddNewMovie" xml:space="preserve">
+    <value>AddNewMovie</value>
+  </data>
+	<data name="MoviesFound" xml:space="preserve">
+    <value>MoviesFound</value>
+  </data>
+	<data name="MovieListManage" xml:space="preserve">
+    <value>MOVIELISTMANAGE</value>
+  </data>
+
+	<!-- Table Headers -->
+	<data name="MovieName" xml:space="preserve">
+    <value>MovieName</value>
+  </data>
+	<data name="Poster" xml:space="preserve">
+    <value>Poster</value>
+  </data>
+	<data name="Genre" xml:space="preserve">
+    <value>Genre</value>
+  </data>
+	<data name="Duration" xml:space="preserve">
+    <value>Duration</value>
+  </data>
+	<data name="Director" xml:space="preserve">
+    <value>Director</value>
+  </data>
+	<data name="Actors" xml:space="preserve">
+    <value>Actors</value>
+  </data>
+	<data name="Description" xml:space="preserve">
+    <value>Description</value>
+  </data>
+	<data name="TrailerURL" xml:space="preserve">
+    <value>TrailerURL</value>
+  </data>
+	<data name="Actions" xml:space="preserve">
+    <value>Actions</value>
+  </data>
+	<data name="Minutes" xml:space="preserve">
+    <value>Minutes</value>
+  </data>
+
+	<!-- Buttons -->
+	<data name="ViewTrailer" xml:space="preserve">
+    <value>ViewTrailer</value>
+  </data>
+	<data name="Details" xml:space="preserve">
+    <value>Details</value>
+  </data>
+	<data name="Edit" xml:space="preserve">
+    <value>Edit</value>
+  </data>
+	<data name="Delete" xml:space="preserve">
+    <value>Delete</value>
+  </data>
+
+	<!-- Messages -->
+	<data name="Rating" xml:space="preserve">
+    <value>Rating</value>
+  </data>
+	<data name="NoDescription" xml:space="preserve">
+    <value>No description</value>
+  </data>
+	<data name="NoMovies" xml:space="preserve">
+    <value>No movies available</value>
+  </data>
+
+	<!-- Sidebar -->
+	<data name="ManageMovies" xml:space="preserve">
+    <value>ManageMovies</value>
+  </data>
+	<data name="ManageShowtimes" xml:space="preserve">
+    <value>ManageShowtimes</value>
+  </data>
+	<data name="ManageRooms" xml:space="preserve">
+    <value>ManageRooms</value>
+  </data>
+	<data name="ManageSeats" xml:space="preserve">
+    <value>ManageSeats</value>
+  </data>
+	<data name="ManageFoods" xml:space="preserve">
+    <value>ManageFoods</value>
+  </data>
+	<data name="ManageBookings" xml:space="preserve">
+    <value>ManageBookings</value>
+  </data>
+	<data name="RevenueStatistics" xml:space="preserve">
+    <value>RevenueStatistics</value>
+  </data>
+
+	<!-- Pagination -->
+	<data name="Showing" xml:space="preserve">
+    <value>Showing</value>
+  </data>
+	<data name="Of" xml:space="preserve">
+    <value>of</value>
+  </data>
+
+	<!-- Modals -->
+	<data name="AddMovie" xml:space="preserve">
+    <value>Add Movie</value>
+  </data>
+	<data name="EditMovie" xml:space="preserve">
+    <value>Edit Movie</value>
+  </data>
+	<data name="SaveChanges" xml:space="preserve">
+    <value>Save Changes</value>
+  </data>
+	<data name="ConfirmDelete" xml:space="preserve">
+    <value>Are you sure you want to delete this movie?</value>
+  </data>
+
+	<!-- Features -->
+	<data name="ComfortableSeats" xml:space="preserve">
+    <value>ComfortableSeats</value>
+  </data>
+	<data name="ComfortableSeatsDesc" xml:space="preserve">
+    <value>ComfortableSeatsDesc</value>
+  </data>
+	<data name="DolbySound" xml:space="preserve">
+    <value>DolbySound</value>
+  </data>
+	<data name="DolbySoundDesc" xml:space="preserve">
+    <value>DolbySoundDesc</value>
+  </data>
+	<data name="Screen4K" xml:space="preserve">
+    <value>4KScreen</value>
+  </data>
+	<data name="Screen4KDesc" xml:space="preserve">
+    <value>4KScreenDesc</value>
+  </data>
+	<data name="OnlineBooking" xml:space="preserve">
+    <value>Online Booking</value>
+  </data>
+	<data name="OnlineBookingDesc" xml:space="preserve">
+    <value>Book tickets quickly and conveniently through our website or mobile app.</value>
+  </data>
+</root>

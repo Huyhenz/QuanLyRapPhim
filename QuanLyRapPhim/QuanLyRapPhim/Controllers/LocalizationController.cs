@@ -13,19 +13,26 @@ namespace QuanLyRapPhim.Controllers
                 culture = "vi"; // Default to Vietnamese
             }
 
-            // Set cookie
+            // Set cookie với các options đầy đủ
             Response.Cookies.Append(
                 CookieRequestCultureProvider.DefaultCookieName,
                 CookieRequestCultureProvider.MakeCookieValue(new RequestCulture(culture)),
-                new CookieOptions { Expires = DateTimeOffset.UtcNow.AddYears(1) });
+                new CookieOptions
+                {
+                    Expires = DateTimeOffset.UtcNow.AddYears(1),
+                    Path = "/",
+                    HttpOnly = false,
+                    IsEssential = true, // QUAN TRỌNG: Cookie này là bắt buộc
+                    SameSite = SameSiteMode.Lax // Cho phép cookie hoạt động với redirect
+                });
 
-            // Redirect back to returnUrl or home
-            return LocalRedirect(returnUrl ?? "/");
-        }
+            // Đảm bảo returnUrl an toàn
+            if (string.IsNullOrEmpty(returnUrl) || !Url.IsLocalUrl(returnUrl))
+            {
+                returnUrl = "/";
+            }
 
-        public IActionResult Index()
-        {
-            return View();
+            return LocalRedirect(returnUrl);
         }
     }
 }

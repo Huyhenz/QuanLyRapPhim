@@ -1,0 +1,87 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+	<data name="FoodItemList" xml:space="preserve">
+    <value>Danh sách đồ ăn và nước uống</value>
+  </data>
+	<data name="AddFoodItem" xml:space="preserve">
+    <value>Thêm món mới</value>
+  </data>
+	<data name="Image" xml:space="preserve">
+    <value>Hình ảnh</value>
+  </data>
+	<data name="Name" xml:space="preserve">
+    <value>Tên món</value>
+  </data>
+	<data name="Description" xml:space="preserve">
+    <value>Mô tả</value>
+  </data>
+	<data name="Price" xml:space="preserve">
+    <value>Giá</value>
+  </data>
+	<data name="Category" xml:space="preserve">
+    <value>Danh mục</value>
+  </data>
+	<data name="Status" xml:space="preserve">
+    <value>Trạng thái</value>
+  </data>
+	<data name="Actions" xml:space="preserve">
+    <value>Thao tác</value>
+  </data>
+	<data name="Available" xml:space="preserve">
+    <value>Còn hàng</value>
+  </data>
+	<data name="OutOfStock" xml:space="preserve">
+    <value>Hết hàng</value>
+  </data>
+	<data name="Edit" xml:space="preserve">
+    <value>Sửa</value>
+  </data>
+	<data name="Delete" xml:space="preserve">
+    <value>Xóa</value>
+  </data>
+	<data name="Previous" xml:space="preserve">
+    <value>Trước</value>
+  </data>
+	<data name="Next" xml:space="preserve">
+    <value>Sau</value>
+  </data>
+	<data name="NoFoodItemsAvailable" xml:space="preserve">
+    <value>Chưa có món ăn nào</value>
+  </data>
+	<data name="Save" xml:space="preserve">
+    <value>Lưu</value>
+  </data>
+	<data name="Update" xml:space="preserve">
+    <value>Cập nhật</value>
+  </data>
+	<data name="EditFoodItem" xml:space="preserve">
+    <value>Chỉnh sửa món ăn</value>
+  </data>
+	<data name="ImageUrl" xml:space="preserve">
+    <value>URL hình ảnh</value>
+  </data>
+	<data name="Drink" xml:space="preserve">
+    <value>Đồ uống</value>
+  </data>
+	<data name="Snack" xml:space="preserve">
+    <value>Snack</value>
+  </data>
+	<data name="Combo" xml:space="preserve">
+    <value>Combo</value>
+  </data>
+	<data name="ErrorAddingFoodItem" xml:space="preserve">
+    <value>Lỗi khi thêm món ăn</value>
+  </data>
+	<data name="ErrorLoadingFoodItem" xml:space="preserve">
+    <value>Lỗi khi tải thông tin món ăn</value>
+  </data>
+	<data name="ErrorUpdatingFoodItem" xml:space="preserve">
+    <value>Lỗi khi cập nhật món ăn</value>
+  </data>
+	<data name="ErrorDeletingFoodItem" xml:space="preserve">
+    <value>Lỗi khi xóa món ăn</value>
+  </data>
+	<data name="ConfirmDelete" xml:space="preserve">
+    <value>Bạn có chắc muốn xóa món này?</value>
+  </data>
+</root>

@@ -149,11 +149,13 @@
                     <!-- NÚT CHUYỂN ĐỔI NGÔN NGỮ -->
                     <div class="language-switcher me-3">
                         <div class="btn-group" role="group">
-                            <button type="button" class="btn btn-language @(System.Globalization.CultureInfo.CurrentCulture.Name == "vi" ? "active" : "")"
+                            <button type="button"
+                                    class="btn btn-language @(System.Globalization.CultureInfo.CurrentCulture.Name == "vi" ? "active" : "")"
                                     onclick="changeLanguage('vi')">
                                 <img src="https://flagcdn.com/w20/vn.png" alt="VN" class="flag-icon" /> VN
                             </button>
-                            <button type="button" class="btn btn-language @(System.Globalization.CultureInfo.CurrentCulture.Name == "en" ? "active" : "")"
+                            <button type="button"
+                                    class="btn btn-language @(System.Globalization.CultureInfo.CurrentCulture.Name == "en" ? "active" : "")"
                                     onclick="changeLanguage('en')">
                                 <img src="https://flagcdn.com/w20/us.png" alt="EN" class="flag-icon" /> ENG
                             </button>
@@ -337,9 +339,29 @@
 
     <script>
         function changeLanguage(culture) {
+            // Lấy URL hiện tại (bao gồm cả query string)
             var currentUrl = window.location.pathname + window.location.search;
-            window.location.href = '/Localization/SetLanguage?culture=' + culture + '&returnUrl=' + encodeURIComponent(currentUrl);
+
+            // Loại bỏ hash nếu có
+            if (window.location.hash) {
+                currentUrl += window.location.hash;
+            }
+
+            // Gọi API để set ngôn ngữ
+            var setLanguageUrl = '/Localization/SetLanguage?culture=' + culture + '&returnUrl=' + encodeURIComponent(currentUrl);
+
+            // Redirect
+            window.location.href = setLanguageUrl;
         }
+
+        // Cập nhật trạng thái active của button khi trang load
+        document.addEventListener('DOMContentLoaded', function() {
+            var currentCulture = '@System.Globalization.CultureInfo.CurrentCulture.Name';
+            document.querySelectorAll('.btn-language').forEach(function(btn) {
+                btn.classList.remove('active');
+            });
+            document.querySelector('.btn-language[onclick*="' + currentCulture + '"]')?.classList.add('active');
+        });
     </script>
 
     @await RenderSectionAsync("Scripts", required: false)
