@@ -1,174 +1,358 @@
 ﻿@model QuanLyRapPhim.Models.Payment
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+
 @{
-    ViewData["Title"] = "Hóa đơn thanh toán";
+    ViewData["Title"] = Localizer["Invoice"].Value;
     var booking = Model.Booking;
     var fullName = ViewBag.FullName as string;
 }
 
 <div class="container my-5">
-    <div class="card showtime-card text-light mb-4 shadow-lg rounded-3">
-        <div class="card-body text-center">
-            <h2 class="mb-0">HÓA ĐƠN THANH TOÁN</h2>
-            <p class="text-muted">Mã thanh toán: @Model.PaymentId</p>
+    <div class="card invoice-card text-light mb-4 shadow-lg rounded-3">
+
+        <!-- Header hóa đơn -->
+        <div class="card-body text-center invoice-header">
+            <div class="invoice-logo mb-3">
+                <i class="fas fa-ticket-alt"></i>
+            </div>
+            <h2 class="mb-2 fw-bold">@Localizer["InvoiceTitle"]</h2>
+            <p class="text-muted mb-0">@Localizer["PaymentId"]: <span class="fw-bold">#@Model.PaymentId</span></p>
         </div>
 
         <div class="card-body">
             <!-- Thông tin rạp -->
-            <div class="row mb-4 text-center">
-                <h4>Rạp chiếu phim CinemaX</h4>
-                <p>Địa chỉ: 123 Đường Điện Ảnh, TP. Hồ Chí Minh</p>
-                <p>Hotline: 1900 1234</p>
+            <div class="cinema-info text-center mb-4">
+                <h4 class="fw-bold text-warning">@Localizer["CinemaName"]</h4>
+                <p class="mb-1">
+                    <i class="fas fa-map-marker-alt me-2"></i>@Localizer["CinemaAddress"]
+                </p>
+                <p class="mb-0">
+                    <i class="fas fa-phone me-2"></i>@Localizer["Hotline"]: 1900 1234
+                </p>
             </div>
 
+            <hr class="border-light mb-4" />
+
             <!-- Thông tin khách hàng -->
-            <div class="row mb-4">
-                <h5>Thông tin khách hàng</h5>
-                <p><strong>Họ và tên:</strong> @fullName</p>
+            <div class="customer-info mb-4 p-3 rounded">
+                <h5 class="mb-3">
+                    <i class="fas fa-user me-2"></i>@Localizer["CustomerInfo"]
+                </h5>
+                <p class="mb-0">
+                    <strong>@Localizer["FullName"]:</strong>
+                    <span class="text-warning">@fullName</span>
+                </p>
             </div>
 
             <!-- PHẦN VÉ: CHỈ HIỆN NẾU CÓ GHẾ -->
             @if (booking.BookingDetails != null && booking.BookingDetails.Any())
             {
-                <div class="row mb-4">
-                    <div class="col-md-6">
-                        <h5>Thông tin vé</h5>
-                        <p><strong>Phim:</strong> @booking.Showtime.Movie.Title</p>
-                        <p><strong>Phòng:</strong> @booking.Showtime.Room.RoomName</p>
-                        <p><strong>Ngày chiếu:</strong> @booking.Showtime.Date:dd/MM/yyyy</p>
-                        <p><strong>Giờ chiếu:</strong> @booking.Showtime.StartTime</p>
-                    </div>
-                    <div class="col-md-6">
-                        <h5>Chi tiết ghế</h5>
-                        <ul class="list-unstyled">
-                            @foreach (var d in booking.BookingDetails)
-                            {
-                                <li>@d.Seat.SeatNumber - @d.Price:N0đ</li>
-                            }
-                        </ul>
+                <div class="ticket-info mb-4 p-3 rounded">
+                    <div class="row">
+                        <div class="col-md-6 mb-3 mb-md-0">
+                            <h5 class="mb-3">
+                                <i class="fas fa-film me-2"></i>@Localizer["TicketInfo"]
+                            </h5>
+                            <p class="mb-2">
+                                <strong>@Localizer["Movie"]:</strong> @booking.Showtime.Movie.Title
+                            </p>
+                            <p class="mb-2">
+                                <strong>@Localizer["Room"]:</strong> @booking.Showtime.Room.RoomName
+                            </p>
+                            <p class="mb-2">
+                                <strong>@Localizer["ShowDate"]:</strong> @booking.Showtime.Date.ToString("dd/MM/yyyy")
+                            </p>
+                            <p class="mb-0">
+                                <strong>@Localizer["ShowTime"]:</strong> @booking.Showtime.StartTime
+                            </p>
+                        </div>
+                        <div class="col-md-6">
+                            <h5 class="mb-3">
+                                <i class="fas fa-chair me-2"></i>@Localizer["SeatDetails"]
+                            </h5>
+                            <ul class="list-unstyled seat-list">
+                                @foreach (var d in booking.BookingDetails)
+                                {
+                                    <li class="mb-2">
+                                        <span class="badge bg-primary me-2">@d.Seat.SeatNumber</span>
+                                        <span class="text-success fw-bold">@d.Price.ToString("N0")đ</span>
+                                    </li>
+                                }
+                            </ul>
+                        </div>
                     </div>
                 </div>
             }
             else
             {
-                <div class="row mb-4">
-                    <div class="col-12 text-center">
-                        <p class="text-info fst-italic">
-                            <i class="fas fa-popcorn me-2"></i>
-                            Đơn hàng chỉ bao gồm đồ ăn & nước uống
-                        </p>
-                    </div>
+                <div class="food-only-notice mb-4 p-4 rounded text-center">
+                    <i class="fas fa-popcorn fa-3x mb-3 text-warning"></i>
+                    <p class="text-info fst-italic mb-0 fs-5">
+                        @Localizer["FoodOnlyOrder"]
+                    </p>
                 </div>
             }
 
             <!-- PHẦN ĐỒ ĂN & NƯỚC UỐNG -->
             @if (booking.BookingFoods != null && booking.BookingFoods.Any())
             {
-                <div class="row mb-4">
-                    <div class="col-12">
-                        <h5>Đồ ăn & nước uống</h5>
-                        <ul class="list-unstyled">
-                            @foreach (var bf in booking.BookingFoods)
-                            {
-                                var totalFoodPrice = bf.UnitPrice * bf.Quantity;
-                                <li>
-                                    @bf.FoodItem.Name (@bf.FoodItem.Size) × @bf.Quantity
-                                    <span class="text-success fw-bold float-end">@totalFoodPrice:N0đ</span>
-                                </li>
-                            }
-                        </ul>
-                        <hr class="border-light" />
-                        <p class="text-end fw-bold text-warning">
-                            Tổng đồ ăn: @booking.BookingFoods.Sum(bf => bf.UnitPrice * bf.Quantity):N0đ
+                <div class="food-info mb-4 p-3 rounded">
+                    <h5 class="mb-3">
+                        <i class="fas fa-utensils me-2"></i>@Localizer["FoodAndDrinks"]
+                    </h5>
+                    <ul class="list-unstyled">
+                        @foreach (var bf in booking.BookingFoods)
+                        {
+                            var totalFoodPrice = bf.UnitPrice * bf.Quantity;
+                            <li class="d-flex justify-content-between align-items-center mb-2 pb-2 border-bottom border-secondary">
+                                <span>
+                                    <span class="fw-bold">@bf.FoodItem.Name</span>
+                                    <span class="text-muted">(@bf.FoodItem.Size)</span>
+                                    <span class="badge bg-info ms-2">x@bf.Quantity</span>
+                                </span>
+                                <span class="text-success fw-bold">@totalFoodPrice.ToString("N0")đ</span>
+                            </li>
+                        }
+                    </ul>
+                    <hr class="border-light" />
+                    <div class="text-end">
+                        <p class="fw-bold text-warning fs-5 mb-0">
+                            @Localizer["TotalFood"]:
+                            <span class="ms-2">@booking.BookingFoods.Sum(bf => bf.UnitPrice * bf.Quantity).ToString("N0")đ</span>
                         </p>
                     </div>
                 </div>
             }
 
             <!-- Thông tin thanh toán -->
-            <div class="row mb-4">
-                <div class="col-md-6">
-                    <h5>Thông tin thanh toán</h5>
-                    <p><strong>Mã đơn hàng:</strong> @booking.BookingId</p>
-                    <p><strong>Ngày thanh toán:</strong> @Model.PaymentDate:dd/MM/yyyy HH:mm</p>
-                    <p><strong>Phương thức:</strong> @Model.PaymentMethod</p>
-                    <p>
-                        <strong>Trạng thái:</strong>
-                        <span class="badge bg-success">@Model.PaymentStatus</span>
-                    </p>
-                </div>
-                <div class="col-md-6 text-end">
-                    <h5>Tổng tiền</h5>
-                    <p class="fs-3 fw-bold text-primary">@Model.Amount:N0 VNĐ</p>
+            <div class="payment-summary mb-4 p-3 rounded">
+                <div class="row">
+                    <div class="col-md-6 mb-3 mb-md-0">
+                        <h5 class="mb-3">
+                            <i class="fas fa-credit-card me-2"></i>@Localizer["PaymentInfo"]
+                        </h5>
+                        <p class="mb-2">
+                            <strong>@Localizer["OrderId"]:</strong>
+                            <span class="text-warning">#@booking.BookingId</span>
+                        </p>
+                        <p class="mb-2">
+                            <strong>@Localizer["PaymentDate"]:</strong>
+                            @Model.PaymentDate.ToString("dd/MM/yyyy HH:mm")
+                        </p>
+                        <p class="mb-2">
+                            <strong>@Localizer["PaymentMethod"]:</strong> @Model.PaymentMethod
+                        </p>
+                        <p class="mb-0">
+                            <strong>@Localizer["Status"]:</strong>
+                            <span class="badge bg-success ms-2">@Model.PaymentStatus</span>
+                        </p>
+                    </div>
+                    <div class="col-md-6 text-md-end">
+                        <h5 class="mb-3">@Localizer["TotalAmount"]</h5>
+                        <div class="total-amount p-3 rounded">
+                            <p class="fs-2 fw-bold text-warning mb-0">
+                                @Model.Amount.ToString("N0") VNĐ
+                            </p>
+                        </div>
+                    </div>
                 </div>
             </div>
 
             <!-- Nút hành động -->
-            <div class="text-center">
-                <a href="javascript:window.print()" class="btn btn-primary me-2 rounded-pill px-4">
-                    <i class="fas fa-print me-1"></i> In hóa đơn
+            <div class="text-center action-buttons">
+                <a href="javascript:window.print()" class="btn btn-print me-2 rounded-pill px-4 py-2">
+                    <i class="fas fa-print me-2"></i>@Localizer["PrintInvoice"]
                 </a>
-                <a asp-controller="Movies" asp-action="Index" class="btn btn-secondary rounded-pill px-4">
-                    <i class="fas fa-home me-1"></i> Về trang chủ
+                <a asp-controller="Movies" asp-action="Index" class="btn btn-home rounded-pill px-4 py-2">
+                    <i class="fas fa-home me-2"></i>@Localizer["BackToHome"]
                 </a>
             </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="card-footer text-center invoice-footer">
+            <p class="mb-0 small">@Localizer["ThankYou"]</p>
         </div>
     </div>
 </div>
 
+<!-- CSS -->
 <style>
     body {
-        background: linear-gradient(135deg, #ff9a8b 0%, #ff6a88 50%, #6b48ff 100%);
-        font-family: 'Arial', sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        font-family: 'Montserrat', sans-serif;
         color: #fff;
     }
 
-    .showtime-card {
+    .invoice-card {
         border: none;
-        background: rgba(255, 255, 255, 0.2);
+        background: linear-gradient(145deg, #1c1c1c, #252525);
         backdrop-filter: blur(10px);
-        border-radius: 15px;
+        border-radius: 20px;
         transition: transform 0.3s ease, box-shadow 0.3s ease;
+        border: 2px solid rgba(255, 255, 255, 0.1);
     }
 
-        .showtime-card:hover {
+        .invoice-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3) !important;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5) !important;
         }
 
-    .btn-primary {
-        background: linear-gradient(90deg, #ff6a88 0%, #6b48ff 100%);
+    /* Header */
+    .invoice-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 20px 20px 0 0;
+        padding: 30px;
+    }
+
+    .invoice-logo i {
+        font-size: 4rem;
+        color: #fff;
+        filter: drop-shadow(0 5px 15px rgba(255, 255, 255, 0.3));
+    }
+
+    /* Sections */
+    .cinema-info,
+    .customer-info,
+    .ticket-info,
+    .food-info,
+    .food-only-notice,
+    .payment-summary {
+        background: rgba(0, 0, 0, 0.3);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+        .customer-info h5,
+        .ticket-info h5,
+        .food-info h5,
+        .payment-summary h5 {
+            color: #ffd700;
+            font-weight: 600;
+        }
+
+    /* Seat list */
+    .seat-list li {
+        background: rgba(255, 255, 255, 0.05);
+        padding: 8px 12px;
+        border-radius: 8px;
+        transition: background 0.3s ease;
+    }
+
+        .seat-list li:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+    /* Total amount box */
+    .total-amount {
+        background: linear-gradient(135deg, rgba(255, 215, 0, 0.2), rgba(255, 140, 0, 0.2));
+        border: 2px solid #ffd700;
+        box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
+    }
+
+    /* Buttons */
+    .btn-print {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         color: #fff;
         border: none;
-        border-radius: 8px;
-        transition: background 0.3s ease, transform 0.2s ease;
+        font-weight: 600;
+        font-size: 1.1rem;
+        transition: all 0.3s ease;
+        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
     }
 
-        .btn-primary:hover {
-            background: linear-gradient(90deg, #ff6a88 50%, #6b48ff 100%);
-            transform: scale(1.05);
+        .btn-print:hover {
+            background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.6);
+            color: #fff;
         }
 
-    .btn-secondary {
+    .btn-home {
         background-color: #333;
-        border: none;
-        transition: background 0.3s;
+        color: #fff;
+        border: 2px solid #555;
+        font-weight: 600;
+        font-size: 1.1rem;
+        transition: all 0.3s ease;
     }
 
-        .btn-secondary:hover {
+        .btn-home:hover {
             background-color: #555;
+            border-color: #777;
+            transform: translateY(-3px);
+            color: #fff;
         }
 
+    /* Footer */
+    .invoice-footer {
+        background: rgba(0, 0, 0, 0.3);
+        border-radius: 0 0 20px 20px;
+        padding: 15px;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    /* Border styles */
+    hr.border-light {
+        border-top: 1px solid rgba(255, 255, 255, 0.2);
+        opacity: 1;
+    }
+
+    /* Badges */
+    .badge {
+        font-size: 0.9rem;
+        padding: 6px 12px;
+    }
+
+    /* Text colors */
     .text-info {
         color: #a0d8ff !important;
     }
 
-    .badge {
-        font-size: 0.9rem;
+    /* Responsive */
+    @@media (max-width: 768px) {
+        .invoice-logo i
+
+    {
+        font-size: 3rem;
     }
 
-    hr.border-light {
-        border-top: 1px solid rgba(255,255,255,0.3);
+    .invoice-header h2 {
+        font-size: 1.5rem;
+    }
+
+    .total-amount p {
+        font-size: 1.5rem !important;
+    }
+
+    .btn-print,
+    .btn-home {
+        display: block;
+        width: 100%;
+        margin: 5px 0 !important;
+    }
+
+    }
+
+    /* Print styles */
+    @@media print {
+        body
+
+    {
+        background: white;
+        color: black;
+    }
+
+    .invoice-card {
+        border: 2px solid black;
+        background: white;
+    }
+
+    .action-buttons {
+        display: none;
+    }
+
     }
 </style>
 
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />

@@ -1,0 +1,51 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+	<data name="SelectSeats" xml:space="preserve">
+    <value>Select Your Seats</value>
+  </data>
+	<data name="Movie" xml:space="preserve">
+    <value>Movie</value>
+  </data>
+	<data name="Room" xml:space="preserve">
+    <value>Room</value>
+  </data>
+	<data name="ShowDate" xml:space="preserve">
+    <value>Show Date</value>
+  </data>
+	<data name="ShowTime" xml:space="preserve">
+    <value>Show Time</value>
+  </data>
+	<data name="BackToShowtimes" xml:space="preserve">
+    <value>Back to Showtimes</value>
+  </data>
+	<data name="Screen" xml:space="preserve">
+    <value>Screen</value>
+  </data>
+	<data name="Row" xml:space="preserve">
+    <value>Row</value>
+  </data>
+	<data name="AvailableSeat" xml:space="preserve">
+    <value>Available</value>
+  </data>
+	<data name="TakenSeat" xml:space="preserve">
+    <value>Taken</value>
+  </data>
+	<data name="SelectedSeat" xml:space="preserve">
+    <value>Selected</value>
+  </data>
+	<data name="CoupleSeat" xml:space="preserve">
+    <value>Couple Seat</value>
+  </data>
+	<data name="SelectedSeatsLabel" xml:space="preserve">
+    <value>Selected Seats</value>
+  </data>
+	<data name="TotalPrice" xml:space="preserve">
+    <value>Total Price</value>
+  </data>
+	<data name="ConfirmBooking" xml:space="preserve">
+    <value>Confirm Booking</value>
+  </data>
+	<data name="NoSeatsSelected" xml:space="preserve">
+    <value>No seats selected</value>
+  </data>
+</root>

@@ -1,0 +1,103 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+	<xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+		<xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+		<xsd:element name="root" msdata:IsDataSet="true">
+			<xsd:complexType>
+				<xsd:choice maxOccurs="unbounded">
+					<xsd:element name="data">
+						<xsd:complexType>
+							<xsd:sequence>
+								<xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+								<xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+							</xsd:sequence>
+							<xsd:attribute name="name" type="xsd:string" msdata:Ordinal="1" />
+							<xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" default="System.String" />
+							<xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+							<xsd:attribute name="xml:space" type="preserve" />
+						</xsd:complexType>
+					</xsd:element>
+					<xsd:element name="schema" />
+					<xsd:element name="connection" />
+				</xsd:choice>
+			</xsd:complexType>
+		</xsd:element>
+	</xsd:schema>
+	<msdata:Properties>
+		<msdata:Property ref="generator" msdata:Value="System.Data.Dataset" />
+		<msdata:Property ref="version" msdata:Value="1.0" />
+		<msdata:Property ref="encoding" msdata:Value="utf-8" />
+	</msdata:Properties>
+	<data name="PaymentHistory" xml:space="preserve">
+    <value>Lịch sử thanh toán</value>
+    <comment>Page title for payment history</comment>
+  </data>
+	<data name="BookingId" xml:space="preserve">
+    <value>Mã đặt vé</value>
+    <comment>Table header: Booking ID</comment>
+  </data>
+	<data name="Movie" xml:space="preserve">
+    <value>Phim</value>
+    <comment>Table header: Movie</comment>
+  </data>
+	<data name="Room" xml:space="preserve">
+    <value>Phòng</value>
+    <comment>Table header: Room</comment>
+  </data>
+	<data name="Seats" xml:space="preserve">
+    <value>Ghế</value>
+    <comment>Table header: Seats</comment>
+  </data>
+	<data name="ShowDate" xml:space="preserve">
+    <value>Ngày chiếu</value>
+    <comment>Table header: Show Date</comment>
+  </data>
+	<data name="ShowTime" xml:space="preserve">
+    <value>Giờ chiếu</value>
+    <comment>Table header: Show Time</comment>
+  </data>
+	<data name="Food" xml:space="preserve">
+    <value>Đồ ăn</value>
+    <comment>Table header: Food</comment>
+  </data>
+	<data name="TotalPrice" xml:space="preserve">
+    <value>Tổng tiền</value>
+    <comment>Table header: Total Price</comment>
+  </data>
+	<data name="BookingDate" xml:space="preserve">
+    <value>Ngày đặt</value>
+    <comment>Table header: Booking Date</comment>
+  </data>
+	<data name="Status" xml:space="preserve">
+    <value>Trạng thái</value>
+    <comment>Table header: Status</comment>
+  </data>
+	<data name="FoodOnly" xml:space="preserve">
+    <value>Chỉ đặt đồ ăn</value>
+    <comment>Fallback for movie column when only food is ordered</comment>
+  </data>
+	<data name="NoSeatsSelected" xml:space="preserve">
+    <value>Không chọn</value>
+    <comment>Fallback for seats when none selected</comment>
+  </data>
+	<data name="NoFood" xml:space="preserve">
+    <value>Không</value>
+    <comment>Fallback for food when none ordered</comment>
+  </data>
+	<data name="VND" xml:space="preserve">
+    <value>VNĐ</value>
+    <comment>Currency: Vietnamese Dong</comment>
+  </data>
+	<data name="Paid" xml:space="preserve">
+    <value>Đã thanh toán</value>
+    <comment>Payment status: Paid</comment>
+  </data>
+	<data name="NoPaymentHistory" xml:space="preserve">
+    <value>Chưa có lịch sử thanh toán nào.</value>
+    <comment>No data message for empty table</comment>
+  </data>
+	<data name="BackToHome" xml:space="preserve">
+    <value>Quay lại trang chủ</value>
+    <comment>Back button text</comment>
+  </data>
+</root>

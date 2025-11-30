@@ -1,0 +1,42 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <data name="VNPayPayment" xml:space="preserve">
+    <value>VNPAY Payment</value>
+  </data>
+  <data name="PaymentSuccessful" xml:space="preserve">
+    <value>Payment Successful!</value>
+  </data>
+  <data name="PaymentFailed" xml:space="preserve">
+    <value>Payment Failed!</value>
+  </data>
+  <data name="TransactionId" xml:space="preserve">
+    <value>Transaction ID</value>
+  </data>
+  <data name="Email" xml:space="preserve">
+    <value>Email</value>
+  </data>
+  <data name="Amount" xml:space="preserve">
+    <value>Amount</value>
+  </data>
+  <data name="PaymentMethod" xml:space="preserve">
+    <value>Payment Method</value>
+  </data>
+  <data name="Status" xml:space="preserve">
+    <value>Status</value>
+  </data>
+  <data name="Successful" xml:space="preserve">
+    <value>Successful</value>
+  </data>
+  <data name="Failed" xml:space="preserve">
+    <value>Failed</value>
+  </data>
+  <data name="BackToMovies" xml:space="preserve">
+    <value>Back to Movies</value>
+  </data>
+  <data name="ViewBookings" xml:space="preserve">
+    <value>View Bookings Management</value>
+  </data>
+  <data name="Unidentified" xml:space="preserve">
+    <value>Unidentified</value>
+  </data>
+</root>

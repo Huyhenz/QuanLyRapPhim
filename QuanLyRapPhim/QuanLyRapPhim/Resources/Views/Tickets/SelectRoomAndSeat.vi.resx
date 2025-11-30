@@ -1,0 +1,51 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+	<data name="SelectSeats" xml:space="preserve">
+    <value>Chọn ghế xem phim</value>
+  </data>
+	<data name="Movie" xml:space="preserve">
+    <value>Phim</value>
+  </data>
+	<data name="Room" xml:space="preserve">
+    <value>Phòng</value>
+  </data>
+	<data name="ShowDate" xml:space="preserve">
+    <value>Ngày chiếu</value>
+  </data>
+	<data name="ShowTime" xml:space="preserve">
+    <value>Giờ chiếu</value>
+  </data>
+	<data name="BackToShowtimes" xml:space="preserve">
+    <value>Quay lại chọn lịch chiếu</value>
+  </data>
+	<data name="Screen" xml:space="preserve">
+    <value>Màn hình chiếu</value>
+  </data>
+	<data name="Row" xml:space="preserve">
+    <value>Hàng</value>
+  </data>
+	<data name="AvailableSeat" xml:space="preserve">
+    <value>Ghế trống</value>
+  </data>
+	<data name="TakenSeat" xml:space="preserve">
+    <value>Ghế đã đặt</value>
+  </data>
+	<data name="SelectedSeat" xml:space="preserve">
+    <value>Ghế đang chọn</value>
+  </data>
+	<data name="CoupleSeat" xml:space="preserve">
+    <value>Ghế đôi</value>
+  </data>
+	<data name="SelectedSeatsLabel" xml:space="preserve">
+    <value>Ghế đã chọn</value>
+  </data>
+	<data name="TotalPrice" xml:space="preserve">
+    <value>Tổng tiền</value>
+  </data>
+	<data name="ConfirmBooking" xml:space="preserve">
+    <value>Xác nhận đặt vé</value>
+  </data>
+	<data name="NoSeatsSelected" xml:space="preserve">
+    <value>Chưa chọn ghế</value>
+  </data>
+</root>

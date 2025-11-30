@@ -1,28 +1,56 @@
 ﻿@model IEnumerable<QuanLyRapPhim.Models.Voucher>
-
 @{
     ViewData["Title"] = "Danh sách Voucher";
     Layout = "~/Views/Shared/_Layout.cshtml";
     bool isAdmin = User.IsInRole("Admin");
 }
-
 <div class="container-fluid d-flex position-relative">
-    <!-- Admin Sidebar -->
+    <!-- Toggle Button -->
+    @if (isAdmin)
+    {
+        <button id="sidebar-toggle" class="sidebar-toggle">
+            <i class="fas fa-bars"></i>
+        </button>
+    }
+    <!-- SIDEBAR -->
     @if (isAdmin)
     {
         <aside class="sidebar">
             <div class="sidebar-header">
-                <h3 class="sidebar-title">CinemaX Admin</h3>
+                <h3 class="sidebar-title">🎬 CinemaX Admin</h3>
             </div>
             <nav class="sidebar-nav">
-                <a href="/Movies" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Movies" ? "active" : "")"><i class="fas fa-film"></i> Quản lý phim</a>
-                <a href="/Showtimes" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Showtimes" ? "active" : "")"><i class="fas fa-clock"></i> Quản lý lịch chiếu</a>
-                <a href="/Rooms" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Rooms" ? "active" : "")"><i class="fas fa-door-open"></i> Quản lý phòng</a>
-                <a href="/Seats" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Seats" ? "active" : "")"><i class="fas fa-chair"></i> Quản lý ghế</a>
-                <a href="/Admin/ManageFoods" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "ManageFoods" ? "active" : "")"><i class="fas fa-utensils"></i> Quản lý đồ ăn</a>
-                <a href="/Admin/ManageBookings" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Admin" && ViewContext.RouteData.Values["Action"]?.ToString() == "ManageBookings" ? "active" : "")"><i class="fas fa-ticket-alt"></i> Quản lý đặt vé</a>
-                <a href="/Admin/RevenueStatistics" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Admin" && ViewContext.RouteData.Values["Action"]?.ToString() == "RevenueStatistics" ? "active" : "")"><i class="fas fa-chart-bar"></i> Báo cáo thống kê</a>
-                <a href="/Vouchers" class="nav-item active"><i class="fas fa-gift"></i> Quản lý Voucher</a>
+                <a href="/Movies"
+                   class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Movies" ? "active" : "")">
+                    <i class="fas fa-film"></i> Quản lý phim
+                </a>
+                <a href="/Showtimes"
+                   class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Showtimes" ? "active" : "")">
+                    <i class="fas fa-clock"></i> Lịch chiếu
+                </a>
+                <a href="/Rooms"
+                   class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Rooms" ? "active" : "")">
+                    <i class="fas fa-door-open"></i> Phòng chiếu
+                </a>
+                <a href="/Seats"
+                   class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Seats" ? "active" : "")">
+                    <i class="fas fa-chair"></i> Ghế ngồi
+                </a>
+                <a href="/Admin/ManageFoods"
+                   class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "ManageFoods" ? "active" : "")">
+                    <i class="fas fa-utensils"></i> Đồ ăn & nước
+                </a>
+                <a href="/Admin/ManageBookings"
+                   class="nav-item @(ViewContext.RouteData.Values["Action"]?.ToString() == "ManageBookings" ? "active" : "")">
+                    <i class="fas fa-ticket-alt"></i> Đặt vé
+                </a>
+                <a href="/Admin/RevenueStatistics"
+                   class="nav-item @(ViewContext.RouteData.Values["Action"]?.ToString() == "RevenueStatistics" ? "active" : "")">
+                    <i class="fas fa-chart-bar"></i> Doanh thu
+                </a>
+                <a href="/Vouchers" class="nav-item active">
+                    <i class="fas fa-gift"></i> Voucher
+                </a>
                 <div class="nav-divider"></div>
                 <a href="#" class="nav-item"><i class="fab fa-facebook"></i> Facebook</a>
                 <a href="#" class="nav-item"><i class="fab fa-twitter"></i> Twitter</a>
@@ -30,7 +58,7 @@
             </nav>
         </aside>
     }
-
+    <!-- MAIN CONTENT -->
     <div class="frame-wrapper flex-grow-1 @(isAdmin ? "admin-view" : "")">
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h1 class="title-gradient">Danh sách Voucher</h1>
@@ -42,7 +70,6 @@
                 </div>
             }
         </div>
-
         @if (TempData["SuccessMessage"] != null)
         {
             <div class="alert alert-success alert-dismissible fade show glow-effect" role="alert">
@@ -57,7 +84,6 @@
                 <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
             </div>
         }
-
         <div class="table-container">
             <table class="table table-custom">
                 <thead>
@@ -80,7 +106,11 @@
                             <td>@(item.DiscountAmount > 0 ? item.DiscountAmount.ToString("N0") : "-")</td>
                             <td>@(item.DiscountPercentage > 0 ? item.DiscountPercentage + "%" : "-")</td>
                             <td>@item.ExpiryDate.ToString("dd/MM/yyyy")</td>
-                            <td><span class="badge @(item.IsActive ? "bg-success" : "bg-secondary")">@(item.IsActive ? "Active" : "Inactive")</span></td>
+                            <td>
+                                <span class="badge @(item.IsActive ? "bg-success" : "bg-secondary")">
+                                    @(item.IsActive ? "Active" : "Inactive")
+                                </span>
+                            </td>
                             <td>@item.UsageLimit</td>
                             <td>@item.UsedCount</td>
                             <td>
@@ -94,37 +124,89 @@
             </table>
         </div>
     </div>
-
     <footer class="footer text-center py-3">
-        <p class="text-white mb-0">© 2025 CinemaX. All rights reserved. | Last updated: November 29, 2025</p>
+        <p class="text-white mb-0">© 2025 CinemaX. All rights reserved.</p>
     </footer>
 </div>
-
 <style>
-    /* Giống hệt Movies/Index */
     body {
         background-color: #0F0F0F;
-        font-family: 'Montserrat',sans-serif;
+        font-family: 'Montserrat', sans-serif;
     }
-
+    /* ===== SIDEBAR STYLE (GIỐNG SHOWTIME) ===== */
     .sidebar {
-        background: linear-gradient(180deg,#ff0033 0%,#e50914 100%);
+        background: #111;
         width: 250px;
         height: 100vh;
         position: fixed;
-        left: 0;
         top: 0;
-        padding: 20px;
+        left: 0;
+        padding: 25px 20px;
         overflow-y: auto;
+        border-right: 2px solid #e50914;
+        box-shadow: 2px 0 10px rgba(0,0,0,0.4);
+        transition: width 0.3s ease, transform 0.3s ease;
         z-index: 1000;
+    }
+
+        .sidebar.collapsed {
+            width: 0;
+            padding: 0;
+            transform: translateX(-100%);
+        }
+
+    .sidebar-title {
+        color: #fff;
+        font-weight: 700;
+        font-size: 1.4rem;
+    }
+
+    .sidebar-nav .nav-item {
+        color: #ddd;
+        padding: 12px 15px;
+        border-radius: 8px;
+        margin-bottom: 5px;
+        font-size: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        text-decoration: none;
+        transition: 0.25s;
+    }
+
+    .nav-item i {
+        width: 20px;
+    }
+
+    .nav-item:hover {
+        background-color: #e50914;
+        color: #fff;
+        transform: translateX(5px);
+    }
+
+    .nav-item.active {
+        background-color: #e50914;
+        color: #fff;
+        font-weight: 600;
+    }
+
+    .nav-divider {
+        height: 1px;
+        background: #444;
+        margin: 15px 0;
     }
 
     .frame-wrapper.admin-view {
         margin-left: 250px;
+        transition: margin-left 0.3s ease;
     }
 
+        .frame-wrapper.admin-view.shifted {
+            margin-left: 0;
+        }
+
     .title-gradient {
-        background: linear-gradient(90deg,#ff0033 0%,#e50914 100%);
+        background: linear-gradient(90deg, #ff0033, #e50914);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         font-size: 2rem;
@@ -133,50 +215,157 @@
     }
 
     .btn-create {
-        background: linear-gradient(90deg,#ff0033 0%,#e50914 100%);
+        background: linear-gradient(90deg, #ff0033, #e50914);
         border: none;
         color: #fff;
         padding: 10px 20px;
         border-radius: 8px;
-        transition: all .3s;
+        transition: 0.3s;
     }
 
         .btn-create:hover {
-            background: linear-gradient(90deg,#e6002e 0%,#d30912 100%);
+            background: linear-gradient(90deg, #e6002e, #d30912);
             transform: translateY(-2px);
         }
 
     .table-custom th {
         background: #1C2526;
-        color: #fff;
+        color: white;
         position: sticky;
         top: 0;
     }
 
     .table-custom td {
         border-bottom: 1px solid #ff0033;
-        color: #fff;
+        color: white;
     }
 
-    .glow-effect {
-        transition: box-shadow .3s;
-    }
-
-        .glow-effect:hover {
-            box-shadow: 0 0 15px rgba(255,0,51,0.5);
-        }
-
-    .badge {
-        padding: 5px 10px;
-        border-radius: 20px;
-        font-size: 0.8rem;
+    .glow-effect:hover {
+        box-shadow: 0 0 15px rgba(255,0,51,0.5);
     }
 
     .action-btn {
-        margin: 0 3px;
+        margin: 2px;
+    }
+    /* Toggle Button - Compact and Beautiful */
+    .sidebar-toggle {
+        position: fixed;
+        top: 15px;
+        left: 15px;
+        z-index: 1001;
+        background: linear-gradient(135deg, #ff0033, #e50914);
+        color: #fff;
+        border: none;
+        border-radius: 50%;
+        width: 35px;
+        height: 35px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 4px 15px rgba(229, 9, 20, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        transition: all 0.3s ease;
+        cursor: pointer;
+        font-size: 14px;
+    }
+
+        .sidebar-toggle:hover {
+            transform: scale(1.05) rotate(5deg);
+            box-shadow: 0 6px 20px rgba(229, 9, 20, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar-toggle:active {
+            transform: scale(0.95);
+        }
+
+    .sidebar.collapsed + .frame-wrapper.admin-view .sidebar-toggle {
+        left: 15px;
+    }
+    /* Media Queries */
+    @@media (max-width: 768px) {
+        .sidebar
+
+    {
+        width: 200px;
+    }
+
+    .frame-wrapper.admin-view {
+        margin-left: 200px;
+    }
+
+    .sidebar.collapsed {
+        width: 0;
+        padding: 0;
+        transform: translateX(-100%);
+    }
+
+    .frame-wrapper.admin-view.shifted {
+        margin-left: 0;
+    }
+
+    .sidebar-toggle {
+        top: 10px;
+        left: 10px;
+        width: 32px;
+        height: 32px;
+        font-size: 13px;
+    }
+
+    }
+    @@media (max-width: 576px) {
+        .container-fluid.d-flex
+
+    {
+        flex-direction: column;
+    }
+
+    .sidebar {
+        position: relative;
+        width: 100%;
+        height: auto;
+    }
+
+    .frame-wrapper.admin-view {
+        margin-left: 0;
+        width: 100%;
+        min-height: auto;
+    }
+
+    .content-inner {
+        width: 100%;
+        padding: 20px;
+    }
+
+    .sidebar.collapsed {
+        display: none;
+    }
+
+    .sidebar-toggle {
+        position: relative;
+        margin: 10px auto;
+        display: block;
+    }
+
     }
 </style>
-
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const toggleBtn = document.getElementById('sidebar-toggle');
+        const sidebar = document.querySelector('.sidebar');
+        const frameWrapper = document.querySelector('.frame-wrapper');
+        if (toggleBtn && sidebar && frameWrapper) {
+            toggleBtn.addEventListener('click', function() {
+                sidebar.classList.toggle('collapsed');
+                frameWrapper.classList.toggle('shifted');
+                const icon = toggleBtn.querySelector('i');
+                if (sidebar.classList.contains('collapsed')) {
+                    icon.className = 'fas fa-bars';
+                } else {
+                    icon.className = 'fas fa-times';
+                }
+            });
+        }
+    });
+</script>
 @section Scripts {
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");

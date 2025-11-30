@@ -1,0 +1,81 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+	<data name="Invoice" xml:space="preserve">
+    <value>Payment Invoice</value>
+  </data>
+	<data name="InvoiceTitle" xml:space="preserve">
+    <value>PAYMENT INVOICE</value>
+  </data>
+	<data name="PaymentId" xml:space="preserve">
+    <value>Payment ID</value>
+  </data>
+	<data name="CinemaName" xml:space="preserve">
+    <value>CinemaX Theater</value>
+  </data>
+	<data name="CinemaAddress" xml:space="preserve">
+    <value>Address: 123 Cinema Street, Ho Chi Minh City</value>
+  </data>
+	<data name="Hotline" xml:space="preserve">
+    <value>Hotline</value>
+  </data>
+	<data name="CustomerInfo" xml:space="preserve">
+    <value>Customer Information</value>
+  </data>
+	<data name="FullName" xml:space="preserve">
+    <value>Full Name</value>
+  </data>
+	<data name="TicketInfo" xml:space="preserve">
+    <value>Ticket Information</value>
+  </data>
+	<data name="Movie" xml:space="preserve">
+    <value>Movie</value>
+  </data>
+	<data name="Room" xml:space="preserve">
+    <value>Room</value>
+  </data>
+	<data name="ShowDate" xml:space="preserve">
+    <value>Show Date</value>
+  </data>
+	<data name="ShowTime" xml:space="preserve">
+    <value>Show Time</value>
+  </data>
+	<data name="SeatDetails" xml:space="preserve">
+    <value>Seat Details</value>
+  </data>
+	<data name="FoodOnlyOrder" xml:space="preserve">
+    <value>This order includes food &amp; drinks only</value>
+  </data>
+	<data name="FoodAndDrinks" xml:space="preserve">
+    <value>Food &amp; Drinks</value>
+  </data>
+	<data name="TotalFood" xml:space="preserve">
+    <value>Total Food</value>
+  </data>
+	<data name="PaymentInfo" xml:space="preserve">
+    <value>Payment Information</value>
+  </data>
+	<data name="OrderId" xml:space="preserve">
+    <value>Order ID</value>
+  </data>
+	<data name="PaymentDate" xml:space="preserve">
+    <value>Payment Date</value>
+  </data>
+	<data name="PaymentMethod" xml:space="preserve">
+    <value>Payment Method</value>
+  </data>
+	<data name="Status" xml:space="preserve">
+    <value>Status</value>
+  </data>
+	<data name="TotalAmount" xml:space="preserve">
+    <value>Total Amount</value>
+  </data>
+	<data name="PrintInvoice" xml:space="preserve">
+    <value>Print Invoice</value>
+  </data>
+	<data name="BackToHome" xml:space="preserve">
+    <value>Back to Home</value>
+  </data>
+	<data name="ThankYou" xml:space="preserve">
+    <value>Thank you for using our service!</value>
+  </data>
+</root>

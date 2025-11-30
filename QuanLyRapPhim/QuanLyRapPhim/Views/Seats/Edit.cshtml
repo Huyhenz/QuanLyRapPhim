@@ -1,311 +1,396 @@
 ﻿@model QuanLyRapPhim.Models.Seat
-
 @{
     ViewData["Title"] = "Edit";
     Layout = "~/Views/Shared/_Layout.cshtml";
+    bool isAdmin = User.IsInRole("Admin");
 }
-
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" />
-    <style>
-        body {
-            margin: 0;
-            background-color: #0F0F0F; /* Galaxy Black */
-            color: #ffffff;
-            font-family: 'Montserrat', sans-serif;
-            overflow-x: hidden;
-        }
-
-        .admin-dashboard {
-            display: flex;
-            min-height: 100vh;
-        }
-
-        .sidebar {
-            width: 250px;
-            background-color: #000000; /* Black background */
-            color: #ffffff; /* White text for readability */
-            height: 100vh;
-            position: fixed;
-            top: 0;
-            left: 0;
-            padding-top: 20px;
-            border-right: 2px solid #ff0033; /* Red border */
-            overflow-y: auto;
-            z-index: 1000;
-        }
-
-        .sidebar-header {
-            padding: 10px 20px;
-            border-bottom: 1px solid #ff0033; /* Red border */
-        }
-
-        .sidebar-title {
-            margin: 0;
-            font-size: 1.5em;
-            color: #ff0033; /* Red text for the header */
-        }
-
-        .sidebar-nav {
-            list-style: none;
-            padding: 0;
-            margin: 20px 0;
-        }
-
-        .nav-item {
-            display: flex;
-            align-items: center;
-            padding: 10px 20px;
-            color: #ffffff; /* White text */
-            text-decoration: none;
-        }
-
-            .nav-item i {
-                margin-right: 10px;
-                color: #ffffff; /* White icons */
-            }
-
-            .nav-item:hover {
-                background-color: #ff0033; /* Red on hover */
-                color: #000000; /* Black text on hover for contrast */
-            }
-
-                .nav-item:hover i {
-                    color: #000000; /* Black icons on hover */
-                }
-
-            .nav-item.active {
-                background-color: #ff0033; /* Red for active item */
-                color: #000000; /* Black text for active item */
-            }
-
-                .nav-item.active i {
-                    color: #000000; /* Black icons for active item */
-                }
-
-        .social-item {
-            color: #ff0033; /* Red for social media icons and text */
-        }
-
-            .social-item i {
-                color: #ff0033; /* Red icons for social media */
-            }
-
-            .social-item:hover {
-                background-color: #ff0033;
-                color: #000000; /* Black text on hover */
-            }
-
-                .social-item:hover i {
-                    color: #000000; /* Black icons on hover for social items */
-                }
-
-        .content {
-            margin-left: 250px;
-            padding: 20px;
-            flex-grow: 1;
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
-        }
-
-        .content-inner {
-            max-width: 1200px;
-            width: 100%;
-        }
-
-        .page-title {
-            background-color: #1c1c1c;
-            color: #fff;
-            padding: 15px;
-            text-align: center;
-            border-radius: 15px;
-            font-family: 'Montserrat', sans-serif;
-            font-weight: 700;
-            text-transform: uppercase;
-            margin-bottom: 20px;
-        }
-
-        .form-container {
-            background-color: #1c1c1c;
-            padding: 20px;
-            border-radius: 15px;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
-            width: 100%;
-            max-width: 500px;
-        }
-
-        .form-group label {
-            color: #ffffff;
-            font-weight: 600;
-            margin-bottom: 5px;
-            display: block;
-        }
-
-        .form-group input,
-        .form-group select {
-            width: 100%;
-            padding: 10px;
-            border: none;
-            border-radius: 5px;
-            background-color: #333;
-            color: #b3b3b3;
-            font-family: 'Montserrat', sans-serif;
-        }
-
-            .form-group input:focus,
-            .form-group select:focus {
-                outline: none;
-                background-color: #444;
-                color: #ffffff;
-            }
-
-        .text-danger {
-            color: #e6002e;
-            font-size: 0.9em;
-            margin-top: 5px;
-        }
-
-        .btn-primary {
-            display: inline-block;
-            padding: 8px 20px;
-            background-color: #00cc00;
-            color: #fff;
-            text-decoration: none;
-            border-radius: 20px;
-            font-weight: 600;
-            font-family: 'Montserrat', sans-serif;
-            border: none;
-            cursor: pointer;
-        }
-
-            .btn-primary:hover {
-                transform: scale(1.05);
-                transition: transform 0.3s ease;
-            }
-
-        .back-link {
-            display: inline-block;
-            padding: 8px 20px;
-            background-color: #00bfff;
-            color: #fff;
-            text-decoration: none;
-            border-radius: 20px;
-            font-weight: 600;
-            font-family: 'Montserrat', sans-serif;
-            margin-top: 20px;
-        }
-
-            .back-link:hover {
-                transform: scale(1.05);
-                transition: transform 0.3s ease;
-            }
-
-        @@media (max-width: 768px) {
-            .sidebar
-
-        {
-            width: 200px;
-        }
-
-        .content {
-            margin-left: 200px;
-        }
-
-        }
-
-        @@media (max-width: 576px) {
-            .admin-dashboard
-
-        {
-            flex-direction: column;
-        }
-
-        .sidebar {
-            position: relative;
-            width: 100%;
-            height: auto;
-        }
-
-        .content {
-            margin-left: 0;
-        }
-
-        .form-container {
-            max-width: 100%;
-        }
-
-        }
-    </style>
-</head>
-<body>
-    <div class="admin-dashboard">
-        @if (User.IsInRole("Admin"))
-        {
-            <aside class="sidebar">
-                <div class="sidebar-header">
-                    <h3 class="sidebar-title">CinemaX Admin</h3>
-                </div>
-                <nav class="sidebar-nav">
-                    <a href="/Movies" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Movies" ? "active" : "")"><i class="fas fa-film"></i> Manage Movies</a>
-                    <a href="/Showtimes" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Showtimes" ? "active" : "")"><i class="fas fa-clock"></i> Manage Showtimes</a>
-                    <a href="/Rooms" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Rooms" ? "active" : "")"><i class="fas fa-door-open"></i> Manage Rooms</a>
-                    <a href="/Seats" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Seats" ? "active" : "")"><i class="fas fa-chair"></i> Manage Seats</a>
-                    <a href="/Admin/ManageBookings" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Admin" && ViewContext.RouteData.Values["Action"]?.ToString() == "ManageBookings" ? "active" : "")"><i class="fas fa-ticket-alt"></i> Manage Bookings</a>
-                    <a href="/Admin/RevenueStatistics" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Admin" && ViewContext.RouteData.Values["Action"]?.ToString() == "RevenueStatistics" ? "active" : "")"><i class="fas fa-chart-bar"></i> Revenue Statistics</a>
-                    <div class="nav-divider"></div>
-                    <a href="#" class="nav-item social-item"><i class="fab fa-facebook"></i> Facebook</a>
-                    <a href="#" class="nav-item social-item"><i class="fab fa-twitter"></i> Twitter</a>
-                    <a href="#" class="nav-item social-item"><i class="fab fa-google"></i> Google</a>
-                </nav>
-            </aside>
-        }
-
-        <div class="content">
-            <div class="content-inner">
-                <div class="page-title">Edit Seat</div>
-
-                <div class="form-container">
-                    <form asp-action="Edit">
-                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-                        <input type="hidden" asp-for="SeatId" />
-                        <div class="form-group">
-                            <label asp-for="RoomId" class="control-label"></label>
-                            <select asp-for="RoomId" class="form-control" asp-items="ViewBag.RoomId"></select>
-                            <span asp-validation-for="RoomId" class="text-danger"></span>
-                        </div>
-                        <div class="form-group">
-                            <label asp-for="SeatNumber" class="control-label"></label>
-                            <input asp-for="SeatNumber" class="form-control" />
-                            <span asp-validation-for="SeatNumber" class="text-danger"></span>
-                        </div>
-                        <div class="form-group">
-                            <label asp-for="Status" class="control-label"></label>
-                            <input asp-for="Status" class="form-control" />
-                            <span asp-validation-for="Status" class="text-danger"></span>
-                        </div>
-                        <div class="form-group">
-                            <input type="submit" value="Lưu" class="btn btn-primary" />
-                        </div>
-                    </form>
-                </div>
-
-                <div>
-                    <a asp-action="Index" class="back-link">Quay lại trang trước</a>
-                </div>
+<div class="container-fluid d-flex position-relative">
+    <!-- Toggle Button -->
+    @if (isAdmin)
+    {
+        <button id="sidebar-toggle" class="sidebar-toggle">
+            <i class="fas fa-bars"></i>
+        </button>
+    }
+    <!-- SIDEBAR -->
+    @if (isAdmin)
+    {
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h3 class="sidebar-title">🎬 CinemaX Admin</h3>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="/Admin/Index"
+                   class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Admin" && ViewContext.RouteData.Values["Action"]?.ToString() == "Index" ? "active" : "")">
+                    <i class="fas fa-tachometer-alt"></i> Bảng điều khiển
+                </a>
+                <a href="/Movies"
+                   class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Movies" ? "active" : "")">
+                    <i class="fas fa-film"></i> Quản lý phim
+                </a>
+                <a href="/Showtimes"
+                   class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Showtimes" ? "active" : "")">
+                    <i class="fas fa-clock"></i> Lịch chiếu
+                </a>
+                <a href="/Rooms"
+                   class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Rooms" ? "active" : "")">
+                    <i class="fas fa-door-open"></i> Phòng chiếu
+                </a>
+                <a href="/Seats"
+                   class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Seats" ? "active" : "")">
+                    <i class="fas fa-chair"></i> Ghế ngồi
+                </a>
+                <a href="/Admin/ManageFoods"
+                   class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "ManageFoods" ? "active" : "")">
+                    <i class="fas fa-utensils"></i> Đồ ăn & nước
+                </a>
+                <a href="/Admin/ManageBookings"
+                   class="nav-item @(ViewContext.RouteData.Values["Action"]?.ToString() == "ManageBookings" ? "active" : "")">
+                    <i class="fas fa-ticket-alt"></i> Đặt vé
+                </a>
+                <a href="/Admin/RevenueStatistics"
+                   class="nav-item @(ViewContext.RouteData.Values["Action"]?.ToString() == "RevenueStatistics" ? "active" : "")">
+                    <i class="fas fa-chart-bar"></i> Doanh thu
+                </a>
+                <a href="/Vouchers"
+                   class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Vouchers" ? "active" : "")">
+                    <i class="fas fa-gift"></i> Voucher
+                </a>
+                <div class="nav-divider"></div>
+                <a href="#" class="nav-item"><i class="fab fa-facebook"></i> Facebook</a>
+                <a href="#" class="nav-item"><i class="fab fa-twitter"></i> Twitter</a>
+                <a href="#" class="nav-item"><i class="fab fa-google"></i> Google</a>
+            </nav>
+        </aside>
+    }
+    <!-- MAIN CONTENT -->
+    <div class="frame-wrapper flex-grow-1 @(isAdmin ? "admin-view" : "")">
+        <div class="content-inner">
+            <div class="page-title">Edit Seat</div>
+            <div class="form-container">
+                <form asp-action="Edit">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    <input type="hidden" asp-for="SeatId" />
+                    <div class="form-group">
+                        <label asp-for="RoomId" class="control-label"></label>
+                        <select asp-for="RoomId" class="form-control" asp-items="ViewBag.RoomId"></select>
+                        <span asp-validation-for="RoomId" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="SeatNumber" class="control-label"></label>
+                        <input asp-for="SeatNumber" class="form-control" />
+                        <span asp-validation-for="SeatNumber" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Status" class="control-label"></label>
+                        <input asp-for="Status" class="form-control" />
+                        <span asp-validation-for="Status" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <input type="submit" value="Lưu" class="btn btn-primary" />
+                    </div>
+                </form>
+            </div>
+            <div>
+                <a asp-action="Index" class="back-link">Quay lại trang trước</a>
             </div>
         </div>
     </div>
+    <footer class="footer text-center py-3">
+        <p class="text-white mb-0">© 2025 CinemaX. All rights reserved.</p>
+    </footer>
+</div>
+<style>
+    body {
+        margin: 0;
+        background-color: #0F0F0F; /* Galaxy Black */
+        color: #ffffff;
+        font-family: 'Montserrat', sans-serif;
+        overflow-x: hidden;
+    }
+    /* ===== SIDEBAR STYLE ===== */
+    .sidebar {
+        background: #111;
+        width: 250px;
+        height: 100vh;
+        position: fixed;
+        top: 0;
+        left: 0;
+        padding: 25px 20px;
+        overflow-y: auto;
+        border-right: 2px solid #e50914;
+        box-shadow: 2px 0 10px rgba(0,0,0,0.4);
+        transition: width 0.3s ease, transform 0.3s ease;
+        z-index: 1000;
+    }
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
+        .sidebar.collapsed {
+            width: 0;
+            padding: 0;
+            transform: translateX(-100%);
+        }
 
+    .sidebar-title {
+        color: #fff;
+        font-weight: 700;
+        font-size: 1.4rem;
+    }
+
+    .sidebar-nav .nav-item {
+        color: #ddd;
+        padding: 12px 15px;
+        border-radius: 8px;
+        margin-bottom: 5px;
+        font-size: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        text-decoration: none;
+        transition: 0.25s;
+    }
+
+    .nav-item i {
+        width: 20px;
+    }
+
+    .nav-item:hover {
+        background-color: #e50914;
+        color: #fff;
+        transform: translateX(5px);
+    }
+
+    .nav-item.active {
+        background-color: #e50914;
+        color: #fff;
+        font-weight: 600;
+    }
+
+    .nav-divider {
+        height: 1px;
+        background: #444;
+        margin: 15px 0;
+    }
+
+    .frame-wrapper.admin-view {
+        margin-left: 250px;
+        transition: margin-left 0.3s ease;
+    }
+
+        .frame-wrapper.admin-view.shifted {
+            margin-left: 0;
+        }
+
+    .content-inner {
+        max-width: 1200px;
+        width: 100%;
+    }
+
+    .page-title {
+        background-color: #1c1c1c;
+        color: #fff;
+        padding: 15px;
+        text-align: center;
+        border-radius: 15px;
+        font-family: 'Montserrat', sans-serif;
+        font-weight: 700;
+        text-transform: uppercase;
+        margin-bottom: 20px;
+    }
+
+    .form-container {
+        background-color: #1c1c1c;
+        padding: 20px;
+        border-radius: 15px;
+        box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+        width: 100%;
+        max-width: 500px;
+    }
+
+    .form-group label {
+        color: #ffffff;
+        font-weight: 600;
+        margin-bottom: 5px;
+        display: block;
+    }
+
+    .form-group input,
+    .form-group select {
+        width: 100%;
+        padding: 10px;
+        border: none;
+        border-radius: 5px;
+        background-color: #333;
+        color: #b3b3b3;
+        font-family: 'Montserrat', sans-serif;
+    }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            background-color: #444;
+            color: #ffffff;
+        }
+
+    .text-danger {
+        color: #e6002e;
+        font-size: 0.9em;
+        margin-top: 5px;
+    }
+
+    .btn-primary {
+        display: inline-block;
+        padding: 8px 20px;
+        background-color: #00cc00;
+        color: #fff;
+        text-decoration: none;
+        border-radius: 20px;
+        font-weight: 600;
+        font-family: 'Montserrat', sans-serif;
+        border: none;
+        cursor: pointer;
+    }
+
+        .btn-primary:hover {
+            transform: scale(1.05);
+            transition: transform 0.3s ease;
+        }
+
+    .back-link {
+        display: inline-block;
+        padding: 8px 20px;
+        background-color: #00bfff;
+        color: #fff;
+        text-decoration: none;
+        border-radius: 20px;
+        font-weight: 600;
+        font-family: 'Montserrat', sans-serif;
+        margin-top: 20px;
+    }
+
+        .back-link:hover {
+            transform: scale(1.05);
+            transition: transform 0.3s ease;
+        }
+    /* Toggle Button - Compact and Beautiful */
+    .sidebar-toggle {
+        position: fixed;
+        top: 15px;
+        left: 15px;
+        z-index: 1001;
+        background: linear-gradient(135deg, #ff0033, #e50914);
+        color: #fff;
+        border: none;
+        border-radius: 50%;
+        width: 35px;
+        height: 35px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 4px 15px rgba(229, 9, 20, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        transition: all 0.3s ease;
+        cursor: pointer;
+        font-size: 14px;
+    }
+
+        .sidebar-toggle:hover {
+            transform: scale(1.05) rotate(5deg);
+            box-shadow: 0 6px 20px rgba(229, 9, 20, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar-toggle:active {
+            transform: scale(0.95);
+        }
+
+    .sidebar.collapsed + .frame-wrapper.admin-view .sidebar-toggle {
+        left: 15px;
+    }
+    /* Media Queries */
+    @@media (max-width: 768px) {
+        .sidebar
+
+    {
+        width: 200px;
+    }
+
+    .frame-wrapper.admin-view {
+        margin-left: 200px;
+    }
+
+    .sidebar.collapsed {
+        width: 0;
+        padding: 0;
+        transform: translateX(-100%);
+    }
+
+    .frame-wrapper.admin-view.shifted {
+        margin-left: 0;
+    }
+
+    .sidebar-toggle {
+        top: 10px;
+        left: 10px;
+        width: 32px;
+        height: 32px;
+        font-size: 13px;
+    }
+
+    }
+    @@media (max-width: 576px) {
+        .container-fluid.d-flex
+
+    {
+        flex-direction: column;
+    }
+
+    .sidebar {
+        position: relative;
+        width: 100%;
+        height: auto;
+    }
+
+    .frame-wrapper.admin-view {
+        margin-left: 0;
+        width: 100%;
+        min-height: auto;
+    }
+
+    .content-inner {
+        width: 100%;
+        padding: 20px;
+    }
+
+    .sidebar.collapsed {
+        display: none;
+    }
+
+    .sidebar-toggle {
+        position: relative;
+        margin: 10px auto;
+        display: block;
+    }
+
+    }
+</style>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const toggleBtn = document.getElementById('sidebar-toggle');
+        const sidebar = document.querySelector('.sidebar');
+        const frameWrapper = document.querySelector('.frame-wrapper');
+        if (toggleBtn && sidebar && frameWrapper) {
+            toggleBtn.addEventListener('click', function() {
+                sidebar.classList.toggle('collapsed');
+                frameWrapper.classList.toggle('shifted');
+                const icon = toggleBtn.querySelector('i');
+                if (sidebar.classList.contains('collapsed')) {
+                    icon.className = 'fas fa-bars';
+                } else {
+                    icon.className = 'fas fa-times';
+                }
+            });
+        }
+    });
+</script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 @section Scripts {
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");

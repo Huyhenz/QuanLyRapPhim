@@ -1,0 +1,81 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+	<data name="Invoice" xml:space="preserve">
+    <value>Hóa đơn thanh toán</value>
+  </data>
+	<data name="InvoiceTitle" xml:space="preserve">
+    <value>HÓA ĐƠN THANH TOÁN</value>
+  </data>
+	<data name="PaymentId" xml:space="preserve">
+    <value>Mã thanh toán</value>
+  </data>
+	<data name="CinemaName" xml:space="preserve">
+    <value>Rạp chiếu phim CinemaX</value>
+  </data>
+	<data name="CinemaAddress" xml:space="preserve">
+    <value>Địa chỉ: 123 Đường Điện Ảnh, TP. Hồ Chí Minh</value>
+  </data>
+	<data name="Hotline" xml:space="preserve">
+    <value>Hotline</value>
+  </data>
+	<data name="CustomerInfo" xml:space="preserve">
+    <value>Thông tin khách hàng</value>
+  </data>
+	<data name="FullName" xml:space="preserve">
+    <value>Họ và tên</value>
+  </data>
+	<data name="TicketInfo" xml:space="preserve">
+    <value>Thông tin vé</value>
+  </data>
+	<data name="Movie" xml:space="preserve">
+    <value>Phim</value>
+  </data>
+	<data name="Room" xml:space="preserve">
+    <value>Phòng</value>
+  </data>
+	<data name="ShowDate" xml:space="preserve">
+    <value>Ngày chiếu</value>
+  </data>
+	<data name="ShowTime" xml:space="preserve">
+    <value>Giờ chiếu</value>
+  </data>
+	<data name="SeatDetails" xml:space="preserve">
+    <value>Chi tiết ghế</value>
+  </data>
+	<data name="FoodOnlyOrder" xml:space="preserve">
+    <value>Đơn hàng chỉ bao gồm đồ ăn &amp; nước uống</value>
+  </data>
+	<data name="FoodAndDrinks" xml:space="preserve">
+    <value>Đồ ăn &amp; nước uống</value>
+  </data>
+	<data name="TotalFood" xml:space="preserve">
+    <value>Tổng đồ ăn</value>
+  </data>
+	<data name="PaymentInfo" xml:space="preserve">
+    <value>Thông tin thanh toán</value>
+  </data>
+	<data name="OrderId" xml:space="preserve">
+    <value>Mã đơn hàng</value>
+  </data>
+	<data name="PaymentDate" xml:space="preserve">
+    <value>Ngày thanh toán</value>
+  </data>
+	<data name="PaymentMethod" xml:space="preserve">
+    <value>Phương thức</value>
+  </data>
+	<data name="Status" xml:space="preserve">
+    <value>Trạng thái</value>
+  </data>
+	<data name="TotalAmount" xml:space="preserve">
+    <value>Tổng tiền</value>
+  </data>
+	<data name="PrintInvoice" xml:space="preserve">
+    <value>In hóa đơn</value>
+  </data>
+	<data name="BackToHome" xml:space="preserve">
+    <value>Về trang chủ</value>
+  </data>
+	<data name="ThankYou" xml:space="preserve">
+    <value>Cảm ơn quý khách đã sử dụng dịch vụ!</value>
+  </data>
+</root>

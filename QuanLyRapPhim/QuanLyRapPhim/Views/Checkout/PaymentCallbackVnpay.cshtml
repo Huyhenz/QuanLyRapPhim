@@ -1,48 +1,92 @@
 ﻿@model QuanLyRapPhim.Models.VNPay.PaymentResponseModel
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
 
 @{
-    ViewData["Title"] = "Thanh toán VNPAY";
+    ViewData["Title"] = Localizer["VNPayPayment"].Value;
 
     // Split the OrderDescription into email and amount
     var orderDescriptionParts = Model.OrderDescription.Split(" Thanh toán VNPay ");
-    var email = orderDescriptionParts.Length > 0 ? orderDescriptionParts[0] : "Không xác định";
-    var amount = orderDescriptionParts.Length > 1 ? orderDescriptionParts[1] : "Không xác định";
+    var email = orderDescriptionParts.Length > 0 ? orderDescriptionParts[0] : Localizer["Unidentified"].Value;
+    var amount = orderDescriptionParts.Length > 1 ? orderDescriptionParts[1] : Localizer["Unidentified"].Value;
 }
 
 <div class="container my-5">
     <div class="row">
         <div class="col-md-8 offset-md-2">
-            <div class="card showtime-card text-light glow-effect">
+            <div class="card payment-card text-light glow-effect">
                 <div class="card-body">
-                    <h5 class="title-gradient mb-4">Thanh toán VNPAY @(Model.Success ? "Thành công" : "Thất bại")</h5>
-                    <dl class="row">
-                        @* <dt class="col-sm-4 text-muted">Mã đặt vé</dt> *@
-                        @* <dd class="col-sm-8">@(ViewBag.BookingId ?? "Không xác định")</dd> *@
-                        <dt class="col-sm-4 text-muted">Mã giao dịch</dt>
-                        <dd class="col-sm-8">@Model.TransactionId</dd>
+                    <!-- Icon và tiêu đề -->
+                    <div class="text-center mb-4">
+                        @if (Model.Success)
+                        {
+                            <div class="success-icon mb-3">
+                                <i class="fas fa-check-circle"></i>
+                            </div>
+                            <h3 class="title-gradient fw-bold">@Localizer["PaymentSuccessful"]</h3>
+                        }
+                        else
+                        {
+                            <div class="error-icon mb-3">
+                                <i class="fas fa-times-circle"></i>
+                            </div>
+                            <h3 class="title-gradient-error fw-bold">@Localizer["PaymentFailed"]</h3>
+                        }
+                    </div>
 
-                        <dt class="col-sm-4 text-muted">Email</dt>
-                        <dd class="col-sm-8">@email</dd>
+                    <!-- Thông tin giao dịch -->
+                    <div class="payment-details">
+                        <dl class="row">
+                            <dt class="col-sm-5 text-muted">
+                                <i class="fas fa-hashtag me-2"></i>@Localizer["TransactionId"]
+                            </dt>
+                            <dd class="col-sm-7">@Model.TransactionId</dd>
 
-                        <dt class="col-sm-4 text-muted">Số tiền</dt>
-                        <dd class="col-sm-8">@amount VNĐ</dd>
+                            <dt class="col-sm-5 text-muted">
+                                <i class="fas fa-envelope me-2"></i>@Localizer["Email"]
+                            </dt>
+                            <dd class="col-sm-7">@email</dd>
 
-                        <dt class="col-sm-4 text-muted">Cách thức thanh toán</dt>
-                        <dd class="col-sm-8">@Model.PaymentMethod</dd>
+                            <dt class="col-sm-5 text-muted">
+                                <i class="fas fa-money-bill-wave me-2"></i>@Localizer["Amount"]
+                            </dt>
+                            <dd class="col-sm-7 text-warning fw-bold">@amount VNĐ</dd>
 
-                        
+                            <dt class="col-sm-5 text-muted">
+                                <i class="fas fa-credit-card me-2"></i>@Localizer["PaymentMethod"]
+                            </dt>
+                            <dd class="col-sm-7">@Model.PaymentMethod</dd>
 
-                        <dt class="col-sm-4 text-muted">Tình trạng</dt>
-                        <dd class="col-sm-8">@(Model.Success ? "Thành công" : "Thất bại")</dd>
-                    </dl>
+                            <dt class="col-sm-5 text-muted">
+                                <i class="fas fa-info-circle me-2"></i>@Localizer["Status"]
+                            </dt>
+                            <dd class="col-sm-7">
+                                @if (Model.Success)
+                                {
+                                    <span class="badge bg-success px-3 py-2">
+                                        <i class="fas fa-check me-1"></i>@Localizer["Successful"]
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-danger px-3 py-2">
+                                        <i class="fas fa-times me-1"></i>@Localizer["Failed"]
+                                    </span>
+                                }
+                            </dd>
+                        </dl>
+                    </div>
+
+                    <!-- Nút hành động -->
                     <div class="text-center mt-4">
-                        <a asp-controller="Movies" asp-action="Index" class="btn btn-secondary glow-effect">
-                            <i class="fas fa-arrow-left me-1"></i> Quay lại danh sách phim
+                        <a asp-controller="Movies" asp-action="Index" class="btn btn-secondary glow-effect me-2">
+                            <i class="fas fa-film me-2"></i>@Localizer["BackToMovies"]
                         </a>
                         @if (User.IsInRole("Admin"))
                         {
-                            <a asp-controller="Admin" asp-action="ManageBookings" class="btn btn-secondary glow-effect ms-2" id="viewBookingsBtn">
-                                <i class="fas fa-ticket-alt me-1"></i> Xem quản lý đặt vé
+                            <a asp-controller="Admin" asp-action="ManageBookings"
+                               class="btn btn-admin glow-effect" id="viewBookingsBtn">
+                                <i class="fas fa-ticket-alt me-2"></i>@Localizer["ViewBookings"]
                             </a>
                         }
                     </div>
@@ -52,64 +96,154 @@
     </div>
 </div>
 
-<!-- CSS tùy chỉnh -->
+<!-- CSS -->
 <style>
     body {
-        background-color: #0F0F0F; /* Galaxy Black */
+        background-color: #0F0F0F;
         color: #ffffff;
         font-family: 'Montserrat', sans-serif;
     }
 
+    .payment-card {
+        background: linear-gradient(145deg, #1c1c1c, #252525);
+        border: 2px solid #ff0033;
+        border-radius: 20px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    }
+
+        .payment-card .card-body {
+            padding: 40px;
+        }
+
+    /* Icon thành công/thất bại */
+    .success-icon i {
+        font-size: 5rem;
+        color: #00ff88;
+        animation: scaleIn 0.5s ease;
+        filter: drop-shadow(0 0 20px rgba(0, 255, 136, 0.6));
+    }
+
+    .error-icon i {
+        font-size: 5rem;
+        color: #ff4444;
+        animation: shake 0.5s ease;
+        filter: drop-shadow(0 0 20px rgba(255, 68, 68, 0.6));
+    }
+
+    @@keyframes scaleIn {
+        0%
+
+    {
+        transform: scale(0);
+        opacity: 0;
+    }
+
+    50% {
+        transform: scale(1.2);
+    }
+
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+
+    }
+
+    @@keyframes shake {
+        0%, 100%
+
+    {
+        transform: translateX(0);
+    }
+
+    25% {
+        transform: translateX(-10px);
+    }
+
+    75% {
+        transform: translateX(10px);
+    }
+
+    }
+
+    /* Tiêu đề */
     .title-gradient {
-        background: linear-gradient(90deg, #ff0033, #1c1c1c);
+        background: linear-gradient(90deg, #00ff88, #00cc66);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         background-clip: text;
-        color: transparent;
+        font-weight: 700;
+        font-size: 2rem;
+        margin-top: 10px;
+    }
+
+    .title-gradient-error {
+        background: linear-gradient(90deg, #ff4444, #cc0000);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        font-weight: 700;
+        font-size: 2rem;
+        margin-top: 10px;
     }
 
     .glow-effect {
         box-shadow: 0 0 15px rgba(255, 0, 51, 0.3);
-        transition: box-shadow 0.3s ease, transform 0.3s ease;
+        transition: all 0.3s ease;
     }
 
         .glow-effect:hover {
-            box-shadow: 0 0 25px rgba(255, 0, 51, 0.5);
-            transform: scale(1.05);
+            box-shadow: 0 0 25px rgba(255, 0, 51, 0.6);
+            transform: translateY(-3px);
         }
 
-    .showtime-card {
-        background-color: #1c1c1c;
-        border: none;
+    /* Thông tin chi tiết */
+    .payment-details {
+        background: rgba(0, 0, 0, 0.3);
         border-radius: 15px;
+        padding: 30px;
+        margin: 30px 0;
     }
 
-        .showtime-card .card-body {
-            background-color: #1c1c1c;
-            border-radius: 15px;
+        .payment-details dl.row {
+            margin-bottom: 0;
         }
 
-    .text-muted {
-        color: #b3b3b3 !important;
-    }
+        .payment-details dt {
+            padding: 12px 0;
+            font-size: 1rem;
+            color: #b3b3b3;
+        }
 
-    dl.row dt, dd {
-        margin-bottom: 10px;
-        color: #b3b3b3;
-    }
+        .payment-details dd {
+            padding: 12px 0;
+            font-size: 1.1rem;
+            color: #ffffff;
+            font-weight: 500;
+        }
 
-    dl.row dd {
-        color: #ffffff;
-    }
+        .payment-details dt i {
+            width: 20px;
+            text-align: center;
+        }
 
-    .btn-secondary {
-        border-color: #ff0033;
-        color: #ff0033;
-        border-radius: 20px;
-        padding: 10px 20px;
-        font-weight: 600;
+    /* Badge */
+    .badge {
         font-size: 1rem;
-        transition: background-color 0.3s ease, transform 0.3s ease;
+        font-weight: 600;
+        border-radius: 20px;
+    }
+
+    /* Nút */
+    .btn-secondary {
+        border: 2px solid #ff0033;
+        color: #ff0033;
+        background-color: transparent;
+        border-radius: 25px;
+        padding: 12px 30px;
+        font-weight: 600;
+        font-size: 1.1rem;
+        transition: all 0.3s ease;
     }
 
         .btn-secondary:hover {
@@ -118,10 +252,59 @@
             border-color: #ff0033;
             transform: scale(1.05);
         }
+
+    .btn-admin {
+        border: 2px solid #667eea;
+        color: #667eea;
+        background-color: transparent;
+        border-radius: 25px;
+        padding: 12px 30px;
+        font-weight: 600;
+        font-size: 1.1rem;
+        transition: all 0.3s ease;
+    }
+
+        .btn-admin:hover {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #ffffff;
+            border-color: #667eea;
+            transform: scale(1.05);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+        }
+
+    /* Responsive */
+    @@media (max-width: 768px) {
+        .payment-card .card-body
+
+    {
+        padding: 20px;
+    }
+
+    .success-icon i,
+    .error-icon i {
+        font-size: 3.5rem;
+    }
+
+    .title-gradient,
+    .title-gradient-error {
+        font-size: 1.5rem;
+    }
+
+    .payment-details {
+        padding: 20px;
+    }
+
+    .btn-secondary,
+    .btn-admin {
+        display: block;
+        width: 100%;
+        margin: 5px 0 !important;
+    }
+
+    }
 </style>
 
-<!-- Thêm Font Awesome -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
 
 <script>
     // Trigger immediate status update in ManageBookings when admin clicks the button

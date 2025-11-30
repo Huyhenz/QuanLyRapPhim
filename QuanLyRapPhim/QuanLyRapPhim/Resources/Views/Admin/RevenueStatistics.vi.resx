@@ -1,0 +1,167 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" default="System.String" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute name="xml:space" type="preserve" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="schema" />
+          <xsd:element name="connection" />
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <msdata:Properties>
+    <msdata:Property ref="generator" msdata:Value="System.Data.Dataset" />
+    <msdata:Property ref="version" msdata:Value="1.0" />
+    <msdata:Property ref="encoding" msdata:Value="utf-8" />
+  </msdata:Properties>
+  <data name="RevenueStatistics" xml:space="preserve">
+    <value>Báo cáo thống kê</value>
+    <comment>Page title for revenue statistics</comment>
+  </data>
+  <data name="ManageMovies" xml:space="preserve">
+    <value>Quản lý phim</value>
+    <comment>Sidebar: Manage Movies</comment>
+  </data>
+  <data name="ManageShowtimes" xml:space="preserve">
+    <value>Quản lý lịch chiếu</value>
+    <comment>Sidebar: Manage Showtimes</comment>
+  </data>
+  <data name="ManageRooms" xml:space="preserve">
+    <value>Quản lý phòng</value>
+    <comment>Sidebar: Manage Rooms</comment>
+  </data>
+  <data name="ManageSeats" xml:space="preserve">
+    <value>Quản lý ghế</value>
+    <comment>Sidebar: Manage Seats</comment>
+  </data>
+  <data name="ManageFoods" xml:space="preserve">
+    <value>Quản lý đồ ăn</value>
+    <comment>Sidebar: Manage Foods</comment>
+  </data>
+  <data name="ManageBookings" xml:space="preserve">
+    <value>Quản lý đặt vé</value>
+    <comment>Sidebar: Manage Bookings</comment>
+  </data>
+  <data name="RevenueDataOverview" xml:space="preserve">
+    <value>Tổng quan về dữ liệu doanh thu</value>
+    <comment>Header span for revenue overview</comment>
+  </data>
+  <data name="From" xml:space="preserve">
+    <value>Từ</value>
+    <comment>Date filter label: From</comment>
+  </data>
+  <data name="To" xml:space="preserve">
+    <value>đến</value>
+    <comment>Date filter label: To</comment>
+  </data>
+  <data name="Filter" xml:space="preserve">
+    <value>Lọc</value>
+    <comment>Filter button text</comment>
+  </data>
+  <data name="Summary" xml:space="preserve">
+    <value>Bản tóm tắt</value>
+    <comment>Section subtitle: Summary</comment>
+  </data>
+  <data name="TotalTicketRevenue" xml:space="preserve">
+    <value>Tổng doanh thu vé:</value>
+    <comment>Summary label: Total Ticket Revenue</comment>
+  </data>
+  <data name="TotalFoodRevenue" xml:space="preserve">
+    <value>Tổng doanh thu thức ăn:</value>
+    <comment>Summary label: Total Food Revenue</comment>
+  </data>
+  <data name="TotalRevenue" xml:space="preserve">
+    <value>Tổng doanh thu:</value>
+    <comment>Summary label: Total Revenue</comment>
+  </data>
+  <data name="RevenueByMovie" xml:space="preserve">
+    <value>Doanh thu theo phim (Vé + Thức ăn)</value>
+    <comment>Section subtitle: Revenue by Movie</comment>
+  </data>
+  <data name="MovieTitle" xml:space="preserve">
+    <value>Tiêu đề phim</value>
+    <comment>Table header: Movie Title</comment>
+  </data>
+  <data name="TicketRevenue" xml:space="preserve">
+    <value>Doanh thu vé</value>
+    <comment>Table header: Ticket Revenue</comment>
+  </data>
+  <data name="RevenueByDate" xml:space="preserve">
+    <value>Doanh thu theo ngày</value>
+    <comment>Section subtitle: Revenue by Date</comment>
+  </data>
+  <data name="Date" xml:space="preserve">
+    <value>Ngày</value>
+    <comment>Table header: Date</comment>
+  </data>
+  <data name="FoodRevenue" xml:space="preserve">
+    <value>Doanh thu thức ăn</value>
+    <comment>Table header: Food Revenue</comment>
+  </data>
+  <data name="Total" xml:space="preserve">
+    <value>Tổng</value>
+    <comment>Table header: Total</comment>
+  </data>
+  <data name="RevenueByMonth" xml:space="preserve">
+    <value>Doanh thu theo tháng</value>
+    <comment>Section subtitle: Revenue by Month</comment>
+  </data>
+  <data name="Month" xml:space="preserve">
+    <value>Tháng</value>
+    <comment>Table header: Month</comment>
+  </data>
+  <data name="FoodRevenueByCategoryAndDate" xml:space="preserve">
+    <value>Doanh thu thức ăn theo category và ngày</value>
+    <comment>Section subtitle: Food Revenue by Category and Date</comment>
+  </data>
+  <data name="Category" xml:space="preserve">
+    <value>Category</value>
+    <comment>Table header: Category</comment>
+  </data>
+  <data name="Revenue" xml:space="preserve">
+    <value>Doanh thu</value>
+    <comment>Table header: Revenue</comment>
+  </data>
+  <data name="RevenueChartByDate" xml:space="preserve">
+    <value>Biểu đồ doanh thu theo ngày</value>
+    <comment>Section subtitle: Revenue Chart by Date</comment>
+  </data>
+  <data name="RevenueChartByMonth" xml:space="preserve">
+    <value>Biểu đồ doanh thu theo tháng</value>
+    <comment>Section subtitle: Revenue Chart by Month</comment>
+  </data>
+  <data name="MonthlyTicketChart" xml:space="preserve">
+    <value>Biểu đồ nhỏ - Doanh thu vé theo tháng</value>
+    <comment>Section subtitle: Monthly Ticket Chart</comment>
+  </data>
+  <data name="MonthlyFoodChart" xml:space="preserve">
+    <value>Biểu đồ nhỏ - Doanh thu thức ăn theo tháng</value>
+    <comment>Section subtitle: Monthly Food Chart</comment>
+  </data>
+  <data name="N/A" xml:space="preserve">
+    <value>N/A</value>
+    <comment>Generic N/A text</comment>
+  </data>
+  <data name="NoData" xml:space="preserve">
+    <value>Không có dữ liệu.</value>
+    <comment>Table no data message</comment>
+  </data>
+  <data name="VND" xml:space="preserve">
+    <value>VNĐ</value>
+    <comment>Currency symbol</comment>
+  </data>
+</root>

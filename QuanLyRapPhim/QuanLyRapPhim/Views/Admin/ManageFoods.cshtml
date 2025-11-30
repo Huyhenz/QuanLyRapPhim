@@ -1,13 +1,16 @@
-﻿@{
-    ViewData["Title"] = "Quản lý đồ ăn & nước uống";
+﻿@model IEnumerable<QuanLyRapPhim.Models.FoodItem>
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+@{
+    ViewData["Title"] = Localizer["ManageFoods"].Value;
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
-
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@Localizer["ManageFoods"]</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" />
     <style>
@@ -237,7 +240,6 @@
             color: #dc3545;
             border-color: #dc3545;
         }
-
         @@media (max-width: 768px) {
             .sidebar
 
@@ -279,42 +281,53 @@
                 <h3 class="sidebar-title">CinemaX Admin</h3>
             </div>
             <nav class="sidebar-nav">
-                <a href="/Movies" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Movies" ? "active" : "")"><i class="fas fa-film"></i> Quản lý phim</a>
-                <a href="/Showtimes" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Showtimes" ? "active" : "")"><i class="fas fa-clock"></i> Quản lý lịch chiếu</a>
-                <a href="/Rooms" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Rooms" ? "active" : "")"><i class="fas fa-door-open"></i> Quản lý phòng</a>
-                <a href="/Seats" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Seats" ? "active" : "")"><i class="fas fa-chair"></i> Quản lý ghế</a>
-                <a href="/Admin/ManageFoods" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "ManageFoods" ? "active" : "")"><i class="fas fa-utensils"></i> Quản lý đồ ăn</a>
-                <a href="/Admin/ManageBookings" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Admin" && ViewContext.RouteData.Values["Action"]?.ToString() == "ManageBookings" ? "active" : "")"><i class="fas fa-ticket-alt"></i> Quản lý đặt vé</a>
-                <a href="/Admin/RevenueStatistics" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Admin" && ViewContext.RouteData.Values["Action"]?.ToString() == "RevenueStatistics" ? "active" : "")"><i class="fas fa-chart-bar"></i> Báo cáo thống kê</a>
+                <a href="/Movies" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Movies" ? "active" : "")">
+                    <i class="fas fa-film"></i> @Localizer["ManageMovies"]
+                </a>
+                <a href="/Showtimes" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Showtimes" ? "active" : "")">
+                    <i class="fas fa-clock"></i> @Localizer["ManageShowtimes"]
+                </a>
+                <a href="/Rooms" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Rooms" ? "active" : "")">
+                    <i class="fas fa-door-open"></i> @Localizer["ManageRooms"]
+                </a>
+                <a href="/Seats" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Seats" ? "active" : "")">
+                    <i class="fas fa-chair"></i> @Localizer["ManageSeats"]
+                </a>
+                <a href="/Admin/ManageFoods" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "ManageFoods" ? "active" : "")">
+                    <i class="fas fa-utensils"></i> @Localizer["ManageFoods"]
+                </a>
+                <a href="/Admin/ManageBookings" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Admin" && ViewContext.RouteData.Values["Action"]?.ToString() == "ManageBookings" ? "active" : "")">
+                    <i class="fas fa-ticket-alt"></i> @Localizer["ManageBookings"]
+                </a>
+                <a href="/Admin/RevenueStatistics" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Admin" && ViewContext.RouteData.Values["Action"]?.ToString() == "RevenueStatistics" ? "active" : "")">
+                    <i class="fas fa-chart-bar"></i> @Localizer["RevenueStatistics"]
+                </a>
                 <div class="nav-divider"></div>
-                <a href="#" class="nav-item">Facebook</a>
-                <a href="#" class="nav-item">Twitter</a>
-                <a href="#" class="nav-item">Google</a>
+                <a href="#" class="nav-item"><i class="fab fa-facebook"></i> Facebook</a>
+                <a href="#" class="nav-item"><i class="fab fa-twitter"></i> Twitter</a>
+                <a href="#" class="nav-item"><i class="fab fa-google"></i> Google</a>
             </nav>
         </aside>
-
         <!-- Main Content -->
         <main class="content">
             <div class="content-inner">
                 <div class="d-flex justify-content-between align-items-center mb-4">
-                    <h2 class="page-title">Quản lý đồ ăn & nước uống</h2>
+                    <h2 class="page-title">@Localizer["ManageFoods"]</h2>
                     <button class="btn btn-success rounded-pill px-4 glow-effect" data-bs-toggle="modal" data-bs-target="#createFoodModal">
-                        Thêm món mới
+                        @Localizer["AddNewFoodItem"]
                     </button>
                 </div>
-
                 <div id="alert-container"></div>
-
                 <div class="table-responsive">
                     <table class="table table-dark table-striped glow-effect" id="foodsTable">
                         <thead class="table-danger">
                             <tr>
-                                <th style="width: 80px;">Ảnh</th>
-                                <th>Tên món</th>
-                                <th style="width: 60px;">Size</th>
-                                <th style="width: 120px;">Giá</th>
-                                <th style="width: 100px;">Loại</th>
-                                <th style="width: 140px;" class="text-center">Hành động</th>
+                                <th style="width: 80px;">@Localizer["FoodImage"]</th>
+                                <th>@Localizer["FoodName"]</th>
+                                <th style="width: 60px;">@Localizer["FoodSize"]</th>
+                                <th style="width: 120px;">@Localizer["FoodPrice"]</th>
+                                <th style="width: 100px;">@Localizer["FoodCategory"]</th>
+                                <th style="width: 140px;" class="text-center">@Localizer["Actions"]</th>
                             </tr>
                         </thead>
                         <tbody></tbody>
@@ -323,58 +336,56 @@
             </div>
         </main>
     </div>
-
     <!-- Modal: Create -->
     <div class="modal fade" id="createFoodModal" tabindex="-1">
         <div class="modal-dialog modal-lg">
             <form id="createFoodForm" enctype="multipart/form-data">
                 <div class="modal-content">
                     <div class="modal-header border-secondary">
-                        <h5 class="modal-title">Thêm món mới</h5>
+                        <h5 class="modal-title">@Localizer["AddNewFoodItem"]</h5>
                         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                     </div>
                     <div class="modal-body">
                         <div class="row g-3">
                             <div class="col-md-6">
-                                <label class="form-label">Tên món</label>
+                                <label class="form-label">@Localizer["FoodName"]</label>
                                 <input type="text" name="Name" class="form-control" required />
                             </div>
                             <div class="col-md-6">
-                                <label class="form-label">Kích thước</label>
+                                <label class="form-label">@Localizer["FoodSize"]</label>
                                 <select name="Size" class="form-select">
-                                    <option value="S">S</option>
-                                    <option value="M" selected>M</option>
-                                    <option value="L">L</option>
+                                    <option value="S">@Localizer["SizeS"]</option>
+                                    <option value="M" selected>@Localizer["SizeM"]</option>
+                                    <option value="L">@Localizer["SizeL"]</option>
                                 </select>
                             </div>
                             <div class="col-md-6">
-                                <label class="form-label">Giá (VNĐ)</label>
+                                <label class="form-label">@Localizer["FoodPrice"] (@Localizer["VND"])</label>
                                 <input type="number" name="Price" class="form-control" min="0" required />
                             </div>
                             <div class="col-md-6">
-                                <label class="form-label">Loại</label>
+                                <label class="form-label">@Localizer["FoodCategory"]</label>
                                 <select name="Category" class="form-select">
-                                    <option value="Bắp">Bắp rang</option>
-                                    <option value="Nước">Nước uống</option>
-                                    <option value="Combo">Combo</option>
+                                    <option value="Bắp">@Localizer["CategoryPopcorn"]</option>
+                                    <option value="Nước">@Localizer["CategoryDrink"]</option>
+                                    <option value="Combo">@Localizer["CategoryCombo"]</option>
                                 </select>
                             </div>
                             <div class="col-12">
-                                <label class="form-label">Hình ảnh</label>
+                                <label class="form-label">@Localizer["FoodImage"]</label>
                                 <input type="file" name="imageFile" class="form-control" accept="image/*" />
-                                <small class="text-muted">Tối đa 2MB, JPG/PNG</small>
+                                <small class="text-muted">@Localizer["Max2MBJPGPNG"]</small>
                             </div>
                         </div>
                     </div>
                     <div class="modal-footer border-secondary">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-                        <button type="submit" class="btn btn-success">Thêm</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">@Localizer["Cancel"]</button>
+                        <button type="submit" class="btn btn-success">@Localizer["Add"]</button>
                     </div>
                 </div>
             </form>
         </div>
     </div>
-
     <!-- Modal: Edit -->
     <div class="modal fade" id="editFoodModal" tabindex="-1">
         <div class="modal-dialog modal-lg">
@@ -382,52 +393,51 @@
                 <input type="hidden" name="foodItemId" />
                 <div class="modal-content">
                     <div class="modal-header border-secondary">
-                        <h5 class="modal-title">Sửa món ăn</h5>
+                        <h5 class="modal-title">@Localizer["EditFoodItem"]</h5>
                         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                     </div>
                     <div class="modal-body">
                         <div class="row g-3">
                             <div class="col-md-6">
-                                <label class="form-label">Tên món</label>
+                                <label class="form-label">@Localizer["FoodName"]</label>
                                 <input type="text" name="name" class="form-control" required />
                             </div>
                             <div class="col-md-6">
-                                <label class="form-label">Kích thước</label>
+                                <label class="form-label">@Localizer["FoodSize"]</label>
                                 <select name="size" class="form-select">
-                                    <option value="S">S</option>
-                                    <option value="M">M</option>
-                                    <option value="L">L</option>
+                                    <option value="S">@Localizer["SizeS"]</option>
+                                    <option value="M">@Localizer["SizeM"]</option>
+                                    <option value="L">@Localizer["SizeL"]</option>
                                 </select>
                             </div>
                             <div class="col-md-6">
-                                <label class="form-label">Giá (VNĐ)</label>
+                                <label class="form-label">@Localizer["FoodPrice"] (@Localizer["VND"])</label>
                                 <input type="number" name="price" class="form-control" min="0" step="1000" required />
                             </div>
                             <div class="col-md-6">
-                                <label class="form-label">Loại</label>
+                                <label class="form-label">@Localizer["FoodCategory"]</label>
                                 <select name="category" class="form-select">
-                                    <option value="Bắp">Bắp rang</option>
-                                    <option value="Nước">Nước uống</option>
-                                    <option value="Combo">Combo</option>
+                                    <option value="Bắp">@Localizer["CategoryPopcorn"]</option>
+                                    <option value="Nước">@Localizer["CategoryDrink"]</option>
+                                    <option value="Combo">@Localizer["CategoryCombo"]</option>
                                 </select>
                             </div>
                             <div class="col-12">
-                                <label class="form-label">Hình ảnh hiện tại</label>
+                                <label class="form-label">@Localizer["CurrentImage"]</label>
                                 <div id="currentImage" class="mb-2"></div>
                                 <input type="file" name="imageFile" class="form-control" accept="image/*" />
-                                <small class="text-muted">Để trống nếu không đổi</small>
+                                <small class="text-muted">@Localizer["NoChangeImage"]</small>
                             </div>
                         </div>
                     </div>
                     <div class="modal-footer border-secondary">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-                        <button type="submit" class="btn btn-primary">Cập nhật</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">@Localizer["Cancel"]</button>
+                        <button type="submit" class="btn btn-primary">@Localizer["Update"]</button>
                     </div>
                 </div>
             </form>
         </div>
     </div>
-
     @section Scripts {
         <script>
             function showAlert(msg, type = 'success') {
@@ -438,7 +448,6 @@
                     </div>`);
                 setTimeout(() => $('.alert').alert('close'), 4000);
             }
-
             function loadFoods() {
                 $.get('/Admin/GetFoodItems', data => {
                     $('#foodsTable tbody').empty();
@@ -447,23 +456,24 @@
                             ? `<img src="${f.imageUrl}" class="img-thumbnail" style="width:50px;height:50px;object-fit:cover;">`
                             : `<div class="bg-secondary text-white d-flex align-items-center justify-content-center rounded" style="width:50px;height:50px;"><i class="fas fa-utensils"></i></div>`;
                         const badge = f.category === 'Combo' ? 'warning' : f.category === 'Bắp' ? 'success' : 'primary';
+                        const categoryDisplay = f.category === 'Bắp' ? '@Localizer["CategoryPopcorn"].Value' : f.category === 'Nước' ? '@Localizer["CategoryDrink"].Value' : '@Localizer["CategoryCombo"].Value';
+                        const sizeDisplay = f.size === 'S' ? '@Localizer["SizeS"].Value' : f.size === 'M' ? '@Localizer["SizeM"].Value' : '@Localizer["SizeL"].Value';
                         $('#foodsTable tbody').append(`
                             <tr data-id="${f.foodItemId}">
                                 <td>${img}</td>
                                 <td class="fw-bold">${f.name}</td>
-                                <td><span class="badge bg-info">${f.size}</span></td>
-                                <td class="text-warning">${f.price.toLocaleString()}đ</td>
-                                <td><span class="badge bg-${badge}">${f.category}</span></td>
+                                <td><span class="badge bg-info">${sizeDisplay}</span></td>
+                                <td class="text-warning">${f.price.toLocaleString()}${@Localizer["VND"].Value}</td>
+                                <td><span class="badge bg-${badge}">${categoryDisplay}</span></td>
                                 <td class="text-center">
-                                    <button class="btn btn-warning btn-sm edit-btn me-1 glow-effect">Sửa</button>
-                                    <button class="btn btn-danger btn-sm delete-btn glow-effect">Xóa</button>
+                                    <button class="btn btn-warning btn-sm edit-btn me-1 glow-effect">@Localizer["Edit"]</button>
+                                    <button class="btn btn-danger btn-sm delete-btn glow-effect">@Localizer["Delete"]</button>
                                 </td>
                             </tr>
                         `);
                     });
-                }).fail(() => showAlert('Lỗi tải dữ liệu!', 'danger'));
+                }).fail(() => showAlert('@Localizer["LoadDataError"].Value', 'danger'));
             }
-
             // Create
             $('#createFoodForm').submit(function (e) {
                 e.preventDefault();
@@ -479,15 +489,14 @@
                             $('#createFoodModal').modal('hide');
                             this.reset();
                             loadFoods();
-                            showAlert(res.message);
+                            showAlert(res.message || '@Localizer["CreateSuccess"].Value');
                         } else {
-                            showAlert(res.message, 'danger');
+                            showAlert(res.message || '@Localizer["CreateError"].Value', 'danger');
                         }
                     },
-                    error: () => showAlert('Lỗi server!', 'danger')
+                    error: () => showAlert('@Localizer["ServerError"].Value', 'danger')
                 });
             });
-
             // Edit - Load data
             $(document).on('click', '.edit-btn', function () {
                 const id = $(this).closest('tr').data('id');
@@ -500,12 +509,11 @@
                     $('#currentImage').html(
                         food.imageUrl
                             ? `<img src="${food.imageUrl}" class="img-thumbnail" style="max-height: 80px;">`
-                            : '<em class="text-muted">Không có ảnh</em>'
+                            : '<em class="text-muted">@Localizer["NoImage"].Value</em>'
                     );
                     $('#editFoodModal').modal('show');
-                }).fail(() => showAlert('Lỗi tải món ăn!', 'danger'));
+                }).fail(() => showAlert('@Localizer["LoadFoodError"].Value', 'danger'));
             });
-
             // Edit - Submit
             $('#editFoodForm').submit(function (e) {
                 e.preventDefault();
@@ -520,30 +528,28 @@
                         if (res.success) {
                             $('#editFoodModal').modal('hide');
                             loadFoods();
-                            showAlert(res.message);
+                            showAlert(res.message || '@Localizer["EditSuccess"].Value');
                         } else {
-                            showAlert(res.message || 'Cập nhật thất bại!', 'danger');
+                            showAlert(res.message || '@Localizer["EditError"].Value', 'danger');
                         }
                     },
-                    error: () => showAlert('Lỗi server!', 'danger')
+                    error: () => showAlert('@Localizer["ServerError"].Value', 'danger')
                 });
             });
-
             // Delete
             $(document).on('click', '.delete-btn', function () {
                 const id = $(this).closest('tr').data('id');
-                if (confirm('Xóa món ăn này? Dữ liệu sẽ mất vĩnh viễn!')) {
+                if (confirm('@Localizer["DeleteConfirm"].Value')) {
                     $.post('/Admin/DeleteFood', { id }, res => {
                         if (res.success) {
                             loadFoods();
-                            showAlert(res.message);
+                            showAlert(res.message || '@Localizer["DeleteSuccess"].Value');
                         } else {
-                            showAlert(res.message || 'Xóa thất bại!', 'danger');
+                            showAlert(res.message || '@Localizer["DeleteError"].Value', 'danger');
                         }
-                    }).fail(() => showAlert('Lỗi xóa!', 'danger'));
+                    }).fail(() => showAlert('@Localizer["DeleteError"].Value', 'danger'));
                 }
             });
-
             // Load on start
             $(document).ready(loadFoods);
         </script>

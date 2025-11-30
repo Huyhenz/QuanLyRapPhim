@@ -1,16 +1,16 @@
 ﻿@model IEnumerable<QuanLyRapPhim.Models.Booking>
-@using System.Linq
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
 @{
-    ViewData["Title"] = "Quản lý đặt vé";
+    ViewData["Title"] = Localizer["ManageBookings"].Value;
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
-
 <!DOCTYPE html>
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quản lý đặt vé</title>
+    <title>@Localizer["ManageBookings"]</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" />
     <style>
@@ -21,10 +21,12 @@
             font-family: 'Montserrat', sans-serif;
             overflow-x: hidden;
         }
+
         .admin-dashboard {
             display: flex;
             min-height: 100vh;
         }
+
         .sidebar {
             width: 250px;
             background-color: #000000;
@@ -38,20 +40,24 @@
             overflow-y: auto;
             z-index: 1000;
         }
+
         .sidebar-header {
             padding: 10px 20px;
             border-bottom: 1px solid #ff0033;
         }
+
         .sidebar-title {
             margin: 0;
             font-size: 1.5em;
             color: #ff0033;
         }
+
         .sidebar-nav {
             list-style: none;
             padding: 0;
             margin: 20px 0;
         }
+
         .nav-item {
             display: flex;
             align-items: center;
@@ -59,24 +65,30 @@
             color: #ffffff;
             text-decoration: none;
         }
+
             .nav-item i {
                 margin-right: 10px;
                 color: #ffffff;
             }
+
             .nav-item:hover {
                 background-color: #ff0033;
                 color: #000000;
             }
+
                 .nav-item:hover i {
                     color: #000000;
                 }
+
             .nav-item.active {
                 background-color: #ff0033;
                 color: #000000;
             }
+
                 .nav-item.active i {
                     color: #000000;
                 }
+
         .content {
             margin-left: 250px;
             padding: 20px 20px 20px 10px;
@@ -86,9 +98,11 @@
             align-items: flex-start;
             min-height: 100vh;
         }
+
         .content-inner {
             width: 100%;
         }
+
         .title-gradient {
             background: linear-gradient(90deg, #ff0033, #1c1c1c);
             -webkit-background-clip: text;
@@ -99,14 +113,17 @@
             text-align: center;
             margin-bottom: 30px;
         }
+
         .glow-effect {
             box-shadow: 0 0 15px rgba(255, 0, 51, 0.3);
             transition: box-shadow 0.3s ease;
         }
+
         .table-dark.glow-effect:hover {
             box-shadow: 0 0 25px rgba(255, 0, 51, 0.5);
             transform: none;
         }
+
         .table-dark {
             background-color: #1c1c1c;
             border-radius: 15px;
@@ -115,6 +132,7 @@
             border-collapse: collapse;
             table-layout: fixed;
         }
+
             .table-dark th, .table-dark td {
                 border: 1px solid #444;
                 padding: 10px 12px;
@@ -126,6 +144,7 @@
                 overflow-wrap: break-word;
                 vertical-align: middle;
             }
+
             .table-dark th {
                 background-color: #2a2a2a;
                 font-weight: 600;
@@ -133,6 +152,7 @@
                 top: 0;
                 z-index: 10;
             }
+
             .table-dark td.payment-status,
             .table-dark td.email-column,
             .table-dark td.movie-column,
@@ -143,48 +163,59 @@
                 text-align: left;
                 overflow: visible;
             }
+
             .table-dark td.payment-status {
                 text-align: center;
                 padding: 10px 12px;
             }
+
             .table-dark tr:hover td {
                 background-color: #2a2a2a;
             }
+
             .table-dark td.email-column,
             .table-dark th.email-column {
                 max-width: 150px;
                 text-align: left;
             }
+
             .table-dark td.movie-column,
             .table-dark th.movie-column {
                 max-width: 150px;
                 text-align: left;
             }
+
             .table-dark td.seat-column,
             .table-dark th.seat-column {
                 max-width: 180px;
                 text-align: left;
             }
+
             .table-dark td.status-column,
             .table-dark th.status-column {
                 max-width: 130px;
                 min-width: 100px;
                 text-align: center;
             }
+
         .table-container {
             overflow-x: auto;
             width: 100%;
         }
+
             .table-container::-webkit-scrollbar {
                 height: 8px;
             }
+
             .table-container::-webkit-scrollbar-thumb {
                 background: #ff0033;
                 border-radius: 10px;
             }
+
             .table-container::-webkit-scrollbar-track {
                 background: #2a2a2a;
             }
+
         .btn-secondary {
             background-color: #ff0033;
             border: none;
@@ -194,14 +225,17 @@
             font-weight: 600;
             transition: all 0.3s ease;
         }
+
             .btn-secondary:hover {
                 background-color: #cc002a;
                 transform: scale(1.05);
             }
+
         .text-muted {
             color: #b3b3b3 !important;
             font-style: italic;
         }
+
         .payment-status .spinner-border {
             margin-left: 5px;
         }
@@ -216,13 +250,27 @@
                     <h3 class="sidebar-title">CinemaX Admin</h3>
                 </div>
                 <nav class="sidebar-nav">
-                    <a href="/Movies" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Movies" ? "active" : "")"><i class="fas fa-film"></i> Quản lý phim</a>
-                    <a href="/Showtimes" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Showtimes" ? "active" : "")"><i class="fas fa-clock"></i> Quản lý lịch chiếu</a>
-                    <a href="/Rooms" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Rooms" ? "active" : "")"><i class="fas fa-door-open"></i> Quản lý phòng</a>
-                    <a href="/Seats" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Seats" ? "active" : "")"><i class="fas fa-chair"></i> Quản lý ghế</a>
-                    <a href="/Admin/ManageFoods" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "ManageFoods" ? "active" : "")"><i class="fas fa-utensils"></i> Quản lý đồ ăn</a>
-                    <a href="/Admin/ManageBookings" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Admin" && ViewContext.RouteData.Values["Action"]?.ToString() == "ManageBookings" ? "active" : "")"><i class="fas fa-ticket-alt"></i> Quản lý đặt vé</a>
-                    <a href="/Admin/RevenueStatistics" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Admin" && ViewContext.RouteData.Values["Action"]?.ToString() == "RevenueStatistics" ? "active" : "")"><i class="fas fa-chart-bar"></i> Báo cáo thống kê</a>
+                    <a href="/Movies" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Movies" ? "active" : "")">
+                        <i class="fas fa-film"></i> @Localizer["ManageMovies"]
+                    </a>
+                    <a href="/Showtimes" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Showtimes" ? "active" : "")">
+                        <i class="fas fa-clock"></i> @Localizer["ManageShowtimes"]
+                    </a>
+                    <a href="/Rooms" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Rooms" ? "active" : "")">
+                        <i class="fas fa-door-open"></i> @Localizer["ManageRooms"]
+                    </a>
+                    <a href="/Seats" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Seats" ? "active" : "")">
+                        <i class="fas fa-chair"></i> @Localizer["ManageSeats"]
+                    </a>
+                    <a href="/Admin/ManageFoods" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "ManageFoods" ? "active" : "")">
+                        <i class="fas fa-utensils"></i> @Localizer["ManageFoods"]
+                    </a>
+                    <a href="/Admin/ManageBookings" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Admin" && ViewContext.RouteData.Values["Action"]?.ToString() == "ManageBookings" ? "active" : "")">
+                        <i class="fas fa-ticket-alt"></i> @Localizer["ManageBookings"]
+                    </a>
+                    <a href="/Admin/RevenueStatistics" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Admin" && ViewContext.RouteData.Values["Action"]?.ToString() == "RevenueStatistics" ? "active" : "")">
+                        <i class="fas fa-chart-bar"></i> @Localizer["RevenueStatistics"]
+                    </a>
                     <div class="nav-divider"></div>
                     <a href="#" class="nav-item"><i class="fab fa-facebook"></i> Facebook</a>
                     <a href="#" class="nav-item"><i class="fab fa-twitter"></i> Twitter</a>
@@ -230,25 +278,23 @@
                 </nav>
             </aside>
         }
-
         <div class="content">
             <div class="content-inner">
-                <h1 class="title-gradient">Quản lý đặt vé</h1>
-
+                <h1 class="title-gradient">@Localizer["ManageBookings"]</h1>
                 <div class="table-container">
                     <table class="table table-dark table-bordered glow-effect">
                         <thead>
                             <tr>
-                                <th>Mã đặt vé</th>
-                                <th>Khách hàng (Email)</th>
-                                <th>Phim</th>
-                                <th>Phòng</th>
-                                <th>Ghế</th>
-                                <th>Ngày chiếu</th>
-                                <th>Giờ chiếu</th>
-                                <th>Tổng tiền</th>
-                                <th>Ngày đặt</th>
-                                <th class="status-column">Trạng thái thanh toán</th>
+                                <th>@Localizer["BookingId"]</th>
+                                <th>@Localizer["CustomerEmail"]</th>
+                                <th>@Localizer["Movie"]</th>
+                                <th>@Localizer["Room"]</th>
+                                <th>@Localizer["Seats"]</th>
+                                <th>@Localizer["ShowDate"]</th>
+                                <th>@Localizer["ShowTime"]</th>
+                                <th>@Localizer["TotalPrice"]</th>
+                                <th>@Localizer["BookingDate"]</th>
+                                <th class="status-column">@Localizer["PaymentStatus"]</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -259,12 +305,9 @@
                                     var payment = booking.Payment;
                                     var showtime = booking.Showtime;
                                     var isFoodOnly = showtime == null;
-
                                     <tr data-booking-id="@booking.BookingId">
                                         <td class="fw-bold">@booking.BookingId</td>
-
-                                        <td class="email-column">@(booking.User?.Email ?? "Khách vãng lai")</td>
-
+                                        <td class="email-column">@(booking.User?.Email ?? Localizer["GuestUser"].Value)</td>
                                         <!-- Phim -->
                                         <td class="movie-column">
                                             @if (!isFoodOnly && showtime?.Movie != null)
@@ -273,10 +316,9 @@
                                             }
                                             else
                                             {
-                                                <em class="text-muted">Chỉ đặt đồ ăn</em>
+                                                <em class="text-muted">@Localizer["FoodOnly"].Value</em>
                                             }
                                         </td>
-
                                         <!-- Phòng -->
                                         <td>
                                             @if (!isFoodOnly && showtime?.Room != null)
@@ -288,19 +330,17 @@
                                                 <em class="text-muted">—</em>
                                             }
                                         </td>
-
                                         <!-- Ghế -->
                                         <td class="seat-column">
                                             @if (booking.BookingDetails?.Any() == true)
                                             {
-                                                @string.Join(", ", booking.BookingDetails.Select(bd => bd.Seat?.SeatNumber ?? "N/A"))
+                                                @string.Join(", ", booking.BookingDetails.Select(bd => bd.Seat?.SeatNumber ?? Localizer["N/A"].Value))
                                             }
                                             else
                                             {
-                                                <em class="text-muted">Không chọn</em>
+                                                <em class="text-muted">@Localizer["NoSeatsSelected"].Value</em>
                                             }
                                         </td>
-
                                         <!-- Ngày chiếu -->
                                         <td>
                                             @if (!isFoodOnly && showtime?.Date != null)
@@ -312,7 +352,6 @@
                                                 <em class="text-muted">—</em>
                                             }
                                         </td>
-
                                         <!-- Giờ chiếu -->
                                         <td>
                                             @if (!isFoodOnly && showtime?.StartTime != null)
@@ -324,16 +363,14 @@
                                                 <em class="text-muted">—</em>
                                             }
                                         </td>
-
                                         <td class="text-end text-warning fw-bold" style="font-size: 1.05rem;">
-                                            @string.Format("{0:N0}", booking.TotalPrice) <small class="text-white-50">VNĐ</small>
+                                            @string.Format("{0:N0}", booking.TotalPrice) <small class="text-white-50">@Localizer["VND"].Value</small>
                                         </td>
                                         <td>@booking.BookingDate.ToString("dd/MM/yyyy HH:mm")</td>
-
                                         <!-- Trạng thái thanh toán -->
                                         <td id="payment-status-@booking.BookingId" class="payment-status status-column">
                                             <span class="status-text">
-                                                @(payment?.PaymentStatus ?? "Chưa thanh toán")
+                                                @(payment?.PaymentStatus ?? Localizer["Unpaid"].Value)
                                             </span>
                                             <span class="spinner-border spinner-border-sm text-danger d-none" role="status"></span>
                                         </td>
@@ -344,23 +381,21 @@
                             {
                                 <tr>
                                     <td colspan="10" class="text-center py-5">
-                                        <em class="text-muted">Chưa có đặt vé nào.</em>
+                                        <em class="text-muted">@Localizer["NoBookings"].Value</em>
                                     </td>
                                 </tr>
                             }
                         </tbody>
                     </table>
                 </div>
-
                 <div class="text-center mt-5">
                     <a asp-controller="Home" asp-action="Index" class="btn btn-secondary glow-effect">
-                        <i class="fas fa-arrow-left me-1"></i> Quay lại trang chủ
+                        <i class="fas fa-arrow-left me-1"></i> @Localizer["BackToHome"].Value
                     </a>
                 </div>
             </div>
         </div>
     </div>
-
     <script>
         function updatePaymentStatuses() {
             document.querySelectorAll('.payment-status').forEach(cell => {
@@ -371,10 +406,9 @@
                     statusText.classList.add('text-muted');
                 }
             });
-
             fetch('/Admin/GetPaymentStatuses')
                 .then(response => {
-                    if (!response.ok) throw new Error('Lỗi mạng: ' + response.statusText);
+                    if (!response.ok) throw new Error('@Localizer["NetworkError"].Value ' + response.statusText);
                     return response.json();
                 })
                 .then(data => {
@@ -384,7 +418,7 @@
                             const statusText = cell.querySelector('.status-text');
                             const spinner = cell.querySelector('.spinner-border');
                             if (statusText && spinner) {
-                                statusText.textContent = p.paymentStatus || "Chưa thanh toán";
+                                statusText.textContent = p.paymentStatus || "@Localizer["Unpaid"].Value";
                                 statusText.classList.remove('text-muted');
                                 spinner.classList.add('d-none');
                             }
@@ -397,14 +431,13 @@
                         const statusText = cell.querySelector('.status-text');
                         const spinner = cell.querySelector('.spinner-border');
                         if (statusText && spinner) {
-                            statusText.textContent = "Lỗi tải";
+                            statusText.textContent = "@Localizer["LoadError"].Value";
                             statusText.classList.remove('text-muted');
                             spinner.classList.add('d-none');
                         }
                     });
                 });
         }
-
         updatePaymentStatuses();
         setInterval(updatePaymentStatuses, 5000);
     </script>

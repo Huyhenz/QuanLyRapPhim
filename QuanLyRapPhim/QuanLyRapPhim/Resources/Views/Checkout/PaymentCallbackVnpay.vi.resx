@@ -1,0 +1,42 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+	<data name="VNPayPayment" xml:space="preserve">
+    <value>Thanh toán VNPAY</value>
+  </data>
+	<data name="PaymentSuccessful" xml:space="preserve">
+    <value>Thanh toán thành công!</value>
+  </data>
+	<data name="PaymentFailed" xml:space="preserve">
+    <value>Thanh toán thất bại!</value>
+  </data>
+	<data name="TransactionId" xml:space="preserve">
+    <value>Mã giao dịch</value>
+  </data>
+	<data name="Email" xml:space="preserve">
+    <value>Email</value>
+  </data>
+	<data name="Amount" xml:space="preserve">
+    <value>Số tiền</value>
+  </data>
+	<data name="PaymentMethod" xml:space="preserve">
+    <value>Phương thức thanh toán</value>
+  </data>
+	<data name="Status" xml:space="preserve">
+    <value>Tình trạng</value>
+  </data>
+	<data name="Successful" xml:space="preserve">
+    <value>Thành công</value>
+  </data>
+	<data name="Failed" xml:space="preserve">
+    <value>Thất bại</value>
+  </data>
+	<data name="BackToMovies" xml:space="preserve">
+    <value>Quay lại danh sách phim</value>
+  </data>
+	<data name="ViewBookings" xml:space="preserve">
+    <value>Xem quản lý đặt vé</value>
+  </data>
+	<data name="Unidentified" xml:space="preserve">
+    <value>Không xác định</value>
+  </data>
+</root>

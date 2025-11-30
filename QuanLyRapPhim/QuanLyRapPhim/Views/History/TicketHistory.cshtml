@@ -1,17 +1,17 @@
 ﻿@using QuanLyRapPhim.Models
 @using System.Linq
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
 @model IEnumerable<Booking>
-
 @{
-    ViewData["Title"] = "Lịch sử thanh toán";
+    ViewData["Title"] = Localizer["PaymentHistory"].Value;
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
-
 <!DOCTYPE html>
 <html lang="vi">
 <head>
     <meta charset="utf-8" />
-    <title>Lịch sử thanh toán</title>
+    <title>@Localizer["PaymentHistory"]</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
     <style>
@@ -20,20 +20,24 @@
             color: white;
             font-family: 'Montserrat', sans-serif;
         }
+
         .table-dark {
             background-color: #1c1c1c;
             border-radius: 15px;
             overflow: hidden;
         }
-        .table-dark th {
-            background-color: #2a2a2a;
-            font-weight: 600;
-            text-align: center;
-        }
-        .table-dark td {
-            vertical-align: middle;
-            text-align: center;
-        }
+
+            .table-dark th {
+                background-color: #2a2a2a;
+                font-weight: 600;
+                text-align: center;
+            }
+
+            .table-dark td {
+                vertical-align: middle;
+                text-align: center;
+            }
+
         .title-gradient {
             background: linear-gradient(90deg, #ff0033, #1c1c1c);
             -webkit-background-clip: text;
@@ -44,11 +48,13 @@
             text-align: center;
             margin-bottom: 30px;
         }
+
         .badge-success {
             background-color: #28a745;
             font-weight: 600;
             padding: 6px 12px;
         }
+
         .btn-back {
             background-color: #ff0033;
             border: none;
@@ -58,17 +64,21 @@
             font-weight: 600;
             transition: all 0.3s ease;
         }
-        .btn-back:hover {
-            background-color: #cc002a;
-            transform: scale(1.05);
-        }
+
+            .btn-back:hover {
+                background-color: #cc002a;
+                transform: scale(1.05);
+            }
+
         .glow-effect {
             box-shadow: 0 0 15px rgba(255, 0, 51, 0.3);
             transition: all 0.3s ease;
         }
-        .glow-effect:hover {
-            box-shadow: 0 0 25px rgba(255, 0, 51, 0.5);
-        }
+
+            .glow-effect:hover {
+                box-shadow: 0 0 25px rgba(255, 0, 51, 0.5);
+            }
+
         .text-muted {
             color: #b3b3b3 !important;
             font-style: italic;
@@ -77,22 +87,21 @@
 </head>
 <body>
     <div class="container py-5">
-        <h1 class="title-gradient">Lịch sử thanh toán</h1>
-
+        <h1 class="title-gradient">@Localizer["PaymentHistory"]</h1>
         <div class="table-responsive">
             <table class="table table-dark table-bordered glow-effect">
                 <thead>
                     <tr>
-                        <th>Mã đặt vé</th>
-                        <th>Phim</th>
-                        <th>Phòng</th>
-                        <th>Ghế</th>
-                        <th>Ngày chiếu</th>
-                        <th>Giờ chiếu</th>
-                        <th>Đồ ăn</th>
-                        <th>Tổng tiền</th>
-                        <th>Ngày đặt</th>
-                        <th>Trạng thái</th>
+                        <th>@Localizer["BookingId"]</th>
+                        <th>@Localizer["Movie"]</th>
+                        <th>@Localizer["Room"]</th>
+                        <th>@Localizer["Seats"]</th>
+                        <th>@Localizer["ShowDate"]</th>
+                        <th>@Localizer["ShowTime"]</th>
+                        <th>@Localizer["Food"]</th>
+                        <th>@Localizer["TotalPrice"]</th>
+                        <th>@Localizer["BookingDate"]</th>
+                        <th>@Localizer["Status"]</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -102,10 +111,8 @@
                         {
                             var showtime = booking.Showtime;
                             var isFoodOnly = showtime == null;
-
                             <tr>
                                 <td class="fw-bold">@booking.BookingId</td>
-
                                 <!-- Phim -->
                                 <td>
                                     @if (!isFoodOnly)
@@ -114,10 +121,9 @@
                                     }
                                     else
                                     {
-                                        <em class="text-muted">Chỉ đặt đồ ăn</em>
+                                        <em class="text-muted">@Localizer["FoodOnly"].Value</em>
                                     }
                                 </td>
-
                                 <!-- Phòng -->
                                 <td>
                                     @if (!isFoodOnly)
@@ -129,7 +135,6 @@
                                         <em class="text-muted">—</em>
                                     }
                                 </td>
-
                                 <!-- Ghế -->
                                 <td>
                                     @if (booking.BookingDetails?.Any() == true)
@@ -138,10 +143,9 @@
                                     }
                                     else
                                     {
-                                        <em class="text-muted">Không chọn</em>
+                                        <em class="text-muted">@Localizer["NoSeatsSelected"].Value</em>
                                     }
                                 </td>
-
                                 <!-- Ngày chiếu -->
                                 <td>
                                     @if (!isFoodOnly)
@@ -153,7 +157,6 @@
                                         <em class="text-muted">—</em>
                                     }
                                 </td>
-
                                 <!-- Giờ chiếu -->
                                 <td>
                                     @if (!isFoodOnly)
@@ -165,7 +168,6 @@
                                         <em class="text-muted">—</em>
                                     }
                                 </td>
-
                                 <!-- Đồ ăn -->
                                 <td>
                                     @if (booking.BookingFoods?.Any() == true)
@@ -179,21 +181,18 @@
                                     }
                                     else
                                     {
-                                        <em class="text-muted">Không</em>
+                                        <em class="text-muted">@Localizer["NoFood"].Value</em>
                                     }
                                 </td>
-
                                 <!-- Tổng tiền -->
                                 <td class="text-end text-warning fw-bold" style="font-size: 1.05rem;">
-                                    @string.Format("{0:N0}", booking.TotalPrice) <small class="text-white-50">VNĐ</small>
+                                    @string.Format("{0:N0}", booking.TotalPrice) <small class="text-white-50">@Localizer["VND"].Value</small>
                                 </td>
-
                                 <!-- Ngày đặt -->
                                 <td>@booking.BookingDate.ToString("dd/MM/yyyy HH:mm")</td>
-
                                 <!-- Trạng thái -->
                                 <td>
-                                    <span class="badge badge-success">Đã thanh toán</span>
+                                    <span class="badge badge-success">@Localizer["Paid"].Value</span>
                                 </td>
                             </tr>
                         }
@@ -202,17 +201,16 @@
                     {
                         <tr>
                             <td colspan="10" class="text-center py-5">
-                                <em class="text-muted">Chưa có lịch sử thanh toán nào.</em>
+                                <em class="text-muted">@Localizer["NoPaymentHistory"].Value</em>
                             </td>
                         </tr>
                     }
                 </tbody>
             </table>
         </div>
-
         <div class="text-center mt-5">
             <a asp-controller="Home" asp-action="Index" class="btn btn-back glow-effect">
-                Quay lại trang chủ
+                @Localizer["BackToHome"].Value
             </a>
         </div>
     </div>

@@ -1,0 +1,167 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+	<xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+		<xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+		<xsd:element name="root" msdata:IsDataSet="true">
+			<xsd:complexType>
+				<xsd:choice maxOccurs="unbounded">
+					<xsd:element name="data">
+						<xsd:complexType>
+							<xsd:sequence>
+								<xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+								<xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+							</xsd:sequence>
+							<xsd:attribute name="name" type="xsd:string" msdata:Ordinal="1" />
+							<xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" default="System.String" />
+							<xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+							<xsd:attribute name="xml:space" type="preserve" />
+						</xsd:complexType>
+					</xsd:element>
+					<xsd:element name="schema" />
+					<xsd:element name="connection" />
+				</xsd:choice>
+			</xsd:complexType>
+		</xsd:element>
+	</xsd:schema>
+	<msdata:Properties>
+		<msdata:Property ref="generator" msdata:Value="System.Data.Dataset" />
+		<msdata:Property ref="version" msdata:Value="1.0" />
+		<msdata:Property ref="encoding" msdata:Value="utf-8" />
+	</msdata:Properties>
+	<data name="RevenueStatistics" xml:space="preserve">
+    <value>Revenue Statistics</value>
+    <comment>Page title for revenue statistics</comment>
+  </data>
+	<data name="ManageMovies" xml:space="preserve">
+    <value>Manage Movies</value>
+    <comment>Sidebar: Manage Movies</comment>
+  </data>
+	<data name="ManageShowtimes" xml:space="preserve">
+    <value>Manage Showtimes</value>
+    <comment>Sidebar: Manage Showtimes</comment>
+  </data>
+	<data name="ManageRooms" xml:space="preserve">
+    <value>Manage Rooms</value>
+    <comment>Sidebar: Manage Rooms</comment>
+  </data>
+	<data name="ManageSeats" xml:space="preserve">
+    <value>Manage Seats</value>
+    <comment>Sidebar: Manage Seats</comment>
+  </data>
+	<data name="ManageFoods" xml:space="preserve">
+    <value>Manage Foods</value>
+    <comment>Sidebar: Manage Foods</comment>
+  </data>
+	<data name="ManageBookings" xml:space="preserve">
+    <value>Manage Bookings</value>
+    <comment>Sidebar: Manage Bookings</comment>
+  </data>
+	<data name="RevenueDataOverview" xml:space="preserve">
+    <value>Overview of Revenue Data</value>
+    <comment>Header span for revenue overview</comment>
+  </data>
+	<data name="From" xml:space="preserve">
+    <value>From</value>
+    <comment>Date filter label: From</comment>
+  </data>
+	<data name="To" xml:space="preserve">
+    <value>to</value>
+    <comment>Date filter label: To</comment>
+  </data>
+	<data name="Filter" xml:space="preserve">
+    <value>Filter</value>
+    <comment>Filter button text</comment>
+  </data>
+	<data name="Summary" xml:space="preserve">
+    <value>Summary</value>
+    <comment>Section subtitle: Summary</comment>
+  </data>
+	<data name="TotalTicketRevenue" xml:space="preserve">
+    <value>Total Ticket Revenue:</value>
+    <comment>Summary label: Total Ticket Revenue</comment>
+  </data>
+	<data name="TotalFoodRevenue" xml:space="preserve">
+    <value>Total Food Revenue:</value>
+    <comment>Summary label: Total Food Revenue</comment>
+  </data>
+	<data name="TotalRevenue" xml:space="preserve">
+    <value>Total Revenue:</value>
+    <comment>Summary label: Total Revenue</comment>
+  </data>
+	<data name="RevenueByMovie" xml:space="preserve">
+    <value>Revenue by Movie (Tickets + Food)</value>
+    <comment>Section subtitle: Revenue by Movie</comment>
+  </data>
+	<data name="MovieTitle" xml:space="preserve">
+    <value>Movie Title</value>
+    <comment>Table header: Movie Title</comment>
+  </data>
+	<data name="TicketRevenue" xml:space="preserve">
+    <value>Ticket Revenue</value>
+    <comment>Table header: Ticket Revenue</comment>
+  </data>
+	<data name="RevenueByDate" xml:space="preserve">
+    <value>Revenue by Date</value>
+    <comment>Section subtitle: Revenue by Date</comment>
+  </data>
+	<data name="Date" xml:space="preserve">
+    <value>Date</value>
+    <comment>Table header: Date</comment>
+  </data>
+	<data name="FoodRevenue" xml:space="preserve">
+    <value>Food Revenue</value>
+    <comment>Table header: Food Revenue</comment>
+  </data>
+	<data name="Total" xml:space="preserve">
+    <value>Total</value>
+    <comment>Table header: Total</comment>
+  </data>
+	<data name="RevenueByMonth" xml:space="preserve">
+    <value>Revenue by Month</value>
+    <comment>Section subtitle: Revenue by Month</comment>
+  </data>
+	<data name="Month" xml:space="preserve">
+    <value>Month</value>
+    <comment>Table header: Month</comment>
+  </data>
+	<data name="FoodRevenueByCategoryAndDate" xml:space="preserve">
+    <value>Food Revenue by Category and Date</value>
+    <comment>Section subtitle: Food Revenue by Category and Date</comment>
+  </data>
+	<data name="Category" xml:space="preserve">
+    <value>Category</value>
+    <comment>Table header: Category</comment>
+  </data>
+	<data name="Revenue" xml:space="preserve">
+    <value>Revenue</value>
+    <comment>Table header: Revenue</comment>
+  </data>
+	<data name="RevenueChartByDate" xml:space="preserve">
+    <value>Revenue Chart by Date</value>
+    <comment>Section subtitle: Revenue Chart by Date</comment>
+  </data>
+	<data name="RevenueChartByMonth" xml:space="preserve">
+    <value>Revenue Chart by Month</value>
+    <comment>Section subtitle: Revenue Chart by Month</comment>
+  </data>
+	<data name="MonthlyTicketChart" xml:space="preserve">
+    <value>Monthly Ticket Chart</value>
+    <comment>Section subtitle: Monthly Ticket Chart</comment>
+  </data>
+	<data name="MonthlyFoodChart" xml:space="preserve">
+    <value>Monthly Food Chart</value>
+    <comment>Section subtitle: Monthly Food Chart</comment>
+  </data>
+	<data name="N/A" xml:space="preserve">
+    <value>N/A</value>
+    <comment>Generic N/A text</comment>
+  </data>
+	<data name="NoData" xml:space="preserve">
+    <value>No data available.</value>
+    <comment>Table no data message</comment>
+  </data>
+	<data name="VND" xml:space="preserve">
+    <value>VND</value>
+    <comment>Currency symbol</comment>
+  </data>
+</root>

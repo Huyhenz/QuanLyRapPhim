@@ -1,0 +1,195 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+	<xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+		<xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+		<xsd:element name="root" msdata:IsDataSet="true">
+			<xsd:complexType>
+				<xsd:choice maxOccurs="unbounded">
+					<xsd:element name="data">
+						<xsd:complexType>
+							<xsd:sequence>
+								<xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+								<xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+							</xsd:sequence>
+							<xsd:attribute name="name" type="xsd:string" msdata:Ordinal="1" />
+							<xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" default="System.String" />
+							<xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+							<xsd:attribute name="xml:space" type="preserve" />
+						</xsd:complexType>
+					</xsd:element>
+					<xsd:element name="schema" />
+					<xsd:element name="connection" />
+				</xsd:choice>
+			</xsd:complexType>
+		</xsd:element>
+	</xsd:schema>
+	<msdata:Properties>
+		<msdata:Property ref="generator" msdata:Value="System.Data.Dataset" />
+		<msdata:Property ref="version" msdata:Value="1.0" />
+		<msdata:Property ref="encoding" msdata:Value="utf-8" />
+	</msdata:Properties>
+	<data name="ManageFoods" xml:space="preserve">
+    <value>Manage Food and Beverages</value>
+    <comment>Page title for managing food items</comment>
+  </data>
+	<data name="ManageMovies" xml:space="preserve">
+    <value>Manage Movies</value>
+    <comment>Sidebar: Manage Movies</comment>
+  </data>
+	<data name="ManageShowtimes" xml:space="preserve">
+    <value>Manage Showtimes</value>
+    <comment>Sidebar: Manage Showtimes</comment>
+  </data>
+	<data name="ManageRooms" xml:space="preserve">
+    <value>Manage Rooms</value>
+    <comment>Sidebar: Manage Rooms</comment>
+  </data>
+	<data name="ManageSeats" xml:space="preserve">
+    <value>Manage Seats</value>
+    <comment>Sidebar: Manage Seats</comment>
+  </data>
+	<data name="ManageBookings" xml:space="preserve">
+    <value>Manage Bookings</value>
+    <comment>Sidebar: Manage Bookings</comment>
+  </data>
+	<data name="RevenueStatistics" xml:space="preserve">
+    <value>Revenue Statistics</value>
+    <comment>Sidebar: Revenue Statistics</comment>
+  </data>
+	<data name="AddNewFoodItem" xml:space="preserve">
+    <value>Add New Item</value>
+    <comment>Button to add new food item</comment>
+  </data>
+	<data name="FoodImage" xml:space="preserve">
+    <value>Image</value>
+    <comment>Table header: Food Image</comment>
+  </data>
+	<data name="FoodName" xml:space="preserve">
+    <value>Item Name</value>
+    <comment>Table header and label: Food Name</comment>
+  </data>
+	<data name="FoodSize" xml:space="preserve">
+    <value>Size</value>
+    <comment>Table header and label: Food Size</comment>
+  </data>
+	<data name="FoodPrice" xml:space="preserve">
+    <value>Price</value>
+    <comment>Table header and label: Food Price</comment>
+  </data>
+	<data name="FoodCategory" xml:space="preserve">
+    <value>Category</value>
+    <comment>Table header and label: Food Category</comment>
+  </data>
+	<data name="Actions" xml:space="preserve">
+    <value>Actions</value>
+    <comment>Table header: Actions</comment>
+  </data>
+	<data name="Edit" xml:space="preserve">
+    <value>Edit</value>
+    <comment>Edit button</comment>
+  </data>
+	<data name="Delete" xml:space="preserve">
+    <value>Delete</value>
+    <comment>Delete button</comment>
+  </data>
+	<data name="Cancel" xml:space="preserve">
+    <value>Cancel</value>
+    <comment>Cancel button</comment>
+  </data>
+	<data name="Add" xml:space="preserve">
+    <value>Add</value>
+    <comment>Add button in modal</comment>
+  </data>
+	<data name="Update" xml:space="preserve">
+    <value>Update</value>
+    <comment>Update button in edit modal</comment>
+  </data>
+	<data name="SizeS" xml:space="preserve">
+    <value>S</value>
+    <comment>Size option: Small</comment>
+  </data>
+	<data name="SizeM" xml:space="preserve">
+    <value>M</value>
+    <comment>Size option: Medium</comment>
+  </data>
+	<data name="SizeL" xml:space="preserve">
+    <value>L</value>
+    <comment>Size option: Large</comment>
+  </data>
+	<data name="CategoryPopcorn" xml:space="preserve">
+    <value>Popcorn</value>
+    <comment>Category: Popcorn</comment>
+  </data>
+	<data name="CategoryDrink" xml:space="preserve">
+    <value>Drink</value>
+    <comment>Category: Drink</comment>
+  </data>
+	<data name="CategoryCombo" xml:space="preserve">
+    <value>Combo</value>
+    <comment>Category: Combo</comment>
+  </data>
+	<data name="VND" xml:space="preserve">
+    <value>VND</value>
+    <comment>Currency: Vietnamese Dong</comment>
+  </data>
+	<data name="Max2MBJPGPNG" xml:space="preserve">
+    <value>Max 2MB, JPG/PNG</value>
+    <comment>Image upload hint</comment>
+  </data>
+	<data name="NoChangeImage" xml:space="preserve">
+    <value>Leave empty if no change</value>
+    <comment>Image upload hint in edit</comment>
+  </data>
+	<data name="CurrentImage" xml:space="preserve">
+    <value>Current Image</value>
+    <comment>Label for current image in edit modal</comment>
+  </data>
+	<data name="NoImage" xml:space="preserve">
+    <value>No image</value>
+    <comment>No image text</comment>
+  </data>
+	<data name="LoadDataError" xml:space="preserve">
+    <value>Error loading data!</value>
+    <comment>Alert: Load error</comment>
+  </data>
+	<data name="CreateSuccess" xml:space="preserve">
+    <value>Item added successfully!</value>
+    <comment>Alert: Create success</comment>
+  </data>
+	<data name="CreateError" xml:space="preserve">
+    <value>Error adding item!</value>
+    <comment>Alert: Create error</comment>
+  </data>
+	<data name="EditSuccess" xml:space="preserve">
+    <value>Item updated successfully!</value>
+    <comment>Alert: Edit success</comment>
+  </data>
+	<data name="EditError" xml:space="preserve">
+    <value>Error updating item!</value>
+    <comment>Alert: Edit error</comment>
+  </data>
+	<data name="DeleteConfirm" xml:space="preserve">
+    <value>Delete this item? Data will be lost permanently!</value>
+    <comment>Confirm delete</comment>
+  </data>
+	<data name="DeleteSuccess" xml:space="preserve">
+    <value>Item deleted successfully!</value>
+    <comment>Alert: Delete success</comment>
+  </data>
+	<data name="DeleteError" xml:space="preserve">
+    <value>Error deleting item!</value>
+    <comment>Alert: Delete error</comment>
+  </data>
+	<data name="ServerError" xml:space="preserve">
+    <value>Server error!</value>
+    <comment>Alert: Server error</comment>
+  </data>
+	<data name="LoadFoodError" xml:space="preserve">
+    <value>Error loading food item!</value>
+    <comment>Alert: Load food error</comment>
+  </data>
+	<data name="EditFoodItem" xml:space="preserve">
+    <value>Edit Food Item</value>
+    <comment>Edit modal title</comment>
+  </data>
+</root>

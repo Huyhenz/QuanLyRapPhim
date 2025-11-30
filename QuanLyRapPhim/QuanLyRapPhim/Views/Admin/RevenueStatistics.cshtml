@@ -3,8 +3,10 @@
 @using System.Collections.Generic
 @using System.Globalization
 @using System.Linq
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
 @{
-    ViewData["Title"] = "Báo cáo thống kê";
+    ViewData["Title"] = Localizer["RevenueStatistics"].Value;
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 <div class="admin-dashboard">
@@ -14,13 +16,13 @@
             <h3 class="sidebar-title">CinemaX Admin</h3>
         </div>
         <nav class="sidebar-nav">
-            <a href="/Movies" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Movies" ? "active" : "")"><i class="fas fa-film"></i> Quản lý phim</a>
-            <a href="/Showtimes" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Showtimes" ? "active" : "")"><i class="fas fa-clock"></i> Quản lý lịch chiếu</a>
-            <a href="/Rooms" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Rooms" ? "active" : "")"><i class="fas fa-door-open"></i> Quản lý phòng</a>
-            <a href="/Seats" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Seats" ? "active" : "")"><i class="fas fa-chair"></i> Quản lý ghế</a>
-            <a href="/Admin/ManageFoods" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "ManageFoods" ? "active" : "")"><i class="fas fa-utensils"></i> Quản lý đồ ăn</a>
-            <a href="/Admin/ManageBookings" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Admin" && ViewContext.RouteData.Values["Action"]?.ToString() == "ManageBookings" ? "active" : "")"><i class="fas fa-ticket-alt"></i> Quản lý đặt vé</a>
-            <a href="/Admin/RevenueStatistics" class="nav-item active"><i class="fas fa-chart-bar"></i> Báo cáo thống kê</a>
+            <a href="/Movies" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Movies" ? "active" : "")"><i class="fas fa-film"></i> @Localizer["ManageMovies"]</a>
+            <a href="/Showtimes" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Showtimes" ? "active" : "")"><i class="fas fa-clock"></i> @Localizer["ManageShowtimes"]</a>
+            <a href="/Rooms" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Rooms" ? "active" : "")"><i class="fas fa-door-open"></i> @Localizer["ManageRooms"]</a>
+            <a href="/Seats" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Seats" ? "active" : "")"><i class="fas fa-chair"></i> @Localizer["ManageSeats"]</a>
+            <a href="/Admin/ManageFoods" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "ManageFoods" ? "active" : "")"><i class="fas fa-utensils"></i> @Localizer["ManageFoods"]</a>
+            <a href="/Admin/ManageBookings" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Admin" && ViewContext.RouteData.Values["Action"]?.ToString() == "ManageBookings" ? "active" : "")"><i class="fas fa-ticket-alt"></i> @Localizer["ManageBookings"]</a>
+            <a href="/Admin/RevenueStatistics" class="nav-item active"><i class="fas fa-chart-bar"></i> @Localizer["RevenueStatistics"]</a>
             <div class="nav-divider"></div>
             <a href="#" class="nav-item"><i class="fab fa-facebook"></i> Facebook</a>
             <a href="#" class="nav-item"><i class="fab fa-twitter"></i> Twitter</a>
@@ -30,18 +32,18 @@
     <!-- Main Content -->
     <main class="content">
         <div class="content-inner">
-            <h2 class="page-title">Báo cáo thống kê</h2>
+            <h2 class="page-title">@Localizer["RevenueStatistics"]</h2>
             <div class="header-actions">
-                <span class="order-count">Tổng quan về dữ liệu doanh thu</span>
+                <span class="order-count">@Localizer["RevenueDataOverview"]</span>
                 <div class="date-filter">
                     <form id="dateFilterForm" method="get" action="@Url.Action("RevenueStatistics")">
                         <input type="hidden" name="fromDate" id="fromDateInput" value="@(((dynamic)ViewBag.RevenueData)?.FromDate ?? DateTime.Now.AddMonths(-1).ToString("yyyy-MM-dd"))">
                         <input type="hidden" name="toDate" id="toDateInput" value="@(((dynamic)ViewBag.RevenueData)?.ToDate ?? DateTime.Now.ToString("yyyy-MM-dd"))">
-                        <span>From</span>
+                        <span>@Localizer["From"]</span>
                         <input type="date" class="date-input" id="fromDate" onchange="updateFilter()">
-                        <span>to</span>
+                        <span>@Localizer["To"]</span>
                         <input type="date" class="date-input" id="toDate" onchange="updateFilter()">
-                        <button type="submit" class="filter-btn">Lọc</button>
+                        <button type="submit" class="filter-btn">@Localizer["Filter"]</button>
                     </form>
                 </div>
             </div>
@@ -49,25 +51,25 @@
             <div id="alert-container" class="mb-4"></div>
             <!-- Revenue Summary -->
             <div class="admin-section">
-                <h3 class="section-subtitle">Bản tóm tắt</h3>
+                <h3 class="section-subtitle">@Localizer["Summary"]</h3>
                 <div class="summary-card">
                     <div class="summary-row">
-                        <span>Tổng doanh thu vé: @(((dynamic)ViewBag.RevenueData)?.TotalTicketRevenue.ToString("C", new System.Globalization.CultureInfo("vi-VN")) ?? "N/A")</span>
-                        <span>Tổng doanh thu thức ăn: @(((dynamic)ViewBag.RevenueData)?.TotalFoodRevenue.ToString("C", new System.Globalization.CultureInfo("vi-VN")) ?? "N/A")</span>
-                        <span>Tổng doanh thu: @(((dynamic)ViewBag.RevenueData)?.TotalRevenue.ToString("C", new System.Globalization.CultureInfo("vi-VN")) ?? "N/A")</span>
+                        <span>@Localizer["TotalTicketRevenue"]: @(((dynamic)ViewBag.RevenueData)?.TotalTicketRevenue.ToString("C", new System.Globalization.CultureInfo("vi-VN")) ?? Localizer["N/A"].Value)</span>
+                        <span>@Localizer["TotalFoodRevenue"]: @(((dynamic)ViewBag.RevenueData)?.TotalFoodRevenue.ToString("C", new System.Globalization.CultureInfo("vi-VN")) ?? Localizer["N/A"].Value)</span>
+                        <span>@Localizer["TotalRevenue"]: @(((dynamic)ViewBag.RevenueData)?.TotalRevenue.ToString("C", new System.Globalization.CultureInfo("vi-VN")) ?? Localizer["N/A"].Value)</span>
                     </div>
                 </div>
             </div>
             <!-- Revenue by Movie -->
             <div class="admin-section">
-                <h3 class="section-subtitle">Doanh thu theo phim (Vé + Thức ăn)</h3>
+                <h3 class="section-subtitle">@Localizer["RevenueByMovie"]</h3>
                 <div class="table-responsive">
                     <table class="table table-custom">
                         <thead>
                             <tr>
-                                <th>Tiêu đề phim</th>
-                                <th>Doanh thu vé (VND)</th>
-                                <th>Tổng doanh thu (VND)</th>
+                                <th>@Localizer["MovieTitle"]</th>
+                                <th>@Localizer["TicketRevenue"] (VND)</th>
+                                <th>@Localizer["TotalRevenue"] (VND)</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -78,15 +80,15 @@
                                     foreach (var item in revenueByMovie)
                                     {
                                         <tr>
-                                            <td>@(item.MovieTitle ?? "N/A")</td>
-                                            <td>@(item.TicketRevenue?.ToString("C", new System.Globalization.CultureInfo("vi-VN")) ?? "N/A")</td>
-                                            <td>@(item.TotalRevenue?.ToString("C", new System.Globalization.CultureInfo("vi-VN")) ?? "N/A")</td>
+                                            <td>@(item.MovieTitle ?? Localizer["N/A"].Value)</td>
+                                            <td>@(item.TicketRevenue?.ToString("C", new System.Globalization.CultureInfo("vi-VN")) ?? Localizer["N/A"].Value)</td>
+                                            <td>@(item.TotalRevenue?.ToString("C", new System.Globalization.CultureInfo("vi-VN")) ?? Localizer["N/A"].Value)</td>
                                         </tr>
                                     }
                                 }
                                 else
                                 {
-                                    <tr><td colspan="3" class="text-center">Không có dữ liệu.</td></tr>
+                                    <tr><td colspan="3" class="text-center">@Localizer["NoData"].Value</td></tr>
                                 }
                             }
                         </tbody>
@@ -95,15 +97,15 @@
             </div>
             <!-- Revenue by Date Table -->
             <div class="admin-section">
-                <h3 class="section-subtitle">Doanh thu theo ngày</h3>
+                <h3 class="section-subtitle">@Localizer["RevenueByDate"]</h3>
                 <div class="table-responsive">
                     <table class="table table-custom">
                         <thead>
                             <tr>
-                                <th>Ngày</th>
-                                <th>Doanh thu vé (VND)</th>
-                                <th>Doanh thu thức ăn (VND)</th>
-                                <th>Tổng (VND)</th>
+                                <th>@Localizer["Date"]</th>
+                                <th>@Localizer["TicketRevenue"] (VND)</th>
+                                <th>@Localizer["FoodRevenue"] (VND)</th>
+                                <th>@Localizer["Total"] (VND)</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -114,16 +116,16 @@
                                     foreach (var item in revenueByDate)
                                     {
                                         <tr>
-                                            <td>@(((dynamic)item).Date?.ToString("dd/MM/yyyy") ?? "N/A")</td>
-                                            <td>@(((dynamic)item).TicketRevenue?.ToString("C", new System.Globalization.CultureInfo("vi-VN")) ?? "N/A")</td>
-                                            <td>@(((dynamic)item).FoodRevenue?.ToString("C", new System.Globalization.CultureInfo("vi-VN")) ?? "N/A")</td>
-                                            <td>@(((dynamic)item).TotalRevenue?.ToString("C", new System.Globalization.CultureInfo("vi-VN")) ?? "N/A")</td>
+                                            <td>@(((dynamic)item).Date?.ToString("dd/MM/yyyy") ?? Localizer["N/A"].Value)</td>
+                                            <td>@(((dynamic)item).TicketRevenue?.ToString("C", new System.Globalization.CultureInfo("vi-VN")) ?? Localizer["N/A"].Value)</td>
+                                            <td>@(((dynamic)item).FoodRevenue?.ToString("C", new System.Globalization.CultureInfo("vi-VN")) ?? Localizer["N/A"].Value)</td>
+                                            <td>@(((dynamic)item).TotalRevenue?.ToString("C", new System.Globalization.CultureInfo("vi-VN")) ?? Localizer["N/A"].Value)</td>
                                         </tr>
                                     }
                                 }
                                 else
                                 {
-                                    <tr><td colspan="4" class="text-center">Không có dữ liệu.</td></tr>
+                                    <tr><td colspan="4" class="text-center">@Localizer["NoData"].Value</td></tr>
                                 }
                             }
                         </tbody>
@@ -132,15 +134,15 @@
             </div>
             <!-- Revenue by Month Table -->
             <div class="admin-section">
-                <h3 class="section-subtitle">Doanh thu theo tháng</h3>
+                <h3 class="section-subtitle">@Localizer["RevenueByMonth"]</h3>
                 <div class="table-responsive">
                     <table class="table table-custom">
                         <thead>
                             <tr>
-                                <th>Tháng</th>
-                                <th>Doanh thu vé (VND)</th>
-                                <th>Doanh thu thức ăn (VND)</th>
-                                <th>Tổng (VND)</th>
+                                <th>@Localizer["Month"]</th>
+                                <th>@Localizer["TicketRevenue"] (VND)</th>
+                                <th>@Localizer["FoodRevenue"] (VND)</th>
+                                <th>@Localizer["Total"] (VND)</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -152,15 +154,15 @@
                                     {
                                         <tr>
                                             <td>@(((dynamic)item).MonthName + " " + ((dynamic)item).Year)</td>
-                                            <td>@(((dynamic)item).TicketRevenue?.ToString("C", new System.Globalization.CultureInfo("vi-VN")) ?? "N/A")</td>
-                                            <td>@(((dynamic)item).FoodRevenue?.ToString("C", new System.Globalization.CultureInfo("vi-VN")) ?? "N/A")</td>
-                                            <td>@(((dynamic)item).TotalRevenue?.ToString("C", new System.Globalization.CultureInfo("vi-VN")) ?? "N/A")</td>
+                                            <td>@(((dynamic)item).TicketRevenue?.ToString("C", new System.Globalization.CultureInfo("vi-VN")) ?? Localizer["N/A"].Value)</td>
+                                            <td>@(((dynamic)item).FoodRevenue?.ToString("C", new System.Globalization.CultureInfo("vi-VN")) ?? Localizer["N/A"].Value)</td>
+                                            <td>@(((dynamic)item).TotalRevenue?.ToString("C", new System.Globalization.CultureInfo("vi-VN")) ?? Localizer["N/A"].Value)</td>
                                         </tr>
                                     }
                                 }
                                 else
                                 {
-                                    <tr><td colspan="4" class="text-center">Không có dữ liệu.</td></tr>
+                                    <tr><td colspan="4" class="text-center">@Localizer["NoData"].Value</td></tr>
                                 }
                             }
                         </tbody>
@@ -169,14 +171,14 @@
             </div>
             <!-- Food Revenue by Category by Date -->
             <div class="admin-section">
-                <h3 class="section-subtitle">Doanh thu thức ăn theo category và ngày</h3>
+                <h3 class="section-subtitle">@Localizer["FoodRevenueByCategoryAndDate"]</h3>
                 <div class="table-responsive">
                     <table class="table table-custom">
                         <thead>
                             <tr>
-                                <th>Ngày</th>
-                                <th>Category</th>
-                                <th>Doanh thu (VND)</th>
+                                <th>@Localizer["Date"]</th>
+                                <th>@Localizer["Category"]</th>
+                                <th>@Localizer["Revenue"] (VND)</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -194,9 +196,9 @@
                                             foreach (var item in categories)
                                             {
                                                 <tr>
-                                                    <td>@(dg.Date?.ToString("dd/MM/yyyy") ?? "N/A")</td>
-                                                    <td>@(item.Category ?? "N/A")</td>
-                                                    <td>@(item.Revenue?.ToString("C", new System.Globalization.CultureInfo("vi-VN")) ?? "N/A")</td>
+                                                    <td>@(dg.Date?.ToString("dd/MM/yyyy") ?? Localizer["N/A"].Value)</td>
+                                                    <td>@(item.Category ?? Localizer["N/A"].Value)</td>
+                                                    <td>@(item.Revenue?.ToString("C", new System.Globalization.CultureInfo("vi-VN")) ?? Localizer["N/A"].Value)</td>
                                                 </tr>
                                             }
                                         }
@@ -204,7 +206,7 @@
                                 }
                                 else
                                 {
-                                    <tr><td colspan="3" class="text-center">Không có dữ liệu.</td></tr>
+                                    <tr><td colspan="3" class="text-center">@Localizer["NoData"].Value</td></tr>
                                 }
                             }
                         </tbody>
@@ -213,20 +215,20 @@
             </div>
             <!-- Charts -->
             <div class="admin-section">
-                <h3 class="section-subtitle">Biểu đồ doanh thu theo ngày</h3>
+                <h3 class="section-subtitle">@Localizer["RevenueChartByDate"]</h3>
                 <canvas id="revenueByDateChart" width="400" height="200"></canvas>
             </div>
             <div class="admin-section">
-                <h3 class="section-subtitle">Biểu đồ doanh thu theo tháng</h3>
+                <h3 class="section-subtitle">@Localizer["RevenueChartByMonth"]</h3>
                 <canvas id="revenueByMonthChart" width="400" height="200"></canvas>
             </div>
             <!-- Additional Small Charts for Monthly Revenue -->
             <div class="admin-section">
-                <h3 class="section-subtitle">Biểu đồ nhỏ - Doanh thu vé theo tháng</h3>
+                <h3 class="section-subtitle">@Localizer["MonthlyTicketChart"]</h3>
                 <canvas id="monthlyTicketChart" width="300" height="150"></canvas>
             </div>
             <div class="admin-section">
-                <h3 class="section-subtitle">Biểu đồ nhỏ - Doanh thu thức ăn theo tháng</h3>
+                <h3 class="section-subtitle">@Localizer["MonthlyFoodChart"]</h3>
                 <canvas id="monthlyFoodChart" width="300" height="150"></canvas>
             </div>
         </div>
@@ -532,17 +534,14 @@
             // Set initial date values
             $('#fromDate').val('@(((dynamic)ViewBag.RevenueData)?.FromDate ?? DateTime.Now.AddMonths(-1).ToString("yyyy-MM-dd"))');
             $('#toDate').val('@(((dynamic)ViewBag.RevenueData)?.ToDate ?? DateTime.Now.ToString("yyyy-MM-dd"))');
-
             // Update hidden inputs on date change
             function updateFilter() {
                 $('#fromDateInput').val($('#fromDate').val());
                 $('#toDateInput').val($('#toDate').val());
             }
-
             // Parse JSON data for charts
             var revenueByDateData = JSON.parse('@Html.Raw(ViewBag.FormattedRevenueByDate ?? "[]")');
             var revenueByMonthData = JSON.parse('@Html.Raw(ViewBag.FormattedRevenueByMonth ?? "[]")');
-
             // Chart theo ngày
             if (revenueByDateData.length > 0) {
                 var ctxDate = document.getElementById('revenueByDateChart').getContext('2d');
@@ -552,21 +551,21 @@
                         labels: revenueByDateData.map(item => item.Date),
                         datasets: [
                             {
-                                label: 'Vé (VND)',
+                                label: '@Localizer["TicketRevenue"] (VND)',
                                 data: revenueByDateData.map(item => item.TicketRevenue),
                                 backgroundColor: 'rgba(0, 123, 255, 0.2)',
                                 borderColor: 'rgba(0, 123, 255, 1)',
                                 borderWidth: 1
                             },
                             {
-                                label: 'Thức ăn (VND)',
+                                label: '@Localizer["FoodRevenue"] (VND)',
                                 data: revenueByDateData.map(item => item.FoodRevenue),
                                 backgroundColor: 'rgba(255, 193, 7, 0.2)',
                                 borderColor: 'rgba(255, 193, 7, 1)',
                                 borderWidth: 1
                             },
                             {
-                                label: 'Tổng (VND)',
+                                label: '@Localizer["Total"] (VND)',
                                 data: revenueByDateData.map(item => item.TotalRevenue),
                                 backgroundColor: 'rgba(255, 0, 51, 0.2)',
                                 borderColor: 'rgba(255, 0, 51, 1)',
@@ -598,7 +597,6 @@
                     }
                 });
             }
-
             // Chart theo tháng
             if (revenueByMonthData.length > 0) {
                 var ctxMonth = document.getElementById('revenueByMonthChart').getContext('2d');
@@ -608,21 +606,21 @@
                         labels: revenueByMonthData.map(item => item.Month),
                         datasets: [
                             {
-                                label: 'Vé (VND)',
+                                label: '@Localizer["TicketRevenue"] (VND)',
                                 data: revenueByMonthData.map(item => item.TicketRevenue),
                                 borderColor: 'rgba(0, 123, 255, 1)',
                                 backgroundColor: 'rgba(0, 123, 255, 0.2)',
                                 tension: 0.1
                             },
                             {
-                                label: 'Thức ăn (VND)',
+                                label: '@Localizer["FoodRevenue"] (VND)',
                                 data: revenueByMonthData.map(item => item.FoodRevenue),
                                 borderColor: 'rgba(255, 193, 7, 1)',
                                 backgroundColor: 'rgba(255, 193, 7, 0.2)',
                                 tension: 0.1
                             },
                             {
-                                label: 'Tổng (VND)',
+                                label: '@Localizer["Total"] (VND)',
                                 data: revenueByMonthData.map(item => item.TotalRevenue),
                                 borderColor: 'rgba(255, 0, 51, 1)',
                                 backgroundColor: 'rgba(255, 0, 51, 0.2)',
@@ -654,7 +652,6 @@
                     }
                 });
             }
-
             // Biểu đồ nhỏ - Doanh thu vé theo tháng
             if (revenueByMonthData.length > 0) {
                 var ctxTicket = document.getElementById('monthlyTicketChart').getContext('2d');
@@ -663,7 +660,7 @@
                     data: {
                         labels: revenueByMonthData.map(item => item.Month),
                         datasets: [{
-                            label: 'Doanh thu vé (VND)',
+                            label: '@Localizer["TicketRevenue"] (VND)',
                             data: revenueByMonthData.map(item => item.TicketRevenue),
                             backgroundColor: 'rgba(0, 123, 255, 0.6)',
                             borderColor: 'rgba(0, 123, 255, 1)',
@@ -694,7 +691,6 @@
                     }
                 });
             }
-
             // Biểu đồ nhỏ - Doanh thu thức ăn theo tháng
             if (revenueByMonthData.length > 0) {
                 var ctxFood = document.getElementById('monthlyFoodChart').getContext('2d');
@@ -703,7 +699,7 @@
                     data: {
                         labels: revenueByMonthData.map(item => item.Month),
                         datasets: [{
-                            label: 'Doanh thu thức ăn (VND)',
+                            label: '@Localizer["FoodRevenue"] (VND)',
                             data: revenueByMonthData.map(item => item.FoodRevenue),
                             backgroundColor: 'rgba(255, 193, 7, 0.6)',
                             borderColor: 'rgba(255, 193, 7, 1)',

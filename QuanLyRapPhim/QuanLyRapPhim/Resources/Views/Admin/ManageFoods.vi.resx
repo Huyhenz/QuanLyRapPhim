@@ -1,0 +1,195 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+	<xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+		<xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+		<xsd:element name="root" msdata:IsDataSet="true">
+			<xsd:complexType>
+				<xsd:choice maxOccurs="unbounded">
+					<xsd:element name="data">
+						<xsd:complexType>
+							<xsd:sequence>
+								<xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+								<xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+							</xsd:sequence>
+							<xsd:attribute name="name" type="xsd:string" msdata:Ordinal="1" />
+							<xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" default="System.String" />
+							<xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+							<xsd:attribute name="xml:space" type="preserve" />
+						</xsd:complexType>
+					</xsd:element>
+					<xsd:element name="schema" />
+					<xsd:element name="connection" />
+				</xsd:choice>
+			</xsd:complexType>
+		</xsd:element>
+	</xsd:schema>
+	<msdata:Properties>
+		<msdata:Property ref="generator" msdata:Value="System.Data.Dataset" />
+		<msdata:Property ref="version" msdata:Value="1.0" />
+		<msdata:Property ref="encoding" msdata:Value="utf-8" />
+	</msdata:Properties>
+	<data name="ManageFoods" xml:space="preserve">
+    <value>Quản lý đồ ăn và nước uống</value>
+    <comment>Page title for managing food items</comment>
+  </data>
+	<data name="ManageMovies" xml:space="preserve">
+    <value>Quản lý phim</value>
+    <comment>Sidebar: Manage Movies</comment>
+  </data>
+	<data name="ManageShowtimes" xml:space="preserve">
+    <value>Quản lý lịch chiếu</value>
+    <comment>Sidebar: Manage Showtimes</comment>
+  </data>
+	<data name="ManageRooms" xml:space="preserve">
+    <value>Quản lý phòng</value>
+    <comment>Sidebar: Manage Rooms</comment>
+  </data>
+	<data name="ManageSeats" xml:space="preserve">
+    <value>Quản lý ghế</value>
+    <comment>Sidebar: Manage Seats</comment>
+  </data>
+	<data name="ManageBookings" xml:space="preserve">
+    <value>Quản lý đặt vé</value>
+    <comment>Sidebar: Manage Bookings</comment>
+  </data>
+	<data name="RevenueStatistics" xml:space="preserve">
+    <value>Báo cáo thống kê</value>
+    <comment>Sidebar: Revenue Statistics</comment>
+  </data>
+	<data name="AddNewFoodItem" xml:space="preserve">
+    <value>Thêm món mới</value>
+    <comment>Button to add new food item</comment>
+  </data>
+	<data name="FoodImage" xml:space="preserve">
+    <value>Ảnh</value>
+    <comment>Table header: Food Image</comment>
+  </data>
+	<data name="FoodName" xml:space="preserve">
+    <value>Tên món</value>
+    <comment>Table header and label: Food Name</comment>
+  </data>
+	<data name="FoodSize" xml:space="preserve">
+    <value>Size</value>
+    <comment>Table header and label: Food Size</comment>
+  </data>
+	<data name="FoodPrice" xml:space="preserve">
+    <value>Giá</value>
+    <comment>Table header and label: Food Price</comment>
+  </data>
+	<data name="FoodCategory" xml:space="preserve">
+    <value>Loại</value>
+    <comment>Table header and label: Food Category</comment>
+  </data>
+	<data name="Actions" xml:space="preserve">
+    <value>Hành động</value>
+    <comment>Table header: Actions</comment>
+  </data>
+	<data name="Edit" xml:space="preserve">
+    <value>Sửa</value>
+    <comment>Edit button</comment>
+  </data>
+	<data name="Delete" xml:space="preserve">
+    <value>Xóa</value>
+    <comment>Delete button</comment>
+  </data>
+	<data name="Cancel" xml:space="preserve">
+    <value>Hủy</value>
+    <comment>Cancel button</comment>
+  </data>
+	<data name="Add" xml:space="preserve">
+    <value>Thêm</value>
+    <comment>Add button in modal</comment>
+  </data>
+	<data name="Update" xml:space="preserve">
+    <value>Cập nhật</value>
+    <comment>Update button in edit modal</comment>
+  </data>
+	<data name="SizeS" xml:space="preserve">
+    <value>S</value>
+    <comment>Size option: Small</comment>
+  </data>
+	<data name="SizeM" xml:space="preserve">
+    <value>M</value>
+    <comment>Size option: Medium</comment>
+  </data>
+	<data name="SizeL" xml:space="preserve">
+    <value>L</value>
+    <comment>Size option: Large</comment>
+  </data>
+	<data name="CategoryPopcorn" xml:space="preserve">
+    <value>Bắp rang</value>
+    <comment>Category: Popcorn</comment>
+  </data>
+	<data name="CategoryDrink" xml:space="preserve">
+    <value>Nước uống</value>
+    <comment>Category: Drink</comment>
+  </data>
+	<data name="CategoryCombo" xml:space="preserve">
+    <value>Combo</value>
+    <comment>Category: Combo</comment>
+  </data>
+	<data name="VND" xml:space="preserve">
+    <value>VNĐ</value>
+    <comment>Currency: Vietnamese Dong</comment>
+  </data>
+	<data name="Max2MBJPGPNG" xml:space="preserve">
+    <value>Tối đa 2MB, JPG/PNG</value>
+    <comment>Image upload hint</comment>
+  </data>
+	<data name="NoChangeImage" xml:space="preserve">
+    <value>Để trống nếu không đổi</value>
+    <comment>Image upload hint in edit</comment>
+  </data>
+	<data name="CurrentImage" xml:space="preserve">
+    <value>Hình ảnh hiện tại</value>
+    <comment>Label for current image in edit modal</comment>
+  </data>
+	<data name="NoImage" xml:space="preserve">
+    <value>Không có ảnh</value>
+    <comment>No image text</comment>
+  </data>
+	<data name="LoadDataError" xml:space="preserve">
+    <value>Lỗi tải dữ liệu!</value>
+    <comment>Alert: Load error</comment>
+  </data>
+	<data name="CreateSuccess" xml:space="preserve">
+    <value>Thêm món thành công!</value>
+    <comment>Alert: Create success</comment>
+  </data>
+	<data name="CreateError" xml:space="preserve">
+    <value>Lỗi khi thêm món!</value>
+    <comment>Alert: Create error</comment>
+  </data>
+	<data name="EditSuccess" xml:space="preserve">
+    <value>Cập nhật món thành công!</value>
+    <comment>Alert: Edit success</comment>
+  </data>
+	<data name="EditError" xml:space="preserve">
+    <value>Lỗi khi cập nhật món!</value>
+    <comment>Alert: Edit error</comment>
+  </data>
+	<data name="DeleteConfirm" xml:space="preserve">
+    <value>Xóa món ăn này? Dữ liệu sẽ mất vĩnh viễn!</value>
+    <comment>Confirm delete</comment>
+  </data>
+	<data name="DeleteSuccess" xml:space="preserve">
+    <value>Xóa món thành công!</value>
+    <comment>Alert: Delete success</comment>
+  </data>
+	<data name="DeleteError" xml:space="preserve">
+    <value>Lỗi khi xóa món!</value>
+    <comment>Alert: Delete error</comment>
+  </data>
+	<data name="ServerError" xml:space="preserve">
+    <value>Lỗi server!</value>
+    <comment>Alert: Server error</comment>
+  </data>
+	<data name="LoadFoodError" xml:space="preserve">
+    <value>Lỗi tải món ăn!</value>
+    <comment>Alert: Load food error</comment>
+  </data>
+	<data name="EditFoodItem" xml:space="preserve">
+    <value>Sửa món ăn</value>
+    <comment>Edit modal title</comment>
+  </data>
+</root>

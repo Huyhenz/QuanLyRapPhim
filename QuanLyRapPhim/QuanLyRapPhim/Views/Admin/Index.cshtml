@@ -1,205 +1,241 @@
 ﻿@model dynamic
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
 
 @{
-    ViewData["Title"] = "Admin Dashboard";
+    ViewData["Title"] = Localizer["AdminDashboard"].Value;
     Layout = "~/Views/Shared/_Layout.cshtml";
+    bool isAdmin = User.IsInRole("Admin");
 }
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" />
-    <style>
-        body {
-            margin: 0;
-            background-color: #0F0F0F; /* Galaxy Black */
-            color: #ffffff;
-            font-family: 'Montserrat', sans-serif;
-            overflow-x: hidden;
-        }
-
-        .admin-dashboard {
-            display: flex;
-            min-height: 100vh;
-        }
-
-        .sidebar {
-            width: 250px;
-            background-color: #000000; /* Black background */
-            color: #ffffff; /* White text for readability */
-            height: 100vh;
-            position: fixed;
-            top: 0;
-            left: 0;
-            padding-top: 20px;
-            border-right: 2px solid #ff0033; /* Red border */
-            overflow-y: auto;
-            z-index: 1000;
-        }
-
-        .sidebar-header {
-            padding: 10px 20px;
-            border-bottom: 1px solid #ff0033; /* Red border */
-        }
-
-        .sidebar-title {
-            margin: 0;
-            font-size: 1.5em;
-            color: #ff0033; /* Red text for the header */
-        }
-
-        .sidebar-nav {
-            list-style: none;
-            padding: 0;
-            margin: 20px 0;
-        }
-
-        .nav-item {
-            display: flex;
-            align-items: center;
-            padding: 10px 20px;
-            color: #ffffff; /* White text */
-            text-decoration: none;
-        }
-
-            .nav-item i {
-                margin-right: 10px;
-                color: #ffffff; /* White icons */
-            }
-
-            .nav-item:hover {
-                background-color: #ff0033; /* Red on hover */
-                color: #000000; /* Black text on hover for contrast */
-            }
-
-                .nav-item:hover i {
-                    color: #000000; /* Black icons on hover */
-                }
-
-            .nav-item.active {
-                background-color: #ff0033; /* Red for active item */
-                color: #000000; /* Black text for active item */
-            }
-
-                .nav-item.active i {
-                    color: #000000; /* Black icons for active item */
-                }
-
-        .nav-divider {
-            border-top: 1px solid #ff0033;
-            margin: 10px 0;
-        }
-
-        .content {
-            margin-left: 250px;
-            padding: 20px;
-            flex-grow: 1;
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
-        }
-
-        .content-inner {
-            max-width: 1200px;
-            width: 100%;
-        }
-
-        .page-title {
-            background-color: #1c1c1c;
-            color: #fff;
-            padding: 15px;
-            text-align: center;
-            border-radius: 15px;
-            font-family: 'Montserrat', sans-serif;
-            font-weight: 700;
-            text-transform: uppercase;
-            margin-bottom: 20px;
-        }
-
-        .create-button {
-            display: inline-block;
-            padding: 8px 20px;
-            background-color: #00cc00;
-            color: #fff;
-            text-decoration: none;
-            border-radius: 20px;
-            font-weight: 600;
-            font-family: 'Montserrat', sans-serif;
-            margin-bottom: 20px;
-        }
-
-            .create-button:hover {
-                transform: scale(1.05);
-                transition: transform 0.3s ease;
-            }
-
-        /* Fixed Media Queries */
-        @@media (max-width: 768px) {
-            .sidebar {
-                width: 200px;
-                z-index: 1000;
-            }
-
-            .content {
-                margin-left: 200px;
-                width: calc(100% - 200px);
-            }
-        }
-
-        @@media (max-width: 576px) {
-            .admin-dashboard {
-                flex-direction: column;
-            }
-
-            .sidebar {
-                position: relative;
-                width: 100%;
-                height: auto;
-            }
-
-            .content {
-                margin-left: 0;
-                width: 100%;
-                min-height: auto;
-            }
-
-            .content-inner {
-                width: 100%;
-                padding: 20px;
-            }
-        }
-    </style>
-</head>
-<body>
-    <div class="admin-dashboard">
-        @if (User.IsInRole("Admin"))
-        {
-            <aside class="sidebar">
-                <div class="sidebar-header">
-                    <h3 class="sidebar-title">CinemaX Admin</h3>
-                </div>
-                <nav class="sidebar-nav">
-
-                    <a href="/Movies" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Movies" ? "active" : "")"><i class="fas fa-film"></i> Quản lý phim</a>
-                    <a href="/Showtimes" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Showtimes" ? "active" : "")"><i class="fas fa-clock"></i> Quản lý lịch chiếu</a>
-                    <a href="/Rooms" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Rooms" ? "active" : "")"><i class="fas fa-door-open"></i> Quản lý phòng</a>
-                    <a href="/Seats" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Seats" ? "active" : "")"><i class="fas fa-chair"></i> Quản lý ghế</a>
-                    <a href="/Admin/ManageFoods" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "ManageFoods" ? "active" : "")"><i class="fas fa-utensils"></i> Quản lý đồ ăn</a>                    <a href="/Admin/ManageBookings" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Admin" && ViewContext.RouteData.Values["Action"]?.ToString() == "ManageBookings" ? "active" : "")"><i class="fas fa-ticket-alt"></i> Quản lý đặt vé</a>
-                    <a href="/Admin/RevenueStatistics" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Admin" && ViewContext.RouteData.Values["Action"]?.ToString() == "RevenueStatistics" ? "active" : "")"><i class="fas fa-chart-bar"></i> Báo cáo thống kê</a>
-                    <div class="nav-divider"></div>
-                    <a href="#" class="nav-item"><i class="fab fa-facebook"></i> Facebook</a>
-                    <a href="#" class="nav-item"><i class="fab fa-twitter"></i> Twitter</a>
-                    <a href="#" class="nav-item"><i class="fab fa-google"></i> Google</a>
-                </nav>
-            </aside>
-        }
-
-        
+<div class="container-fluid d-flex position-relative">
+    <!-- Toggle Button -->
+    @if (isAdmin)
+    {
+        <button id="sidebar-toggle" class="sidebar-toggle">
+            <i class="fas fa-bars"></i>
+        </button>
+    }
+    <!-- SIDEBAR -->
+    @if (isAdmin)
+    {
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h3 class="sidebar-title">🎬 @Localizer["CinemaXAdmin"]</h3>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="/Admin/Index"
+                   class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Admin" && ViewContext.RouteData.Values["Action"]?.ToString() == "Index" ? "active" : "")">
+                    <i class="fas fa-tachometer-alt"></i> @Localizer["Dashboard"]
+                </a>
+                <a href="/Movies"
+                   class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Movies" ? "active" : "")">
+                    <i class="fas fa-film"></i> @Localizer["ManageMovies"]
+                </a>
+                <a href="/Showtimes"
+                   class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Showtimes" ? "active" : "")">
+                    <i class="fas fa-clock"></i> @Localizer["ManageShowtimes"]
+                </a>
+                <a href="/Rooms"
+                   class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Rooms" ? "active" : "")">
+                    <i class="fas fa-door-open"></i> @Localizer["ManageRooms"]
+                </a>
+                <a href="/Seats"
+                   class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Seats" ? "active" : "")">
+                    <i class="fas fa-chair"></i> @Localizer["ManageSeats"]
+                </a>
+                <a href="/Admin/ManageFoods"
+                   class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "ManageFoods" ? "active" : "")">
+                    <i class="fas fa-utensils"></i> @Localizer["ManageFoods"]
+                </a>
+                <a href="/Admin/ManageBookings"
+                   class="nav-item @(ViewContext.RouteData.Values["Action"]?.ToString() == "ManageBookings" ? "active" : "")">
+                    <i class="fas fa-ticket-alt"></i> @Localizer["ManageBookings"]
+                </a>
+                <a href="/Admin/RevenueStatistics"
+                   class="nav-item @(ViewContext.RouteData.Values["Action"]?.ToString() == "RevenueStatistics" ? "active" : "")">
+                    <i class="fas fa-chart-bar"></i> @Localizer["RevenueStatistics"]
+                </a>
+                <a href="/Vouchers"
+                   class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Vouchers" ? "active" : "")">
+                    <i class="fas fa-gift"></i> @Localizer["Vouchers"]
+                </a>
+                <div class="nav-divider"></div>
+                <a href="#" class="nav-item"><i class="fab fa-facebook"></i> Facebook</a>
+                <a href="#" class="nav-item"><i class="fab fa-twitter"></i> Twitter</a>
+                <a href="#" class="nav-item"><i class="fab fa-google"></i> Google</a>
+            </nav>
+        </aside>
+    }
+    <!-- MAIN CONTENT -->
+    <div class="frame-wrapper flex-grow-1 @(isAdmin ? "admin-view" : "")">
+        <div class="content-inner">
+            <h1 class="title-gradient">@Localizer["AdminDashboard"]</h1>
+            <!-- Add your dashboard content here -->
+        </div>
     </div>
+    <footer class="footer text-center py-3">
+        <p class="text-white mb-0">© 2025 CinemaX. @Localizer["AllRightsReserved"]</p>
+    </footer>
+</div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
+<style>
+    body {
+        background-color: #0F0F0F;
+        font-family: 'Montserrat', sans-serif;
+    }
+
+    .sidebar {
+        background: #111;
+        width: 250px;
+        height: 100vh;
+        position: fixed;
+        top: 0;
+        left: 0;
+        padding: 25px 20px;
+        overflow-y: auto;
+        border-right: 2px solid #e50914;
+        box-shadow: 2px 0 10px rgba(0,0,0,0.4);
+        transition: width 0.3s ease, transform 0.3s ease;
+        z-index: 1000;
+    }
+
+        .sidebar.collapsed {
+            width: 0;
+            padding: 0;
+            transform: translateX(-100%);
+        }
+
+    .sidebar-title {
+        color: #fff;
+        font-weight: 700;
+        font-size: 1.4rem;
+    }
+
+    .sidebar-nav .nav-item {
+        color: #ddd;
+        padding: 12px 15px;
+        border-radius: 8px;
+        margin-bottom: 5px;
+        font-size: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        text-decoration: none;
+        transition: 0.25s;
+    }
+
+    .nav-item i {
+        width: 20px;
+    }
+
+    .nav-item:hover {
+        background-color: #e50914;
+        color: #fff;
+        transform: translateX(5px);
+    }
+
+    .nav-item.active {
+        background-color: #e50914;
+        color: #fff;
+        font-weight: 600;
+    }
+
+    .nav-divider {
+        height: 1px;
+        background: #444;
+        margin: 15px 0;
+    }
+
+    .frame-wrapper.admin-view {
+        margin-left: 250px;
+        transition: margin-left 0.3s ease;
+    }
+
+        .frame-wrapper.admin-view.shifted {
+            margin-left: 0;
+        }
+
+    .title-gradient {
+        background: linear-gradient(90deg, #ff0033, #e50914);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        font-size: 2rem;
+        font-weight: 700;
+        text-transform: uppercase;
+    }
+
+    .content-inner {
+        max-width: 1200px;
+        width: 100%;
+        padding: 20px;
+    }
+
+    .sidebar-toggle {
+        position: fixed;
+        top: 15px;
+        left: 15px;
+        z-index: 1001;
+        background: linear-gradient(135deg, #ff0033, #e50914);
+        color: #fff;
+        border: none;
+        border-radius: 50%;
+        width: 35px;
+        height: 35px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 4px 15px rgba(229, 9, 20, 0.4);
+        transition: all 0.3s ease;
+        cursor: pointer;
+        font-size: 14px;
+    }
+
+        .sidebar-toggle:hover {
+            transform: scale(1.05) rotate(5deg);
+            box-shadow: 0 6px 20px rgba(229, 9, 20, 0.6);
+        }
+    @@media (max-width: 768px) {
+        .sidebar
+
+    {
+        width: 200px;
+    }
+
+    .frame-wrapper.admin-view {
+        margin-left: 200px;
+    }
+
+    }
+    @@media (max-width: 576px) {
+        .sidebar
+
+    {
+        position: relative;
+        width: 100%;
+        height: auto;
+    }
+
+    .frame-wrapper.admin-view {
+        margin-left: 0;
+        width: 100%;
+    }
+
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const toggleBtn = document.getElementById('sidebar-toggle');
+        const sidebar = document.querySelector('.sidebar');
+        const frameWrapper = document.querySelector('.frame-wrapper');
+        if (toggleBtn && sidebar && frameWrapper) {
+            toggleBtn.addEventListener('click', function() {
+                sidebar.classList.toggle('collapsed');
+                frameWrapper.classList.toggle('shifted');
+                const icon = toggleBtn.querySelector('i');
+                icon.className = sidebar.classList.contains('collapsed') ? 'fas fa-bars' : 'fas fa-times';
+            });
+        }
+    });
+</script>
