@@ -8,29 +8,69 @@
 @{
     ViewData["Title"] = Localizer["RevenueStatistics"].Value;
     Layout = "~/Views/Shared/_Layout.cshtml";
+    bool isAdmin = User.IsInRole("Admin");
 }
-<div class="admin-dashboard">
-    <!-- Sidebar (giữ nguyên) -->
-    <aside class="sidebar">
-        <div class="sidebar-header">
-            <h3 class="sidebar-title">CinemaX Admin</h3>
-        </div>
-        <nav class="sidebar-nav">
-            <a href="/Movies" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Movies" ? "active" : "")"><i class="fas fa-film"></i> @Localizer["ManageMovies"]</a>
-            <a href="/Showtimes" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Showtimes" ? "active" : "")"><i class="fas fa-clock"></i> @Localizer["ManageShowtimes"]</a>
-            <a href="/Rooms" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Rooms" ? "active" : "")"><i class="fas fa-door-open"></i> @Localizer["ManageRooms"]</a>
-            <a href="/Seats" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Seats" ? "active" : "")"><i class="fas fa-chair"></i> @Localizer["ManageSeats"]</a>
-            <a href="/Admin/ManageFoods" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "ManageFoods" ? "active" : "")"><i class="fas fa-utensils"></i> @Localizer["ManageFoods"]</a>
-            <a href="/Admin/ManageBookings" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Admin" && ViewContext.RouteData.Values["Action"]?.ToString() == "ManageBookings" ? "active" : "")"><i class="fas fa-ticket-alt"></i> @Localizer["ManageBookings"]</a>
-            <a href="/Admin/RevenueStatistics" class="nav-item active"><i class="fas fa-chart-bar"></i> @Localizer["RevenueStatistics"]</a>
-            <div class="nav-divider"></div>
-            <a href="#" class="nav-item"><i class="fab fa-facebook"></i> Facebook</a>
-            <a href="#" class="nav-item"><i class="fab fa-twitter"></i> Twitter</a>
-            <a href="#" class="nav-item"><i class="fab fa-google"></i> Google</a>
-        </nav>
-    </aside>
-    <!-- Main Content -->
-    <main class="content">
+<div class="container-fluid d-flex position-relative">
+    <!-- Toggle Button -->
+    @if (isAdmin)
+    {
+        <button id="sidebar-toggle" class="sidebar-toggle">
+            <i class="fas fa-bars"></i>
+        </button>
+    }
+    <!-- SIDEBAR -->
+    @if (isAdmin)
+    {
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h3 class="sidebar-title">🎬 @Localizer["CinemaXAdmin"]</h3>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="/Admin/Index"
+                   class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Admin" && ViewContext.RouteData.Values["Action"]?.ToString() == "Index" ? "active" : "")">
+                    <i class="fas fa-tachometer-alt"></i> @Localizer["Dashboard"]
+                </a>
+                <a href="/Movies"
+                   class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Movies" ? "active" : "")">
+                    <i class="fas fa-film"></i> @Localizer["ManageMovies"]
+                </a>
+                <a href="/Showtimes"
+                   class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Showtimes" ? "active" : "")">
+                    <i class="fas fa-clock"></i> @Localizer["ManageShowtimes"]
+                </a>
+                <a href="/Rooms"
+                   class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Rooms" ? "active" : "")">
+                    <i class="fas fa-door-open"></i> @Localizer["ManageRooms"]
+                </a>
+                <a href="/Seats"
+                   class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Seats" ? "active" : "")">
+                    <i class="fas fa-chair"></i> @Localizer["ManageSeats"]
+                </a>
+                <a href="/Admin/ManageFoods"
+                   class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "ManageFoods" ? "active" : "")">
+                    <i class="fas fa-utensils"></i> @Localizer["ManageFoods"]
+                </a>
+                <a href="/Admin/ManageBookings"
+                   class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Admin" && ViewContext.RouteData.Values["Action"]?.ToString() == "ManageBookings" ? "active" : "")">
+                    <i class="fas fa-ticket-alt"></i> @Localizer["ManageBookings"]
+                </a>
+                <a href="/Admin/RevenueStatistics"
+                   class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Admin" && ViewContext.RouteData.Values["Action"]?.ToString() == "RevenueStatistics" ? "active" : "")">
+                    <i class="fas fa-chart-bar"></i> @Localizer["RevenueStatistics"]
+                </a>
+                <a href="/Vouchers"
+                   class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Vouchers" ? "active" : "")">
+                    <i class="fas fa-gift"></i> @Localizer["ManageVouchers"]
+                </a>
+                <div class="nav-divider"></div>
+                <a href="#" class="nav-item"><i class="fab fa-facebook"></i> Facebook</a>
+                <a href="#" class="nav-item"><i class="fab fa-twitter"></i> Twitter</a>
+                <a href="#" class="nav-item"><i class="fab fa-google"></i> Google</a>
+            </nav>
+        </aside>
+    }
+    <!-- MAIN CONTENT -->
+    <div class="frame-wrapper flex-grow-1 @(isAdmin ? "admin-view" : "")">
         <div class="content-inner">
             <h2 class="page-title">@Localizer["RevenueStatistics"]</h2>
             <div class="header-actions">
@@ -56,6 +96,8 @@
                     <div class="summary-row">
                         <span>@Localizer["TotalTicketRevenue"]: @(((dynamic)ViewBag.RevenueData)?.TotalTicketRevenue.ToString("C", new System.Globalization.CultureInfo("vi-VN")) ?? Localizer["N/A"].Value)</span>
                         <span>@Localizer["TotalFoodRevenue"]: @(((dynamic)ViewBag.RevenueData)?.TotalFoodRevenue.ToString("C", new System.Globalization.CultureInfo("vi-VN")) ?? Localizer["N/A"].Value)</span>
+                        <span>@Localizer["TotalDrinkRevenue"]: @(((dynamic)ViewBag.RevenueData)?.TotalDrinkRevenue.ToString("C", new System.Globalization.CultureInfo("vi-VN")) ?? Localizer["N/A"].Value)</span>
+                        <span>@Localizer["TotalComboRevenue"]: @(((dynamic)ViewBag.RevenueData)?.TotalComboRevenue.ToString("C", new System.Globalization.CultureInfo("vi-VN")) ?? Localizer["N/A"].Value)</span>
                         <span>@Localizer["TotalRevenue"]: @(((dynamic)ViewBag.RevenueData)?.TotalRevenue.ToString("C", new System.Globalization.CultureInfo("vi-VN")) ?? Localizer["N/A"].Value)</span>
                     </div>
                 </div>
@@ -105,6 +147,8 @@
                                 <th>@Localizer["Date"]</th>
                                 <th>@Localizer["TicketRevenue"] (VND)</th>
                                 <th>@Localizer["FoodRevenue"] (VND)</th>
+                                <th>@Localizer["DrinkRevenue"] (VND)</th>
+                                <th>@Localizer["ComboRevenue"] (VND)</th>
                                 <th>@Localizer["Total"] (VND)</th>
                             </tr>
                         </thead>
@@ -119,13 +163,15 @@
                                             <td>@(((dynamic)item).Date?.ToString("dd/MM/yyyy") ?? Localizer["N/A"].Value)</td>
                                             <td>@(((dynamic)item).TicketRevenue?.ToString("C", new System.Globalization.CultureInfo("vi-VN")) ?? Localizer["N/A"].Value)</td>
                                             <td>@(((dynamic)item).FoodRevenue?.ToString("C", new System.Globalization.CultureInfo("vi-VN")) ?? Localizer["N/A"].Value)</td>
+                                            <td>@(((dynamic)item).DrinkRevenue?.ToString("C", new System.Globalization.CultureInfo("vi-VN")) ?? Localizer["N/A"].Value)</td>
+                                            <td>@(((dynamic)item).ComboRevenue?.ToString("C", new System.Globalization.CultureInfo("vi-VN")) ?? Localizer["N/A"].Value)</td>
                                             <td>@(((dynamic)item).TotalRevenue?.ToString("C", new System.Globalization.CultureInfo("vi-VN")) ?? Localizer["N/A"].Value)</td>
                                         </tr>
                                     }
                                 }
                                 else
                                 {
-                                    <tr><td colspan="4" class="text-center">@Localizer["NoData"].Value</td></tr>
+                                    <tr><td colspan="6" class="text-center">@Localizer["NoData"].Value</td></tr>
                                 }
                             }
                         </tbody>
@@ -142,6 +188,8 @@
                                 <th>@Localizer["Month"]</th>
                                 <th>@Localizer["TicketRevenue"] (VND)</th>
                                 <th>@Localizer["FoodRevenue"] (VND)</th>
+                                <th>@Localizer["DrinkRevenue"] (VND)</th>
+                                <th>@Localizer["ComboRevenue"] (VND)</th>
                                 <th>@Localizer["Total"] (VND)</th>
                             </tr>
                         </thead>
@@ -156,13 +204,15 @@
                                             <td>@(((dynamic)item).MonthName + " " + ((dynamic)item).Year)</td>
                                             <td>@(((dynamic)item).TicketRevenue?.ToString("C", new System.Globalization.CultureInfo("vi-VN")) ?? Localizer["N/A"].Value)</td>
                                             <td>@(((dynamic)item).FoodRevenue?.ToString("C", new System.Globalization.CultureInfo("vi-VN")) ?? Localizer["N/A"].Value)</td>
+                                            <td>@(((dynamic)item).DrinkRevenue?.ToString("C", new System.Globalization.CultureInfo("vi-VN")) ?? Localizer["N/A"].Value)</td>
+                                            <td>@(((dynamic)item).ComboRevenue?.ToString("C", new System.Globalization.CultureInfo("vi-VN")) ?? Localizer["N/A"].Value)</td>
                                             <td>@(((dynamic)item).TotalRevenue?.ToString("C", new System.Globalization.CultureInfo("vi-VN")) ?? Localizer["N/A"].Value)</td>
                                         </tr>
                                     }
                                 }
                                 else
                                 {
-                                    <tr><td colspan="4" class="text-center">@Localizer["NoData"].Value</td></tr>
+                                    <tr><td colspan="6" class="text-center">@Localizer["NoData"].Value</td></tr>
                                 }
                             }
                         </tbody>
@@ -231,8 +281,16 @@
                 <h3 class="section-subtitle">@Localizer["MonthlyFoodChart"]</h3>
                 <canvas id="monthlyFoodChart" width="300" height="150"></canvas>
             </div>
+            <div class="admin-section">
+                <h3 class="section-subtitle">@Localizer["MonthlyDrinkChart"]</h3>
+                <canvas id="monthlyDrinkChart" width="300" height="150"></canvas>
+            </div>
+            <div class="admin-section">
+                <h3 class="section-subtitle">@Localizer["MonthlyComboChart"]</h3>
+                <canvas id="monthlyComboChart" width="300" height="150"></canvas>
+            </div>
         </div>
-    </main>
+    </div>
 </div>
 <style>
     body {
@@ -242,87 +300,77 @@
         font-family: 'Montserrat', sans-serif;
         overflow-x: hidden;
     }
-
-    .admin-dashboard {
-        display: flex;
-        min-height: 100vh;
-    }
-
+    /* ===== SIDEBAR STYLE (GIỐNG SHOWTIME) ===== */
     .sidebar {
+        background: #111;
         width: 250px;
-        background-color: #000000; /* Black background */
-        color: #ffffff; /* White text for readability */
         height: 100vh;
         position: fixed;
         top: 0;
         left: 0;
-        padding-top: 20px;
-        border-right: 2px solid #ff0033; /* Red border */
+        padding: 25px 20px;
         overflow-y: auto;
+        border-right: 2px solid #e50914;
+        box-shadow: 2px 0 10px rgba(0,0,0,0.4);
+        transition: width 0.3s ease, transform 0.3s ease;
         z-index: 1000;
     }
 
-    .sidebar-header {
-        padding: 10px 20px;
-        border-bottom: 1px solid #ff0033; /* Red border */
-    }
+        .sidebar.collapsed {
+            width: 0;
+            padding: 0;
+            transform: translateX(-100%);
+        }
 
     .sidebar-title {
-        margin: 0;
-        font-size: 1.5em;
-        color: #ff0033; /* Red text for the header */
+        color: #fff;
+        font-weight: 700;
+        font-size: 1.4rem;
     }
 
-    .sidebar-nav {
-        list-style: none;
-        padding: 0;
-        margin: 20px 0;
-    }
-
-    .nav-item {
+    .sidebar-nav .nav-item {
+        color: #ddd;
+        padding: 12px 15px;
+        border-radius: 8px;
+        margin-bottom: 5px;
+        font-size: 1rem;
         display: flex;
         align-items: center;
-        padding: 10px 20px;
-        color: #ffffff; /* White text */
+        gap: 12px;
         text-decoration: none;
+        transition: 0.25s;
     }
 
-        .nav-item i {
-            margin-right: 10px;
-            color: #ffffff; /* White icons */
-        }
+    .nav-item i {
+        width: 20px;
+    }
 
-        .nav-item:hover {
-            background-color: #ff0033; /* Red on hover */
-            color: #000000; /* Black text on hover for contrast */
-        }
+    .nav-item:hover {
+        background-color: #e50914;
+        color: #fff;
+        transform: translateX(5px);
+    }
 
-            .nav-item:hover i {
-                color: #000000; /* Black icons on hover */
-            }
-
-        .nav-item.active {
-            background-color: #ff0033; /* Red for active item */
-            color: #000000; /* Black text for active item */
-        }
-
-            .nav-item.active i {
-                color: #000000; /* Black icons for active item */
-            }
+    .nav-item.active {
+        background-color: #e50914;
+        color: #fff;
+        font-weight: 600;
+    }
 
     .nav-divider {
-        border-top: 1px solid #ff0033;
-        margin: 10px 0;
+        height: 1px;
+        background: #444;
+        margin: 15px 0;
     }
 
-    .content {
+    .frame-wrapper.admin-view {
         margin-left: 250px;
-        padding: 20px;
-        flex-grow: 1;
-        display: flex;
-        justify-content: center;
-        align-items: flex-start;
+        transition: margin-left 0.3s ease;
     }
+
+        .frame-wrapper.admin-view.shifted {
+            margin-left: 0;
+        }
 
     .content-inner {
         max-width: 1200px;
@@ -486,50 +534,122 @@
         .filter-btn:hover {
             background: #cc0026;
         }
+    /* Toggle Button - Compact and Beautiful */
+    .sidebar-toggle {
+        position: fixed;
+        top: 15px;
+        left: 15px;
+        z-index: 1001;
+        background: linear-gradient(135deg, #ff0033, #e50914);
+        color: #fff;
+        border: none;
+        border-radius: 50%;
+        width: 35px;
+        height: 35px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 4px 15px rgba(229, 9, 20, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        transition: all 0.3s ease;
+        cursor: pointer;
+        font-size: 14px;
+    }
+
+        .sidebar-toggle:hover {
+            transform: scale(1.05) rotate(5deg);
+            box-shadow: 0 6px 20px rgba(229, 9, 20, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar-toggle:active {
+            transform: scale(0.95);
+        }
+
+    .sidebar.collapsed + .frame-wrapper.admin-view .sidebar-toggle {
+        left: 15px;
+    }
     /* Media Queries */
     @@media (max-width: 768px) {
-        .sidebar
+        .sidebar {
+            width: 200px;
+        }
 
-    {
-        width: 200px;
-        z-index: 1000;
+        .frame-wrapper.admin-view {
+            margin-left: 200px;
+        }
+
+        .sidebar.collapsed {
+            width: 0;
+            padding: 0;
+            transform: translateX(-100%);
+        }
+
+        .frame-wrapper.admin-view.shifted {
+            margin-left: 0;
+        }
+
+        .sidebar-toggle {
+            top: 10px;
+            left: 10px;
+            width: 32px;
+            height: 32px;
+            font-size: 13px;
+        }
     }
 
-    .content {
-        margin-left: 200px;
-        width: calc(100% - 200px);
-    }
-
-    }
     @@media (max-width: 576px) {
-        .admin-dashboard
+        .container-fluid.d-flex {
+            flex-direction: column;
+        }
 
-    {
-        flex-direction: column;
-    }
+        .sidebar {
+            position: relative;
+            width: 100%;
+            height: auto;
+        }
 
-    .sidebar {
-        position: relative;
-        width: 100%;
-        height: auto;
-    }
+        .frame-wrapper.admin-view {
+            margin-left: 0;
+            width: 100%;
+            min-height: auto;
+        }
 
-    .content {
-        margin-left: 0;
-        width: 100%;
-        min-height: auto;
-    }
+        .content-inner {
+            width: 100%;
+            padding: 20px;
+        }
 
-    .content-inner {
-        width: 100%;
-        padding: 20px;
-    }
+        .sidebar.collapsed {
+            display: none;
+        }
 
+        .sidebar-toggle {
+            position: relative;
+            margin: 10px auto;
+            display: block;
+        }
     }
 </style>
 @section Scripts {
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const toggleBtn = document.getElementById('sidebar-toggle');
+            const sidebar = document.querySelector('.sidebar');
+            const frameWrapper = document.querySelector('.frame-wrapper');
+            if (toggleBtn && sidebar && frameWrapper) {
+                toggleBtn.addEventListener('click', function() {
+                    sidebar.classList.toggle('collapsed');
+                    frameWrapper.classList.toggle('shifted');
+                    const icon = toggleBtn.querySelector('i');
+                    if (sidebar.classList.contains('collapsed')) {
+                        icon.className = 'fas fa-bars';
+                    } else {
+                        icon.className = 'fas fa-times';
+                    }
+                });
+            }
+        });
         $(document).ready(function () {
             // Set initial date values
             $('#fromDate').val('@(((dynamic)ViewBag.RevenueData)?.FromDate ?? DateTime.Now.AddMonths(-1).ToString("yyyy-MM-dd"))');
@@ -562,6 +682,20 @@
                                 data: revenueByDateData.map(item => item.FoodRevenue),
                                 backgroundColor: 'rgba(255, 193, 7, 0.2)',
                                 borderColor: 'rgba(255, 193, 7, 1)',
+                                borderWidth: 1
+                            },
+                            {
+                                label: '@Localizer["DrinkRevenue"] (VND)',
+                                data: revenueByDateData.map(item => item.DrinkRevenue),
+                                backgroundColor: 'rgba(40, 167, 69, 0.2)',
+                                borderColor: 'rgba(40, 167, 69, 1)',
+                                borderWidth: 1
+                            },
+                            {
+                                label: '@Localizer["ComboRevenue"] (VND)',
+                                data: revenueByDateData.map(item => item.ComboRevenue),
+                                backgroundColor: 'rgba(153, 102, 255, 0.2)',
+                                borderColor: 'rgba(153, 102, 255, 1)',
                                 borderWidth: 1
                             },
                             {
@@ -617,6 +751,20 @@
                                 data: revenueByMonthData.map(item => item.FoodRevenue),
                                 borderColor: 'rgba(255, 193, 7, 1)',
                                 backgroundColor: 'rgba(255, 193, 7, 0.2)',
+                                tension: 0.1
+                            },
+                            {
+                                label: '@Localizer["DrinkRevenue"] (VND)',
+                                data: revenueByMonthData.map(item => item.DrinkRevenue),
+                                borderColor: 'rgba(40, 167, 69, 1)',
+                                backgroundColor: 'rgba(40, 167, 69, 0.2)',
+                                tension: 0.1
+                            },
+                            {
+                                label: '@Localizer["ComboRevenue"] (VND)',
+                                data: revenueByMonthData.map(item => item.ComboRevenue),
+                                borderColor: 'rgba(153, 102, 255, 1)',
+                                backgroundColor: 'rgba(153, 102, 255, 0.2)',
                                 tension: 0.1
                             },
                             {
@@ -703,6 +851,84 @@
                             data: revenueByMonthData.map(item => item.FoodRevenue),
                             backgroundColor: 'rgba(255, 193, 7, 0.6)',
                             borderColor: 'rgba(255, 193, 7, 1)',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    callback: function(value) {
+                                        return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(value);
+                                    },
+                                    color: '#FFFFFF'
+                                },
+                                grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                            },
+                            x: {
+                                ticks: { color: '#FFFFFF' },
+                                grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                            }
+                        },
+                        plugins: {
+                            legend: { labels: { color: '#FFFFFF' } }
+                        }
+                    }
+                });
+            }
+            // Biểu đồ nhỏ - Doanh thu thức uống theo tháng
+            if (revenueByMonthData.length > 0) {
+                var ctxDrink = document.getElementById('monthlyDrinkChart').getContext('2d');
+                new Chart(ctxDrink, {
+                    type: 'bar',
+                    data: {
+                        labels: revenueByMonthData.map(item => item.Month),
+                        datasets: [{
+                            label: '@Localizer["DrinkRevenue"] (VND)',
+                            data: revenueByMonthData.map(item => item.DrinkRevenue),
+                            backgroundColor: 'rgba(40, 167, 69, 0.6)',
+                            borderColor: 'rgba(40, 167, 69, 1)',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    callback: function(value) {
+                                        return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(value);
+                                    },
+                                    color: '#FFFFFF'
+                                },
+                                grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                            },
+                            x: {
+                                ticks: { color: '#FFFFFF' },
+                                grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                            }
+                        },
+                        plugins: {
+                            legend: { labels: { color: '#FFFFFF' } }
+                        }
+                    }
+                });
+            }
+            // Biểu đồ nhỏ - Doanh thu combo theo tháng
+            if (revenueByMonthData.length > 0) {
+                var ctxCombo = document.getElementById('monthlyComboChart').getContext('2d');
+                new Chart(ctxCombo, {
+                    type: 'bar',
+                    data: {
+                        labels: revenueByMonthData.map(item => item.Month),
+                        datasets: [{
+                            label: '@Localizer["ComboRevenue"] (VND)',
+                            data: revenueByMonthData.map(item => item.ComboRevenue),
+                            backgroundColor: 'rgba(153, 102, 255, 0.6)',
+                            borderColor: 'rgba(153, 102, 255, 1)',
                             borderWidth: 1
                         }]
                     },

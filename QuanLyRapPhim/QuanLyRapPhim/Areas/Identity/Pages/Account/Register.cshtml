@@ -1,10 +1,10 @@
 ﻿@page
 @model RegisterModel
-
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
 @{
-    ViewData["Title"] = "Đăng ký";
+    ViewData["Title"] = Localizer["Register"].Value;
 }
-
 <!-- Đăng ký -->
 <div class="container-fluid vh-100 d-flex align-items-center justify-content-center position-relative overflow-hidden">
     <!-- Khung bao quanh -->
@@ -12,68 +12,60 @@
         <!-- Form đăng ký bên trái -->
         <div class="left-section">
             <div class="card shadow-lg border-0 register-card p-4">
-                <h2 class="mb-3 text-white">Đăng ký</h2>
+                <h2 class="mb-3 text-white">@Localizer["Register"]</h2>
                 <form id="registerForm" asp-route-returnUrl="@Model.ReturnUrl" method="post">
                     <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
-
                     <!-- Name -->
                     <div class="mb-3">
-                        <label asp-for="Input.Name" class="form-label text-white">Họ và tên</label>
-                        <input asp-for="Input.Name" class="form-control" placeholder="Họ và tên" />
+                        <label asp-for="Input.Name" class="form-label text-white">@Localizer["FullName"]</label>
+                        <input asp-for="Input.Name" class="form-control" placeholder="@Localizer["FullName"]" />
                         <span asp-validation-for="Input.Name" class="text-danger"></span>
                     </div>
-
                     <!-- Date of Birth -->
                     <div class="mb-3">
-                        <label asp-for="Input.DOB" class="form-label text-white">Ngày sinh</label>
-                        <input asp-for="Input.DOB" type="date" class="form-control" placeholder="Ngày sinh" />
+                        <label asp-for="Input.DOB" class="form-label text-white">@Localizer["DateOfBirth"]</label>
+                        <input asp-for="Input.DOB" type="date" class="form-control" placeholder="@Localizer["DateOfBirth"]" />
                         <span asp-validation-for="Input.DOB" class="text-danger"></span>
                     </div>
-
                     <!-- Email -->
                     <div class="mb-3">
-                        <label asp-for="Input.Email" class="form-label text-white">Email</label>
+                        <label asp-for="Input.Email" class="form-label text-white">@Localizer["Email"]</label>
                         <input asp-for="Input.Email" class="form-control" autocomplete="username" aria-required="true" placeholder="username@gmail.com" />
                         <span asp-validation-for="Input.Email" class="text-danger"></span>
                     </div>
-
                     <!-- Password -->
                     <div class="mb-3">
-                        <label asp-for="Input.Password" class="form-label text-white">Mật khẩu</label>
+                        <label asp-for="Input.Password" class="form-label text-white">@Localizer["Password"]</label>
                         <input asp-for="Input.Password" class="form-control" autocomplete="new-password" aria-required="true" placeholder="********" />
                         <span asp-validation-for="Input.Password" class="text-danger"></span>
                     </div>
-
                     <!-- Confirm Password -->
                     <div class="mb-3">
-                        <label asp-for="Input.ConfirmPassword" class="form-label text-white">Xác nhận mật khẩu</label>
+                        <label asp-for="Input.ConfirmPassword" class="form-label text-white">@Localizer["ConfirmPassword"]</label>
                         <input asp-for="Input.ConfirmPassword" class="form-control" autocomplete="new-password" aria-required="true" placeholder="********" />
                         <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
                     </div>
-
                     <!-- Nút Đăng ký -->
                     <div class="d-grid mb-4">
-                        <button id="registerSubmit" type="submit" class="btn btn-create btn-lg">Đăng ký</button>
+                        <button id="registerSubmit" type="submit" class="btn btn-create btn-lg">@Localizer["Register"]</button>
                     </div>
-
                     <!-- Liên kết đăng nhập -->
                     <div class="text-center">
                         <p class="text-white">
-                            Đã có tài khoản? <a asp-page="./Login" asp-route-returnUrl="@Model.ReturnUrl" class="text-light-red">Đăng nhập</a>
+                            @Localizer["HasAccount"] <a asp-page="./Login" asp-route-returnUrl="@Model.ReturnUrl" class="text-light-red">@Localizer["Login"]</a>
                         </p>
                     </div>
                 </form>
-
                 <!-- Đăng ký bằng dịch vụ bên ngoài -->
                 @if ((Model.ExternalLogins?.Count ?? 0) > 0)
                 {
                     <hr class="my-4 border-light" />
-                    <h5 class="text-center text-white mb-3">Hoặc đăng ký bằng</h5>
+                    <h5 class="text-center text-white mb-3">@Localizer["OrSignUpWith"]</h5>
                     <form id="external-account" asp-page="./ExternalLogin" asp-route-returnUrl="@Model.ReturnUrl" method="post" class="form-horizontal">
                         <div class="d-flex justify-content-center gap-3">
                             @foreach (var provider in Model.ExternalLogins!)
                             {
-                                <button type="submit" class="btn btn-outline-secondary" name="provider" value="@provider.Name" title="Đăng ký bằng tài khoản @provider.DisplayName">
+                                <button type="submit" class="btn btn-outline-secondary" name="provider" value="@provider.Name" title="@Localizer["SignUpWithAccount", provider.DisplayName]">
                                     <i class="fab fa-@provider.Name.ToLower()"></i>
                                 </button>
                             }
@@ -82,17 +74,15 @@
                 }
             </div>
         </div>
-
         <!-- Phần hình ảnh bên phải -->
         <div class="right-section">
             <div class="intro-text">
                 <h2 class="text-white">CinemaX</h2>
-                <h3 class="text-white">Experience movies like never before – only at</h3>
+                <h3 class="text-white">@Localizer["RegisterIntro"]</h3>
             </div>
         </div>
     </div>
 </div>
-
 <!-- CSS tùy chỉnh -->
 <style>
     body {
@@ -113,7 +103,6 @@
         align-items: center;
         justify-content: center;
     }
-
     /* Khung bao quanh */
     .frame-wrapper {
         display: flex;
@@ -126,7 +115,6 @@
         box-shadow: 0 0 20px rgba(46, 46, 46, 0.4); /* Bóng đổ khớp với nền */
         overflow: hidden;
     }
-
     /* Phần form bên trái */
     .left-section {
         flex: 1;
@@ -248,7 +236,6 @@
     .border-light {
         border-color: #cc0022 !important;
     }
-
     /* Phần hình ảnh bên phải */
     .right-section {
         flex: 1;
@@ -281,7 +268,7 @@
         .intro-text h3 {
             font-size: 1.5rem;
             font-weight: 600;
-            margin-bottom: 10px;
+            margin-bottom: 10px; 
         }
 
         .intro-text h2 {
@@ -290,7 +277,6 @@
             margin-bottom: 20px;
         }
 </style>
-
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
 }

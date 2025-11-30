@@ -1,6 +1,10 @@
-﻿@model IEnumerable<QuanLyRapPhim.Models.Seat>
+﻿@using QuanLyRapPhim.Models
+@using System.Linq
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+@model IEnumerable<Seat>
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = Localizer["ManageSeats"].Value;
     Layout = "~/Views/Shared/_Layout.cshtml";
     bool isAdmin = User.IsInRole("Admin");
 }
@@ -22,39 +26,39 @@
             <nav class="sidebar-nav">
                 <a href="/Admin/Index"
                    class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Admin" && ViewContext.RouteData.Values["Action"]?.ToString() == "Index" ? "active" : "")">
-                    <i class="fas fa-tachometer-alt"></i> Bảng điều khiển
+                    <i class="fas fa-tachometer-alt"></i> @Localizer["Dashboard"]
                 </a>
                 <a href="/Movies"
                    class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Movies" ? "active" : "")">
-                    <i class="fas fa-film"></i> Quản lý phim
+                    <i class="fas fa-film"></i> @Localizer["ManageMovies"]
                 </a>
                 <a href="/Showtimes"
                    class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Showtimes" ? "active" : "")">
-                    <i class="fas fa-clock"></i> Lịch chiếu
+                    <i class="fas fa-clock"></i> @Localizer["ManageShowtimes"]
                 </a>
                 <a href="/Rooms"
                    class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Rooms" ? "active" : "")">
-                    <i class="fas fa-door-open"></i> Phòng chiếu
+                    <i class="fas fa-door-open"></i> @Localizer["ManageRooms"]
                 </a>
                 <a href="/Seats"
                    class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Seats" ? "active" : "")">
-                    <i class="fas fa-chair"></i> Ghế ngồi
+                    <i class="fas fa-chair"></i> @Localizer["ManageSeats"]
                 </a>
                 <a href="/Admin/ManageFoods"
                    class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "ManageFoods" ? "active" : "")">
-                    <i class="fas fa-utensils"></i> Đồ ăn & nước
+                    <i class="fas fa-utensils"></i> @Localizer["ManageFoods"]
                 </a>
                 <a href="/Admin/ManageBookings"
                    class="nav-item @(ViewContext.RouteData.Values["Action"]?.ToString() == "ManageBookings" ? "active" : "")">
-                    <i class="fas fa-ticket-alt"></i> Đặt vé
+                    <i class="fas fa-ticket-alt"></i> @Localizer["ManageBookings"]
                 </a>
                 <a href="/Admin/RevenueStatistics"
                    class="nav-item @(ViewContext.RouteData.Values["Action"]?.ToString() == "RevenueStatistics" ? "active" : "")">
-                    <i class="fas fa-chart-bar"></i> Doanh thu
+                    <i class="fas fa-chart-bar"></i> @Localizer["RevenueStatistics"]
                 </a>
                 <a href="/Vouchers"
                    class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Vouchers" ? "active" : "")">
-                    <i class="fas fa-gift"></i> Voucher
+                    <i class="fas fa-gift"></i> @Localizer["Vouchers"]
                 </a>
                 <div class="nav-divider"></div>
                 <a href="#" class="nav-item"><i class="fab fa-facebook"></i> Facebook</a>
@@ -66,7 +70,7 @@
     <!-- MAIN CONTENT -->
     <div class="frame-wrapper flex-grow-1 @(isAdmin ? "admin-view" : "")">
         <div class="content-inner">
-            <h1 class="page-title">Quản lý ghế</h1>
+            <h1 class="page-title">@Localizer["ManageSeats"]</h1>
             @if (TempData["SuccessMessage"] != null)
             {
                 <div class="alert alert-success" role="alert">
@@ -74,15 +78,15 @@
                 </div>
             }
             <p>
-                <a asp-action="Create" class="create-button">Tạo ghế</a>
+                <a asp-action="Create" class="create-button">@Localizer["CreateSeat"]</a>
             </p>
             <table class="table">
                 <thead>
                     <tr>
-                        <th>@Html.DisplayNameFor(model => model.SeatNumber)</th>
-                        <th>@Html.DisplayNameFor(model => model.Status)</th>
-                        <th>@Html.DisplayNameFor(model => model.Room)</th>
-                        <th>Actions</th>
+                        <th>@Localizer["SeatNumber"]</th>
+                        <th>@Localizer["Status"]</th>
+                        <th>@Localizer["Room"]</th>
+                        <th>@Localizer["Actions"]</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -93,8 +97,8 @@
                             <td>@Html.DisplayFor(modelItem => item.Status)</td>
                             <td>@Html.DisplayFor(modelItem => item.Room.RoomName)</td>
                             <td>
-                                <a asp-action="Edit" asp-route-id="@item.SeatId" class="action-link edit-link">Sửa</a>
-                                <a asp-action="Delete" asp-route-id="@item.SeatId" class="action-link delete-link">Xóa</a>
+                                <a asp-action="Edit" asp-route-id="@item.SeatId" class="action-link edit-link">@Localizer["Edit"]</a>
+                                <a asp-action="Delete" asp-route-id="@item.SeatId" class="action-link delete-link">@Localizer["Delete"]</a>
                             </td>
                         </tr>
                     }
@@ -103,7 +107,7 @@
         </div>
     </div>
     <footer class="footer text-center py-3">
-        <p class="text-white mb-0">© 2025 CinemaX. All rights reserved.</p>
+        <p class="text-white mb-0">@Localizer["Copyright"].Value</p>
     </footer>
 </div>
 <style>

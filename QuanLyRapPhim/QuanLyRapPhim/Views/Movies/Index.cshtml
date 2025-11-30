@@ -17,33 +17,56 @@
     var paginatedMovies = moviesList.Skip((currentPage - 1) * pageSize).Take(pageSize);
 }
 <div class="container-fluid d-flex position-relative">
+    <!-- Toggle Button -->
+    @if (isAdmin)
+    {
+        <button id="sidebar-toggle" class="sidebar-toggle">
+            <i class="fas fa-bars"></i>
+        </button>
+    }
+    <!-- SIDEBAR -->
     @if (isAdmin)
     {
         <aside class="sidebar">
             <div class="sidebar-header">
-                <h3 class="sidebar-title">CinemaX Admin</h3>
+                <h3 class="sidebar-title">🎬 CinemaX Admin</h3>
             </div>
             <nav class="sidebar-nav">
-                <a href="/Movies" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Movies" ? "active" : "")">
+                <a href="/Admin/Index"
+                   class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Admin" && ViewContext.RouteData.Values["Action"]?.ToString() == "Index" ? "active" : "")">
+                    <i class="fas fa-tachometer-alt"></i> @Localizer["Dashboard"]
+                </a>
+                <a href="/Movies"
+                   class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Movies" ? "active" : "")">
                     <i class="fas fa-film"></i> @Localizer["ManageMovies"]
                 </a>
-                <a href="/Showtimes" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Showtimes" ? "active" : "")">
+                <a href="/Showtimes"
+                   class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Showtimes" ? "active" : "")">
                     <i class="fas fa-clock"></i> @Localizer["ManageShowtimes"]
                 </a>
-                <a href="/Rooms" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Rooms" ? "active" : "")">
+                <a href="/Rooms"
+                   class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Rooms" ? "active" : "")">
                     <i class="fas fa-door-open"></i> @Localizer["ManageRooms"]
                 </a>
-                <a href="/Seats" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Seats" ? "active" : "")">
+                <a href="/Seats"
+                   class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Seats" ? "active" : "")">
                     <i class="fas fa-chair"></i> @Localizer["ManageSeats"]
                 </a>
-                <a href="/Admin/ManageFoods" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "ManageFoods" ? "active" : "")">
+                <a href="/Admin/ManageFoods"
+                   class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "ManageFoods" ? "active" : "")">
                     <i class="fas fa-utensils"></i> @Localizer["ManageFoods"]
                 </a>
-                <a href="/Admin/ManageBookings" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Admin" && ViewContext.RouteData.Values["Action"]?.ToString() == "ManageBookings" ? "active" : "")">
+                <a href="/Admin/ManageBookings"
+                   class="nav-item @(ViewContext.RouteData.Values["Action"]?.ToString() == "ManageBookings" ? "active" : "")">
                     <i class="fas fa-ticket-alt"></i> @Localizer["ManageBookings"]
                 </a>
-                <a href="/Admin/RevenueStatistics" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Admin" && ViewContext.RouteData.Values["Action"]?.ToString() == "RevenueStatistics" ? "active" : "")">
+                <a href="/Admin/RevenueStatistics"
+                   class="nav-item @(ViewContext.RouteData.Values["Action"]?.ToString() == "RevenueStatistics" ? "active" : "")">
                     <i class="fas fa-chart-bar"></i> @Localizer["RevenueStatistics"]
+                </a>
+                <a href="/Vouchers"
+                   class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Vouchers" ? "active" : "")">
+                    <i class="fas fa-gift"></i> @Localizer["Vouchers"]
                 </a>
                 <div class="nav-divider"></div>
                 <a href="#" class="nav-item"><i class="fab fa-facebook"></i> Facebook</a>
@@ -52,7 +75,8 @@
             </nav>
         </aside>
     }
-    <div class="frame-wrapper flex-grow-1 @(isAdmin ? "admin-view" : "user-view")">
+    <!-- MAIN CONTENT -->
+    <div class="frame-wrapper flex-grow-1 @(isAdmin ? "admin-view" : "")">
         <div class="d-flex justify-content-between align-items-center mb-4">
             <div>
                 <h1 class="title-gradient">@Localizer["MovieList"]</h1>
@@ -447,60 +471,81 @@
         width: 100%;
         min-height: calc(100vh - 150px);
     }
-    /* Sidebar Styles */
+    /* ===== SIDEBAR STYLE (GIỐNG SHOWTIME) ===== */
     .sidebar {
+        background: #111;
         width: 250px;
-        background-color: #000000;
-        color: var(--text-light);
         height: 100vh;
         position: fixed;
         top: 0;
         left: 0;
-        padding-top: 20px;
-        border-right: 2px solid #ff0033;
+        padding: 25px 20px;
         overflow-y: auto;
-        z-index: 999;
+        border-right: 2px solid #e50914;
+        box-shadow: 2px 0 10px rgba(0,0,0,0.4);
+        transition: width 0.3s ease, transform 0.3s ease;
+        z-index: 1000;
     }
 
-    .sidebar-header {
-        padding: 10px 20px;
-        border-bottom: 1px solid #ff0033;
-    }
+        .sidebar.collapsed {
+            width: 0;
+            padding: 0;
+            transform: translateX(-100%);
+        }
 
     .sidebar-title {
-        margin: 0;
-        font-size: 1.5em;
-        color: #ff0033;
+        color: #fff;
+        font-weight: 700;
+        font-size: 1.4rem;
     }
 
-    .sidebar-nav {
-        list-style: none;
-        padding: 0;
-        margin: 20px 0;
-    }
-
-    .nav-item {
+    .sidebar-nav .nav-item {
+        color: #ddd;
+        padding: 12px 15px;
+        border-radius: 8px;
+        margin-bottom: 5px;
+        font-size: 1rem;
         display: flex;
         align-items: center;
-        padding: 12px 20px;
-        color: var(--text-light);
+        gap: 12px;
         text-decoration: none;
-        transition: background 0.3s ease;
+        transition: 0.25s;
     }
 
-        .nav-item:hover, .nav-item.active {
-            background-color: #ff0033;
-            color: var(--text-dark);
-        }
+    .nav-item i {
+        width: 20px;
+    }
 
-        .nav-item i {
-            margin-right: 10px;
-            color: inherit;
-        }
+    .nav-item:hover {
+        background-color: #e50914;
+        color: #fff;
+        transform: translateX(5px);
+    }
+
+    .nav-item.active {
+        background-color: #e50914;
+        color: #fff;
+        font-weight: 600;
+    }
 
     .nav-divider {
-        border-top: 1px solid #ff0033;
-        margin: 10px 0;
+        height: 1px;
+        background: #444;
+        margin: 15px 0;
+    }
+
+    .frame-wrapper.admin-view {
+        margin-left: 250px;
+        transition: margin-left 0.3s ease;
+    }
+
+        .frame-wrapper.admin-view.shifted {
+            margin-left: 0;
+        }
+
+    .content-inner {
+        max-width: 1200px;
+        width: 100%;
     }
     /* Frame Wrapper */
     .frame-wrapper {
@@ -871,67 +916,190 @@
         .table-container::-webkit-scrollbar-thumb:hover {
             background: var(--secondary-color);
         }
-    /* Responsive */
-    @@media (max-width: 768px) {
-        .frame-wrapper
-
-    {
-        width: 98%;
-        padding: 15px;
-    }
-
-    .frame-wrapper.admin-view {
-        margin-left: 0;
-        width: 98%;
-    }
-
-    .sidebar {
-        transform: translateX(-100%);
-        transition: transform 0.3s ease;
-    }
-    /* Add toggle for sidebar on mobile if needed */
-    .col-md-6, .col-lg-4 {
-        flex: 0 0 100%;
-        max-width: 100%;
-    }
-
-    .movie-card {
-        margin-bottom: 20px;
-    }
-
-    .pagination {
-        flex-direction: column;
-        gap: 10px;
-        text-align: center;
-    }
-
-    .table-responsive-wrapper {
-        font-size: 0.85rem;
-    }
-
-    }
-    @@media (max-width: 576px) {
-        .title-gradient
-
-    {
-        font-size: 1.5rem;
-    }
-
-    .action-buttons-wrapper {
-        flex-direction: column;
-        gap: 5px;
-    }
-
-    .movie-actions {
+    /* Toggle Button - Compact and Beautiful */
+    .sidebar-toggle {
+        position: fixed;
+        top: 15px;
+        left: 15px;
+        z-index: 1001;
+        background: linear-gradient(135deg, #ff0033, #e50914);
+        color: #fff;
+        border: none;
+        border-radius: 50%;
+        width: 35px;
+        height: 35px;
+        display: flex;
+        align-items: center;
         justify-content: center;
+        box-shadow: 0 4px 15px rgba(229, 9, 20, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        transition: all 0.3s ease;
+        cursor: pointer;
+        font-size: 14px;
     }
 
+        .sidebar-toggle:hover {
+            transform: scale(1.05) rotate(5deg);
+            box-shadow: 0 6px 20px rgba(229, 9, 20, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar-toggle:active {
+            transform: scale(0.95);
+        }
+
+    .sidebar.collapsed + .frame-wrapper.admin-view .sidebar-toggle {
+        left: 15px;
+    }
+    /* Media Queries */
+    @@media (max-width: 768px) {
+        .sidebar {
+            width: 200px;
+        }
+
+        .frame-wrapper.admin-view {
+            margin-left: 200px;
+        }
+
+        .sidebar.collapsed {
+            width: 0;
+            padding: 0;
+            transform: translateX(-100%);
+        }
+
+        .frame-wrapper.admin-view.shifted {
+            margin-left: 0;
+        }
+
+        .frame-wrapper {
+            width: 98%;
+            padding: 15px;
+        }
+
+            .frame-wrapper.admin-view {
+                margin-left: 200px;
+                width: calc(100% - 200px);
+            }
+
+        .col-md-6, .col-lg-4 {
+            flex: 0 0 100%;
+            max-width: 100%;
+        }
+
+        .movie-card {
+            margin-bottom: 20px;
+        }
+
+        .pagination {
+            flex-direction: column;
+            gap: 10px;
+            text-align: center;
+        }
+
+        .table-responsive-wrapper {
+            font-size: 0.85rem;
+        }
+
+        .search-input {
+            width: 120px; /* Even smaller width for smaller screens */
+            font-size: 0.8rem;
+            height: 28px;
+        }
+
+        .search-btn {
+            font-size: 0.8rem;
+            padding: 4px 10px;
+            height: 28px;
+        }
+
+        .sidebar-toggle {
+            top: 10px;
+            left: 10px;
+            width: 32px;
+            height: 32px;
+            font-size: 13px;
+        }
+    }
+
+    @@media (max-width: 576px) {
+        .container-fluid.d-flex {
+            flex-direction: column;
+        }
+
+        .sidebar {
+            position: relative;
+            width: 100%;
+            height: auto;
+        }
+
+        .frame-wrapper.admin-view {
+            margin-left: 0;
+            width: 100%;
+            min-height: auto;
+        }
+
+        .content-inner {
+            width: 100%;
+            padding: 20px;
+        }
+
+        .search-form {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .search-input, .search-btn {
+            width: 100%; /* Full width on very small screens */
+            margin: 5px 0; /* Add vertical spacing */
+        }
+
+        .search-btn {
+            justify-content: center;
+        }
+
+        .sidebar.collapsed {
+            display: none;
+        }
+
+        .sidebar-toggle {
+            position: relative;
+            margin: 10px auto;
+            display: block;
+        }
+
+        .title-gradient {
+            font-size: 1.5rem;
+        }
+
+        .action-buttons-wrapper {
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .movie-actions {
+            justify-content: center;
+        }
     }
 </style>
 <!-- JavaScript -->
 @section Scripts {
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const toggleBtn = document.getElementById('sidebar-toggle');
+            const sidebar = document.querySelector('.sidebar');
+            const frameWrapper = document.querySelector('.frame-wrapper');
+            if (toggleBtn && sidebar && frameWrapper) {
+                toggleBtn.addEventListener('click', function() {
+                    sidebar.classList.toggle('collapsed');
+                    frameWrapper.classList.toggle('shifted');
+                    const icon = toggleBtn.querySelector('i');
+                    if (sidebar.classList.contains('collapsed')) {
+                        icon.className = 'fas fa-bars';
+                    } else {
+                        icon.className = 'fas fa-times';
+                    }
+                });
+            }
+        });
         $(document).ready(function () {
             // Alert function
             function showAlert(message, type = 'danger') {

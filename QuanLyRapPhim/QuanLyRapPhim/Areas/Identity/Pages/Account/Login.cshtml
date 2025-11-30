@@ -1,10 +1,10 @@
 ﻿@page
 @model LoginModel
-
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
 @{
-    ViewData["Title"] = "Đăng nhập";
+    ViewData["Title"] = Localizer["Login"].Value;
 }
-
 <!-- Đăng nhập -->
 <div class="container-fluid vh-100 d-flex align-items-center justify-content-center position-relative overflow-hidden">
     <!-- Khung bao quanh -->
@@ -13,64 +13,57 @@
         <div class="left-section">
             <div class="intro-text">
                 <h3 class="text-white">CinemaX</h3>
-                <h2 class="text-white">Step into the magic – where every seat takes you on a journey.</h2>
+                <h2 class="text-white">@Localizer["LoginIntro"]</h2>
             </div>
         </div>
-
         <!-- Form đăng nhập bên phải -->
         <div class="right-section">
             <div class="card shadow-lg border-0 login-card p-4">
-                <h2 class="mb-3 text-white">Đăng nhập</h2>
+                <h2 class="mb-3 text-white">@Localizer["Login"]</h2>
                 <form id="account" method="post">
                     <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
-
                     <!-- Email -->
                     <div class="mb-3">
-                        <label asp-for="Input.Email" class="form-label text-white">Email</label>
-                        <input asp-for="Input.Email" class="form-control" autocomplete="username" aria-required="true" placeholder="username@gmail.com" />
+                        <label asp-for="Input.Email" class="form-label text-white">@Localizer["Email"]</label>
+                        <input asp-for="Input.Email" class="form-control" autocomplete="username" aria-required="true" placeholder="@Localizer["EmailPlaceholder"]" />
                         <span asp-validation-for="Input.Email" class="text-danger"></span>
                     </div>
-
                     <!-- Password -->
                     <div class="mb-3">
-                        <label asp-for="Input.Password" class="form-label text-white">Mật khẩu</label>
-                        <input asp-for="Input.Password" class="form-control" autocomplete="current-password" aria-required="true" placeholder="********" />
+                        <label asp-for="Input.Password" class="form-label text-white">@Localizer["Password"]</label>
+                        <input asp-for="Input.Password" class="form-control" autocomplete="current-password" aria-required="true" placeholder="@Localizer["PasswordPlaceholder"]" />
                         <span asp-validation-for="Input.Password" class="text-danger"></span>
                     </div>
-
                     <!-- Remember Me và Forgot Password -->
                     <div class="d-flex justify-content-between align-items-center mb-4">
                         <div class="form-check">
                             <label asp-for="Input.RememberMe" class="form-check-label text-white">
                                 <input class="form-check-input" asp-for="Input.RememberMe" />
-                                Ghi nhớ tôi
+                                @Localizer["RememberMe"]
                             </label>
                         </div>
-                        <a id="forgot-password" asp-page="./ForgotPassword" class="text-light-red">Quên mật khẩu?</a>
+                        <a id="forgot-password" asp-page="./ForgotPassword" class="text-light-red">@Localizer["ForgotPassword"]</a>
                     </div>
-
                     <!-- Nút Đăng nhập -->
                     <div class="d-grid mb-4">
-                        <button id="login-submit" type="submit" class="btn btn-create btn-lg">Đăng nhập</button>
+                        <button id="login-submit" type="submit" class="btn btn-create btn-lg">@Localizer["Login"]</button>
                     </div>
-
                     <!-- Liên kết đăng ký -->
                     <div class="text-center">
                         <p class="text-white">
-                            Đã có tài khoản? <a asp-page="./Register" asp-route-returnUrl="@Model.ReturnUrl" class="text-light-red">Đăng ký</a>
+                            @Localizer["NoAccount"] <a asp-page="./Register" asp-route-returnUrl="@Model.ReturnUrl" class="text-light-red">@Localizer["Register"]</a>
                         </p>
                     </div>
-
                     <!-- Đăng nhập bằng dịch vụ bên ngoài -->
                     @if ((Model.ExternalLogins?.Count ?? 0) > 0)
                     {
                         <hr class="my-4 border-light" />
-                        <h5 class="text-center text-white mb-3">Hoặc đăng nhập bằng</h5>
+                        <h5 class="text-center text-white mb-3">@Localizer["OrSignInWith"]</h5>
                         <form id="external-account" asp-page="./ExternalLogin" asp-route-returnUrl="@Model.ReturnUrl" method="post" class="form-horizontal">
                             <div class="d-flex justify-content-center gap-3">
                                 @foreach (var provider in Model.ExternalLogins!)
                                 {
-                                    <button type="submit" class="btn btn-outline-secondary" name="provider" value="@provider.Name" title="Đăng nhập bằng tài khoản @provider.DisplayName">
+                                    <button type="submit" class="btn btn-outline-secondary" name="provider" value="@provider.Name" title="@Localizer["SignInWithAccount", provider.DisplayName]">
                                         <i class="fab fa-@provider.Name.ToLower()"></i>
                                     </button>
                                 }
@@ -82,7 +75,6 @@
         </div>
     </div>
 </div>
-
 <!-- CSS tùy chỉnh -->
 <style>
     body {
@@ -103,7 +95,6 @@
         align-items: center;
         justify-content: center;
     }
-
     /* Khung bao quanh */
     .frame-wrapper {
         display: flex;
@@ -116,7 +107,6 @@
         box-shadow: 0 0 20px rgba(46, 46, 46, 0.4); /* Bóng đổ khớp với nền */
         overflow: hidden;
     }
-
     /* Phần hình ảnh bên trái */
     .left-section {
         flex: 1;
@@ -157,7 +147,6 @@
             font-weight: 700;
             margin-bottom: 20px;
         }
-
     /* Phần form bên phải */
     .right-section {
         flex: 1;
@@ -290,7 +279,6 @@
         border-color: #cc0022 !important;
     }
 </style>
-
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
 }

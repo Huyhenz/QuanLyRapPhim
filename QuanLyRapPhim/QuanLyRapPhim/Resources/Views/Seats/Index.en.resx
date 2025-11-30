@@ -1,0 +1,107 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+	<xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+		<xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+		<xsd:element name="root" msdata:IsDataSet="true">
+			<xsd:complexType>
+				<xsd:choice maxOccurs="unbounded">
+					<xsd:element name="data">
+						<xsd:complexType>
+							<xsd:sequence>
+								<xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+								<xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+							</xsd:sequence>
+							<xsd:attribute name="name" type="xsd:string" msdata:Ordinal="1" />
+							<xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" default="System.String" />
+							<xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+							<xsd:attribute name="xml:space" type="preserve" />
+						</xsd:complexType>
+					</xsd:element>
+					<xsd:element name="schema" />
+					<xsd:element name="connection" />
+				</xsd:choice>
+			</xsd:complexType>
+		</xsd:element>
+	</xsd:schema>
+	<msdata:Properties>
+		<msdata:Property ref="generator" msdata:Value="System.Data.Dataset" />
+		<msdata:Property ref="version" msdata:Value="1.0" />
+		<msdata:Property ref="encoding" msdata:Value="utf-8" />
+	</msdata:Properties>
+	<data name="ManageSeats" xml:space="preserve">
+    <value>Manage Seats</value>
+    <comment>Page title for managing seats</comment>
+  </data>
+	<data name="Dashboard" xml:space="preserve">
+    <value>Dashboard</value>
+    <comment>Sidebar: Dashboard</comment>
+  </data>
+	<data name="ManageMovies" xml:space="preserve">
+    <value>Manage Movies</value>
+    <comment>Sidebar: Manage Movies</comment>
+  </data>
+	<data name="ManageShowtimes" xml:space="preserve">
+    <value>Manage Showtimes</value>
+    <comment>Sidebar: Manage Showtimes</comment>
+  </data>
+	<data name="ManageRooms" xml:space="preserve">
+    <value>Manage Rooms</value>
+    <comment>Sidebar: Manage Rooms</comment>
+  </data>
+	<data name="ManageSeats" xml:space="preserve">
+    <value>Manage Seats</value>
+    <comment>Sidebar: Manage Seats</comment>
+  </data>
+	<data name="ManageFoods" xml:space="preserve">
+    <value>Manage Foods</value>
+    <comment>Sidebar: Manage Foods</comment>
+  </data>
+	<data name="ManageBookings" xml:space="preserve">
+    <value>Manage Bookings</value>
+    <comment>Sidebar: Manage Bookings</comment>
+  </data>
+	<data name="RevenueStatistics" xml:space="preserve">
+    <value>Revenue Statistics</value>
+    <comment>Sidebar: Revenue Statistics</comment>
+  </data>
+	<data name="Vouchers" xml:space="preserve">
+    <value>Vouchers</value>
+    <comment>Sidebar: Vouchers</comment>
+  </data>
+	<data name="SeatNumber" xml:space="preserve">
+    <value>Seat Number</value>
+    <comment>Table header: Seat Number</comment>
+  </data>
+	<data name="Status" xml:space="preserve">
+    <value>Status</value>
+    <comment>Table header: Status</comment>
+  </data>
+	<data name="Room" xml:space="preserve">
+    <value>Room</value>
+    <comment>Table header: Room</comment>
+  </data>
+	<data name="Actions" xml:space="preserve">
+    <value>Actions</value>
+    <comment>Table header: Actions</comment>
+  </data>
+	<data name="CreateSeat" xml:space="preserve">
+    <value>Create Seat</value>
+    <comment>Create button text</comment>
+  </data>
+	<data name="Edit" xml:space="preserve">
+    <value>Edit</value>
+    <comment>Edit link text</comment>
+  </data>
+	<data name="Delete" xml:space="preserve">
+    <value>Delete</value>
+    <comment>Delete link text</comment>
+  </data>
+	<data name="Copyright" xml:space="preserve">
+    <value>©</value>
+    <comment>Copyright symbol in footer</comment>
+  </data>
+	<data name="AllRightsReserved" xml:space="preserve">
+    <value>All rights reserved.</value>
+    <comment>Footer copyright text</comment>
+  </data>
+</root>

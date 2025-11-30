@@ -4,303 +4,381 @@
 @{
     ViewData["Title"] = Localizer["ManageFoods"].Value;
     Layout = "~/Views/Shared/_Layout.cshtml";
+    bool isAdmin = User.IsInRole("Admin");
 }
-<!DOCTYPE html>
-<html lang="vi">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@Localizer["ManageFoods"]</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" />
-    <style>
-        body {
-            margin: 0;
-            background-color: #0F0F0F;
-            color: #ffffff;
-            font-family: 'Montserrat', sans-serif;
-            overflow-x: hidden;
-        }
+<style>
+    body {
+        margin: 0;
+        background-color: #0F0F0F;
+        color: #ffffff;
+        font-family: 'Montserrat', sans-serif;
+        overflow-x: hidden;
+    }
+    /* ===== SIDEBAR STYLE (GIỐNG SHOWTIME) ===== */
+    .sidebar {
+        background: #111;
+        width: 250px;
+        height: 100vh;
+        position: fixed;
+        top: 0;
+        left: 0;
+        padding: 25px 20px;
+        overflow-y: auto;
+        border-right: 2px solid #e50914;
+        box-shadow: 2px 0 10px rgba(0,0,0,0.4);
+        transition: width 0.3s ease, transform 0.3s ease;
+        z-index: 1000;
+    }
 
-        .admin-dashboard {
-            display: flex;
-            min-height: 100vh;
-        }
-
-        .sidebar {
-            width: 250px;
-            background-color: #000000;
-            color: #ffffff;
-            height: 100vh;
-            position: fixed;
-            top: 0;
-            left: 0;
-            padding-top: 20px;
-            border-right: 2px solid #ff0033;
-            overflow-y: auto;
-            z-index: 1000;
-        }
-
-        .sidebar-header {
-            padding: 10px 20px;
-            border-bottom: 1px solid #ff0033;
-        }
-
-        .sidebar-title {
-            margin: 0;
-            font-size: 1.5em;
-            color: #ff0033;
-        }
-
-        .sidebar-nav {
-            list-style: none;
+        .sidebar.collapsed {
+            width: 0;
             padding: 0;
-            margin: 20px 0;
+            transform: translateX(-100%);
         }
 
-        .nav-item {
-            display: flex;
-            align-items: center;
-            padding: 10px 20px;
-            color: #ffffff;
-            text-decoration: none;
-        }
+    .sidebar-title {
+        color: #fff;
+        font-weight: 700;
+        font-size: 1.4rem;
+    }
 
-            .nav-item i {
-                margin-right: 10px;
-                color: #ffffff;
-            }
+    .sidebar-nav .nav-item {
+        color: #ddd;
+        padding: 12px 15px;
+        border-radius: 8px;
+        margin-bottom: 5px;
+        font-size: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        text-decoration: none;
+        transition: 0.25s;
+    }
 
-            .nav-item:hover {
-                background-color: #ff0033;
-                color: #000000;
-            }
+    .nav-item i {
+        width: 20px;
+    }
 
-                .nav-item:hover i {
-                    color: #000000;
-                }
+    .nav-item:hover {
+        background-color: #e50914;
+        color: #fff;
+        transform: translateX(5px);
+    }
 
-            .nav-item.active {
-                background-color: #ff0033;
-                color: #000000;
-            }
+    .nav-item.active {
+        background-color: #e50914;
+        color: #fff;
+        font-weight: 600;
+    }
 
-                .nav-item.active i {
-                    color: #000000;
-                }
+    .nav-divider {
+        height: 1px;
+        background: #444;
+        margin: 15px 0;
+    }
 
-        .content {
-            margin-left: 250px;
-            padding: 20px;
-            flex-grow: 1;
-            display: flex;
-            justify-content: flex-start;
-            align-items: flex-start;
-            min-height: 100vh;
-        }
+    .frame-wrapper.admin-view {
+        margin-left: 250px;
+        transition: margin-left 0.3s ease;
+    }
 
-        .content-inner {
-            width: 100%;
-        }
-
-        .page-title {
-            background-color: #1c1c1c;
-            color: #fff;
-            padding: 15px;
-            text-align: center;
-            border-radius: 15px;
-            font-weight: 700;
-            text-transform: uppercase;
-            margin-bottom: 20px;
-        }
-
-        .glow-effect {
-            box-shadow: 0 0 15px rgba(255, 0, 51, 0.3);
-            transition: box-shadow 0.3s ease, transform 0.3s ease;
-        }
-
-            .glow-effect:hover {
-                box-shadow: 0 0 25px rgba(255, 0, 51, 0.5);
-                transform: translateY(-2px);
-            }
-
-        .table-dark {
-            background-color: #1c1c1c;
-            border-radius: 15px;
-            overflow: hidden;
-            width: 100%;
-            border-collapse: collapse;
-            table-layout: fixed;
-        }
-
-            .table-dark th, .table-dark td {
-                border: 1px solid #444;
-                padding: 12px;
-                text-align: center;
-                font-size: 0.95rem;
-                color: white;
-                vertical-align: middle;
-            }
-
-            .table-dark th {
-                background-color: #2a2a2a;
-                font-weight: 600;
-                position: sticky;
-                top: 0;
-                z-index: 10;
-            }
-
-            .table-dark tr:hover td {
-                background-color: #2a2a2a;
-            }
-
-            .table-dark td img {
-                border-radius: 8px;
-                object-fit: cover;
-            }
-
-        .badge {
-            padding: 5px 10px;
-            font-size: 0.85rem;
-            border-radius: 8px;
-            white-space: nowrap;
-        }
-
-        .bg-success {
-            background-color: #28a745;
-        }
-
-        .bg-warning {
-            background-color: #ffc107;
-            color: #000;
-        }
-
-        .bg-primary {
-            background-color: #0d6efd;
-        }
-
-        .bg-info {
-            background-color: #17a2b8;
-        }
-
-        .text-warning {
-            color: #ffc107 !important;
-        }
-
-        .btn-success, .btn-primary, .btn-warning, .btn-danger {
-            border-radius: 20px;
-            font-weight: 600;
-        }
-
-        .modal-content {
-            background-color: #1c1c1c;
-            color: #fff;
-            border: 1px solid #ff0033;
-            border-radius: 15px;
-        }
-
-        .modal-header, .modal-footer {
-            border-color: #ff0033;
-        }
-
-        .form-control, .form-select {
-            background-color: #2a2a2a;
-            border: 1px solid #ff0033;
-            color: #fff;
-        }
-
-            .form-control:focus, .form-select:focus {
-                background-color: #333;
-                border-color: #ff0033;
-                box-shadow: 0 0 0 0.2rem rgba(255, 0, 51, 0.25);
-                color: #fff;
-            }
-
-        .text-muted {
-            color: #b3b3b3 !important;
-        }
-
-        .img-thumbnail {
-            max-height: 80px;
-        }
-
-        .alert {
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
-        }
-
-        .alert-success {
-            background-color: #1c1c1c;
-            color: #28a745;
-            border-color: #28a745;
-        }
-
-        .alert-danger {
-            background-color: #1c1c1c;
-            color: #dc3545;
-            border-color: #dc3545;
-        }
-        @@media (max-width: 768px) {
-            .sidebar
-
-        {
-            width: 200px;
-        }
-
-        .content {
-            margin-left: 200px;
-        }
-
-        }
-        @@media (max-width: 576px) {
-            .admin-dashboard
-
-        {
-            flex-direction: column;
-        }
-
-        .sidebar {
-            position: relative;
-            width: 100%;
-            height: auto;
-        }
-
-        .content {
+        .frame-wrapper.admin-view.shifted {
             margin-left: 0;
-            width: 100%;
         }
 
+    .content-inner {
+        max-width: 1200px;
+        width: 100%;
+    }
+
+    .page-title {
+        background-color: #1c1c1c;
+        color: #fff;
+        padding: 15px;
+        text-align: center;
+        border-radius: 15px;
+        font-weight: 700;
+        text-transform: uppercase;
+        margin-bottom: 20px;
+    }
+
+    .glow-effect {
+        box-shadow: 0 0 15px rgba(255, 0, 51, 0.3);
+        transition: box-shadow 0.3s ease, transform 0.3s ease;
+    }
+
+        .glow-effect:hover {
+            box-shadow: 0 0 25px rgba(255, 0, 51, 0.5);
+            transform: translateY(-2px);
         }
-    </style>
-</head>
-<body>
-    <div class="admin-dashboard">
-        <!-- Sidebar -->
+
+    .table-dark {
+        background-color: #1c1c1c;
+        border-radius: 15px;
+        overflow: hidden;
+        width: 100%;
+        border-collapse: collapse;
+        table-layout: fixed;
+    }
+
+        .table-dark th, .table-dark td {
+            border: 1px solid #444;
+            padding: 12px;
+            text-align: center;
+            font-size: 0.95rem;
+            color: white;
+            vertical-align: middle;
+        }
+
+        .table-dark th {
+            background-color: #2a2a2a;
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .table-dark tr:hover td {
+            background-color: #2a2a2a;
+        }
+
+        .table-dark td img {
+            border-radius: 8px;
+            object-fit: cover;
+        }
+
+    .badge {
+        padding: 5px 10px;
+        font-size: 0.85rem;
+        border-radius: 8px;
+        white-space: nowrap;
+    }
+
+    .bg-success {
+        background-color: #28a745;
+    }
+
+    .bg-warning {
+        background-color: #ffc107;
+        color: #000;
+    }
+
+    .bg-primary {
+        background-color: #0d6efd;
+    }
+
+    .bg-info {
+        background-color: #17a2b8;
+    }
+
+    .text-warning {
+        color: #ffc107 !important;
+    }
+
+    .btn-success, .btn-primary, .btn-warning, .btn-danger {
+        border-radius: 20px;
+        font-weight: 600;
+    }
+
+    .modal-content {
+        background-color: #1c1c1c;
+        color: #fff;
+        border: 1px solid #ff0033;
+        border-radius: 15px;
+    }
+
+    .modal-header, .modal-footer {
+        border-color: #ff0033;
+    }
+
+    .form-control, .form-select {
+        background-color: #2a2a2a;
+        border: 1px solid #ff0033;
+        color: #fff;
+    }
+
+        .form-control:focus, .form-select:focus {
+            background-color: #333;
+            border-color: #ff0033;
+            box-shadow: 0 0 0 0.2rem rgba(255, 0, 51, 0.25);
+            color: #fff;
+        }
+
+    .text-muted {
+        color: #b3b3b3 !important;
+    }
+
+    .img-thumbnail {
+        max-height: 80px;
+    }
+
+    .alert {
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+    }
+
+    .alert-success {
+        background-color: #1c1c1c;
+        color: #28a745;
+        border-color: #28a745;
+    }
+
+    .alert-danger {
+        background-color: #1c1c1c;
+        color: #dc3545;
+        border-color: #dc3545;
+    }
+    /* Toggle Button - Compact and Beautiful */
+    .sidebar-toggle {
+        position: fixed;
+        top: 15px;
+        left: 15px;
+        z-index: 1001;
+        background: linear-gradient(135deg, #ff0033, #e50914);
+        color: #fff;
+        border: none;
+        border-radius: 50%;
+        width: 35px;
+        height: 35px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 4px 15px rgba(229, 9, 20, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        transition: all 0.3s ease;
+        cursor: pointer;
+        font-size: 14px;
+    }
+
+        .sidebar-toggle:hover {
+            transform: scale(1.05) rotate(5deg);
+            box-shadow: 0 6px 20px rgba(229, 9, 20, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar-toggle:active {
+            transform: scale(0.95);
+        }
+
+    .sidebar.collapsed + .frame-wrapper.admin-view .sidebar-toggle {
+        left: 15px;
+    }
+    /* Media Queries */
+    @@media (max-width: 768px) {
+        .sidebar
+
+    {
+        width: 200px;
+    }
+
+    .frame-wrapper.admin-view {
+        margin-left: 200px;
+    }
+
+    .sidebar.collapsed {
+        width: 0;
+        padding: 0;
+        transform: translateX(-100%);
+    }
+
+    .frame-wrapper.admin-view.shifted {
+        margin-left: 0;
+    }
+
+    .sidebar-toggle {
+        top: 10px;
+        left: 10px;
+        width: 32px;
+        height: 32px;
+        font-size: 13px;
+    }
+
+    }
+    @@media (max-width: 576px) {
+        .container-fluid.d-flex
+
+    {
+        flex-direction: column;
+    }
+
+    .sidebar {
+        position: relative;
+        width: 100%;
+        height: auto;
+    }
+
+    .frame-wrapper.admin-view {
+        margin-left: 0;
+        width: 100%;
+        min-height: auto;
+    }
+
+    .content-inner {
+        width: 100%;
+        padding: 20px;
+    }
+
+    .sidebar.collapsed {
+        display: none;
+    }
+
+    .sidebar-toggle {
+        position: relative;
+        margin: 10px auto;
+        display: block;
+    }
+
+    }
+</style>
+<div class="container-fluid d-flex position-relative">
+    <!-- Toggle Button -->
+    @if (isAdmin)
+    {
+        <button id="sidebar-toggle" class="sidebar-toggle">
+            <i class="fas fa-bars"></i>
+        </button>
+    }
+    <!-- SIDEBAR -->
+    @if (isAdmin)
+    {
         <aside class="sidebar">
             <div class="sidebar-header">
-                <h3 class="sidebar-title">CinemaX Admin</h3>
+                <h3 class="sidebar-title">🎬 CinemaX Admin</h3>
             </div>
             <nav class="sidebar-nav">
-                <a href="/Movies" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Movies" ? "active" : "")">
+                <a href="/Admin/Index"
+                   class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Admin" && ViewContext.RouteData.Values["Action"]?.ToString() == "Index" ? "active" : "")">
+                    <i class="fas fa-tachometer-alt"></i> @Localizer["Dashboard"]
+                </a>
+                <a href="/Movies"
+                   class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Movies" ? "active" : "")">
                     <i class="fas fa-film"></i> @Localizer["ManageMovies"]
                 </a>
-                <a href="/Showtimes" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Showtimes" ? "active" : "")">
+                <a href="/Showtimes"
+                   class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Showtimes" ? "active" : "")">
                     <i class="fas fa-clock"></i> @Localizer["ManageShowtimes"]
                 </a>
-                <a href="/Rooms" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Rooms" ? "active" : "")">
+                <a href="/Rooms"
+                   class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Rooms" ? "active" : "")">
                     <i class="fas fa-door-open"></i> @Localizer["ManageRooms"]
                 </a>
-                <a href="/Seats" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Seats" ? "active" : "")">
+                <a href="/Seats"
+                   class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Seats" ? "active" : "")">
                     <i class="fas fa-chair"></i> @Localizer["ManageSeats"]
                 </a>
-                <a href="/Admin/ManageFoods" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "ManageFoods" ? "active" : "")">
+                <a href="/Admin/ManageFoods"
+                   class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Admin" && ViewContext.RouteData.Values["Action"]?.ToString() == "ManageFoods" ? "active" : "")">
                     <i class="fas fa-utensils"></i> @Localizer["ManageFoods"]
                 </a>
-                <a href="/Admin/ManageBookings" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Admin" && ViewContext.RouteData.Values["Action"]?.ToString() == "ManageBookings" ? "active" : "")">
+                <a href="/Admin/ManageBookings"
+                   class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Admin" && ViewContext.RouteData.Values["Action"]?.ToString() == "ManageBookings" ? "active" : "")">
                     <i class="fas fa-ticket-alt"></i> @Localizer["ManageBookings"]
                 </a>
-                <a href="/Admin/RevenueStatistics" class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Admin" && ViewContext.RouteData.Values["Action"]?.ToString() == "RevenueStatistics" ? "active" : "")">
+                <a href="/Admin/RevenueStatistics"
+                   class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Admin" && ViewContext.RouteData.Values["Action"]?.ToString() == "RevenueStatistics" ? "active" : "")">
                     <i class="fas fa-chart-bar"></i> @Localizer["RevenueStatistics"]
+                </a>
+                <a href="/Vouchers"
+                   class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Vouchers" ? "active" : "")">
+                    <i class="fas fa-gift"></i> @Localizer["Vouchers"]
                 </a>
                 <div class="nav-divider"></div>
                 <a href="#" class="nav-item"><i class="fab fa-facebook"></i> Facebook</a>
@@ -308,251 +386,291 @@
                 <a href="#" class="nav-item"><i class="fab fa-google"></i> Google</a>
             </nav>
         </aside>
-        <!-- Main Content -->
-        <main class="content">
-            <div class="content-inner">
-                <div class="d-flex justify-content-between align-items-center mb-4">
-                    <h2 class="page-title">@Localizer["ManageFoods"]</h2>
-                    <button class="btn btn-success rounded-pill px-4 glow-effect" data-bs-toggle="modal" data-bs-target="#createFoodModal">
-                        @Localizer["AddNewFoodItem"]
-                    </button>
+    }
+    <!-- MAIN CONTENT -->
+    <div class="frame-wrapper flex-grow-1 @(isAdmin ? "admin-view" : "")">
+        <div class="content-inner">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2 class="page-title">@Localizer["ManageFoods"]</h2>
+                <button class="btn btn-success rounded-pill px-4 glow-effect" data-bs-toggle="modal" data-bs-target="#createFoodModal">
+                    @Localizer["AddNewFoodItem"]
+                </button>
+            </div>
+            <div id="alert-container"></div>
+            <div class="table-responsive">
+                <table class="table table-dark table-striped glow-effect" id="foodsTable">
+                    <thead class="table-danger">
+                        <tr>
+                            <th style="width: 80px;">@Localizer["FoodImage"]</th>
+                            <th>@Localizer["FoodName"]</th>
+                            <th style="width: 60px;">@Localizer["FoodSize"]</th>
+                            <th style="width: 120px;">@Localizer["FoodPrice"]</th>
+                            <th style="width: 100px;">@Localizer["FoodCategory"]</th>
+                            <th style="width: 140px;" class="text-center">@Localizer["Actions"]</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Modal: Create -->
+<div class="modal fade" id="createFoodModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <form id="createFoodForm" enctype="multipart/form-data">
+            <div class="modal-content">
+                <div class="modal-header border-secondary">
+                    <h5 class="modal-title">@Localizer["AddNewFoodItem"]</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
-                <div id="alert-container"></div>
-                <div class="table-responsive">
-                    <table class="table table-dark table-striped glow-effect" id="foodsTable">
-                        <thead class="table-danger">
-                            <tr>
-                                <th style="width: 80px;">@Localizer["FoodImage"]</th>
-                                <th>@Localizer["FoodName"]</th>
-                                <th style="width: 60px;">@Localizer["FoodSize"]</th>
-                                <th style="width: 120px;">@Localizer["FoodPrice"]</th>
-                                <th style="width: 100px;">@Localizer["FoodCategory"]</th>
-                                <th style="width: 140px;" class="text-center">@Localizer["Actions"]</th>
-                            </tr>
-                        </thead>
-                        <tbody></tbody>
-                    </table>
+                <div class="modal-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">@Localizer["FoodName"]</label>
+                            <input type="text" name="Name" class="form-control" required />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">@Localizer["FoodSize"]</label>
+                            <select name="Size" class="form-select">
+                                <option value="S">@Localizer["SizeS"]</option>
+                                <option value="M" selected>@Localizer["SizeM"]</option>
+                                <option value="L">@Localizer["SizeL"]</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">@Localizer["FoodPrice"] (@Localizer["VND"])</label>
+                            <input type="number" name="Price" class="form-control" min="0" required />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">@Localizer["FoodCategory"]</label>
+                            <select name="Category" class="form-select">
+                                <option value="Bắp">@Localizer["CategoryPopcorn"]</option>
+                                <option value="Nước">@Localizer["CategoryDrink"]</option>
+                                <option value="Combo">@Localizer["CategoryCombo"]</option>
+                            </select>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">@Localizer["FoodImage"]</label>
+                            <input type="file" name="imageFile" class="form-control" accept="image/*" />
+                            <small class="text-muted">@Localizer["Max2MBJPGPNG"]</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer border-secondary">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">@Localizer["Cancel"]</button>
+                    <button type="submit" class="btn btn-success">@Localizer["Add"]</button>
                 </div>
             </div>
-        </main>
+        </form>
     </div>
-    <!-- Modal: Create -->
-    <div class="modal fade" id="createFoodModal" tabindex="-1">
-        <div class="modal-dialog modal-lg">
-            <form id="createFoodForm" enctype="multipart/form-data">
-                <div class="modal-content">
-                    <div class="modal-header border-secondary">
-                        <h5 class="modal-title">@Localizer["AddNewFoodItem"]</h5>
-                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="row g-3">
-                            <div class="col-md-6">
-                                <label class="form-label">@Localizer["FoodName"]</label>
-                                <input type="text" name="Name" class="form-control" required />
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">@Localizer["FoodSize"]</label>
-                                <select name="Size" class="form-select">
-                                    <option value="S">@Localizer["SizeS"]</option>
-                                    <option value="M" selected>@Localizer["SizeM"]</option>
-                                    <option value="L">@Localizer["SizeL"]</option>
-                                </select>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">@Localizer["FoodPrice"] (@Localizer["VND"])</label>
-                                <input type="number" name="Price" class="form-control" min="0" required />
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">@Localizer["FoodCategory"]</label>
-                                <select name="Category" class="form-select">
-                                    <option value="Bắp">@Localizer["CategoryPopcorn"]</option>
-                                    <option value="Nước">@Localizer["CategoryDrink"]</option>
-                                    <option value="Combo">@Localizer["CategoryCombo"]</option>
-                                </select>
-                            </div>
-                            <div class="col-12">
-                                <label class="form-label">@Localizer["FoodImage"]</label>
-                                <input type="file" name="imageFile" class="form-control" accept="image/*" />
-                                <small class="text-muted">@Localizer["Max2MBJPGPNG"]</small>
-                            </div>
+</div>
+<!-- Modal: Edit -->
+<div class="modal fade" id="editFoodModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <form id="editFoodForm" enctype="multipart/form-data">
+            <input type="hidden" name="foodItemId" />
+            <div class="modal-content">
+                <div class="modal-header border-secondary">
+                    <h5 class="modal-title">@Localizer["EditFoodItem"]</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">@Localizer["FoodName"]</label>
+                            <input type="text" name="name" class="form-control" required />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">@Localizer["FoodSize"]</label>
+                            <select name="size" class="form-select">
+                                <option value="S">@Localizer["SizeS"]</option>
+                                <option value="M">@Localizer["SizeM"]</option>
+                                <option value="L">@Localizer["SizeL"]</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">@Localizer["FoodPrice"] (@Localizer["VND"])</label>
+                            <input type="number" name="price" class="form-control" min="0" step="1000" required />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">@Localizer["FoodCategory"]</label>
+                            <select name="category" class="form-select">
+                                <option value="Bắp">@Localizer["CategoryPopcorn"]</option>
+                                <option value="Nước">@Localizer["CategoryDrink"]</option>
+                                <option value="Combo">@Localizer["CategoryCombo"]</option>
+                            </select>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">@Localizer["CurrentImage"]</label>
+                            <div id="currentImage" class="mb-2"></div>
+                            <input type="file" name="imageFile" class="form-control" accept="image/*" />
+                            <small class="text-muted">@Localizer["NoChangeImage"]</small>
                         </div>
                     </div>
-                    <div class="modal-footer border-secondary">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">@Localizer["Cancel"]</button>
-                        <button type="submit" class="btn btn-success">@Localizer["Add"]</button>
-                    </div>
                 </div>
-            </form>
-        </div>
-    </div>
-    <!-- Modal: Edit -->
-    <div class="modal fade" id="editFoodModal" tabindex="-1">
-        <div class="modal-dialog modal-lg">
-            <form id="editFoodForm" enctype="multipart/form-data">
-                <input type="hidden" name="foodItemId" />
-                <div class="modal-content">
-                    <div class="modal-header border-secondary">
-                        <h5 class="modal-title">@Localizer["EditFoodItem"]</h5>
-                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="row g-3">
-                            <div class="col-md-6">
-                                <label class="form-label">@Localizer["FoodName"]</label>
-                                <input type="text" name="name" class="form-control" required />
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">@Localizer["FoodSize"]</label>
-                                <select name="size" class="form-select">
-                                    <option value="S">@Localizer["SizeS"]</option>
-                                    <option value="M">@Localizer["SizeM"]</option>
-                                    <option value="L">@Localizer["SizeL"]</option>
-                                </select>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">@Localizer["FoodPrice"] (@Localizer["VND"])</label>
-                                <input type="number" name="price" class="form-control" min="0" step="1000" required />
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">@Localizer["FoodCategory"]</label>
-                                <select name="category" class="form-select">
-                                    <option value="Bắp">@Localizer["CategoryPopcorn"]</option>
-                                    <option value="Nước">@Localizer["CategoryDrink"]</option>
-                                    <option value="Combo">@Localizer["CategoryCombo"]</option>
-                                </select>
-                            </div>
-                            <div class="col-12">
-                                <label class="form-label">@Localizer["CurrentImage"]</label>
-                                <div id="currentImage" class="mb-2"></div>
-                                <input type="file" name="imageFile" class="form-control" accept="image/*" />
-                                <small class="text-muted">@Localizer["NoChangeImage"]</small>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="modal-footer border-secondary">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">@Localizer["Cancel"]</button>
-                        <button type="submit" class="btn btn-primary">@Localizer["Update"]</button>
-                    </div>
+                <div class="modal-footer border-secondary">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">@Localizer["Cancel"]</button>
+                    <button type="submit" class="btn btn-primary">@Localizer["Update"]</button>
                 </div>
-            </form>
-        </div>
+            </div>
+        </form>
     </div>
-    @section Scripts {
-        <script>
-            function showAlert(msg, type = 'success') {
-                $('#alert-container').html(`
-                    <div class="alert alert-${type} alert-dismissible fade show" role="alert">
-                        ${msg}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                    </div>`);
-                setTimeout(() => $('.alert').alert('close'), 4000);
-            }
-            function loadFoods() {
-                $.get('/Admin/GetFoodItems', data => {
-                    $('#foodsTable tbody').empty();
-                    data.forEach(f => {
-                        const img = f.imageUrl
-                            ? `<img src="${f.imageUrl}" class="img-thumbnail" style="width:50px;height:50px;object-fit:cover;">`
-                            : `<div class="bg-secondary text-white d-flex align-items-center justify-content-center rounded" style="width:50px;height:50px;"><i class="fas fa-utensils"></i></div>`;
-                        const badge = f.category === 'Combo' ? 'warning' : f.category === 'Bắp' ? 'success' : 'primary';
-                        const categoryDisplay = f.category === 'Bắp' ? '@Localizer["CategoryPopcorn"].Value' : f.category === 'Nước' ? '@Localizer["CategoryDrink"].Value' : '@Localizer["CategoryCombo"].Value';
-                        const sizeDisplay = f.size === 'S' ? '@Localizer["SizeS"].Value' : f.size === 'M' ? '@Localizer["SizeM"].Value' : '@Localizer["SizeL"].Value';
-                        $('#foodsTable tbody').append(`
-                            <tr data-id="${f.foodItemId}">
-                                <td>${img}</td>
-                                <td class="fw-bold">${f.name}</td>
-                                <td><span class="badge bg-info">${sizeDisplay}</span></td>
-                                <td class="text-warning">${f.price.toLocaleString()}${@Localizer["VND"].Value}</td>
-                                <td><span class="badge bg-${badge}">${categoryDisplay}</span></td>
-                                <td class="text-center">
-                                    <button class="btn btn-warning btn-sm edit-btn me-1 glow-effect">@Localizer["Edit"]</button>
-                                    <button class="btn btn-danger btn-sm delete-btn glow-effect">@Localizer["Delete"]</button>
-                                </td>
-                            </tr>
-                        `);
-                    });
-                }).fail(() => showAlert('@Localizer["LoadDataError"].Value', 'danger'));
-            }
-            // Create
-            $('#createFoodForm').submit(function (e) {
-                e.preventDefault();
-                const formData = new FormData(this);
-                $.ajax({
-                    url: '/Admin/CreateFood',
-                    type: 'POST',
-                    data: formData,
-                    processData: false,
-                    contentType: false,
-                    success: res => {
-                        if (res.success) {
-                            $('#createFoodModal').modal('hide');
-                            this.reset();
-                            loadFoods();
-                            showAlert(res.message || '@Localizer["CreateSuccess"].Value');
-                        } else {
-                            showAlert(res.message || '@Localizer["CreateError"].Value', 'danger');
-                        }
-                    },
-                    error: () => showAlert('@Localizer["ServerError"].Value', 'danger')
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const toggleBtn = document.getElementById('sidebar-toggle');
+            const sidebar = document.querySelector('.sidebar');
+            const frameWrapper = document.querySelector('.frame-wrapper');
+            if (toggleBtn && sidebar && frameWrapper) {
+                toggleBtn.addEventListener('click', function() {
+                    sidebar.classList.toggle('collapsed');
+                    frameWrapper.classList.toggle('shifted');
+                    const icon = toggleBtn.querySelector('i');
+                    if (sidebar.classList.contains('collapsed')) {
+                        icon.className = 'fas fa-bars';
+                    } else {
+                        icon.className = 'fas fa-times';
+                    }
                 });
-            });
-            // Edit - Load data
-            $(document).on('click', '.edit-btn', function () {
-                const id = $(this).closest('tr').data('id');
-                $.get('/Admin/GetFoodItem?id=' + id, food => {
-                    $('#editFoodForm [name="foodItemId"]').val(food.foodItemId);
-                    $('#editFoodForm [name="name"]').val(food.name);
-                    $('#editFoodForm [name="size"]').val(food.size);
-                    $('#editFoodForm [name="price"]').val(food.price);
-                    $('#editFoodForm [name="category"]').val(food.category);
-                    $('#currentImage').html(
-                        food.imageUrl
-                            ? `<img src="${food.imageUrl}" class="img-thumbnail" style="max-height: 80px;">`
-                            : '<em class="text-muted">@Localizer["NoImage"].Value</em>'
-                    );
-                    $('#editFoodModal').modal('show');
-                }).fail(() => showAlert('@Localizer["LoadFoodError"].Value', 'danger'));
-            });
-            // Edit - Submit
-            $('#editFoodForm').submit(function (e) {
-                e.preventDefault();
-                const formData = new FormData(this);
-                $.ajax({
-                    url: '/Admin/EditFood',
-                    type: 'POST',
-                    data: formData,
-                    processData: false,
-                    contentType: false,
-                    success: res => {
-                        if (res.success) {
-                            $('#editFoodModal').modal('hide');
-                            loadFoods();
-                            showAlert(res.message || '@Localizer["EditSuccess"].Value');
-                        } else {
-                            showAlert(res.message || '@Localizer["EditError"].Value', 'danger');
-                        }
-                    },
-                    error: () => showAlert('@Localizer["ServerError"].Value', 'danger')
+            }
+        });
+        function showAlert(msg, type = 'success') {
+            $('#alert-container').html(`
+                <div class="alert alert-${type} alert-dismissible fade show" role="alert">
+                    ${msg}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>`);
+            setTimeout(() => $('.alert').alert('close'), 4000);
+        }
+        function loadFoods() {
+            $.get('/Admin/GetFoodItems', data => {
+                console.log('Loaded foods:', data); // Debug log
+                $('#foodsTable tbody').empty();
+                data.forEach(f => {
+                    const img = f.imageUrl
+                        ? `<img src="${f.imageUrl}" class="img-thumbnail" style="width:50px;height:50px;object-fit:cover;">`
+                        : `<div class="bg-secondary text-white d-flex align-items-center justify-content-center rounded" style="width:50px;height:50px;"><i class="fas fa-utensils"></i></div>`;
+                    const badge = f.category === 'Combo' ? 'warning' : f.category === 'Bắp' ? 'success' : 'primary';
+                    const categoryDisplay = f.category === 'Bắp' ? '@Localizer["CategoryPopcorn"].Value' : f.category === 'Nước' ? '@Localizer["CategoryDrink"].Value' : '@Localizer["CategoryCombo"].Value';
+                    const sizeDisplay = f.size === 'S' ? '@Localizer["SizeS"].Value' : f.size === 'M' ? '@Localizer["SizeM"].Value' : '@Localizer["SizeL"].Value';
+                    $('#foodsTable tbody').append(`
+                        <tr data-id="${f.foodItemId}">
+                            <td>${img}</td>
+                            <td class="fw-bold">${f.name}</td>
+                            <td><span class="badge bg-info">${sizeDisplay}</span></td>
+                            <td class="text-warning">${f.price.toLocaleString()}${@Localizer["VND"].Value}</td>
+                            <td><span class="badge bg-${badge}">${categoryDisplay}</span></td>
+                            <td class="text-center">
+                                <button class="btn btn-warning btn-sm edit-btn me-1 glow-effect">@Localizer["Edit"]</button>
+                                <button class="btn btn-danger btn-sm delete-btn glow-effect">@Localizer["Delete"]</button>
+                            </td>
+                        </tr>
+                    `);
                 });
+                if (data.length === 0) {
+                    $('#foodsTable tbody').append('<tr><td colspan="6" class="text-center text-muted">No food items found.</td></tr>');
+                }
+            }).fail(err => {
+                console.error('Load foods error:', err); // Debug log
+                showAlert('@Localizer["LoadDataError"].Value', 'danger');
             });
-            // Delete
-            $(document).on('click', '.delete-btn', function () {
-                const id = $(this).closest('tr').data('id');
-                if (confirm('@Localizer["DeleteConfirm"].Value')) {
-                    $.post('/Admin/DeleteFood', { id }, res => {
-                        if (res.success) {
-                            loadFoods();
-                            showAlert(res.message || '@Localizer["DeleteSuccess"].Value');
-                        } else {
-                            showAlert(res.message || '@Localizer["DeleteError"].Value', 'danger');
-                        }
-                    }).fail(() => showAlert('@Localizer["DeleteError"].Value', 'danger'));
+        }
+        // Create
+        $('#createFoodForm').submit(function (e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            $.ajax({
+                url: '/Admin/CreateFood',
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: res => {
+                    console.log('Create response:', res); // Debug log
+                    if (res.success) {
+                        $('#createFoodModal').modal('hide');
+                        this.reset();
+                        loadFoods();
+                        showAlert(res.message || '@Localizer["CreateSuccess"].Value');
+                    } else {
+                        showAlert(res.message || '@Localizer["CreateError"].Value', 'danger');
+                    }
+                },
+                error: err => {
+                    console.error('Create error:', err); // Debug log
+                    showAlert('@Localizer["ServerError"].Value', 'danger');
                 }
             });
-            // Load on start
-            $(document).ready(loadFoods);
-        </script>
-    }
-</body>
-</html>
+        });
+        // Edit - Load data
+        $(document).on('click', '.edit-btn', function () {
+            const id = $(this).closest('tr').data('id');
+            $.get('/Admin/GetFoodItem?id=' + id, food => {
+                console.log('Edit food:', food); // Debug log
+                $('#editFoodForm [name="foodItemId"]').val(food.foodItemId);
+                $('#editFoodForm [name="name"]').val(food.name);
+                $('#editFoodForm [name="size"]').val(food.size);
+                $('#editFoodForm [name="price"]').val(food.price);
+                $('#editFoodForm [name="category"]').val(food.category);
+                $('#currentImage').html(
+                    food.imageUrl
+                        ? `<img src="${food.imageUrl}" class="img-thumbnail" style="max-height: 80px;">`
+                        : '<em class="text-muted">@Localizer["NoImage"].Value</em>'
+                );
+                $('#editFoodModal').modal('show');
+            }).fail(err => {
+                console.error('Load edit error:', err); // Debug log
+                showAlert('@Localizer["LoadFoodError"].Value', 'danger');
+            });
+        });
+        // Edit - Submit
+        $('#editFoodForm').submit(function (e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            $.ajax({
+                url: '/Admin/EditFood',
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: res => {
+                    console.log('Edit response:', res); // Debug log
+                    if (res.success) {
+                        $('#editFoodModal').modal('hide');
+                        loadFoods();
+                        showAlert(res.message || '@Localizer["EditSuccess"].Value');
+                    } else {
+                        showAlert(res.message || '@Localizer["EditError"].Value', 'danger');
+                    }
+                },
+                error: err => {
+                    console.error('Edit error:', err); // Debug log
+                    showAlert('@Localizer["ServerError"].Value', 'danger');
+                }
+            });
+        });
+        // Delete
+        $(document).on('click', '.delete-btn', function () {
+            const id = $(this).closest('tr').data('id');
+            if (confirm('@Localizer["DeleteConfirm"].Value')) {
+                $.post('/Admin/DeleteFood', { id }, res => {
+                    console.log('Delete response:', res); // Debug log
+                    if (res.success) {
+                        loadFoods();
+                        showAlert(res.message || '@Localizer["DeleteSuccess"].Value');
+                    } else {
+                        showAlert(res.message || '@Localizer["DeleteError"].Value', 'danger');
+                    }
+                }).fail(err => {
+                    console.error('Delete error:', err); // Debug log
+                    showAlert('@Localizer["DeleteError"].Value', 'danger');
+                });
+            }
+        });
+        // Load on start
+        $(document).ready(loadFoods);
+    </script>
+}

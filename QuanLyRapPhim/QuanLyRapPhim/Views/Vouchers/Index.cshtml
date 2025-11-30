@@ -1,6 +1,10 @@
 ﻿@model IEnumerable<QuanLyRapPhim.Models.Voucher>
+@using QuanLyRapPhim.Models
+@using System.Linq
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
 @{
-    ViewData["Title"] = "Danh sách Voucher";
+    ViewData["Title"] = Localizer["VoucherList"].Value;
     Layout = "~/Views/Shared/_Layout.cshtml";
     bool isAdmin = User.IsInRole("Admin");
 }
@@ -20,36 +24,41 @@
                 <h3 class="sidebar-title">🎬 CinemaX Admin</h3>
             </div>
             <nav class="sidebar-nav">
+                <a href="/Admin/Index"
+                   class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Admin" && ViewContext.RouteData.Values["Action"]?.ToString() == "Index" ? "active" : "")">
+                    <i class="fas fa-tachometer-alt"></i> @Localizer["Dashboard"]
+                </a>
                 <a href="/Movies"
                    class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Movies" ? "active" : "")">
-                    <i class="fas fa-film"></i> Quản lý phim
+                    <i class="fas fa-film"></i> @Localizer["ManageMovies"]
                 </a>
                 <a href="/Showtimes"
                    class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Showtimes" ? "active" : "")">
-                    <i class="fas fa-clock"></i> Lịch chiếu
+                    <i class="fas fa-clock"></i> @Localizer["ManageShowtimes"]
                 </a>
                 <a href="/Rooms"
                    class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Rooms" ? "active" : "")">
-                    <i class="fas fa-door-open"></i> Phòng chiếu
+                    <i class="fas fa-door-open"></i> @Localizer["ManageRooms"]
                 </a>
                 <a href="/Seats"
                    class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Seats" ? "active" : "")">
-                    <i class="fas fa-chair"></i> Ghế ngồi
+                    <i class="fas fa-chair"></i> @Localizer["ManageSeats"]
                 </a>
                 <a href="/Admin/ManageFoods"
                    class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "ManageFoods" ? "active" : "")">
-                    <i class="fas fa-utensils"></i> Đồ ăn & nước
+                    <i class="fas fa-utensils"></i> @Localizer["ManageFoods"]
                 </a>
                 <a href="/Admin/ManageBookings"
                    class="nav-item @(ViewContext.RouteData.Values["Action"]?.ToString() == "ManageBookings" ? "active" : "")">
-                    <i class="fas fa-ticket-alt"></i> Đặt vé
+                    <i class="fas fa-ticket-alt"></i> @Localizer["ManageBookings"]
                 </a>
                 <a href="/Admin/RevenueStatistics"
                    class="nav-item @(ViewContext.RouteData.Values["Action"]?.ToString() == "RevenueStatistics" ? "active" : "")">
-                    <i class="fas fa-chart-bar"></i> Doanh thu
+                    <i class="fas fa-chart-bar"></i> @Localizer["RevenueStatistics"]
                 </a>
-                <a href="/Vouchers" class="nav-item active">
-                    <i class="fas fa-gift"></i> Voucher
+                <a href="/Vouchers"
+                   class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Vouchers" ? "active" : "")">
+                    <i class="fas fa-gift"></i> @Localizer["Vouchers"]
                 </a>
                 <div class="nav-divider"></div>
                 <a href="#" class="nav-item"><i class="fab fa-facebook"></i> Facebook</a>
@@ -61,12 +70,12 @@
     <!-- MAIN CONTENT -->
     <div class="frame-wrapper flex-grow-1 @(isAdmin ? "admin-view" : "")">
         <div class="d-flex justify-content-between align-items-center mb-4">
-            <h1 class="title-gradient">Danh sách Voucher</h1>
+            <h1 class="title-gradient">@Localizer["VoucherList"]</h1>
             @if (isAdmin)
             {
                 <div class="header-actions">
-                    <a asp-action="Create" class="btn btn-create glow-effect">Thêm Voucher mới</a>
-                    <span class="order-count ms-3">@Model.Count() voucher được tìm thấy</span>
+                    <a asp-action="Create" class="btn btn-create glow-effect">@Localizer["CreateVoucher"]</a>
+                    <span class="order-count ms-3">@Localizer["VoucherCountFound", Model.Count()]</span>
                 </div>
             }
         </div>
@@ -88,14 +97,14 @@
             <table class="table table-custom">
                 <thead>
                     <tr>
-                        <th>Mã Voucher</th>
-                        <th>Giảm cố định (VND)</th>
-                        <th>Giảm phần trăm (%)</th>
-                        <th>Ngày hết hạn</th>
-                        <th>Trạng thái</th>
-                        <th>Giới hạn sử dụng</th>
-                        <th>Đã dùng</th>
-                        <th>Hành động</th>
+                        <th>@Localizer["VoucherCode"]</th>
+                        <th>@Localizer["FixedDiscount"]</th>
+                        <th>@Localizer["PercentageDiscount"]</th>
+                        <th>@Localizer["ExpiryDate"]</th>
+                        <th>@Localizer["Status"]</th>
+                        <th>@Localizer["UsageLimit"]</th>
+                        <th>@Localizer["UsedCount"]</th>
+                        <th>@Localizer["Actions"]</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -108,15 +117,15 @@
                             <td>@item.ExpiryDate.ToString("dd/MM/yyyy")</td>
                             <td>
                                 <span class="badge @(item.IsActive ? "bg-success" : "bg-secondary")">
-                                    @(item.IsActive ? "Active" : "Inactive")
+                                    @(item.IsActive ? Localizer["Active"] : Localizer["Inactive"])
                                 </span>
                             </td>
                             <td>@item.UsageLimit</td>
                             <td>@item.UsedCount</td>
                             <td>
-                                <a asp-action="Details" asp-route-id="@item.VoucherId" class="btn btn-sm btn-create glow-effect action-btn">Chi tiết</a>
-                                <a asp-action="Edit" asp-route-id="@item.VoucherId" class="btn btn-sm btn-warning glow-effect action-btn">Sửa</a>
-                                <a asp-action="Delete" asp-route-id="@item.VoucherId" class="btn btn-sm btn-danger glow-effect action-btn">Xóa</a>
+                                <a asp-action="Details" asp-route-id="@item.VoucherId" class="btn btn-sm btn-create glow-effect action-btn">@Localizer["Details"]</a>
+                                <a asp-action="Edit" asp-route-id="@item.VoucherId" class="btn btn-sm btn-warning glow-effect action-btn">@Localizer["Edit"]</a>
+                                <a asp-action="Delete" asp-route-id="@item.VoucherId" class="btn btn-sm btn-danger glow-effect action-btn">@Localizer["Delete"]</a>
                             </td>
                         </tr>
                     }
@@ -125,7 +134,7 @@
         </div>
     </div>
     <footer class="footer text-center py-3">
-        <p class="text-white mb-0">© 2025 CinemaX. All rights reserved.</p>
+        <p class="text-white mb-0">@Localizer["Copyright"] 2025 CinemaX. @Localizer["AllRightsReserved"]</p>
     </footer>
 </div>
 <style>

@@ -10,14 +10,12 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Collections.Generic;
-
 namespace QuanLyRapPhim.Controllers
 {
     [Authorize(Roles = "Admin")]
     public class AdminController : Controller
     {
         private readonly DBContext _context;
-
         public AdminController(DBContext context)
         {
             _context = context;
@@ -303,7 +301,6 @@ namespace QuanLyRapPhim.Controllers
             // Mặc định lấy dữ liệu 1 tháng gần nhất nếu không có filter
             fromDate ??= DateTime.Now.AddMonths(-1).Date;
             toDate ??= DateTime.Now.Date;
-
             // Lấy bookings hợp lệ với đầy đủ include để tính doanh thu riêng biệt
             var validBookings = _context.Bookings
                 .Include(b => b.Showtime).ThenInclude(s => s.Movie)
@@ -318,12 +315,12 @@ namespace QuanLyRapPhim.Controllers
                 .AsEnumerable()
                 .Where(b => b.Showtime != null && b.Showtime.Movie != null)
                 .ToList();
-
             // Tính tổng doanh thu
             var totalTicketRevenue = validBookings.Sum(b => b.BookingDetails?.Sum(bd => bd.Price) ?? 0m);
-            var totalFoodRevenue = validBookings.Sum(b => b.BookingFoods?.Sum(bf => (bf.FoodItem?.Price ?? 0m) * bf.Quantity) ?? 0m);
+            var totalFoodRevenue = validBookings.Sum(b => b.BookingFoods?.Where(bf => bf.FoodItem?.Category == "Food").Sum(bf => (bf.FoodItem?.Price ?? 0m) * bf.Quantity) ?? 0m);
+            var totalDrinkRevenue = validBookings.Sum(b => b.BookingFoods?.Where(bf => bf.FoodItem?.Category == "Drink").Sum(bf => (bf.FoodItem?.Price ?? 0m) * bf.Quantity) ?? 0m);
+            var totalComboRevenue = validBookings.Sum(b => b.BookingFoods?.Where(bf => bf.FoodItem?.Category == "Combo").Sum(bf => (bf.FoodItem?.Price ?? 0m) * bf.Quantity) ?? 0m);
             var totalRevenue = validBookings.Sum(b => b.TotalPrice);
-
             // Doanh thu theo phim
             var revenueByMovie = validBookings
                 .GroupBy(b => b.Showtime.Movie.Title)
@@ -335,7 +332,6 @@ namespace QuanLyRapPhim.Controllers
                 })
                 .OrderByDescending(x => x.TotalRevenue)
                 .ToList();
-
             // Doanh thu theo ngày (sử dụng Models.RevenueByDateItem)
             var revenueByDate = validBookings
                 .GroupBy(b => b.BookingDate.Date)
@@ -343,12 +339,13 @@ namespace QuanLyRapPhim.Controllers
                 {
                     Date = g.Key,
                     TicketRevenue = g.Sum(b => b.BookingDetails?.Sum(bd => bd.Price) ?? 0m),
-                    FoodRevenue = g.Sum(b => b.BookingFoods?.Sum(bf => (bf.FoodItem?.Price ?? 0m) * bf.Quantity) ?? 0m),
+                    FoodRevenue = g.Sum(b => b.BookingFoods?.Where(bf => bf.FoodItem?.Category == "Food").Sum(bf => (bf.FoodItem?.Price ?? 0m) * bf.Quantity) ?? 0m),
+                    DrinkRevenue = g.Sum(b => b.BookingFoods?.Where(bf => bf.FoodItem?.Category == "Drink").Sum(bf => (bf.FoodItem?.Price ?? 0m) * bf.Quantity) ?? 0m),
+                    ComboRevenue = g.Sum(b => b.BookingFoods?.Where(bf => bf.FoodItem?.Category == "Combo").Sum(bf => (bf.FoodItem?.Price ?? 0m) * bf.Quantity) ?? 0m),
                     TotalRevenue = g.Sum(b => b.TotalPrice)
                 })
                 .OrderBy(x => x.Date)
                 .ToList();
-
             // Doanh thu theo tháng (sử dụng Models.RevenueByMonthItem)
             var revenueByMonth = validBookings
                 .GroupBy(b => new { b.BookingDate.Year, b.BookingDate.Month })
@@ -358,12 +355,13 @@ namespace QuanLyRapPhim.Controllers
                     Month = g.Key.Month,
                     MonthName = CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(g.Key.Month),
                     TicketRevenue = g.Sum(b => b.BookingDetails?.Sum(bd => bd.Price) ?? 0m),
-                    FoodRevenue = g.Sum(b => b.BookingFoods?.Sum(bf => (bf.FoodItem?.Price ?? 0m) * bf.Quantity) ?? 0m),
+                    FoodRevenue = g.Sum(b => b.BookingFoods?.Where(bf => bf.FoodItem?.Category == "Food").Sum(bf => (bf.FoodItem?.Price ?? 0m) * bf.Quantity) ?? 0m),
+                    DrinkRevenue = g.Sum(b => b.BookingFoods?.Where(bf => bf.FoodItem?.Category == "Drink").Sum(bf => (bf.FoodItem?.Price ?? 0m) * bf.Quantity) ?? 0m),
+                    ComboRevenue = g.Sum(b => b.BookingFoods?.Where(bf => bf.FoodItem?.Category == "Combo").Sum(bf => (bf.FoodItem?.Price ?? 0m) * bf.Quantity) ?? 0m),
                     TotalRevenue = g.Sum(b => b.TotalPrice)
                 })
                 .OrderBy(x => x.Year).ThenBy(x => x.Month)
                 .ToList();
-
             // Doanh thu thức ăn theo category và ngày (sử dụng Models.FoodRevenueByDateItem)
             var allBookingFoods = validBookings
                 .SelectMany(b => b.BookingFoods ?? new List<BookingFood>());
@@ -383,42 +381,43 @@ namespace QuanLyRapPhim.Controllers
                 })
                 .OrderBy(x => x.Date)
                 .ToList();
-
             var revenueData = new
             {
                 FromDate = fromDate.Value.ToString("yyyy-MM-dd"),
                 ToDate = toDate.Value.ToString("yyyy-MM-dd"),
                 TotalTicketRevenue = totalTicketRevenue,
                 TotalFoodRevenue = totalFoodRevenue,
+                TotalDrinkRevenue = totalDrinkRevenue,
+                TotalComboRevenue = totalComboRevenue,
                 TotalRevenue = totalRevenue,
                 RevenueByMovie = revenueByMovie,
                 RevenueByDate = revenueByDate,
                 RevenueByMonth = revenueByMonth,
                 RevenueByFoodCategoryByDate = revenueByFoodCategoryByDate
             };
-
             // Format cho chart (JSON)
             var formattedRevenueByDateForChart = revenueByDate.Select(x => new
             {
                 Date = x.Date.ToString("dd/MM/yyyy"),
                 TicketRevenue = x.TicketRevenue,
                 FoodRevenue = x.FoodRevenue,
+                DrinkRevenue = x.DrinkRevenue,
+                ComboRevenue = x.ComboRevenue,
                 TotalRevenue = x.TotalRevenue
             }).ToList();
-
             var formattedRevenueByMonthForChart = revenueByMonth.Select(x => new
             {
                 Month = $"{x.MonthName} {x.Year}",
                 TicketRevenue = x.TicketRevenue,
                 FoodRevenue = x.FoodRevenue,
+                DrinkRevenue = x.DrinkRevenue,
+                ComboRevenue = x.ComboRevenue,
                 TotalRevenue = x.TotalRevenue
             }).ToList();
-
             ViewBag.RevenueData = revenueData;
             ViewBag.FormattedRevenueByDate = JsonConvert.SerializeObject(formattedRevenueByDateForChart);
             ViewBag.FormattedRevenueByMonth = JsonConvert.SerializeObject(formattedRevenueByMonthForChart);
             ViewBag.FormattedFoodByDate = JsonConvert.SerializeObject(revenueByFoodCategoryByDate);
-
             return View();
         }
         // ========================================
@@ -547,9 +546,10 @@ namespace QuanLyRapPhim.Controllers
         public DateTime Date { get; set; }
         public decimal TicketRevenue { get; set; }
         public decimal FoodRevenue { get; set; }
+        public decimal DrinkRevenue { get; set; }
+        public decimal ComboRevenue { get; set; }
         public decimal TotalRevenue { get; set; }
     }
-
     // Helper class for revenue statistics by month
     public class RevenueByMonthItem
     {
@@ -558,9 +558,10 @@ namespace QuanLyRapPhim.Controllers
         public string MonthName { get; set; }
         public decimal TicketRevenue { get; set; }
         public decimal FoodRevenue { get; set; }
+        public decimal DrinkRevenue { get; set; }
+        public decimal ComboRevenue { get; set; }
         public decimal TotalRevenue { get; set; }
     }
-
     // Helper class for food revenue by category and date
     public class FoodRevenueByDateItem
     {

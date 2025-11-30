@@ -26,4 +26,8 @@
     </EmbeddedResource>
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Resources\Views\NewFolder\" />
+  </ItemGroup>
+
 </Project>

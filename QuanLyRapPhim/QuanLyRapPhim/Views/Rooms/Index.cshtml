@@ -1,6 +1,10 @@
-﻿@model IEnumerable<QuanLyRapPhim.Models.Room>
+﻿@using QuanLyRapPhim.Models
+@using System.Linq
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+@model IEnumerable<QuanLyRapPhim.Models.Room>
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = Localizer["ManageRooms"].Value;
     Layout = "~/Views/Shared/_Layout.cshtml";
     bool isAdmin = User.IsInRole("Admin");
 }
@@ -22,39 +26,39 @@
             <nav class="sidebar-nav">
                 <a href="/Admin/Index"
                    class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Admin" && ViewContext.RouteData.Values["Action"]?.ToString() == "Index" ? "active" : "")">
-                    <i class="fas fa-tachometer-alt"></i> Bảng điều khiển
+                    <i class="fas fa-tachometer-alt"></i> @Localizer["Dashboard"]
                 </a>
                 <a href="/Movies"
                    class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Movies" ? "active" : "")">
-                    <i class="fas fa-film"></i> Quản lý phim
+                    <i class="fas fa-film"></i> @Localizer["ManageMovies"]
                 </a>
                 <a href="/Showtimes"
                    class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Showtimes" ? "active" : "")">
-                    <i class="fas fa-clock"></i> Lịch chiếu
+                    <i class="fas fa-clock"></i> @Localizer["ManageShowtimes"]
                 </a>
                 <a href="/Rooms"
                    class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Rooms" ? "active" : "")">
-                    <i class="fas fa-door-open"></i> Phòng chiếu
+                    <i class="fas fa-door-open"></i> @Localizer["ManageRooms"]
                 </a>
                 <a href="/Seats"
                    class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Seats" ? "active" : "")">
-                    <i class="fas fa-chair"></i> Ghế ngồi
+                    <i class="fas fa-chair"></i> @Localizer["ManageSeats"]
                 </a>
                 <a href="/Admin/ManageFoods"
                    class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "ManageFoods" ? "active" : "")">
-                    <i class="fas fa-utensils"></i> Đồ ăn & nước
+                    <i class="fas fa-utensils"></i> @Localizer["ManageFoods"]
                 </a>
                 <a href="/Admin/ManageBookings"
                    class="nav-item @(ViewContext.RouteData.Values["Action"]?.ToString() == "ManageBookings" ? "active" : "")">
-                    <i class="fas fa-ticket-alt"></i> Đặt vé
+                    <i class="fas fa-ticket-alt"></i> @Localizer["ManageBookings"]
                 </a>
                 <a href="/Admin/RevenueStatistics"
                    class="nav-item @(ViewContext.RouteData.Values["Action"]?.ToString() == "RevenueStatistics" ? "active" : "")">
-                    <i class="fas fa-chart-bar"></i> Doanh thu
+                    <i class="fas fa-chart-bar"></i> @Localizer["RevenueStatistics"]
                 </a>
                 <a href="/Vouchers"
                    class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Vouchers" ? "active" : "")">
-                    <i class="fas fa-gift"></i> Voucher
+                    <i class="fas fa-gift"></i> @Localizer["Vouchers"]
                 </a>
                 <div class="nav-divider"></div>
                 <a href="#" class="nav-item"><i class="fab fa-facebook"></i> Facebook</a>
@@ -66,16 +70,22 @@
     <!-- MAIN CONTENT -->
     <div class="frame-wrapper flex-grow-1 @(isAdmin ? "admin-view" : "")">
         <div class="content-inner">
-            <h1 class="page-title">Quản lý phòng</h1>
+            <h1 class="page-title">@Localizer["ManageRooms"]</h1>
+            @if (TempData["SuccessMessage"] != null)
+            {
+                <div class="alert alert-success" role="alert">
+                    @TempData["SuccessMessage"]
+                </div>
+            }
             <p>
-                <a asp-action="Create" class="create-button">Tạo phòng mới</a>
+                <a asp-action="Create" class="create-button">@Localizer["CreateRoom"]</a>
             </p>
             <table class="table">
                 <thead>
                     <tr>
-                        <th>@Html.DisplayNameFor(model => model.RoomName)</th>
-                        <th>@Html.DisplayNameFor(model => model.Capacity)</th>
-                        <th>Actions</th>
+                        <th>@Localizer["RoomName"]</th>
+                        <th>@Localizer["Capacity"]</th>
+                        <th>@Localizer["Actions"]</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -85,8 +95,8 @@
                             <td>@Html.DisplayFor(modelItem => item.RoomName)</td>
                             <td>@Html.DisplayFor(modelItem => item.Capacity)</td>
                             <td>
-                                <a asp-action="Edit" asp-route-id="@item.RoomId" class="action-link edit-link">Sửa</a>
-                                <a asp-action="Delete" asp-route-id="@item.RoomId" class="action-link delete-link">Xóa</a>
+                                <a asp-action="Edit" asp-route-id="@item.RoomId" class="action-link edit-link">@Localizer["Edit"]</a>
+                                <a asp-action="Delete" asp-route-id="@item.RoomId" class="action-link delete-link">@Localizer["Delete"]</a>
                             </td>
                         </tr>
                     }
@@ -95,14 +105,14 @@
         </div>
     </div>
     <footer class="footer text-center py-3">
-        <p class="text-white mb-0">© 2025 CinemaX. All rights reserved.</p>
+        <p class="text-white mb-0">@Localizer["Copyright"] 2025 CinemaX. @Localizer["AllRightsReserved"]</p>
     </footer>
 </div>
 <style>
     body {
         margin: 0;
         background-color: #0F0F0F; /* Galaxy Black */
-        color: #ffffff;
+        color: #d3d3d3; /* Darkened from #ffffff to light gray for better readability */
         font-family: 'Montserrat', sans-serif;
         overflow-x: hidden;
     }
@@ -181,15 +191,11 @@
     .content-inner {
         max-width: 1200px;
         width: 100%;
-        border: 2px solid #ff0033; /* Red border for the content frame */
-        border-radius: 15px;
-        padding: 20px;
-        background-color: #1c1c1c; /* Dark background to match the table */
     }
 
     .page-title {
         background-color: #1c1c1c;
-        color: #fff;
+        color: #d3d3d3; /* Darkened from #fff to light gray */
         padding: 15px;
         text-align: center;
         border-radius: 15px;
@@ -199,11 +205,19 @@
         margin-bottom: 20px;
     }
 
+    .alert-success {
+        background-color: #333;
+        color: #d3d3d3; /* Darkened from #fff to light gray */
+        border: 1px solid #ff0000; /* Red border */
+        border-radius: 10px;
+        margin-bottom: 20px;
+    }
+
     .create-button {
         display: inline-block;
         padding: 8px 20px;
         background-color: #00cc00;
-        color: #fff;
+        color: #d3d3d3; /* Darkened from #fff to light gray */
         text-decoration: none;
         border-radius: 20px;
         font-weight: 600;
@@ -223,11 +237,12 @@
         box-shadow: 0 10px 20px rgba(0,0,0,0.3);
         border-radius: 15px;
         overflow: hidden;
+        border: 2px solid #ff0000; /* Red border */
     }
 
         .table thead tr {
             background-color: #333;
-            color: #fff;
+            color: #d3d3d3; /* Darkened from #fff to light gray */
         }
 
         .table th {
@@ -240,7 +255,7 @@
         .table td {
             padding: 12px;
             border: none;
-            color: #b3b3b3;
+            color: #a9a9a9; /* Darkened from #b3b3b3 to a slightly darker gray */
             font-family: 'Montserrat', sans-serif;
         }
 
@@ -263,12 +278,12 @@
     }
 
     .details-link {
-        color: #fff;
+        color: #d3d3d3; /* Darkened from #fff to light gray */
         background-color: #00bfff;
     }
 
     .delete-link {
-        color: #fff;
+        color: #d3d3d3; /* Darkened from #fff to light gray */
         background-color: #e6002e;
     }
 

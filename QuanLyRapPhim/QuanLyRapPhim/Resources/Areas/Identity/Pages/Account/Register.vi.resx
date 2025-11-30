@@ -1,0 +1,209 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+	<xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+		<xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+		<xsd:element name="root" msdata:IsDataSet="true">
+			<xsd:complexType>
+				<xsd:choice maxOccurs="unbounded">
+					<xsd:element name="metadata">
+						<xsd:complexType>
+							<xsd:sequence>
+								<xsd:element name="value" type="xsd:string" minOccurs="0" />
+							</xsd:sequence>
+							<xsd:attribute name="name" use="required" type="xsd:string" />
+							<xsd:attribute name="type" type="xsd:string" />
+							<xsd:attribute name="mimetype" type="xsd:string" />
+							<xsd:attribute ref="xml:space" />
+						</xsd:complexType>
+					</xsd:element>
+					<xsd:element name="assembly">
+						<xsd:complexType>
+							<xsd:attribute name="alias" type="xsd:string" />
+							<xsd:attribute name="name" type="xsd:string" />
+						</xsd:complexType>
+					</xsd:element>
+					<xsd:element name="data">
+						<xsd:complexType>
+							<xsd:sequence>
+								<xsd:element name="value" type="xsd:string" minOccurs="0" />
+							</xsd:sequence>
+							<xsd:attribute name="name" use="required" type="xsd:string" />
+							<xsd:attribute name="type" type="xsd:string" />
+							<xsd:attribute name="mimetype" type="xsd:string" />
+							<xsd:attribute ref="xml:space" />
+						</xsd:complexType>
+					</xsd:element>
+					<xsd:element name="resheader">
+						<xsd:complexType>
+							<xsd:sequence>
+								<xsd:element name="value" type="xsd:string" minOccurs="0" />
+							</xsd:sequence>
+							<xsd:attribute name="name" use="required" type="xsd:string" />
+							<xsd:attribute name="type" type="xsd:string" />
+						</xsd:complexType>
+					</xsd:element>
+				</xsd:choice>
+			</xsd:complexType>
+		</xsd:element>
+	</xsd:schema>
+	<resheader name="resmimetype">text/microsoft-resx</resheader>
+	<resheader name="version">2.0</resheader>
+	<resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</resheader>
+	<resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</resheader>
+	<data name="Dashboard" xml:space="preserve">
+    <value>Bảng điều khiển</value>
+  </data>
+	<data name="ManageMovies" xml:space="preserve">
+    <value>Quản lý phim</value>
+  </data>
+	<data name="ManageShowtimes" xml:space="preserve">
+    <value>Lịch chiếu</value>
+  </data>
+	<data name="ManageRooms" xml:space="preserve">
+    <value>Quản lý phòng</value>
+  </data>
+	<data name="ManageSeats" xml:space="preserve">
+    <value>Quản lý ghế</value>
+  </data>
+	<data name="ManageFoods" xml:space="preserve">
+    <value>Đồ ăn &amp; nước</value>
+  </data>
+	<data name="ManageBookings" xml:space="preserve">
+    <value>Đặt vé</value>
+  </data>
+	<data name="RevenueStatistics" xml:space="preserve">
+    <value>Doanh thu</value>
+  </data>
+	<data name="Vouchers" xml:space="preserve">
+    <value>Voucher</value>
+  </data>
+	<data name="Copyright" xml:space="preserve">
+    <value>Bản quyền</value>
+  </data>
+	<data name="AllRightsReserved" xml:space="preserve">
+    <value>Tất cả quyền được bảo lưu.</value>
+  </data>
+	<data name="CreateSeat" xml:space="preserve">
+    <value>Tạo ghế mới</value>
+  </data>
+	<data name="SeatNumber" xml:space="preserve">
+    <value>Số ghế</value>
+  </data>
+	<data name="Status" xml:space="preserve">
+    <value>Trạng thái</value>
+  </data>
+	<data name="Room" xml:space="preserve">
+    <value>Phòng</value>
+  </data>
+	<data name="Actions" xml:space="preserve">
+    <value>Thao tác</value>
+  </data>
+	<data name="Edit" xml:space="preserve">
+    <value>Sửa</value>
+  </data>
+	<data name="Delete" xml:space="preserve">
+    <value>Xóa</value>
+  </data>
+	<data name="CreateRoom" xml:space="preserve">
+    <value>Tạo phòng mới</value>
+  </data>
+	<data name="RoomName" xml:space="preserve">
+    <value>Tên phòng</value>
+  </data>
+	<data name="Capacity" xml:space="preserve">
+    <value>Sức chứa</value>
+  </data>
+	<data name="VoucherList" xml:space="preserve">
+    <value>Danh sách Voucher</value>
+  </data>
+	<data name="CreateVoucher" xml:space="preserve">
+    <value>Thêm Voucher mới</value>
+  </data>
+	<data name="VoucherCountFound" xml:space="preserve">
+    <value>{0} voucher được tìm thấy</value>
+  </data>
+	<data name="VoucherCode" xml:space="preserve">
+    <value>Mã Voucher</value>
+  </data>
+	<data name="FixedDiscount" xml:space="preserve">
+    <value>Giảm cố định (VND)</value>
+  </data>
+	<data name="PercentageDiscount" xml:space="preserve">
+    <value>Giảm phần trăm (%)</value>
+  </data>
+	<data name="ExpiryDate" xml:space="preserve">
+    <value>Ngày hết hạn</value>
+  </data>
+	<data name="UsageLimit" xml:space="preserve">
+    <value>Giới hạn sử dụng</value>
+  </data>
+	<data name="UsedCount" xml:space="preserve">
+    <value>Đã dùng</value>
+  </data>
+	<data name="Details" xml:space="preserve">
+    <value>Chi tiết</value>
+  </data>
+	<data name="Active" xml:space="preserve">
+    <value>Hoạt động</value>
+  </data>
+	<data name="Inactive" xml:space="preserve">
+    <value>Không hoạt động</value>
+  </data>
+	<data name="Login" xml:space="preserve">
+    <value>Đăng nhập</value>
+  </data>
+	<data name="LoginIntro" xml:space="preserve">
+    <value>Bước vào thế giới kỳ diệu – nơi mỗi ghế ngồi đưa bạn vào một hành trình.</value>
+  </data>
+	<data name="Email" xml:space="preserve">
+    <value>Email</value>
+  </data>
+	<data name="Password" xml:space="preserve">
+    <value>Mật khẩu</value>
+  </data>
+	<data name="RememberMe" xml:space="preserve">
+    <value>Ghi nhớ tôi</value>
+  </data>
+	<data name="ForgotPassword" xml:space="preserve">
+    <value>Quên mật khẩu?</value>
+  </data>
+	<data name="NoAccount" xml:space="preserve">
+    <value>Chưa có tài khoản?</value>
+  </data>
+	<data name="Register" xml:space="preserve">
+    <value>Đăng ký</value>
+  </data>
+	<data name="OrSignInWith" xml:space="preserve">
+    <value>Hoặc đăng nhập bằng</value>
+  </data>
+	<data name="SignInWithAccount" xml:space="preserve">
+    <value>Đăng nhập bằng tài khoản {0}</value>
+  </data>
+	<data name="FullName" xml:space="preserve">
+    <value>Họ và tên</value>
+  </data>
+	<data name="DateOfBirth" xml:space="preserve">
+    <value>Ngày sinh</value>
+  </data>
+	<data name="ConfirmPassword" xml:space="preserve">
+    <value>Xác nhận mật khẩu</value>
+  </data>
+	<data name="HasAccount" xml:space="preserve">
+    <value>Đã có tài khoản?</value>
+  </data>
+	<data name="OrSignUpWith" xml:space="preserve">
+    <value>Hoặc đăng ký bằng</value>
+  </data>
+	<data name="SignUpWithAccount" xml:space="preserve">
+    <value>Đăng ký bằng tài khoản {0}</value>
+  </data>
+	<data name="RegisterIntro" xml:space="preserve">
+    <value>Trải nghiệm phim ảnh chưa từng có – chỉ tại</value>
+  </data>
+	<data name="EmailPlaceholder" xml:space="preserve">
+    <value>tênngườidùng@gmail.com</value>
+  </data>
+	<data name="PasswordPlaceholder" xml:space="preserve">
+    <value>********</value>
+  </data>
+</root>
