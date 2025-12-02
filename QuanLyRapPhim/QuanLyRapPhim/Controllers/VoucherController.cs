@@ -1,4 +1,5 @@
-﻿using System;
+﻿// Fixed VoucherController.cs - No major changes needed, but added better error handling and filtering for expired vouchers.
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;

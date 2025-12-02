@@ -1,582 +1,183 @@
-﻿@model IEnumerable<QuanLyRapPhim.Models.Booking>
+﻿@using QuanLyRapPhim.Models
+@using System.Linq
 @using Microsoft.AspNetCore.Mvc.Localization
 @inject IViewLocalizer Localizer
+@model IEnumerable<Booking>
+
 @{
-    ViewData["Title"] = Localizer["ManageBookings"].Value;
+    ViewData["Title"] = Localizer["PaymentHistory"].Value;
     Layout = "~/Views/Shared/_Layout.cshtml";
-    bool isAdmin = User.IsInRole("Admin");
 }
+
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@Localizer["ManageBookings"]</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+    <meta charset="utf-8" />
+    <title>@Localizer["PaymentHistory"]</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
     <style>
         body {
-            margin: 0;
-            background-color: #0F0F0F; /* Galaxy Black */
-            color: #ffffff;
+            background-color: #0F0F0F;
+            color: white;
             font-family: 'Montserrat', sans-serif;
-            overflow-x: hidden;
-        }
-        /* ===== SIDEBAR STYLE (GIỐNG SHOWTIME) ===== */
-        .sidebar {
-            background: #111;
-            width: 250px;
-            height: 100vh;
-            position: fixed;
-            top: 0;
-            left: 0;
-            padding: 25px 20px;
-            overflow-y: auto;
-            border-right: 2px solid #e50914;
-            box-shadow: 2px 0 10px rgba(0,0,0,0.4);
-            transition: width 0.3s ease, transform 0.3s ease;
-            z-index: 1000;
-        }
-
-            .sidebar.collapsed {
-                width: 0;
-                padding: 0;
-                transform: translateX(-100%);
-            }
-
-        .sidebar-title {
-            color: #fff;
-            font-weight: 700;
-            font-size: 1.4rem;
-        }
-
-        .sidebar-nav .nav-item {
-            color: #ddd;
-            padding: 12px 15px;
-            border-radius: 8px;
-            margin-bottom: 5px;
-            font-size: 1rem;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            text-decoration: none;
-            transition: 0.25s;
-        }
-
-        .nav-item i {
-            width: 20px;
-        }
-
-        .nav-item:hover {
-            background-color: #e50914;
-            color: #fff;
-            transform: translateX(5px);
-        }
-
-        .nav-item.active {
-            background-color: #e50914;
-            color: #fff;
-            font-weight: 600;
-        }
-
-        .nav-divider {
-            height: 1px;
-            background: #444;
-            margin: 15px 0;
-        }
-
-        .frame-wrapper.admin-view {
-            margin-left: 250px;
-            transition: margin-left 0.3s ease;
-        }
-
-            .frame-wrapper.admin-view.shifted {
-                margin-left: 0;
-            }
-
-        .content-inner {
-            max-width: 1200px;
-            width: 100%;
-        }
-
-        .admin-dashboard {
-            display: flex;
-            min-height: 100vh;
-        }
-
-        .title-gradient {
-            background: linear-gradient(90deg, #ff0033, #1c1c1c);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            font-size: 2.2rem;
-            font-weight: bold;
-            text-align: center;
-            margin-bottom: 30px;
-        }
-
-        .glow-effect {
-            box-shadow: 0 0 15px rgba(255, 0, 51, 0.3);
-            transition: box-shadow 0.3s ease;
-        }
-
-        .table-dark.glow-effect:hover {
-            box-shadow: 0 0 25px rgba(255, 0, 51, 0.5);
-            transform: none;
         }
 
         .table-dark {
             background-color: #1c1c1c;
             border-radius: 15px;
             overflow: hidden;
-            width: 100%;
-            border-collapse: collapse;
-            table-layout: fixed;
         }
-
-            .table-dark th, .table-dark td {
-                border: 1px solid #444;
-                padding: 10px 12px;
-                text-align: center;
-                font-size: 0.95rem;
-                color: white;
-                word-wrap: break-word;
-                white-space: normal;
-                overflow-wrap: break-word;
-                vertical-align: middle;
-            }
 
             .table-dark th {
                 background-color: #2a2a2a;
                 font-weight: 600;
-                position: sticky;
-                top: 0;
-                z-index: 10;
-            }
-
-            .table-dark td.payment-status,
-            .table-dark td.email-column,
-            .table-dark td.movie-column,
-            .table-dark td.seat-column {
-                white-space: normal;
-                word-wrap: break-word;
-                min-width: 200px;
-                text-align: left;
-                overflow: visible;
-            }
-
-            .table-dark td.payment-status {
-                text-align: center;
-                padding: 10px 12px;
-            }
-
-            .table-dark tr:hover td {
-                background-color: #2a2a2a;
-            }
-
-            .table-dark td.email-column,
-            .table-dark th.email-column {
-                max-width: 150px;
-                text-align: left;
-            }
-
-            .table-dark td.movie-column,
-            .table-dark th.movie-column {
-                max-width: 150px;
-                text-align: left;
-            }
-
-            .table-dark td.seat-column,
-            .table-dark th.seat-column {
-                max-width: 180px;
-                text-align: left;
-            }
-
-            .table-dark td.status-column,
-            .table-dark th.status-column {
-                max-width: 130px;
-                min-width: 100px;
                 text-align: center;
             }
 
-        .table-container {
-            overflow-x: auto;
-            width: 100%;
+            .table-dark td {
+                vertical-align: middle;
+                text-align: center;
+            }
+
+        .title-gradient {
+            background: linear-gradient(90deg, #ff0033, #ff8c00);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-size: 2.5rem;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 40px;
         }
 
-            .table-container::-webkit-scrollbar {
-                height: 8px;
-            }
+        .badge-success {
+            background-color: #28a745;
+            font-weight: 600;
+            padding: 8px 16px;
+            border-radius: 20px;
+        }
 
-            .table-container::-webkit-scrollbar-thumb {
-                background: #ff0033;
-                border-radius: 10px;
-            }
-
-            .table-container::-webkit-scrollbar-track {
-                background: #2a2a2a;
-            }
-
-        .btn-secondary {
-            background-color: #ff0033;
+        .btn-back {
+            background: linear-gradient(45deg, #ff0033, #cc002a);
             border: none;
             color: white;
-            border-radius: 25px;
-            padding: 12px 30px;
+            padding: 14px 40px;
+            border-radius: 30px;
             font-weight: 600;
+            font-size: 1.1rem;
             transition: all 0.3s ease;
         }
 
-            .btn-secondary:hover {
-                background-color: #cc002a;
-                transform: scale(1.05);
+            .btn-back:hover {
+                transform: translateY(-3px);
+                box-shadow: 0 10px 20px rgba(255,0,51,0.4);
+            }
+
+        .glow-effect {
+            box-shadow: 0 0 20px rgba(255,0,51,0.3);
+            transition: all 0.3s ease;
+        }
+
+            .glow-effect:hover {
+                box-shadow: 0 0 30px rgba(255,0,51,0.6);
             }
 
         .text-muted {
-            color: #b3b3b3 !important;
+            color: #aaaaaa !important;
             font-style: italic;
-        }
-
-        .payment-status .spinner-border {
-            margin-left: 5px;
-        }
-        /* Toggle Button - Compact and Beautiful */
-        .sidebar-toggle {
-            position: fixed;
-            top: 15px;
-            left: 15px;
-            z-index: 1001;
-            background: linear-gradient(135deg, #ff0033, #e50914);
-            color: #fff;
-            border: none;
-            border-radius: 50%;
-            width: 35px;
-            height: 35px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 4px 15px rgba(229, 9, 20, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1);
-            transition: all 0.3s ease;
-            cursor: pointer;
-            font-size: 14px;
-        }
-
-            .sidebar-toggle:hover {
-                transform: scale(1.05) rotate(5deg);
-                box-shadow: 0 6px 20px rgba(229, 9, 20, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.1);
-            }
-
-            .sidebar-toggle:active {
-                transform: scale(0.95);
-            }
-
-        .sidebar.collapsed + .frame-wrapper.admin-view .sidebar-toggle {
-            left: 15px;
-        }
-        /* Media Queries */
-        @@media (max-width: 768px) {
-            .sidebar {
-                width: 200px;
-            }
-
-            .frame-wrapper.admin-view {
-                margin-left: 200px;
-            }
-
-            .sidebar.collapsed {
-                width: 0;
-                padding: 0;
-                transform: translateX(-100%);
-            }
-
-            .frame-wrapper.admin-view.shifted {
-                margin-left: 0;
-            }
-
-            .sidebar-toggle {
-                top: 10px;
-                left: 10px;
-                width: 32px;
-                height: 32px;
-                font-size: 13px;
-            }
-        }
-
-        @@media (max-width: 576px) {
-            .container-fluid.d-flex {
-                flex-direction: column;
-            }
-
-            .sidebar {
-                position: relative;
-                width: 100%;
-                height: auto;
-            }
-
-            .frame-wrapper.admin-view {
-                margin-left: 0;
-                width: 100%;
-                min-height: auto;
-            }
-
-            .content-inner {
-                width: 100%;
-                padding: 20px;
-            }
-
-            .sidebar.collapsed {
-                display: none;
-            }
-
-            .sidebar-toggle {
-                position: relative;
-                margin: 10px auto;
-                display: block;
-            }
         }
     </style>
 </head>
 <body>
-    <div class="container-fluid d-flex position-relative">
-        <!-- Toggle Button -->
-        @if (isAdmin)
-        {
-            <button id="sidebar-toggle" class="sidebar-toggle">
-                <i class="fas fa-bars"></i>
-            </button>
-        }
-        <!-- SIDEBAR -->
-        @if (isAdmin)
-        {
-            <aside class="sidebar">
-                <div class="sidebar-header">
-                    <h3 class="sidebar-title">🎬 CinemaX Admin</h3>
-                </div>
-                <nav class="sidebar-nav">
-                    <a href="/Admin/Index"
-                       class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Admin" && ViewContext.RouteData.Values["Action"]?.ToString() == "Index" ? "active" : "")">
-                        <i class="fas fa-tachometer-alt"></i> @Localizer["Dashboard"]
-                    </a>
-                    <a href="/Movies"
-                       class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Movies" ? "active" : "")">
-                        <i class="fas fa-film"></i> @Localizer["ManageMovies"]
-                    </a>
-                    <a href="/Showtimes"
-                       class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Showtimes" ? "active" : "")">
-                        <i class="fas fa-clock"></i> @Localizer["ManageShowtimes"]
-                    </a>
-                    <a href="/Rooms"
-                       class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Rooms" ? "active" : "")">
-                        <i class="fas fa-door-open"></i> @Localizer["ManageRooms"]
-                    </a>
-                    <a href="/Seats"
-                       class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Seats" ? "active" : "")">
-                        <i class="fas fa-chair"></i> @Localizer["ManageSeats"]
-                    </a>
-                    <a href="/Admin/ManageFoods"
-                       class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Admin" && ViewContext.RouteData.Values["Action"]?.ToString() == "ManageFoods" ? "active" : "")">
-                        <i class="fas fa-utensils"></i> @Localizer["ManageFoods"]
-                    </a>
-                    <a href="/Admin/ManageBookings"
-                       class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Admin" && ViewContext.RouteData.Values["Action"]?.ToString() == "ManageBookings" ? "active" : "")">
-                        <i class="fas fa-ticket-alt"></i> @Localizer["ManageBookings"]
-                    </a>
-                    <a href="/Admin/RevenueStatistics"
-                       class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Admin" && ViewContext.RouteData.Values["Action"]?.ToString() == "RevenueStatistics" ? "active" : "")">
-                        <i class="fas fa-chart-bar"></i> @Localizer["RevenueStatistics"]
-                    </a>
-                    <a href="/Vouchers"
-                       class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Vouchers" ? "active" : "")">
-                        <i class="fas fa-gift"></i> @Localizer["Vouchers"]
-                    </a>
-                    <div class="nav-divider"></div>
-                    <a href="#" class="nav-item"><i class="fab fa-facebook"></i> Facebook</a>
-                    <a href="#" class="nav-item"><i class="fab fa-twitter"></i> Twitter</a>
-                    <a href="#" class="nav-item"><i class="fab fa-google"></i> Google</a>
-                </nav>
-            </aside>
-        }
-        <!-- MAIN CONTENT -->
-        <div class="frame-wrapper flex-grow-1 @(isAdmin ? "admin-view" : "")">
-            <div class="content-inner">
-                <h1 class="title-gradient">@Localizer["ManageBookings"]</h1>
-                <div class="table-container">
-                    <table class="table table-dark table-bordered glow-effect">
-                        <thead>
-                            <tr>
-                                <th>@Localizer["BookingId"]</th>
-                                <th>@Localizer["CustomerEmail"]</th>
-                                <th>@Localizer["Movie"]</th>
-                                <th>@Localizer["Room"]</th>
-                                <th>@Localizer["Seats"]</th>
-                                <th>@Localizer["ShowDate"]</th>
-                                <th>@Localizer["ShowTime"]</th>
-                                <th>@Localizer["TotalPrice"]</th>
-                                <th>@Localizer["BookingDate"]</th>
-                                <th class="status-column">@Localizer["PaymentStatus"]</th>
+    <div class="container py-5">
+        <h1 class="title-gradient">@Localizer["PaymentHistory"]</h1>
+        <div class="table-responsive">
+            <table class="table table-dark table-hover glow-effect">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Phim</th>
+                        <th>Phòng</th>
+                        <th>Ghế</th>
+                        <th>Ngày chiếu</th>
+                        <th>Giờ chiếu</th>
+                        <th>Đồ ăn/Đồ uống</th>
+                        <th>Số tiền</th>
+                        <th>Ngày đặt</th>
+                        <th>Trạng thái</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model?.Any() == true)
+                    {
+                        @foreach (var booking in Model)
+                        {
+                            var showtime = booking.Showtime;
+                            var isFoodOnly = showtime == null;
+                            var payment = booking.Payment;
+                            // Ưu tiên payment.Amount nếu đã thanh toán (luôn có ở đây vì filter Completed)
+                            decimal displayAmount = payment != null ? payment.Amount : booking.TotalPrice;
+                            bool hasDiscount = payment != null && payment.Amount < booking.TotalPrice;
+                            decimal discountAmount = hasDiscount ? (booking.TotalPrice - payment.Amount) : 0;
+                            <tr class="text-center align-middle">
+                                <td class="fw-bold text-info">#@booking.BookingId</td>
+                                <td>
+                                    @(isFoodOnly ? "Chỉ mua đồ ăn" : showtime.Movie.Title)
+                                </td>
+                                <td>@(isFoodOnly ? "—" : showtime.Room.RoomName)</td>
+                                <td>
+                                    @(booking.BookingDetails?.Any() == true
+                                        ? string.Join(", ", booking.BookingDetails.Select(bd => bd.Seat.SeatNumber))
+                                        : Html.Raw("<em class='text-muted'>—</em>"))
+                                </td>
+                                <td>@(isFoodOnly ? "—" : showtime.Date.ToString("dd/MM/yyyy"))</td>
+                                <td>@(isFoodOnly ? "—" : showtime.StartTime.ToString(@"hh\:mm"))</td>
+                                <td>
+                                    @if (booking.BookingFoods?.Any() == true)
+                                    {
+                                        <div class="text-start">
+                                            @foreach (var bf in booking.BookingFoods)
+                                            {
+                                                <div>@bf.FoodItem.Name × @bf.Quantity</div>
+                                            }
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <em class="text-muted">Không</em>
+                                    }
+                                </td>
+                                <td class="text-end text-warning fw-bold fs-5">
+                                    @displayAmount.ToString("N0") <small class="text-white-50">VNĐ</small>
+                                    @if (hasDiscount)
+                                    {
+                                        <br />
+
+                                        <small class="text-success">(Giảm @discountAmount.ToString("N0") VNĐ từ voucher)</small>
+                                    }
+                                </td>
+                                <td>@booking.BookingDate.ToString("dd/MM/yyyy")<br><small>@booking.BookingDate.ToString("HH:mm")</small></td>
+                                <td><span class="badge bg-success px-3 py-2">Đã thanh toán</span></td>
                             </tr>
-                        </thead>
-                        <tbody>
-                            @if (Model?.Any() == true)
-                            {
-                                @foreach (var booking in Model)
-                                {
-                                    var payment = booking.Payment;
-                                    var showtime = booking.Showtime;
-                                    var isFoodOnly = showtime == null;
-                                    <tr data-booking-id="@booking.BookingId">
-                                        <td class="fw-bold">@booking.BookingId</td>
-                                        <td class="email-column">@(booking.User?.Email ?? Localizer["GuestUser"].Value)</td>
-                                        <!-- Phim -->
-                                        <td class="movie-column">
-                                            @if (!isFoodOnly && showtime?.Movie != null)
-                                            {
-                                                @showtime.Movie.Title
-                                            }
-                                            else
-                                            {
-                                                <em class="text-muted">@Localizer["FoodOnly"].Value</em>
-                                            }
-                                        </td>
-                                        <!-- Phòng -->
-                                        <td>
-                                            @if (!isFoodOnly && showtime?.Room != null)
-                                            {
-                                                @showtime.Room.RoomName
-                                            }
-                                            else
-                                            {
-                                                <em class="text-muted">—</em>
-                                            }
-                                        </td>
-                                        <!-- Ghế -->
-                                        <td class="seat-column">
-                                            @if (booking.BookingDetails?.Any() == true)
-                                            {
-                                                @string.Join(", ", booking.BookingDetails.Select(bd => bd.Seat?.SeatNumber ?? Localizer["N/A"].Value))
-                                            }
-                                            else
-                                            {
-                                                <em class="text-muted">@Localizer["NoSeatsSelected"].Value</em>
-                                            }
-                                        </td>
-                                        <!-- Ngày chiếu -->
-                                        <td>
-                                            @if (!isFoodOnly && showtime?.Date != null)
-                                            {
-                                                @showtime.Date.ToString("dd/MM/yyyy")
-                                            }
-                                            else
-                                            {
-                                                <em class="text-muted">—</em>
-                                            }
-                                        </td>
-                                        <!-- Giờ chiếu -->
-                                        <td>
-                                            @if (!isFoodOnly && showtime?.StartTime != null)
-                                            {
-                                                @showtime.StartTime.ToString(@"hh\:mm")
-                                            }
-                                            else
-                                            {
-                                                <em class="text-muted">—</em>
-                                            }
-                                        </td>
-                                        <td class="text-end text-warning fw-bold" style="font-size: 1.05rem;">
-                                            @string.Format("{0:N0}", booking.TotalPrice) <small class="text-white-50">@Localizer["VND"].Value</small>
-                                        </td>
-                                        <td>@booking.BookingDate.ToString("dd/MM/yyyy HH:mm")</td>
-                                        <!-- Trạng thái thanh toán -->
-                                        <td id="payment-status-@booking.BookingId" class="payment-status status-column">
-                                            <span class="status-text">
-                                                @(payment?.PaymentStatus ?? Localizer["Unpaid"].Value)
-                                            </span>
-                                            <span class="spinner-border spinner-border-sm text-danger d-none" role="status"></span>
-                                        </td>
-                                    </tr>
-                                }
-                            }
-                            else
-                            {
-                                <tr>
-                                    <td colspan="10" class="text-center py-5">
-                                        <em class="text-muted">@Localizer["NoBookings"].Value</em>
-                                    </td>
-                                </tr>
-                            }
-                        </tbody>
-                    </table>
-                </div>
-                <div class="text-center mt-5">
-                    <a asp-controller="Home" asp-action="Index" class="btn btn-secondary glow-effect">
-                        <i class="fas fa-arrow-left me-1"></i> @Localizer["BackToHome"].Value
-                    </a>
-                </div>
-            </div>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="10" class="text-center py-5">
+                                <i class="fas fa-receipt fa-3x mb-3 text-muted"></i><br>
+                                <em class="text-muted fs-4">@Localizer["NoPaymentHistory"]</em>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        <div class="text-center mt-5">
+            <a asp-controller="Home" asp-action="Index" class="btn btn-back glow-effect">
+                <i class="fas fa-home me-2"></i> @Localizer["BackToHome"]
+            </a>
         </div>
     </div>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const toggleBtn = document.getElementById('sidebar-toggle');
-            const sidebar = document.querySelector('.sidebar');
-            const frameWrapper = document.querySelector('.frame-wrapper');
-            if (toggleBtn && sidebar && frameWrapper) {
-                toggleBtn.addEventListener('click', function() {
-                    sidebar.classList.toggle('collapsed');
-                    frameWrapper.classList.toggle('shifted');
-                    const icon = toggleBtn.querySelector('i');
-                    if (sidebar.classList.contains('collapsed')) {
-                        icon.className = 'fas fa-bars';
-                    } else {
-                        icon.className = 'fas fa-times';
-                    }
-                });
-            }
-        });
-        function updatePaymentStatuses() {
-            document.querySelectorAll('.payment-status').forEach(cell => {
-                const spinner = cell.querySelector('.spinner-border');
-                const statusText = cell.querySelector('.status-text');
-                if (spinner && statusText) {
-                    spinner.classList.remove('d-none');
-                    statusText.classList.add('text-muted');
-                }
-            });
-            fetch('/Admin/GetPaymentStatuses')
-                .then(response => {
-                    if (!response.ok) throw new Error('@Localizer["NetworkError"].Value ' + response.statusText);
-                    return response.json();
-                })
-                .then(data => {
-                    data.forEach(p => {
-                        const cell = document.getElementById(`payment-status-${p.bookingId}`);
-                        if (cell) {
-                            const statusText = cell.querySelector('.status-text');
-                            const spinner = cell.querySelector('.spinner-border');
-                            if (statusText && spinner) {
-                                statusText.textContent = p.paymentStatus || "@Localizer["Unpaid"].Value";
-                                statusText.classList.remove('text-muted');
-                                spinner.classList.add('d-none');
-                            }
-                        }
-                    });
-                })
-                .catch(err => {
-                    console.error('Lỗi:', err);
-                    document.querySelectorAll('.payment-status').forEach(cell => {
-                        const statusText = cell.querySelector('.status-text');
-                        const spinner = cell.querySelector('.spinner-border');
-                        if (statusText && spinner) {
-                            statusText.textContent = "@Localizer["LoadError"].Value";
-                            statusText.classList.remove('text-muted');
-                            spinner.classList.add('d-none');
-                        }
-                    });
-                });
-        }
-        updatePaymentStatuses();
-        setInterval(updatePaymentStatuses, 5000);
-    </script>
 </body>
 </html>

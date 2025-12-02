@@ -46,7 +46,9 @@
                 <p><strong>@Localizer["SelectedSeats"]:</strong> @Localizer["NoSeatsSelected"]</p>
             }
 
-            <p><strong>@Localizer["TotalAmount"]:</strong> @booking?.TotalPrice.ToString("N0") VNĐ</p>
+            <p id="totalAmount"><strong>@Localizer["TotalAmount"]:</strong> @booking?.TotalPrice.ToString("N0") VNĐ</p>
+            <p id="discountInfo" class="text-success" style="display: none;"><strong>Giảm giá:</strong> <span id="discountValue"></span> VNĐ</p>
+            <p id="finalAmount" class="text-warning" style="display: none;"><strong>Tổng thanh toán:</strong> <span id="newAmount"></span> VNĐ</p>
         </div>
     </div>
 
@@ -69,10 +71,26 @@
         </div>
     }
 
+    <!-- Áp dụng Voucher -->
+    <div class="card voucher-card text-light mb-4 glow-effect rounded-3">
+        <div class="card-body">
+            <h4 class="card-title title-gradient"><i class="fas fa-ticket-alt me-2"></i>@Localizer["ApplyVoucher"]</h4>
+            <!-- Dòng này bắt buộc để AJAX POST không bị chặn -->
+            @Html.AntiForgeryToken()
+            <div class="input-group mb-3">
+                <input type="text" id="voucherCode" class="form-control rounded-pill glow-effect" placeholder="@Localizer["EnterVoucherCode"]" aria-label="Voucher Code">
+                <button class="btn btn-primary rounded-pill px-4 ms-2 glow-effect" type="button" id="applyVoucherBtn">
+                    <i class="fas fa-check-circle me-2"></i>@Localizer["Apply"]
+                </button>
+            </div>
+            <div id="voucherMessage" class="alert alert-info mt-3" style="display: none;"></div>
+        </div>
+    </div>
+
     <!-- Form thanh toán MoMo -->
     <form method="POST" asp-action="CreatePaymentMomo" asp-controller="Payments" class="mb-3">
         <input type="hidden" name="FullName" value="@User.Identity.Name" />
-        <input type="hidden" name="Amount" value="@Model.Amount" />
+        <input type="hidden" id="momoAmount" name="Amount" value="@Model.Amount" />
         <input type="hidden" name="OrderInfo" value="@Localizer["MomoPayment"] - Booking #@booking?.BookingId" />
         <div class="text-center">
             <button class="btn btn-primary btn-lg rounded-pill px-5 glow-effect title-gradient" type="submit">
@@ -84,7 +102,7 @@
     <!-- Form thanh toán VNPay -->
     <form method="POST" asp-action="CreatePaymentUrlVnpay" asp-controller="Payments" class="mb-3">
         <input type="hidden" name="Name" value="@User.Identity.Name" />
-        <input type="hidden" name="Amount" value="@Model.Amount" />
+        <input type="hidden" id="vnpayAmount" name="Amount" value="@Model.Amount" />
         <input type="hidden" name="OrderDescription" value="@Localizer["VNPayPayment"] - Booking #@booking?.BookingId" />
         <input type="hidden" name="OrderType" value="2500" />
         <div class="text-center">
@@ -132,7 +150,7 @@
             transform: scale(1.05);
         }
 
-    .showtime-card, .food-card {
+    .showtime-card, .food-card, .voucher-card {
         background-color: #1c1c1c;
         border: 1px solid #ff0033;
         border-radius: 15px;
@@ -193,17 +211,33 @@
 
     /* Responsive */
     @@media (max-width: 768px) {
-        .btn-lg
+        .btn-lg {
+            font-size: 1rem;
+            padding: 10px 30px;
+        }
 
-    {
-        font-size: 1rem;
-        padding: 10px 30px;
+        .card-body {
+            padding: 15px;
+        }
     }
 
-    .card-body {
-        padding: 15px;
+    /* Thêm animation cho voucher apply */
+    @@keyframes sparkle {
+        0% {
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+        }
+
+        50% {
+            text-shadow: 0 0 20px rgba(255, 0, 51, 0.8);
+        }
+
+        100% {
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+        }
     }
 
+    .voucher-applied {
+        animation: sparkle 1s infinite;
     }
 </style>
 
@@ -211,4 +245,60 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+    <script>
+        $(document).ready(function () {
+            var bookingId = @booking.BookingId;
+
+            // LẤY TOKEN CHỐNG GIẢ MẠO - DÒNG QUAN TRỌNG NHẤT
+            var token = $('input[name="__RequestVerificationToken"]').val();
+
+            $('#applyVoucherBtn').click(function () {
+                var code = $('#voucherCode').val().trim();
+                if (!code) {
+                    showVoucherMessage('Vui lòng nhập mã voucher!', 'danger');
+                    return;
+                }
+
+                $.ajax({
+                    url: '/Payments/ApplyVoucher',
+                    type: 'POST',
+                    data: {
+                        code: code,
+                        bookingId: bookingId,
+                        __RequestVerificationToken: token   // ← Dòng này quyết định sống còn
+                    },
+                    success: function (response) {
+                        if (response.success) {
+                            $('#totalAmount').addClass('text-decoration-line-through');
+                            $('#discountInfo').show();
+                            $('#discountValue').text(response.discount.toLocaleString('vi-VN'));
+                            $('#finalAmount').show();
+                            $('#newAmount').text(response.newAmount.toLocaleString('vi-VN'));
+                            $('#finalAmount strong').addClass('voucher-applied');
+
+                            $('#momoAmount').val(response.newAmount);
+                            $('#vnpayAmount').val(response.newAmount);
+
+                            showVoucherMessage(response.message, 'success');
+                        } else {
+                            showVoucherMessage(response.message, 'danger');
+                        }
+                    },
+                    error: function () {
+                        showVoucherMessage('Lỗi kết nối server!', 'danger');
+                    }
+                });
+            });
+
+            function showVoucherMessage(message, type) {
+                var alertClass = type === 'success' ? 'alert-success' : 'alert-danger';
+                $('#voucherMessage')
+                    .removeClass('alert-info alert-success alert-danger')
+                    .addClass(alertClass)
+                    .text(message)
+                    .show();
+                setTimeout(function () { $('#voucherMessage').fadeOut(); }, 5000);
+            }
+        });
+    </script>
 }

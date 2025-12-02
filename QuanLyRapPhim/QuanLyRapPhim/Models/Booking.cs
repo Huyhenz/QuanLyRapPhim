@@ -9,6 +9,7 @@ namespace QuanLyRapPhim.Models
         public int? ShowtimeId { get; set; }
         public DateTime BookingDate { get; set; }
         public decimal TotalPrice { get; set; } // Bao gồm cả vé + đồ ăn
+        public decimal FinalAmount { get; set; }
         public string? UserId { get; set; }
         public User? User { get; set; }
         public Showtime? Showtime { get; set; }

@@ -1,4 +1,6 @@
-﻿using System;
+﻿// Fixed PaymentsController.cs - Added voucher application to booking in ApplyVoucher, and UsedCount update in payment callbacks only on success.
+// Added setting booking.FinalAmount in ApplyVoucher and sync in callbacks.
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -47,7 +49,7 @@ namespace QuanLyRapPhim.Controllers
         [HttpGet]
         public async Task<IActionResult> PaymentCallbackVnpay()
         {
-            _logger.LogInformation("PaymentCallbackVnpay called at {Time}", DateTime.Now); // 11:06 PM +07, May 25, 2025
+            _logger.LogInformation("PaymentCallbackVnpay called at {Time}", DateTime.Now);
 
             var response = _vnPayService.PaymentExecute(Request.Query);
 
@@ -65,6 +67,7 @@ namespace QuanLyRapPhim.Controllers
 
             // Find the booking
             var booking = await _context.Bookings
+                .Include(b => b.Voucher) // Include voucher for UsedCount update
                 .AsNoTracking() // Prevent entity tracking issues
                 .FirstOrDefaultAsync(b => b.BookingId == bookingId);
             if (booking == null)
@@ -86,9 +89,9 @@ namespace QuanLyRapPhim.Controllers
                         payment = new Payment
                         {
                             BookingId = bookingId,
-                            Amount = booking.TotalPrice,
+                            Amount = response.Amount / 100, // THỬA: VNPay thường nhân 100, chia để lấy giá thực (nếu cần, điều chỉnh dựa trên service)
                             PaymentMethod = "VNPay",
-                            PaymentDate = DateTime.Now, // 11:06 PM +07, May 25, 2025
+                            PaymentDate = DateTime.Now,
                             PaymentStatus = response.Success ? "Completed" : "Failed"
                         };
                         _context.Payments.Add(payment);
@@ -100,6 +103,25 @@ namespace QuanLyRapPhim.Controllers
                         payment.PaymentDate = DateTime.Now;
                         _context.Payments.Update(payment);
                         _logger.LogInformation("Updated existing Payment record for BookingId: {BookingId}, Status: {PaymentStatus}", payment.BookingId, payment.PaymentStatus);
+                    }
+
+                    // If payment successful and voucher was applied, increment UsedCount
+                    if (response.Success && booking.VoucherId.HasValue)
+                    {
+                        var voucher = await _context.Vouchers.FindAsync(booking.VoucherId.Value);
+                        if (voucher != null)
+                        {
+                            voucher.UsedCount++;
+                            _context.Vouchers.Update(voucher);
+                            _logger.LogInformation("Incremented UsedCount for VoucherId: {VoucherId}, New UsedCount: {UsedCount}", voucher.VoucherId, voucher.UsedCount);
+                        }
+                    }
+
+                    // Sync FinalAmount from Payment.Amount nếu success
+                    if (response.Success)
+                    {
+                        booking.FinalAmount = payment.Amount;
+                        _context.Bookings.Update(booking);
                     }
 
                     // Save changes within the transaction
@@ -135,13 +157,6 @@ namespace QuanLyRapPhim.Controllers
             return Redirect(response.PayUrl);
         }
 
-        [HttpGet]
-        public IActionResult PaymentCallBack()
-        {
-            var response = _momoService.PaymentExecuteAsync(HttpContext.Request.Query);
-            return View(response);
-        }
-
         // GET: Payments
         public async Task<IActionResult> Index()
         {
@@ -173,50 +188,14 @@ namespace QuanLyRapPhim.Controllers
         {
             var booking = await _context.Bookings
                 .Include(b => b.Showtime).ThenInclude(s => s.Movie)
-                .Include(b => b.Showtime).ThenInclude(s => s.Room)
-                .Include(b => b.BookingDetails).ThenInclude(bd => bd.Seat)
-                .Include(b => b.BookingFoods).ThenInclude(bf => bf.FoodItem)
-                .FirstOrDefaultAsync(b => b.BookingId == bookingId);
-
-            if (booking == null) return NotFound();
-
-            ViewBag.Booking = booking;
-
-            var payment = new Payment
-            {
-                BookingId = bookingId,
-                Amount = booking.TotalPrice,
-                PaymentDate = DateTime.Now,
-                PaymentStatus = "Completed"
-            };
-
-            return View(payment);
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("PaymentId,BookingId,Amount,PaymentMethod,PaymentStatus,PaymentDate")] Payment payment)
-        {
-            if (ModelState.IsValid)
-            {
-                payment.PaymentStatus = "Completed"; // CHỈ KHI THANH TOÁN THÀNH CÔNG
-                _context.Add(payment);
-                await _context.SaveChangesAsync();
-                TempData["SuccessMessage"] = "Thanh toán thành công!";
-                return RedirectToAction("Bill", new { paymentId = payment.PaymentId });
-            }
-
-            var booking = await _context.Bookings
-                .Include(b => b.Showtime)
-                .ThenInclude(s => s.Movie)
                 .Include(b => b.Showtime)
                 .ThenInclude(s => s.Room)
                 .Include(b => b.BookingDetails)
                 .ThenInclude(bd => bd.Seat)
-                .FirstOrDefaultAsync(b => b.BookingId == payment.BookingId);
+                .FirstOrDefaultAsync(b => b.BookingId == bookingId);
 
             ViewBag.Booking = booking;
-            return View(payment);
+            return View(new Payment { BookingId = bookingId });
         }
 
         public async Task<IActionResult> Edit(int? id)
@@ -365,6 +344,88 @@ namespace QuanLyRapPhim.Controllers
 
             return View(bookings);
         }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ApplyVoucher(string code, int bookingId)
+        {
+            if (string.IsNullOrWhiteSpace(code))
+                return Json(new { success = false, message = "Vui lòng nhập mã giảm giá!" });
+
+            var booking = await _context.Bookings
+                .FirstOrDefaultAsync(b => b.BookingId == bookingId);
+
+            if (booking == null)
+                return Json(new { success = false, message = "Không tìm thấy đơn hàng!" });
+
+            var voucher = await _context.Vouchers
+                .FirstOrDefaultAsync(v =>
+                    v.Code.Trim().ToUpper() == code.Trim().ToUpper() &&
+                    v.IsActive &&
+                    v.ExpiryDate >= DateTime.Today &&
+                    v.UsedCount < v.UsageLimit);
+
+            if (voucher == null)
+                return Json(new { success = false, message = "Mã giảm giá không hợp lệ, đã hết hạn hoặc đã dùng hết!" });
+
+            decimal discount = 0;
+            string discountType = "";
+
+            // Ưu tiên giảm % nếu có, nếu không thì dùng giảm cố định
+            if (voucher.DiscountPercentage > 0)
+            {
+                discount = booking.TotalPrice * voucher.DiscountPercentage / 100;
+                discountType = "Percentage";
+            }
+            else if (voucher.DiscountAmount > 0)
+            {
+                discount = voucher.DiscountAmount;
+                discountType = "Fixed";
+            }
+            else
+            {
+                return Json(new { success = false, message = "Voucher không có giá trị giảm giá!" });
+            }
+
+            var newAmount = Math.Max(0, booking.TotalPrice - discount);
+
+            // Apply voucher to booking (set VoucherId and FinalAmount), but UsedCount updated on payment success
+            booking.VoucherId = voucher.VoucherId;
+            booking.FinalAmount = newAmount; // THÊM: Lưu giá cuối tạm thời
+            _context.Bookings.Update(booking);
+            await _context.SaveChangesAsync();
+
+            return Json(new
+            {
+                success = true,
+                voucher = new
+                {
+                    Code = voucher.Code,
+                    DiscountPercentage = voucher.DiscountPercentage,
+                    DiscountAmount = voucher.DiscountAmount,
+                    DiscountType = discountType,
+                    DiscountValue = discountType == "Percentage" ? voucher.DiscountPercentage : voucher.DiscountAmount
+                },
+                discount = discount,
+                newAmount = newAmount,
+                message = discountType == "Percentage"
+                    ? $"Giảm {voucher.DiscountPercentage}%"
+                    : $"Giảm {voucher.DiscountAmount:N0}đ"
+            });
+        }
+
+        //[HttpPost]
+        //public async Task<IActionResult> RemoveVoucher(int bookingId)
+        //{
+        //    var booking = await _context.Bookings.FindAsync(bookingId);
+        //    if (booking != null)
+        //    {
+        //        booking.VoucherId = null;
+        //        booking.FinalAmount = 0; // Reset FinalAmount
+        //        await _context.SaveChangesAsync();
+        //    }
+        //    return Json(new { success = true });
+        //}
 
     }
 }

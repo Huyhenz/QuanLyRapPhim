@@ -3,10 +3,12 @@
 @using Microsoft.AspNetCore.Mvc.Localization
 @inject IViewLocalizer Localizer
 @model IEnumerable<Booking>
+
 @{
     ViewData["Title"] = Localizer["PaymentHistory"].Value;
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
+
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -39,48 +41,49 @@
             }
 
         .title-gradient {
-            background: linear-gradient(90deg, #ff0033, #1c1c1c);
+            background: linear-gradient(90deg, #ff0033, #ff8c00);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            background-clip: text;
-            font-size: 2.2rem;
+            font-size: 2.5rem;
             font-weight: bold;
             text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: 40px;
         }
 
         .badge-success {
             background-color: #28a745;
             font-weight: 600;
-            padding: 6px 12px;
+            padding: 8px 16px;
+            border-radius: 20px;
         }
 
         .btn-back {
-            background-color: #ff0033;
+            background: linear-gradient(45deg, #ff0033, #cc002a);
             border: none;
             color: white;
-            padding: 12px 30px;
-            border-radius: 25px;
+            padding: 14px 40px;
+            border-radius: 30px;
             font-weight: 600;
+            font-size: 1.1rem;
             transition: all 0.3s ease;
         }
 
             .btn-back:hover {
-                background-color: #cc002a;
-                transform: scale(1.05);
+                transform: translateY(-3px);
+                box-shadow: 0 10px 20px rgba(255,0,51,0.4);
             }
 
         .glow-effect {
-            box-shadow: 0 0 15px rgba(255, 0, 51, 0.3);
+            box-shadow: 0 0 20px rgba(255,0,51,0.3);
             transition: all 0.3s ease;
         }
 
             .glow-effect:hover {
-                box-shadow: 0 0 25px rgba(255, 0, 51, 0.5);
+                box-shadow: 0 0 30px rgba(255,0,51,0.6);
             }
 
         .text-muted {
-            color: #b3b3b3 !important;
+            color: #aaaaaa !important;
             font-style: italic;
         }
     </style>
@@ -89,19 +92,19 @@
     <div class="container py-5">
         <h1 class="title-gradient">@Localizer["PaymentHistory"]</h1>
         <div class="table-responsive">
-            <table class="table table-dark table-bordered glow-effect">
+            <table class="table table-dark table-hover glow-effect">
                 <thead>
                     <tr>
-                        <th>@Localizer["BookingId"]</th>
-                        <th>@Localizer["Movie"]</th>
-                        <th>@Localizer["Room"]</th>
-                        <th>@Localizer["Seats"]</th>
-                        <th>@Localizer["ShowDate"]</th>
-                        <th>@Localizer["ShowTime"]</th>
-                        <th>@Localizer["Food"]</th>
-                        <th>@Localizer["TotalPrice"]</th>
-                        <th>@Localizer["BookingDate"]</th>
-                        <th>@Localizer["Status"]</th>
+                        <th>ID</th>
+                        <th>Phim</th>
+                        <th>Phòng</th>
+                        <th>Ghế</th>
+                        <th>Ngày chiếu</th>
+                        <th>Giờ chiếu</th>
+                        <th>Đồ ăn/Đồ uống</th>
+                        <th>Số tiền</th>
+                        <th>Ngày đặt</th>
+                        <th>Trạng thái</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -111,89 +114,50 @@
                         {
                             var showtime = booking.Showtime;
                             var isFoodOnly = showtime == null;
-                            <tr>
-                                <td class="fw-bold">@booking.BookingId</td>
-                                <!-- Phim -->
+                            var payment = booking.Payment;
+                            // Ưu tiên payment.Amount nếu đã thanh toán (luôn có ở đây vì filter Completed)
+                            var displayAmount = payment?.Amount ?? booking.TotalPrice;
+                            var hasDiscount = payment != null && payment.Amount < booking.TotalPrice;
+                            var discountAmount = hasDiscount ? (booking.TotalPrice - payment.Amount) : 0;
+                            <tr class="text-center align-middle">
+                                <td class="fw-bold text-info">#@booking.BookingId</td>
                                 <td>
-                                    @if (!isFoodOnly)
-                                    {
-                                        @showtime.Movie.Title
-                                    }
-                                    else
-                                    {
-                                        <em class="text-muted">@Localizer["FoodOnly"].Value</em>
-                                    }
+                                    @(isFoodOnly ? "Chỉ mua đồ ăn" : showtime.Movie.Title)
                                 </td>
-                                <!-- Phòng -->
+                                <td>@(isFoodOnly ? "—" : showtime.Room.RoomName)</td>
                                 <td>
-                                    @if (!isFoodOnly)
-                                    {
-                                        @showtime.Room.RoomName
-                                    }
-                                    else
-                                    {
-                                        <em class="text-muted">—</em>
-                                    }
+                                    @(booking.BookingDetails?.Any() == true
+                                        ? string.Join(", ", booking.BookingDetails.Select(bd => bd.Seat.SeatNumber))
+                                        : Html.Raw("<em class='text-muted'>—</em>"))
                                 </td>
-                                <!-- Ghế -->
-                                <td>
-                                    @if (booking.BookingDetails?.Any() == true)
-                                    {
-                                        @string.Join(", ", booking.BookingDetails.Select(bd => bd.Seat.SeatNumber))
-                                    }
-                                    else
-                                    {
-                                        <em class="text-muted">@Localizer["NoSeatsSelected"].Value</em>
-                                    }
-                                </td>
-                                <!-- Ngày chiếu -->
-                                <td>
-                                    @if (!isFoodOnly)
-                                    {
-                                        @showtime.Date.ToString("dd/MM/yyyy")
-                                    }
-                                    else
-                                    {
-                                        <em class="text-muted">—</em>
-                                    }
-                                </td>
-                                <!-- Giờ chiếu -->
-                                <td>
-                                    @if (!isFoodOnly)
-                                    {
-                                        @showtime.StartTime.ToString("hh\\:mm")
-                                    }
-                                    else
-                                    {
-                                        <em class="text-muted">—</em>
-                                    }
-                                </td>
-                                <!-- Đồ ăn -->
+                                <td>@(isFoodOnly ? "—" : showtime.Date.ToString("dd/MM/yyyy"))</td>
+                                <td>@(isFoodOnly ? "—" : showtime.StartTime.ToString(@"hh\:mm"))</td>
                                 <td>
                                     @if (booking.BookingFoods?.Any() == true)
                                     {
-                                        <ul class="list-unstyled mb-0 small">
+                                        <div class="text-start">
                                             @foreach (var bf in booking.BookingFoods)
                                             {
-                                                <li>@bf.FoodItem.Name x @bf.Quantity</li>
+                                                <div>@bf.FoodItem.Name × @bf.Quantity</div>
                                             }
-                                        </ul>
+                                        </div>
                                     }
                                     else
                                     {
-                                        <em class="text-muted">@Localizer["NoFood"].Value</em>
+                                        <em class="text-muted">Không</em>
                                     }
                                 </td>
-                                <!-- Tổng tiền -->
-                                <td class="text-end text-warning fw-bold" style="font-size: 1.05rem;">
-                                    @string.Format("{0:N0}", booking.TotalPrice) <small class="text-white-50">@Localizer["VND"].Value</small>
+                                <td class="text-end text-warning fw-bold fs-5">
+                                    @displayAmount.ToString("N0") <small class="text-white-50">VNĐ</small>
+                                    @if (hasDiscount)
+                                    {
+                                        <br />
+
+                                        <small class="text-success">(Giảm @discountAmount.ToString("N0") VNĐ từ voucher)</small>
+                                    }
                                 </td>
-                                <!-- Ngày đặt -->
-                                <td>@booking.BookingDate.ToString("dd/MM/yyyy HH:mm")</td>
-                                <!-- Trạng thái -->
-                                <td>
-                                    <span class="badge badge-success">@Localizer["Paid"].Value</span>
-                                </td>
+                                <td>@booking.BookingDate.ToString("dd/MM/yyyy")<br><small>@booking.BookingDate.ToString("HH:mm")</small></td>
+                                <td><span class="badge bg-success px-3 py-2">Đã thanh toán</span></td>
                             </tr>
                         }
                     }
@@ -201,7 +165,8 @@
                     {
                         <tr>
                             <td colspan="10" class="text-center py-5">
-                                <em class="text-muted">@Localizer["NoPaymentHistory"].Value</em>
+                                <i class="fas fa-receipt fa-3x mb-3 text-muted"></i><br>
+                                <em class="text-muted fs-4">@Localizer["NoPaymentHistory"]</em>
                             </td>
                         </tr>
                     }
@@ -210,7 +175,7 @@
         </div>
         <div class="text-center mt-5">
             <a asp-controller="Home" asp-action="Index" class="btn btn-back glow-effect">
-                @Localizer["BackToHome"].Value
+                <i class="fas fa-home me-2"></i> @Localizer["BackToHome"]
             </a>
         </div>
     </div>
