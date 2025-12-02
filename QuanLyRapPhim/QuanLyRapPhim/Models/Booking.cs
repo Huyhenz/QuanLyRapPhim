@@ -20,5 +20,7 @@ namespace QuanLyRapPhim.Models
         // Trong Booking.cs, thêm sau các properties hiện có:
         public int? VoucherId { get; set; }
         public Voucher? Voucher { get; set; }
+
+        public string? VoucherUsed { get; set; }
     }
 }

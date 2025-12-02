@@ -1,19 +1,15 @@
-﻿@using QuanLyRapPhim.Models
-@using System.Linq
-@using Microsoft.AspNetCore.Mvc.Localization
-@inject IViewLocalizer Localizer
-@model IEnumerable<Booking>
+﻿@model IEnumerable<QuanLyRapPhim.Models.Booking>
 
 @{
-    ViewData["Title"] = Localizer["PaymentHistory"].Value;
-    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Manage Bookings";
+    Layout = "~/Views/Shared/_Layout.cshtml"; // Giả sử layout chung
 }
 
 <!DOCTYPE html>
 <html lang="vi">
 <head>
     <meta charset="utf-8" />
-    <title>@Localizer["PaymentHistory"]</title>
+    <title>Manage Bookings</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
     <style>
@@ -90,7 +86,7 @@
 </head>
 <body>
     <div class="container py-5">
-        <h1 class="title-gradient">@Localizer["PaymentHistory"]</h1>
+        <h1 class="title-gradient">Manage Bookings</h1>
         <div class="table-responsive">
             <table class="table table-dark table-hover glow-effect">
                 <thead>
@@ -103,6 +99,7 @@
                         <th>Giờ chiếu</th>
                         <th>Đồ ăn/Đồ uống</th>
                         <th>Số tiền</th>
+                        <th>Voucher</th>
                         <th>Ngày đặt</th>
                         <th>Trạng thái</th>
                     </tr>
@@ -115,10 +112,9 @@
                             var showtime = booking.Showtime;
                             var isFoodOnly = showtime == null;
                             var payment = booking.Payment;
-                            // Ưu tiên payment.Amount nếu đã thanh toán (luôn có ở đây vì filter Completed)
-                            decimal displayAmount = payment != null ? payment.Amount : booking.TotalPrice;
-                            bool hasDiscount = payment != null && payment.Amount < booking.TotalPrice;
-                            decimal discountAmount = hasDiscount ? (booking.TotalPrice - payment.Amount) : 0;
+                            var displayAmount = booking.FinalAmount;
+                            var hasDiscount = booking.FinalAmount < booking.TotalPrice;
+                            var discountAmount = hasDiscount ? (booking.TotalPrice - booking.FinalAmount) : 0;
                             <tr class="text-center align-middle">
                                 <td class="fw-bold text-info">#@booking.BookingId</td>
                                 <td>
@@ -152,9 +148,11 @@
                                     @if (hasDiscount)
                                     {
                                         <br />
-
                                         <small class="text-success">(Giảm @discountAmount.ToString("N0") VNĐ từ voucher)</small>
                                     }
+                                </td>
+                                <td>
+                                    @(booking.VoucherUsed ?? "—")
                                 </td>
                                 <td>@booking.BookingDate.ToString("dd/MM/yyyy")<br><small>@booking.BookingDate.ToString("HH:mm")</small></td>
                                 <td><span class="badge bg-success px-3 py-2">Đã thanh toán</span></td>
@@ -164,9 +162,9 @@
                     else
                     {
                         <tr>
-                            <td colspan="10" class="text-center py-5">
+                            <td colspan="11" class="text-center py-5">
                                 <i class="fas fa-receipt fa-3x mb-3 text-muted"></i><br>
-                                <em class="text-muted fs-4">@Localizer["NoPaymentHistory"]</em>
+                                <em class="text-muted fs-4">No bookings found</em>
                             </td>
                         </tr>
                     }
@@ -174,8 +172,8 @@
             </table>
         </div>
         <div class="text-center mt-5">
-            <a asp-controller="Home" asp-action="Index" class="btn btn-back glow-effect">
-                <i class="fas fa-home me-2"></i> @Localizer["BackToHome"]
+            <a asp-controller="Admin" asp-action="Index" class="btn btn-back glow-effect">
+                <i class="fas fa-home me-2"></i> Back to Dashboard
             </a>
         </div>
     </div>

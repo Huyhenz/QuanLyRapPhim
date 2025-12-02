@@ -67,8 +67,8 @@ namespace QuanLyRapPhim.Controllers
 
             // Find the booking
             var booking = await _context.Bookings
-                .Include(b => b.Voucher) // Include voucher for UsedCount update
-                .AsNoTracking() // Prevent entity tracking issues
+                .Include(b => b.Voucher) // Luôn load voucher để cập nhật UsedCount nếu cần
+                .AsNoTracking()
                 .FirstOrDefaultAsync(b => b.BookingId == bookingId);
             if (booking == null)
             {
@@ -111,10 +111,15 @@ namespace QuanLyRapPhim.Controllers
                         var voucher = await _context.Vouchers.FindAsync(booking.VoucherId.Value);
                         if (voucher != null)
                         {
-                            voucher.UsedCount++;
+                            voucher.UsedCount++; // Chỉ tăng khi thanh toán thành công
                             _context.Vouchers.Update(voucher);
-                            _logger.LogInformation("Incremented UsedCount for VoucherId: {VoucherId}, New UsedCount: {UsedCount}", voucher.VoucherId, voucher.UsedCount);
                         }
+                    }
+
+                    if (!booking.VoucherId.HasValue)
+                    {
+                        booking.FinalAmount = booking.TotalPrice;
+                        _context.Bookings.Update(booking); // Cập nhật nếu cần
                     }
 
                     // Sync FinalAmount from Payment.Amount nếu success
@@ -353,6 +358,7 @@ namespace QuanLyRapPhim.Controllers
                 return Json(new { success = false, message = "Vui lòng nhập mã giảm giá!" });
 
             var booking = await _context.Bookings
+                .Include(b => b.Voucher) // Load voucher nếu cần
                 .FirstOrDefaultAsync(b => b.BookingId == bookingId);
 
             if (booking == null)
@@ -371,7 +377,6 @@ namespace QuanLyRapPhim.Controllers
             decimal discount = 0;
             string discountType = "";
 
-            // Ưu tiên giảm % nếu có, nếu không thì dùng giảm cố định
             if (voucher.DiscountPercentage > 0)
             {
                 discount = booking.TotalPrice * voucher.DiscountPercentage / 100;
@@ -389,9 +394,10 @@ namespace QuanLyRapPhim.Controllers
 
             var newAmount = Math.Max(0, booking.TotalPrice - discount);
 
-            // Apply voucher to booking (set VoucherId and FinalAmount), but UsedCount updated on payment success
+            // Apply voucher: Lưu VoucherId, VoucherUsed (code), và FinalAmount. UsedCount chỉ tăng khi thanh toán thành công.
             booking.VoucherId = voucher.VoucherId;
-            booking.FinalAmount = newAmount; // THÊM: Lưu giá cuối tạm thời
+            booking.VoucherUsed = voucher.Code; // Lưu code cho hiển thị dễ dàng
+            booking.FinalAmount = newAmount;
             _context.Bookings.Update(booking);
             await _context.SaveChangesAsync();
 
@@ -414,18 +420,23 @@ namespace QuanLyRapPhim.Controllers
             });
         }
 
-        //[HttpPost]
-        //public async Task<IActionResult> RemoveVoucher(int bookingId)
-        //{
-        //    var booking = await _context.Bookings.FindAsync(bookingId);
-        //    if (booking != null)
-        //    {
-        //        booking.VoucherId = null;
-        //        booking.FinalAmount = 0; // Reset FinalAmount
-        //        await _context.SaveChangesAsync();
-        //    }
-        //    return Json(new { success = true });
-        //}
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> RemoveVoucher(int bookingId)
+        {
+            var booking = await _context.Bookings.FindAsync(bookingId);
+            if (booking == null)
+                return Json(new { success = false, message = "Không tìm thấy đơn hàng!" });
+
+            // Hủy voucher: Reset VoucherId, VoucherUsed, và FinalAmount = TotalPrice
+            booking.VoucherId = null;
+            booking.VoucherUsed = null;
+            booking.FinalAmount = booking.TotalPrice;
+            _context.Bookings.Update(booking);
+            await _context.SaveChangesAsync();
+
+            return Json(new { success = true, message = "Đã hủy voucher!", newAmount = booking.TotalPrice });
+        }
 
     }
 }
