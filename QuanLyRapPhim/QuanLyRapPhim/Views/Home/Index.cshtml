@@ -40,18 +40,36 @@
                        class="btn book-btn popcorn-btn">
                         @Html.Raw(Localizer["OrderFood"].Value)
                     </a>
+
+                    <!-- NÚT VOUCHER (CHỨA TẤT CẢ VOUCHER CÓ SẴN) -->
+                    <a href="@(User.Identity.IsAuthenticated ? "/Vouchers/Available" : "/Identity/Account/Login")"
+                       class="btn book-btn voucher-btn" title="Xem tất cả voucher">
+                        <i class="fas fa-gift"></i><br>Voucher
+                    </a>
+
+                    <!-- NÚT CHỨA VOUCHER (VOUCHER ĐÃ NHẬN CỦA USER) -->
+                    @if (User.Identity.IsAuthenticated)
+                    {
+                        <a href="/Vouchers/MyVouchers"
+                           class="btn book-btn my-voucher-btn" title="Voucher của tôi">
+                            <i class="fas fa-ticket-alt"></i><br>My Voucher
+                        </a>
+                    }
+
                     <!-- NÚT QUẢN LÝ VOUCHER (CHỈ ADMIN) -->
                     @if (User.IsInRole("Admin"))
                     {
                         <a href="/Vouchers" class="btn book-btn voucher-btn" title="Quản lý Voucher">
-                            <i class="fas fa-gift"></i><br>Voucher
+                            <i class="fas fa-gift"></i><br>Admin Voucher
                         </a>
                     }
+
                     <!-- NÚT ĐẶT VÉ NGAY -->
                     <a href="@(User.Identity.IsAuthenticated ? "/Movies" : "/Identity/Account/Login")"
                        class="btn book-btn ticket-btn">
                         @Html.Raw(Localizer["BookTickets"].Value.Replace(" ", "<br>"))
                     </a>
+
                     <!-- Ô TÌM KIẾM -->
                     <form class="d-flex align-items-center" asp-action="Search" asp-controller="Home" method="get">
                         <div class="search-box">
@@ -234,6 +252,19 @@
         align-items: center;
         width: 100%;
     }
+
+    .my-voucher-btn {
+        background: linear-gradient(135deg, #2196F3, #1E88E5); /* Màu xanh dương để phân biệt */
+        color: #fff;
+    }
+
+        .my-voucher-btn:hover {
+            background: linear-gradient(135deg, #1E88E5, #1976D2);
+        }
+
+        .my-voucher-btn i {
+            font-size: 1.3rem;
+        }
 
     .nav-icon {
         position: relative;

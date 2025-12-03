@@ -29,5 +29,7 @@ namespace QuanLyRapPhim.Models
 
         // Liên kết one-to-many với Booking (một voucher áp dụng cho nhiều booking nếu cho phép)
         public virtual ICollection<Booking> Bookings { get; set; } = new List<Booking>();
+
+        public virtual ICollection<UserVoucher> UserVouchers { get; set; } = new List<UserVoucher>();
     }
 }

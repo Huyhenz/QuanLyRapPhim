@@ -1,0 +1,54 @@
+﻿@model IEnumerable<QuanLyRapPhim.Models.Voucher>
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+@{
+    ViewData["Title"] = "Available Vouchers";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>@Localizer["Available Vouchers"]</h2>
+
+@if (Model.Any())
+{
+    <table class="table table-striped">
+        <thead class="table-dark">
+            <tr>
+                <th>@Localizer["Code"]</th>
+                <th>@Localizer["Discount Amount"]</th>
+                <th>@Localizer["Discount Percentage"]</th>
+                <th>@Localizer["Expiry Date"]</th>
+                <th>@Localizer["Actions"]</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var voucher in Model)
+            {
+                <tr>
+                    <td>@voucher.Code</td>
+                    <td>@voucher.DiscountAmount.ToString("C")</td> <!-- Định dạng như tiền tệ nếu cần -->
+                    <td>@voucher.DiscountPercentage %</td>
+                    <td>@voucher.ExpiryDate.ToShortDateString()</td>
+                    <td>
+                        <form asp-controller="Vouchers" asp-action="Claim" asp-route-id="@voucher.VoucherId" method="post">
+                            @Html.AntiForgeryToken()
+                            <button type="submit" class="btn btn-primary btn-sm">@Localizer["Claim"]</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <p>@Localizer["No available vouchers at this time."]</p>
+}
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+}
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+}
