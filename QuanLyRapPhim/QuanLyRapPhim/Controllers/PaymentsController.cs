@@ -1,5 +1,7 @@
 ﻿// Fixed PaymentsController.cs - Added voucher application to booking in ApplyVoucher, and UsedCount update in payment callbacks only on success.
 // Added setting booking.FinalAmount in ApplyVoucher and sync in callbacks.
+// Updated ApplyVoucher to require user has claimed the voucher (exists in UserVouchers with !IsUsed).
+// In payment callback, if success and voucher applied, set UserVoucher.IsUsed = true and increment Voucher.UsedCount.
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,6 +17,7 @@ using QuanLyRapPhim.Service.Momo;
 using QuanLyRapPhim.Service.VNPay;
 using Microsoft.Extensions.Logging;
 using Microsoft.EntityFrameworkCore.Storage; // For transaction management
+using System.Security.Claims; // For User.FindFirstValue
 
 namespace QuanLyRapPhim.Controllers
 {
@@ -68,7 +71,6 @@ namespace QuanLyRapPhim.Controllers
             // Find the booking
             var booking = await _context.Bookings
                 .Include(b => b.Voucher) // Luôn load voucher để cập nhật UsedCount nếu cần
-                .AsNoTracking()
                 .FirstOrDefaultAsync(b => b.BookingId == bookingId);
             if (booking == null)
             {
@@ -105,14 +107,29 @@ namespace QuanLyRapPhim.Controllers
                         _logger.LogInformation("Updated existing Payment record for BookingId: {BookingId}, Status: {PaymentStatus}", payment.BookingId, payment.PaymentStatus);
                     }
 
-                    // If payment successful and voucher was applied, increment UsedCount
+                    // If payment successful and voucher was applied, update UserVoucher.IsUsed and increment Voucher.UsedCount
                     if (response.Success && booking.VoucherId.HasValue)
                     {
-                        var voucher = await _context.Vouchers.FindAsync(booking.VoucherId.Value);
-                        if (voucher != null)
+                        var userVoucher = await _context.UserVouchers
+                            .FirstOrDefaultAsync(uv => uv.UserId == booking.UserId && uv.VoucherId == booking.VoucherId.Value && !uv.IsUsed);
+
+                        if (userVoucher != null)
                         {
-                            voucher.UsedCount++; // Chỉ tăng khi thanh toán thành công
-                            _context.Vouchers.Update(voucher);
+                            userVoucher.IsUsed = true;
+                            _context.UserVouchers.Update(userVoucher);
+                            _logger.LogInformation("Marked UserVoucher as used for UserId: {UserId}, VoucherId: {VoucherId}", userVoucher.UserId, userVoucher.VoucherId);
+
+                            var voucher = await _context.Vouchers.FindAsync(booking.VoucherId.Value);
+                            if (voucher != null)
+                            {
+                                voucher.UsedCount++; // Chỉ tăng khi thanh toán thành công
+                                _context.Vouchers.Update(voucher);
+                                _logger.LogInformation("Incremented UsedCount for VoucherId: {VoucherId}", voucher.VoucherId);
+                            }
+                        }
+                        else
+                        {
+                            _logger.LogWarning("No unused UserVoucher found for BookingId: {BookingId}, VoucherId: {VoucherId}", booking.BookingId, booking.VoucherId);
                         }
                     }
 
@@ -364,15 +381,26 @@ namespace QuanLyRapPhim.Controllers
             if (booking == null)
                 return Json(new { success = false, message = "Không tìm thấy đơn hàng!" });
 
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userId))
+                return Json(new { success = false, message = "Bạn cần đăng nhập để sử dụng voucher!" });
+
             var voucher = await _context.Vouchers
                 .FirstOrDefaultAsync(v =>
                     v.Code.Trim().ToUpper() == code.Trim().ToUpper() &&
                     v.IsActive &&
                     v.ExpiryDate >= DateTime.Today &&
-                    v.UsedCount < v.UsageLimit);
+                    (v.UsageLimit == 0 || v.UsedCount < v.UsageLimit));
 
             if (voucher == null)
                 return Json(new { success = false, message = "Mã giảm giá không hợp lệ, đã hết hạn hoặc đã dùng hết!" });
+
+            // Kiểm tra xem người dùng đã claim voucher này và chưa sử dụng
+            var userVoucher = await _context.UserVouchers
+                .FirstOrDefaultAsync(uv => uv.UserId == userId && uv.VoucherId == voucher.VoucherId && !uv.IsUsed);
+
+            if (userVoucher == null)
+                return Json(new { success = false, message = "Bạn chưa claim voucher này hoặc đã sử dụng!" });
 
             decimal discount = 0;
             string discountType = "";
@@ -394,7 +422,7 @@ namespace QuanLyRapPhim.Controllers
 
             var newAmount = Math.Max(0, booking.TotalPrice - discount);
 
-            // Apply voucher: Lưu VoucherId, VoucherUsed (code), và FinalAmount. UsedCount chỉ tăng khi thanh toán thành công.
+            // Apply voucher: Lưu VoucherId, VoucherUsed (code), và FinalAmount. IsUsed và UsedCount chỉ cập nhật khi thanh toán thành công.
             booking.VoucherId = voucher.VoucherId;
             booking.VoucherUsed = voucher.Code; // Lưu code cho hiển thị dễ dàng
             booking.FinalAmount = newAmount;
