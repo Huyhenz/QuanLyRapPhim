@@ -92,6 +92,7 @@
                 <thead>
                     <tr>
                         <th>ID</th>
+                        <th>Người đặt</th>
                         <th>Phim</th>
                         <th>Phòng</th>
                         <th>Ghế</th>
@@ -112,11 +113,12 @@
                             var showtime = booking.Showtime;
                             var isFoodOnly = showtime == null;
                             var payment = booking.Payment;
-                            var displayAmount = booking.FinalAmount;
-                            var hasDiscount = booking.FinalAmount < booking.TotalPrice;
+                            var displayAmount = booking.FinalAmount > 0 ? booking.FinalAmount : booking.TotalPrice; // Use TotalPrice if FinalAmount is 0 or invalid
+                            var hasDiscount = !string.IsNullOrEmpty(booking.VoucherUsed) && booking.FinalAmount < booking.TotalPrice && booking.FinalAmount > 0;
                             var discountAmount = hasDiscount ? (booking.TotalPrice - booking.FinalAmount) : 0;
                             <tr class="text-center align-middle">
                                 <td class="fw-bold text-info">#@booking.BookingId</td>
+                                <td>@(booking.User?.FullName ?? booking.User?.Email ?? "Khách vãng lai")</td>
                                 <td>
                                     @(isFoodOnly ? "Chỉ mua đồ ăn" : showtime.Movie.Title)
                                 </td>
@@ -155,7 +157,27 @@
                                     @(booking.VoucherUsed ?? "—")
                                 </td>
                                 <td>@booking.BookingDate.ToString("dd/MM/yyyy")<br><small>@booking.BookingDate.ToString("HH:mm")</small></td>
-                                <td><span class="badge bg-success px-3 py-2">Đã thanh toán</span></td>
+                                <td>
+                                    @if (booking.Payment != null)
+                                    {
+                                        @if (booking.Payment.PaymentStatus == "Completed")
+                                        {
+                                            <span class="badge bg-success px-3 py-2">Đã thanh toán</span>
+                                        }
+                                        else if (booking.Payment.PaymentStatus == "Pending")
+                                        {
+                                            <span class="badge bg-warning px-3 py-2">Đang chờ</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-danger px-3 py-2">@booking.Payment.PaymentStatus</span>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-secondary px-3 py-2">Chưa thanh toán</span>
+                                    }
+                                </td>
                             </tr>
                         }
                     }

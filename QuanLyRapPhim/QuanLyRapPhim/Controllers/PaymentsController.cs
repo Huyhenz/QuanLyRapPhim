@@ -1,8 +1,4 @@
-﻿// Fixed PaymentsController.cs - Added voucher application to booking in ApplyVoucher, and UsedCount update in payment callbacks only on success.
-// Added setting booking.FinalAmount in ApplyVoucher and sync in callbacks.
-// Updated ApplyVoucher to require user has claimed the voucher (exists in UserVouchers with !IsUsed).
-// In payment callback, if success and voucher applied, set UserVoucher.IsUsed = true and increment Voucher.UsedCount.
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -42,6 +38,14 @@ namespace QuanLyRapPhim.Controllers
         public IActionResult CreatePaymentUrlVnpay(PaymentInformationModel model)
         {
             _logger.LogInformation("CreatePaymentUrlVnpay called with BookingId: {BookingId}, Amount: {Amount}", model.BookingId, model.Amount);
+
+            // Validation: Amount must be at least 5000 VND (VNPay requirement)
+            if (model.Amount < 5000)
+            {
+                TempData["ErrorMessage"] = "Số tiền giao dịch phải ít nhất 5.000 VNĐ.";
+                _logger.LogWarning("Invalid amount: {Amount} for BookingId: {BookingId}", model.Amount, model.BookingId);
+                return RedirectToAction("Create", new { bookingId = model.BookingId }); // Redirect back to payment page with error
+            }
 
             // Store BookingId in TempData with explicit type conversion
             TempData["BookingId"] = model.BookingId.ToString();
@@ -86,12 +90,13 @@ namespace QuanLyRapPhim.Controllers
                 {
                     // Check or create Payment record
                     var payment = await _context.Payments.FirstOrDefaultAsync(p => p.BookingId == bookingId);
+                    decimal actualAmount = response.Amount / 100; // Adjust based on VNPay (assuming multiplied by 100)
                     if (payment == null)
                     {
                         payment = new Payment
                         {
                             BookingId = bookingId,
-                            Amount = response.Amount / 100, // THỬA: VNPay thường nhân 100, chia để lấy giá thực (nếu cần, điều chỉnh dựa trên service)
+                            Amount = actualAmount,
                             PaymentMethod = "VNPay",
                             PaymentDate = DateTime.Now,
                             PaymentStatus = response.Success ? "Completed" : "Failed"
@@ -101,74 +106,82 @@ namespace QuanLyRapPhim.Controllers
                     }
                     else
                     {
+                        payment.Amount = actualAmount;
                         payment.PaymentStatus = response.Success ? "Completed" : "Failed";
-                        payment.PaymentDate = DateTime.Now;
                         _context.Payments.Update(payment);
-                        _logger.LogInformation("Updated existing Payment record for BookingId: {BookingId}, Status: {PaymentStatus}", payment.BookingId, payment.PaymentStatus);
+                        _logger.LogInformation("Updated Payment record for BookingId: {BookingId}, New Status: {PaymentStatus}", payment.BookingId, payment.PaymentStatus);
                     }
 
-                    // If payment successful and voucher was applied, update UserVoucher.IsUsed and increment Voucher.UsedCount
-                    if (response.Success && booking.VoucherId.HasValue)
-                    {
-                        var userVoucher = await _context.UserVouchers
-                            .FirstOrDefaultAsync(uv => uv.UserId == booking.UserId && uv.VoucherId == booking.VoucherId.Value && !uv.IsUsed);
-
-                        if (userVoucher != null)
-                        {
-                            userVoucher.IsUsed = true;
-                            _context.UserVouchers.Update(userVoucher);
-                            _logger.LogInformation("Marked UserVoucher as used for UserId: {UserId}, VoucherId: {VoucherId}", userVoucher.UserId, userVoucher.VoucherId);
-
-                            var voucher = await _context.Vouchers.FindAsync(booking.VoucherId.Value);
-                            if (voucher != null)
-                            {
-                                voucher.UsedCount++; // Chỉ tăng khi thanh toán thành công
-                                _context.Vouchers.Update(voucher);
-                                _logger.LogInformation("Incremented UsedCount for VoucherId: {VoucherId}", voucher.VoucherId);
-                            }
-                        }
-                        else
-                        {
-                            _logger.LogWarning("No unused UserVoucher found for BookingId: {BookingId}, VoucherId: {VoucherId}", booking.BookingId, booking.VoucherId);
-                        }
-                    }
-
-                    if (!booking.VoucherId.HasValue)
-                    {
-                        booking.FinalAmount = booking.TotalPrice;
-                        _context.Bookings.Update(booking); // Cập nhật nếu cần
-                    }
-
-                    // Sync FinalAmount from Payment.Amount nếu success
                     if (response.Success)
                     {
-                        booking.FinalAmount = payment.Amount;
+                        // Sync booking.FinalAmount to match the actual paid amount from VNPay
+                        booking.FinalAmount = actualAmount;
+                        _context.Bookings.Update(booking);
+
+                        // If voucher was applied, mark UserVoucher as used and increment Voucher.UsedCount
+                        if (booking.VoucherId.HasValue)
+                        {
+                            var userId = booking.UserId; // Assume UserId in booking
+                            var userVoucher = await _context.UserVouchers
+                                .FirstOrDefaultAsync(uv => uv.UserId == userId && uv.VoucherId == booking.VoucherId && !uv.IsUsed);
+
+                            if (userVoucher != null)
+                            {
+                                userVoucher.IsUsed = true;
+                                _context.UserVouchers.Update(userVoucher);
+
+                                var voucher = booking.Voucher;
+                                if (voucher != null)
+                                {
+                                    voucher.UsedCount++;
+                                    _context.Vouchers.Update(voucher);
+                                }
+                            }
+                        }
+
+                        // No longer need this check since we sync to actualAmount
+                        // if (booking.FinalAmount == 0 || booking.FinalAmount == null)
+                        // {
+                        //     booking.FinalAmount = booking.TotalPrice;
+                        // }
+                    }
+                    else
+                    {
+                        // On failure, optionally remove voucher application to allow retry
+                        booking.VoucherId = null;
+                        booking.VoucherUsed = null;
+                        booking.FinalAmount = booking.TotalPrice;
                         _context.Bookings.Update(booking);
                     }
 
-                    // Save changes within the transaction
-                    int changes = await _context.SaveChangesAsync();
-                    _logger.LogInformation("Database changes saved: {Changes} record(s) affected", changes);
-
-                    // Commit the transaction
+                    await _context.SaveChangesAsync();
                     await transaction.CommitAsync();
-                }
-                catch (DbUpdateException ex)
-                {
-                    _logger.LogError(ex, "Database update failed for BookingId: {BookingId}. Inner Exception: {InnerException}", bookingId, ex.InnerException?.Message);
-                    await transaction.RollbackAsync();
-                    return Json(new { Success = false, Message = "Lỗi khi lưu thông tin thanh toán vào cơ sở dữ liệu." });
+
+                    // Prepare model for View
+                    var viewModel = new PaymentResponseModel
+                    {
+                        Success = response.Success,
+                        TransactionId = response.TransactionId,
+                        OrderId = response.OrderId,
+                        PaymentMethod = response.PaymentMethod ?? "VNPay",
+                        OrderDescription = response.OrderDescription,
+                        VnPayResponseCode = response.VnPayResponseCode,
+                        Token = response.Token,
+                        Amount = booking.FinalAmount // Use the synced FinalAmount
+                    };
+
+                    // Pass BookingId to ViewBag if needed for script
+                    ViewBag.BookingId = bookingId;
+
+                    return View(viewModel);
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError(ex, "Unexpected error for BookingId: {BookingId}", bookingId);
                     await transaction.RollbackAsync();
-                    return Json(new { Success = false, Message = "Lỗi không mong muốn khi xử lý thanh toán." });
+                    _logger.LogError(ex, "Error in PaymentCallbackVnpay for BookingId: {BookingId}", bookingId);
+                    return Json(new { Success = false, Message = "Lỗi hệ thống: " + ex.Message });
                 }
             }
-
-            // Redirect to the VNPayResponse view with the response data
-            return View("VNPayResponse", response);
         }
 
         [HttpPost]
@@ -381,6 +394,9 @@ namespace QuanLyRapPhim.Controllers
             if (booking == null)
                 return Json(new { success = false, message = "Không tìm thấy đơn hàng!" });
 
+            if (booking.TotalPrice <= 0)
+                return Json(new { success = false, message = "Đơn hàng không có giá trị để áp dụng giảm giá!" });
+
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (string.IsNullOrEmpty(userId))
                 return Json(new { success = false, message = "Bạn cần đăng nhập để sử dụng voucher!" });
@@ -421,6 +437,12 @@ namespace QuanLyRapPhim.Controllers
             }
 
             var newAmount = Math.Max(0, booking.TotalPrice - discount);
+
+            // Additional check: newAmount must >= 5000 to avoid payment error later
+            if (newAmount < 5000 && newAmount > 0)
+            {
+                return Json(new { success = false, message = "Sau giảm giá, số tiền phải ít nhất 5.000 VNĐ để thanh toán!" });
+            }
 
             // Apply voucher: Lưu VoucherId, VoucherUsed (code), và FinalAmount. IsUsed và UsedCount chỉ cập nhật khi thanh toán thành công.
             booking.VoucherId = voucher.VoucherId;
