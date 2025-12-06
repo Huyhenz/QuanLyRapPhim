@@ -33,8 +33,8 @@ namespace QuanLyRapPhim.Controllers
                 .Include(b => b.Payment)
                 .Where(b => b.UserId == userId &&
                            b.Payment != null &&
-                           b.Payment.PaymentStatus == "Completed"
-                           && b.TotalPrice > 0) 
+                           b.Payment.PaymentStatus == "Completed" &&
+                           b.TotalPrice > 0)  // Add back filters to show only completed payments
                 .OrderByDescending(b => b.BookingDate)
                 .ToListAsync();
 

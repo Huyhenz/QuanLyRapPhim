@@ -345,19 +345,23 @@ namespace QuanLyRapPhim.Controllers
             return Json(new { success = false, message = "No payment record found." });
         }
 
+        // ==================== QUẢN LÝ ĐẶT VÉ (BOOKINGS) ====================
+
         public async Task<IActionResult> ManageBookings()
         {
             var bookings = await _context.Bookings
-                .Include(b => b.User)
-                .Include(b => b.Showtime).ThenInclude(s => s.Movie)
-                .Include(b => b.Showtime).ThenInclude(s => s.Room)
-                .Include(b => b.BookingDetails).ThenInclude(bd => bd.Seat)
-                .Include(b => b.Payment)
-                .Where(b => b.Payment != null
-                            && b.Payment.PaymentStatus == "Completed"
-                            && b.TotalPrice > 0)
-                .OrderByDescending(b => b.BookingDate)
+                .Include(b => b.User) // Để hiển thị User.FullName hoặc Email
+                .Include(b => b.Showtime) // Để hiển thị Showtime.Date, StartTime
+                    .ThenInclude(s => s.Movie) // Để hiển thị Movie.Title
+                .Include(b => b.Showtime)
+                    .ThenInclude(s => s.Room) // Để hiển thị Room.RoomName
+                .Include(b => b.BookingDetails) // Để hiển thị BookingDetails (ghế)
+                    .ThenInclude(bd => bd.Seat) // Để hiển thị Seat.SeatNumber
+                .Include(b => b.BookingFoods) // Để hiển thị BookingFoods (đồ ăn/đồ uống) <--- Sửa chính ở đây
+                    .ThenInclude(bf => bf.FoodItem) // Để hiển thị FoodItem.Name
+                .OrderByDescending(b => b.BookingDate) // Tùy chọn: Sắp xếp theo ngày đặt mới nhất
                 .ToListAsync();
+
             return View(bookings);
         }
 

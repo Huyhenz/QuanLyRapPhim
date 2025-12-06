@@ -92,7 +92,7 @@
     <!-- Form thanh toán MoMo -->
     <form method="POST" asp-action="CreatePaymentMomo" asp-controller="Payments" class="mb-3">
         <input type="hidden" name="FullName" value="@User.Identity.Name" />
-        <input type="hidden" id="momoAmount" name="Amount" value="@Model.Amount" />
+        <input type="hidden" id="momoAmount" name="Amount" value="@(booking?.TotalPrice ?? 0)" />
         <input type="hidden" name="OrderInfo" value="@Localizer["MomoPayment"] - Booking #@booking?.BookingId" />
         <div class="text-center">
             <button class="btn btn-primary btn-lg rounded-pill px-5 glow-effect title-gradient" type="submit">
@@ -104,9 +104,10 @@
     <!-- Form thanh toán VNPay -->
     <form method="POST" asp-action="CreatePaymentUrlVnpay" asp-controller="Payments" class="mb-3">
         <input type="hidden" name="Name" value="@User.Identity.Name" />
-        <input type="hidden" id="vnpayAmount" name="Amount" value="@Model.Amount" />
+        <input type="hidden" id="vnpayAmount" name="Amount" value="@(booking?.TotalPrice ?? 0)" />
         <input type="hidden" name="OrderDescription" value="@Localizer["VNPayPayment"] - Booking #@booking?.BookingId" />
         <input type="hidden" name="OrderType" value="2500" />
+        <input type="hidden" name="BookingId" value="@booking.BookingId" />
         <div class="text-center">
             <button class="btn btn-primary btn-lg rounded-pill px-5 glow-effect title-gradient" type="submit">
                 <i class="fas fa-wallet me-2"></i> @Localizer["PayWithVNPay"]
@@ -211,32 +212,44 @@
             background-color: #c82333;
         }
 
+    <text>
     /* Responsive */
-    @@media (max-width: 768px) {
-        .btn-lg {
-            font-size: 1rem;
-            padding: 10px 30px;
-        }
+        @@media (max-width: 768px) {
+        .btn-lg
 
-        .card-body {
-            padding: 15px;
-        }
+    {
+        font-size: 1rem;
+        padding: 10px 30px;
     }
 
+    .card-body {
+        padding: 15px;
+    }
+
+    }
+
+    </text >
+
+    <text >
     /* Thêm animation cho voucher apply */
-    @@keyframes sparkle {
-        0% {
-            text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
-        }
+        @@keyframes sparkle {
+        0%
 
-        50% {
-            text-shadow: 0 0 20px rgba(255, 0, 51, 0.8);
-        }
-
-        100% {
-            text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
-        }
+    {
+        text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
     }
+
+    50% {
+        text-shadow: 0 0 20px rgba(255, 0, 51, 0.8);
+    }
+
+    100% {
+        text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+    }
+
+    }
+
+    </text >
 
     .voucher-applied {
         animation: sparkle 1s infinite;
