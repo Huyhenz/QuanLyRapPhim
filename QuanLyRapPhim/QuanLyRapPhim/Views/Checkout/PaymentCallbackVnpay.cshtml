@@ -1,7 +1,7 @@
 ﻿@model QuanLyRapPhim.Models.VNPay.PaymentResponseModel
 @using Microsoft.AspNetCore.Mvc.Localization
-@using System.Globalization; @* Thêm để format amount *@
-@using QuanLyRapPhim.Data; @* Thêm để sử dụng DBContext *@
+@using System.Globalization;
+@using QuanLyRapPhim.Data;
 @inject IViewLocalizer Localizer
 @inject DBContext Context
 
@@ -9,26 +9,15 @@
     ViewData["Title"] = Localizer["VNPayPayment"].Value;
 
     // Lấy BookingId từ ViewBag (đã set trong controller)
-    int bookingId = ViewBag.BookingId ?? 0; // Default 0 nếu null, nhưng nên kiểm tra
+    int bookingId = ViewBag.BookingId ?? 0;
 
-    // Truy vấn trực tiếp từ DB để lấy FinalAmount
-    decimal finalAmount = 0m;
-    if (bookingId > 0)
-    {
-        var booking = Context.Bookings.Find(bookingId); // Sync find
-        if (booking != null)
-        {
-            finalAmount = booking.FinalAmount ?? 0m;
-        }
-    }
-
-    // Lấy email từ OrderDescription: phần đầu trước space (robust, không cần splitter đầy đủ)
-    var descriptionParts = Model.OrderDescription.Split(new char[] { ' ' }, 2); // Split chỉ 2 phần tối đa
+    // Lấy email từ OrderDescription: phần đầu trước space
+    var descriptionParts = Model.OrderDescription.Split(new char[] { ' ' }, 2);
     var email = descriptionParts.Length > 0 ? descriptionParts[0] : Localizer["Unidentified"].Value;
 
-    // Format amount từ finalAmount lấy từ DB
-    var culture = new CultureInfo("vi-VN"); // Format Việt Nam: comma decimal, dot thousands (nhưng dùng 0.00 để no thousands cho số nhỏ)
-    var amount = finalAmount.ToString("0.00", culture); // Kết quả: "50000,00" (khớp ảnh)
+    // Format amount từ Model.Amount (đã được set trong controller)
+    var culture = new CultureInfo("vi-VN");
+    var amount = Model.Amount.ToString("#,##0", culture);
 }
 
 <div class="container my-5">
