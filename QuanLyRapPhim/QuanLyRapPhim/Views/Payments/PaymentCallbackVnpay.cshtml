@@ -1,0 +1,331 @@
+﻿@model QuanLyRapPhim.Models.VNPay.PaymentResponseModel
+@using Microsoft.AspNetCore.Mvc.Localization
+@using System.Globalization;
+@using QuanLyRapPhim.Data;
+@inject IViewLocalizer Localizer
+@inject DBContext Context
+
+@{
+    ViewData["Title"] = Localizer["VNPayPayment"].Value;
+
+    // Lấy BookingId từ ViewBag (đã set trong controller)
+    int bookingId = ViewBag.BookingId ?? 0;
+
+    // Lấy email từ OrderDescription: phần đầu trước space
+    var descriptionParts = Model.OrderDescription.Split(new char[] { ' ' }, 2);
+    var email = descriptionParts.Length > 0 ? descriptionParts[0] : Localizer["Unidentified"].Value;
+
+    // Format amount từ Model.Amount (đã được set trong controller)
+    var culture = new CultureInfo("vi-VN");
+    var amount = Model.Amount.ToString("#,##0", culture);
+}
+
+<div class="container my-5">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card payment-card text-light glow-effect">
+                <div class="card-body">
+                    <!-- Icon và tiêu đề -->
+                    <div class="text-center mb-4">
+                        @if (Model.Success)
+                        {
+                            <div class="success-icon mb-3">
+                                <i class="fas fa-check-circle"></i>
+                            </div>
+                            <h3 class="title-gradient fw-bold">@Localizer["PaymentSuccessful"]</h3>
+                        }
+                        else
+                        {
+                            <div class="error-icon mb-3">
+                                <i class="fas fa-times-circle"></i>
+                            </div>
+                            <h3 class="title-gradient-error fw-bold">@Localizer["PaymentFailed"]</h3>
+                        }
+                    </div>
+
+                    <!-- Thông tin giao dịch -->
+                    <div class="payment-details">
+                        <dl class="row">
+                            <dt class="col-sm-5 text-muted">
+                                <i class="fas fa-hashtag me-2"></i>@Localizer["TransactionId"]
+                            </dt>
+                            <dd class="col-sm-7">@Model.TransactionId</dd>
+
+                            <dt class="col-sm-5 text-muted">
+                                <i class="fas fa-envelope me-2"></i>@Localizer["Email"]
+                            </dt>
+                            <dd class="col-sm-7">@email</dd>
+
+                            <dt class="col-sm-5 text-muted">
+                                <i class="fas fa-money-bill-wave me-2"></i>@Localizer["Amount"]
+                            </dt>
+                            <dd class="col-sm-7 text-warning fw-bold">@amount VNĐ</dd>
+
+                            <dt class="col-sm-5 text-muted">
+                                <i class="fas fa-credit-card me-2"></i>@Localizer["PaymentMethod"]
+                            </dt>
+                            <dd class="col-sm-7">@Model.PaymentMethod</dd>
+
+                            <dt class="col-sm-5 text-muted">
+                                <i class="fas fa-info-circle me-2"></i>@Localizer["Status"]
+                            </dt>
+                            <dd class="col-sm-7">
+                                @if (Model.Success)
+                                {
+                                    <span class="badge bg-success px-3 py-2">
+                                        <i class="fas fa-check me-1"></i>@Localizer["Successful"]
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-danger px-3 py-2">
+                                        <i class="fas fa-times me-1"></i>@Localizer["Failed"]
+                                    </span>
+                                }
+                            </dd>
+                        </dl>
+                    </div>
+
+                    <!-- Nút hành động -->
+                    <div class="text-center mt-4">
+                        <a asp-controller="Movies" asp-action="Index" class="btn btn-secondary glow-effect me-2">
+                            <i class="fas fa-film me-2"></i>@Localizer["BackToMovies"]
+                        </a>
+                        @if (User.IsInRole("Admin"))
+                        {
+                            <a asp-controller="Admin" asp-action="ManageBookings"
+                               class="btn btn-admin glow-effect" id="viewBookingsBtn">
+                                <i class="fas fa-ticket-alt me-2"></i>@Localizer["ViewBookings"]
+                            </a>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- CSS -->
+<style>
+    body {
+        background-color: #0F0F0F;
+        color: #ffffff;
+        font-family: 'Montserrat', sans-serif;
+    }
+
+    .payment-card {
+        background: linear-gradient(145deg, #1c1c1c, #252525);
+        border: 2px solid #ff0033;
+        border-radius: 20px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    }
+
+        .payment-card .card-body {
+            padding: 40px;
+        }
+
+    /* Icon thành công/thất bại */
+    .success-icon i {
+        font-size: 5rem;
+        color: #00ff88;
+        animation: scaleIn 0.5s ease;
+        filter: drop-shadow(0 0 20px rgba(0, 255, 136, 0.6));
+    }
+
+    .error-icon i {
+        font-size: 5rem;
+        color: #ff4444;
+        animation: shake 0.5s ease;
+        filter: drop-shadow(0 0 20px rgba(255, 68, 68, 0.6));
+    }
+
+    @@keyframes scaleIn {
+        0% {
+            transform: scale(0);
+            opacity: 0;
+        }
+
+        50% {
+            transform: scale(1.2);
+        }
+
+        100% {
+            transform: scale(1);
+            opacity: 1;
+        }
+    }
+
+    @@keyframes shake {
+        0%, 100% {
+            transform: translateX(0);
+        }
+
+        25% {
+            transform: translateX(-10px);
+        }
+
+        75% {
+            transform: translateX(10px);
+        }
+    }
+
+    /* Tiêu đề */
+    .title-gradient {
+        background: linear-gradient(90deg, #00ff88, #00cc66);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        font-weight: 700;
+        font-size: 2rem;
+        margin-top: 10px;
+    }
+
+    .title-gradient-error {
+        background: linear-gradient(90deg, #ff4444, #cc0000);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        font-weight: 700;
+        font-size: 2rem;
+        margin-top: 10px;
+    }
+
+    .glow-effect {
+        box-shadow: 0 0 15px rgba(255, 0, 51, 0.3);
+        transition: all 0.3s ease;
+    }
+
+        .glow-effect:hover {
+            box-shadow: 0 0 25px rgba(255, 0, 51, 0.6);
+            transform: translateY(-3px);
+        }
+
+    /* Thông tin chi tiết */
+    .payment-details {
+        background: rgba(0, 0, 0, 0.3);
+        border-radius: 15px;
+        padding: 30px;
+        margin: 30px 0;
+    }
+
+        .payment-details dl.row {
+            margin-bottom: 0;
+        }
+
+        .payment-details dt {
+            padding: 12px 0;
+            font-size: 1rem;
+            color: #b3b3b3;
+        }
+
+        .payment-details dd {
+            padding: 12px 0;
+            font-size: 1.1rem;
+            color: #ffffff;
+            font-weight: 500;
+        }
+
+        .payment-details dt i {
+            width: 20px;
+            text-align: center;
+        }
+
+    /* Badge */
+    .badge {
+        font-size: 1rem;
+        font-weight: 600;
+        border-radius: 20px;
+    }
+
+    /* Nút */
+    .btn-secondary {
+        border: 2px solid #ff0033;
+        color: #ff0033;
+        background-color: transparent;
+        border-radius: 25px;
+        padding: 12px 30px;
+        font-weight: 600;
+        font-size: 1.1rem;
+        transition: all 0.3s ease;
+    }
+
+        .btn-secondary:hover {
+            background-color: #ff0033;
+            color: #ffffff;
+            border-color: #ff0033;
+            transform: scale(1.05);
+        }
+
+    .btn-admin {
+        border: 2px solid #667eea;
+        color: #667eea;
+        background-color: transparent;
+        border-radius: 25px;
+        padding: 12px 30px;
+        font-weight: 600;
+        font-size: 1.1rem;
+        transition: all 0.3s ease;
+    }
+
+        .btn-admin:hover {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #ffffff;
+            border-color: #667eea;
+            transform: scale(1.05);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+        }
+
+    /* Responsive */
+    @@media (max-width: 768px) {
+        .payment-card .card-body {
+            padding: 20px;
+        }
+
+        .success-icon i,
+        .error-icon i {
+            font-size: 3.5rem;
+        }
+
+        .title-gradient,
+        .title-gradient-error {
+            font-size: 1.5rem;
+        }
+
+        .payment-details {
+            padding: 20px;
+        }
+
+        .btn-secondary,
+        .btn-admin {
+            display: block;
+            width: 100%;
+            margin: 5px 0 !important;
+        }
+    }
+</style>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+
+<script>
+    // Trigger immediate status update in ManageBookings when admin clicks the button
+    document.getElementById("viewBookingsBtn")?.addEventListener("click", function () {
+        const bookingId = @ViewBag.BookingId;
+        if (bookingId) {
+            fetch(`/Admin/UpdatePaymentStatus?bookingId=${bookingId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    console.log(`Status updated for booking ${bookingId} to ${data.paymentStatus}`);
+                } else {
+                    console.error('Failed to update status:', data.message);
+                }
+            })
+            .catch(error => console.error('Error updating status:', error));
+        }
+    });
+</script>
