@@ -1,17 +1,12 @@
-﻿@model QuanLyRapPhim.Models.Booking
-@using Microsoft.AspNetCore.Mvc.Localization
+﻿@using Microsoft.AspNetCore.Mvc.Localization
 @inject IViewLocalizer Localizer
 
 @{
     ViewData["Title"] = Localizer["SelectFoodAndDrinks"].Value;
     Layout = "~/Views/Shared/_Layout.cshtml";
 
-    var booking = Model;
-    var showtime = Model.Showtime;
+    var showtime = ViewBag.Showtime as QuanLyRapPhim.Models.Showtime;
     var isQuickFoodOnly = showtime == null;
-    var bookingId = booking.BookingId;
-    var selectedSeats = TempData["SelectedSeats"] as string ?? Localizer["NotSelected"].Value;
-    var seatCount = TempData["SeatCount"] as int? ?? 0;
 }
 
 <div class="container my-5">
@@ -21,14 +16,17 @@
         <div class="col-md-8">
             <h1 class="text-white mb-2 title-gradient">@Localizer["SelectFoodAndDrinks"]</h1>
 
-            @if (!isQuickFoodOnly)
+            @if (!isQuickFoodOnly && showtime != null)
             {
-                <h4 class="text-muted mb-3">@Localizer["Movie"]: @showtime.Movie.Title</h4>
+                <h4 class="text-muted mb-3">@Localizer["Movie"]: @showtime.Movie?.Title</h4>
                 <div class="d-flex flex-wrap text-light">
-                    <p class="me-4">
-                        <i class="fas fa-door-open text-primary me-2"></i>
-                        <strong>@Localizer["Room"]:</strong> @showtime.Room.RoomName
-                    </p>
+                    @if (showtime.Room != null)
+                    {
+                        <p class="me-4">
+                            <i class="fas fa-door-open text-primary me-2"></i>
+                            <strong>@Localizer["Room"]:</strong> @showtime.Room.RoomName
+                        </p>
+                    }
                     <p class="me-4">
                         <i class="fas fa-calendar-alt text-primary me-2"></i>
                         <strong>@Localizer["ShowDate"]:</strong> @showtime.Date.ToString("dd/MM/yyyy")
@@ -46,25 +44,19 @@
                     <strong>@Localizer["OnlyFoodAndDrinks"]</strong> – @Localizer["NoTicketSelected"]
                 </div>
             }
-
-            <p class="text-success">
-                <i class="fas fa-chair text-warning me-2"></i>
-                <strong>@Localizer["SelectedSeats"]:</strong>
-                @(seatCount > 0 ? $"{selectedSeats} ({seatCount} {Localizer["Seats"]})" : Localizer["NoSeatsSelected"])
-            </p>
         </div>
 
         <div class="col-md-4 text-end">
-            @if (!isQuickFoodOnly)
+            @if (!isQuickFoodOnly && showtime != null)
             {
-                <a asp-action="SelectRoomAndSeat" asp-route-showtimeId="@showtime.ShowtimeId" class="btn btn-secondary glow-effect">
-                    @Localizer["BackToSeatSelection"]
+                <a asp-action="SelectRoomAndSeat" asp-controller="Tickets" asp-route-showtimeId="@showtime.ShowtimeId" class="btn btn-secondary glow-effect">
+                    <i class="fas fa-arrow-left me-2"></i>@Localizer["BackToSeatSelection"]
                 </a>
             }
             else
             {
-                <a asp-action="Index" asp-controller="Movies" class="btn btn-secondary glow-effect">
-                    @Localizer["BackToMovieSelection"]
+                <a asp-action="Index" asp-controller="Showtimes" class="btn btn-secondary glow-effect">
+                    <i class="fas fa-arrow-left me-2"></i>Quay lại chọn suất chiếu
                 </a>
             }
         </div>
@@ -85,8 +77,7 @@
     }
 
     <!-- FORM CHỌN ĐỒ ĂN -->
-    <form asp-action="ConfirmFood" method="post">
-        <input type="hidden" name="bookingId" value="@bookingId" />
+    <form asp-action="SelectFood" asp-controller="Tickets" method="post">
 
         <!-- MÀN HÌNH QUẦY ĐỒ ĂN -->
         <div class="screen-container text-center mb-5">
@@ -100,9 +91,14 @@
             @foreach (var food in ViewBag.FoodItems as List<QuanLyRapPhim.Models.FoodItem>)
             {
                 var currentQty = 0;
-                if (ViewBag.CurrentQuantities is Dictionary<int, int> dict && dict.TryGetValue(food.FoodItemId, out var qty))
+                // Load từ ViewBag.SelectedFoods nếu có
+                if (ViewBag.SelectedFoods is List<QuanLyRapPhim.Models.TempFoodItem> selectedFoods)
                 {
-                    currentQty = qty;
+                    var selected = selectedFoods.FirstOrDefault(f => f.FoodItemId == food.FoodItemId);
+                    if (selected != null)
+                    {
+                        currentQty = selected.Quantity;
+                    }
                 }
 
                 <div class="col-md-6 col-lg-4 col-xl-3">
@@ -134,7 +130,7 @@
                                 <button type="button" class="btn btn-outline-light btn-sm minus-btn glow-effect">
                                     <i class="fas fa-minus"></i>
                                 </button>
-                                <input type="number" name="quantities[@food.FoodItemId]" value="@currentQty" min="0" max="10" class="form-control text-center qty fw-bold" style="max-width:70px;" />
+                                <input type="number" name="selectedFoods[@food.FoodItemId]" value="@currentQty" min="0" max="10" class="form-control text-center qty fw-bold" style="max-width:70px;" />
                                 <button type="button" class="btn btn-outline-light btn-sm plus-btn glow-effect">
                                     <i class="fas fa-plus"></i>
                                 </button>
@@ -165,7 +161,7 @@
         <!-- NÚT XÁC NHẬN -->
         <div class="text-center">
             <button type="submit" class="btn btn-payment btn-lg px-5 py-3 glow-effect">
-                <i class="fas fa-credit-card me-2"></i>@Localizer["ProceedToPayment"]
+                <i class="fas fa-arrow-right me-2"></i>Tiếp tục thanh toán
             </button>
         </div>
     </form>
@@ -339,7 +335,7 @@
             const foodData = @Html.Raw(Json.Serialize(ViewBag.FoodItems));
             const orderList = document.getElementById('food-order-list');
             const foodTotal = document.getElementById('food-total');
-            const noItemsText = '@Localizer["NoItemsSelected"]';
+            const noItemsText = 'Chưa chọn món nào';
 
             function updateOrder() {
                 let total = 0;

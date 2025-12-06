@@ -51,7 +51,7 @@
     }
 
     <!-- Form chọn ghế -->
-    <form asp-action="ConfirmBooking" method="post">
+    <form asp-action="SelectRoomAndSeat" asp-controller="Tickets" method="post">
         <input type="hidden" name="showtimeId" value="@Model.ShowtimeId" />
 
         <!-- Màn hình chiếu -->
@@ -95,7 +95,7 @@
                                         var seat2 = rowSeats[i + 1];
                                         <div class="seat-couple-pair mx-2 glow-effect">
                                             <div class="seat seat-couple @(seat1.Status == "Đã đặt" ? "seat-taken" : "seat-available")">
-                                                <input type="checkbox" name="selectedSeats" value="@seat1.SeatId"
+                                                <input type="checkbox" name="selectedSeatIds" value="@seat1.SeatId"
                                                        id="seat-@seat1.SeatId" @(seat1.Status == "Đã đặt" ? "disabled" : "")
                                                        data-pair="@seat2.SeatId" />
                                                 <label for="seat-@seat1.SeatId" class="seat-label">
@@ -106,7 +106,7 @@
                                                 </label>
                                             </div>
                                             <div class="seat seat-couple @(seat2.Status == "Đã đặt" ? "seat-taken" : "seat-available")">
-                                                <input type="checkbox" name="selectedSeats" value="@seat2.SeatId"
+                                                <input type="checkbox" name="selectedSeatIds" value="@seat2.SeatId"
                                                        id="seat-@seat2.SeatId" @(seat2.Status == "Đã đặt" ? "disabled" : "")
                                                        data-pair="@seat1.SeatId" />
                                                 <label for="seat-@seat2.SeatId" class="seat-label">
@@ -123,7 +123,7 @@
                                     else
                                     {
                                         <div class="seat @(seat1.Status == "Đã đặt" ? "seat-taken" : "seat-available") mx-2 glow-effect">
-                                            <input type="checkbox" name="selectedSeats" value="@seat1.SeatId"
+                                            <input type="checkbox" name="selectedSeatIds" value="@seat1.SeatId"
                                                    id="seat-@seat1.SeatId" @(seat1.Status == "Đã đặt" ? "disabled" : "") />
                                             <label for="seat-@seat1.SeatId" class="seat-label">
                                                 <i class="fas fa-chair"></i>
@@ -138,7 +138,7 @@
                                 foreach (var seat in rowSeats)
                                 {
                                     <div class="seat @(seat.Status == "Đã đặt" ? "seat-taken" : "seat-available") mx-2 glow-effect">
-                                        <input type="checkbox" name="selectedSeats" value="@seat.SeatId"
+                                        <input type="checkbox" name="selectedSeatIds" value="@seat.SeatId"
                                                id="seat-@seat.SeatId" @(seat.Status == "Đã đặt" ? "disabled" : "") />
                                         <label for="seat-@seat.SeatId" class="seat-label">
                                             <i class="fas fa-chair"></i>
@@ -187,7 +187,7 @@
         <!-- Nút xác nhận -->
         <div class="text-center">
             <button type="submit" class="btn btn-payment btn-lg glow-effect">
-                <i class="fas fa-ticket-alt me-1"></i> @Localizer["ConfirmBooking"]
+                <i class="fas fa-arrow-right me-2"></i> Tiếp tục chọn đồ ăn
             </button>
         </div>
     </form>
@@ -337,7 +337,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            background: linear-gradient(145deg, #ffcc00, #e6b800);
+            background: transparent;
             transition: background 0.3s ease;
         }
 
@@ -352,18 +352,18 @@
             font-size: 0.8rem;
             font-weight: 700;
             color: #ffffff;
-            top: 10px;
+            top: 5px;
             background: rgba(0, 0, 0, 0.6);
             border-radius: 10px;
             padding: 3px 8px;
         }
 
         .seat-couple input:checked + .seat-label {
-            background: linear-gradient(145deg, #00bfff, #0099cc);
+            background: rgba(0, 191, 255, 0.3);
         }
 
             .seat-couple input:checked + .seat-label .seat-inner i {
-                color: #ffffff;
+                color: #00bfff;
                 transform: scale(1.15);
             }
 
@@ -395,7 +395,7 @@
 
         .seat-label i {
             font-size: 1.5rem;
-            transition: color 0.3s ease;
+            transition: color 0.3s ease, transform 0.3s ease;
         }
 
     .seat-number {
@@ -490,12 +490,12 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function () {
-        const seatCheckboxes = document.querySelectorAll('input[name="selectedSeats"]');
+        const seatCheckboxes = document.querySelectorAll('input[name="selectedSeatIds"]');
         const selectedSeatsList = document.getElementById('selected-seats-list');
         const totalPriceElement = document.getElementById('total-price');
         const normalPrice = 50000;
         const couplePrice = 100000;
-        const noSeatsText = '@Localizer["NoSeatsSelected"]';
+        const noSeatsText = 'Chưa chọn ghế';
 
         function updateSelectedSeats(event) {
             const clickedCheckbox = event.target;

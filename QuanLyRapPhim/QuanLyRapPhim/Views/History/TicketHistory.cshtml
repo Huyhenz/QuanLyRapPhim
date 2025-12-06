@@ -112,9 +112,9 @@
                             var showtime = booking.Showtime;
                             var isFoodOnly = showtime == null;
                             var payment = booking.Payment;
-                            var displayAmount = booking.FinalAmount > 0 ? booking.FinalAmount : booking.TotalPrice; // Use TotalPrice if FinalAmount is 0 or invalid
-                            var hasDiscount = !string.IsNullOrEmpty(booking.VoucherUsed) && booking.FinalAmount < booking.TotalPrice && booking.FinalAmount > 0;
-                            var discountAmount = hasDiscount ? (booking.TotalPrice - booking.FinalAmount) : 0;
+                            var displayAmount = (booking.FinalAmount ?? 0m) > 0m ? (booking.FinalAmount ?? 0m) : (booking.TotalPrice ?? 0m); // Use TotalPrice if FinalAmount is 0 or invalid
+                            var hasDiscount = !string.IsNullOrEmpty(booking.VoucherUsed) && (booking.FinalAmount ?? 0m) < (booking.TotalPrice ?? 0m) && (booking.FinalAmount ?? 0m) > 0m;
+                            var discountAmount = hasDiscount ? ((booking.TotalPrice ?? 0m) - (booking.FinalAmount ?? 0m)) : 0m;
                             <tr class="text-center align-middle">
                                 <td class="fw-bold text-info">#@booking.BookingId</td>
                                 <td>
@@ -144,11 +144,11 @@
                                     }
                                 </td>
                                 <td class="text-end text-warning fw-bold fs-5">
-                                    @displayAmount.ToString("N0") <small class="text-white-50">VNĐ</small>
+                                    @(displayAmount.ToString("N0") ?? "0") <small class="text-white-50">VNĐ</small>
                                     @if (hasDiscount)
                                     {
                                         <br />
-                                        <small class="text-success">(Giảm @discountAmount.ToString("N0") VNĐ từ voucher)</small>
+                                        <small class="text-success">(Giảm @(discountAmount.ToString("N0") ?? "0") VNĐ từ voucher)</small>
                                     }
                                 </td>
                                 <td>

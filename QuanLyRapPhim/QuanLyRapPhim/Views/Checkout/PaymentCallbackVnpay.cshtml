@@ -3,7 +3,7 @@
 @using System.Globalization; @* Thêm để format amount *@
 @using QuanLyRapPhim.Data; @* Thêm để sử dụng DBContext *@
 @inject IViewLocalizer Localizer
-@inject DBContext Context 
+@inject DBContext Context
 
 @{
     ViewData["Title"] = Localizer["VNPayPayment"].Value;
@@ -12,13 +12,13 @@
     int bookingId = ViewBag.BookingId ?? 0; // Default 0 nếu null, nhưng nên kiểm tra
 
     // Truy vấn trực tiếp từ DB để lấy FinalAmount
-    decimal finalAmount = 0;
+    decimal finalAmount = 0m;
     if (bookingId > 0)
     {
         var booking = Context.Bookings.Find(bookingId); // Sync find
         if (booking != null)
         {
-            finalAmount = booking.FinalAmount;
+            finalAmount = booking.FinalAmount ?? 0m;
         }
     }
 
@@ -151,39 +151,33 @@
     }
 
     @@keyframes scaleIn {
-        0%
+        0% {
+            transform: scale(0);
+            opacity: 0;
+        }
 
-    {
-        transform: scale(0);
-        opacity: 0;
-    }
+        50% {
+            transform: scale(1.2);
+        }
 
-    50% {
-        transform: scale(1.2);
-    }
-
-    100% {
-        transform: scale(1);
-        opacity: 1;
-    }
-
+        100% {
+            transform: scale(1);
+            opacity: 1;
+        }
     }
 
     @@keyframes shake {
-        0%, 100%
+        0%, 100% {
+            transform: translateX(0);
+        }
 
-    {
-        transform: translateX(0);
-    }
+        25% {
+            transform: translateX(-10px);
+        }
 
-    25% {
-        transform: translateX(-10px);
-    }
-
-    75% {
-        transform: translateX(10px);
-    }
-
+        75% {
+            transform: translateX(10px);
+        }
     }
 
     /* Tiêu đề */
@@ -294,33 +288,30 @@
 
     /* Responsive */
     @@media (max-width: 768px) {
-        .payment-card .card-body
+        .payment-card .card-body {
+            padding: 20px;
+        }
 
-    {
-        padding: 20px;
-    }
+        .success-icon i,
+        .error-icon i {
+            font-size: 3.5rem;
+        }
 
-    .success-icon i,
-    .error-icon i {
-        font-size: 3.5rem;
-    }
+        .title-gradient,
+        .title-gradient-error {
+            font-size: 1.5rem;
+        }
 
-    .title-gradient,
-    .title-gradient-error {
-        font-size: 1.5rem;
-    }
+        .payment-details {
+            padding: 20px;
+        }
 
-    .payment-details {
-        padding: 20px;
-    }
-
-    .btn-secondary,
-    .btn-admin {
-        display: block;
-        width: 100%;
-        margin: 5px 0 !important;
-    }
-
+        .btn-secondary,
+        .btn-admin {
+            display: block;
+            width: 100%;
+            margin: 5px 0 !important;
+        }
     }
 </style>
 

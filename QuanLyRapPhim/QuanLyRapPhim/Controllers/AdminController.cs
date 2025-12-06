@@ -412,7 +412,7 @@ namespace QuanLyRapPhim.Controllers
                     FoodRevenue = g.Sum(b => b.BookingFoods?.Where(bf => bf.FoodItem?.Category == "Food").Sum(bf => (bf.FoodItem?.Price ?? 0m) * bf.Quantity) ?? 0m),
                     DrinkRevenue = g.Sum(b => b.BookingFoods?.Where(bf => bf.FoodItem?.Category == "Drink").Sum(bf => (bf.FoodItem?.Price ?? 0m) * bf.Quantity) ?? 0m),
                     ComboRevenue = g.Sum(b => b.BookingFoods?.Where(bf => bf.FoodItem?.Category == "Combo").Sum(bf => (bf.FoodItem?.Price ?? 0m) * bf.Quantity) ?? 0m),
-                    TotalRevenue = g.Sum(b => b.TotalPrice)
+                    TotalRevenue = g.Sum(b => b.TotalPrice ?? 0m)
                 })
                 .OrderBy(x => x.Date)
                 .ToList();
@@ -428,7 +428,7 @@ namespace QuanLyRapPhim.Controllers
                     FoodRevenue = g.Sum(b => b.BookingFoods?.Where(bf => bf.FoodItem?.Category == "Food").Sum(bf => (bf.FoodItem?.Price ?? 0m) * bf.Quantity) ?? 0m),
                     DrinkRevenue = g.Sum(b => b.BookingFoods?.Where(bf => bf.FoodItem?.Category == "Drink").Sum(bf => (bf.FoodItem?.Price ?? 0m) * bf.Quantity) ?? 0m),
                     ComboRevenue = g.Sum(b => b.BookingFoods?.Where(bf => bf.FoodItem?.Category == "Combo").Sum(bf => (bf.FoodItem?.Price ?? 0m) * bf.Quantity) ?? 0m),
-                    TotalRevenue = g.Sum(b => b.TotalPrice)
+                    TotalRevenue = g.Sum(b => b.TotalPrice ?? 0m)
                 })
                 .OrderBy(x => x.Year).ThenBy(x => x.Month)
                 .ToList();

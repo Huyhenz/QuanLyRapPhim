@@ -46,9 +46,21 @@
                 <p><strong>@Localizer["SelectedSeats"]:</strong> @Localizer["NoSeatsSelected"]</p>
             }
 
-            <p id="totalAmount"><strong>@Localizer["TotalAmount"]:</strong> @booking?.TotalPrice.ToString("N0") VNĐ</p>
+            <p id="totalAmount"><strong>@Localizer["TotalAmount"]:</strong> @(booking?.TotalPrice?.ToString("N0") ?? "0") VNĐ</p>
+
+            @if (!string.IsNullOrEmpty(booking?.VoucherUsed))
+            {
+                <p class="text-success">
+                    <i class="fas fa-check-circle me-2"></i>
+                    <strong>Voucher đã áp dụng:</strong> @booking.VoucherUsed
+                </p>
+            }
+
             <p id="discountInfo" class="text-success" style="display: none;"><strong>Giảm giá:</strong> <span id="discountValue"></span> VNĐ</p>
-            <p id="finalAmount" class="text-warning" style="display: none;"><strong>Tổng thanh toán:</strong> <span id="newAmount"></span> VNĐ</p>
+            <p id="finalAmount" @(booking?.FinalAmount != booking?.TotalPrice ? "" : "style=display:none;") class="text-warning">
+                <strong>Tổng thanh toán:</strong>
+                <span id="newAmount">@((booking?.FinalAmount ?? booking?.TotalPrice)?.ToString("N0") ?? "0")</span> VNĐ
+            </p>
         </div>
     </div>
 
@@ -77,11 +89,11 @@
             <h4 class="card-title title-gradient"><i class="fas fa-ticket-alt me-2"></i>@Localizer["ApplyVoucher"]</h4>
             @Html.AntiForgeryToken()
             <div class="input-group mb-3">
-                <input type="text" id="voucherCode" class="form-control rounded-pill glow-effect" placeholder="@Localizer["EnterVoucherCode"]" aria-label="Voucher Code">
-                <button class="btn btn-primary rounded-pill px-4 ms-2 glow-effect" type="button" id="applyVoucherBtn">
+                <input type="text" id="voucherCode" class="form-control rounded-pill glow-effect" placeholder="@Localizer["EnterVoucherCode"]" aria-label="Voucher Code" @(string.IsNullOrEmpty(booking?.VoucherUsed) ? "" : "disabled value=\"" + booking.VoucherUsed + "\"")>
+                <button class="btn btn-primary rounded-pill px-4 ms-2 glow-effect" type="button" id="applyVoucherBtn" @(string.IsNullOrEmpty(booking?.VoucherUsed) ? "" : "style=display:none;")>
                     <i class="fas fa-check-circle me-2"></i>@Localizer["Apply"]
                 </button>
-                <button class="btn btn-danger rounded-pill px-4 ms-2 glow-effect" type="button" id="removeVoucherBtn" style="display: none;">
+                <button class="btn btn-danger rounded-pill px-4 ms-2 glow-effect" type="button" id="removeVoucherBtn" @(string.IsNullOrEmpty(booking?.VoucherUsed) ? "style=display:none;" : "")>
                     <i class="fas fa-times-circle me-2"></i>@Localizer["Cancel"]
                 </button>
             </div>
@@ -92,8 +104,8 @@
     <!-- Form thanh toán MoMo -->
     <form method="POST" asp-action="CreatePaymentMomo" asp-controller="Payments" class="mb-3">
         <input type="hidden" name="FullName" value="@User.Identity.Name" />
-        <input type="hidden" id="momoAmount" name="Amount" value="@(booking?.TotalPrice ?? 0)" />
-        <input type="hidden" name="OrderInfo" value="@Localizer["MomoPayment"] - Booking #@booking?.BookingId" />
+        <input type="hidden" id="momoAmount" name="Amount" value="@(booking?.FinalAmount ?? booking?.TotalPrice ?? 0m)" />
+        <input type="hidden" name="OrderInfo" value="Thanh toán MoMo" />
         <div class="text-center">
             <button class="btn btn-primary btn-lg rounded-pill px-5 glow-effect title-gradient" type="submit">
                 <i class="fas fa-wallet me-2"></i> @Localizer["PayWithMomo"]
@@ -104,10 +116,9 @@
     <!-- Form thanh toán VNPay -->
     <form method="POST" asp-action="CreatePaymentUrlVnpay" asp-controller="Payments" class="mb-3">
         <input type="hidden" name="Name" value="@User.Identity.Name" />
-        <input type="hidden" id="vnpayAmount" name="Amount" value="@(booking?.TotalPrice ?? 0)" />
-        <input type="hidden" name="OrderDescription" value="@Localizer["VNPayPayment"] - Booking #@booking?.BookingId" />
+        <input type="hidden" id="vnpayAmount" name="Amount" value="@(booking?.FinalAmount ?? booking?.TotalPrice ?? 0m)" />
+        <input type="hidden" name="OrderDescription" value="Thanh toán VNPay" />
         <input type="hidden" name="OrderType" value="2500" />
-        <input type="hidden" name="BookingId" value="@booking.BookingId" />
         <div class="text-center">
             <button class="btn btn-primary btn-lg rounded-pill px-5 glow-effect title-gradient" type="submit">
                 <i class="fas fa-wallet me-2"></i> @Localizer["PayWithVNPay"]
@@ -117,12 +128,12 @@
 
     <!-- Form hủy đặt -->
     <form asp-controller="Tickets" asp-action="CancelBooking" method="post"
-          onsubmit="return confirm('@Localizer["ConfirmCancelBooking"]');">
-        <input type="hidden" name="bookingId" value="@booking.BookingId" />
+          onsubmit="return confirm('Bạn có chắc muốn hủy và chọn lại?');">
+        @Html.AntiForgeryToken()
         <div class="text-center mt-4">
             <button type="submit" class="btn btn-danger btn-lg rounded-pill px-5 glow-effect">
                 <i class="fas fa-times-circle me-2"></i>
-                @Localizer["CancelAndReselect"]
+                Hủy và chọn lại
             </button>
         </div>
     </form>
@@ -212,44 +223,30 @@
             background-color: #c82333;
         }
 
-    <text>
-    /* Responsive */
-        @@media (max-width: 768px) {
-        .btn-lg
+    @@media (max-width: 768px) {
+        .btn-lg {
+            font-size: 1rem;
+            padding: 10px 30px;
+        }
 
-    {
-        font-size: 1rem;
-        padding: 10px 30px;
+        .card-body {
+            padding: 15px;
+        }
     }
 
-    .card-body {
-        padding: 15px;
+    @@keyframes sparkle {
+        0% {
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+        }
+
+        50% {
+            text-shadow: 0 0 20px rgba(255, 0, 51, 0.8);
+        }
+
+        100% {
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+        }
     }
-
-    }
-
-    </text >
-
-    <text >
-    /* Thêm animation cho voucher apply */
-        @@keyframes sparkle {
-        0%
-
-    {
-        text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
-    }
-
-    50% {
-        text-shadow: 0 0 20px rgba(255, 0, 51, 0.8);
-    }
-
-    100% {
-        text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
-    }
-
-    }
-
-    </text >
 
     .voucher-applied {
         animation: sparkle 1s infinite;
@@ -262,7 +259,6 @@
     <partial name="_ValidationScriptsPartial" />
     <script>
         $(document).ready(function () {
-            var bookingId = @booking.BookingId;
             var token = $('input[name="__RequestVerificationToken"]').val();
 
             // Áp dụng voucher
@@ -276,7 +272,7 @@
                 $.ajax({
                     url: '/Payments/ApplyVoucher',
                     type: 'POST',
-                    data: { code: code, bookingId: bookingId, __RequestVerificationToken: token },
+                    data: { code: code, __RequestVerificationToken: token },
                     success: function (response) {
                         if (response.success) {
                             $('#totalAmount').addClass('text-decoration-line-through');
@@ -291,7 +287,8 @@
 
                             // Hiển thị nút hủy
                             $('#removeVoucherBtn').show();
-                            $('#voucherCode').prop('disabled', true); // Disable input sau khi apply
+                            $('#applyVoucherBtn').hide();
+                            $('#voucherCode').prop('disabled', true);
 
                             showVoucherMessage(response.message, 'success');
                         } else {
@@ -309,7 +306,7 @@
                 $.ajax({
                     url: '/Payments/RemoveVoucher',
                     type: 'POST',
-                    data: { bookingId: bookingId, __RequestVerificationToken: token },
+                    data: { __RequestVerificationToken: token },
                     success: function (response) {
                         if (response.success) {
                             $('#totalAmount').removeClass('text-decoration-line-through');
@@ -322,6 +319,7 @@
 
                             // Ẩn nút hủy, enable input
                             $('#removeVoucherBtn').hide();
+                            $('#applyVoucherBtn').show();
                             $('#voucherCode').prop('disabled', false).val('');
 
                             showVoucherMessage(response.message, 'info');
