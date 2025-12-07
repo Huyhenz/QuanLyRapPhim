@@ -1,45 +1,140 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<root xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+<root>
+	<!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
 	<xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
 		<xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
 		<xsd:element name="root" msdata:IsDataSet="true">
 			<xsd:complexType>
 				<xsd:choice maxOccurs="unbounded">
+					<xsd:element name="metadata">
+						<xsd:complexType>
+							<xsd:sequence>
+								<xsd:element name="value" type="xsd:string" minOccurs="0" />
+							</xsd:sequence>
+							<xsd:attribute name="name" use="required" type="xsd:string" />
+							<xsd:attribute name="type" type="xsd:string" />
+							<xsd:attribute name="mimetype" type="xsd:string" />
+							<xsd:attribute ref="xml:space" />
+						</xsd:complexType>
+					</xsd:element>
+					<xsd:element name="assembly">
+						<xsd:complexType>
+							<xsd:attribute name="alias" type="xsd:string" />
+							<xsd:attribute name="name" type="xsd:string" />
+						</xsd:complexType>
+					</xsd:element>
 					<xsd:element name="data">
 						<xsd:complexType>
 							<xsd:sequence>
 								<xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
 								<xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
 							</xsd:sequence>
-							<xsd:attribute name="name" type="xsd:string" msdata:Ordinal="1" />
-							<xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" default="System.String" />
+							<xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+							<xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
 							<xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
-							<xsd:attribute name="xml:space" type="preserve" />
+							<xsd:attribute ref="xml:space" />
 						</xsd:complexType>
 					</xsd:element>
-					<xsd:element name="schema" />
-					<xsd:element name="connection" />
+					<xsd:element name="resheader">
+						<xsd:complexType>
+							<xsd:sequence>
+								<xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+							</xsd:sequence>
+							<xsd:attribute name="name" type="xsd:string" use="required" />
+						</xsd:complexType>
+					</xsd:element>
 				</xsd:choice>
 			</xsd:complexType>
 		</xsd:element>
 	</xsd:schema>
-	<msdata:Properties>
-		<msdata:Property ref="generator" msdata:Value="System.Data.Dataset" />
-		<msdata:Property ref="version" msdata:Value="1.0" />
-		<msdata:Property ref="encoding" msdata:Value="utf-8" />
-	</msdata:Properties>
+	<resheader name="resmimetype">
+		<value>text/microsoft-resx</value>
+	</resheader>
+	<resheader name="version">
+		<value>2.0</value>
+	</resheader>
+	<resheader name="reader">
+		<value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+	</resheader>
+	<resheader name="writer">
+		<value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+	</resheader>
+
+	<!-- Page Title -->
 	<data name="SelectShowtime" xml:space="preserve">
-    <value>Chọn lịch chiếu</value>
+    <value>Chọn Lịch Chiếu</value>
     <comment>Page title for selecting showtimes</comment>
   </data>
+
+	<!-- Movie Information -->
 	<data name="UnknownMovie" xml:space="preserve">
-    <value>Phim không xác định</value>
+    <value>Phim Không Xác Định</value>
     <comment>Fallback for undefined movie title</comment>
   </data>
 	<data name="Movie" xml:space="preserve">
     <value>Phim:</value>
-    <comment>Label for movie title in showtime selection</comment>
+    <comment>Label for movie title</comment>
   </data>
+
+	<!-- Search Form -->
 	<data name="EnterMovieName" xml:space="preserve">
     <value>Nhập tên phim...</value>
     <comment>Placeholder for search title input</comment>
@@ -56,46 +151,52 @@
     <value>Chọn thể loại</value>
     <comment>Placeholder for genre select</comment>
   </data>
+
+	<!-- Genres -->
 	<data name="Action" xml:space="preserve">
-    <value>Hành động</value>
+    <value>Hành Động</value>
     <comment>Genre: Action</comment>
   </data>
 	<data name="Romance" xml:space="preserve">
-    <value>Tình cảm</value>
+    <value>Tình Cảm</value>
     <comment>Genre: Romance</comment>
   </data>
 	<data name="Horror" xml:space="preserve">
-    <value>Kinh dị</value>
+    <value>Kinh Dị</value>
     <comment>Genre: Horror</comment>
   </data>
 	<data name="Animation" xml:space="preserve">
-    <value>Hoạt hình</value>
+    <value>Hoạt Hình</value>
     <comment>Genre: Animation</comment>
   </data>
 	<data name="SciFi" xml:space="preserve">
-    <value>Khoa học viễn tưởng</value>
+    <value>Khoa Học Viễn Tưởng</value>
     <comment>Genre: Science Fiction</comment>
   </data>
 	<data name="War" xml:space="preserve">
-    <value>Chiến tranh</value>
+    <value>Chiến Tranh</value>
     <comment>Genre: War</comment>
   </data>
 	<data name="Comedy" xml:space="preserve">
-    <value>Hài hước</value>
+    <value>Hài Hước</value>
     <comment>Genre: Comedy</comment>
   </data>
 	<data name="Fantasy" xml:space="preserve">
-    <value>Viễn tưởng</value>
+    <value>Viễn Tưởng</value>
     <comment>Genre: Fantasy</comment>
   </data>
+
+	<!-- Buttons -->
 	<data name="Search" xml:space="preserve">
-    <value>Tìm kiếm</value>
+    <value>Tìm Kiếm</value>
     <comment>Search button text</comment>
   </data>
 	<data name="ReloadPage" xml:space="preserve">
-    <value>Load lại trang</value>
+    <value>Tải Lại Trang</value>
     <comment>Reload button text</comment>
   </data>
+
+	<!-- Showtime Card Labels -->
 	<data name="ShowDate" xml:space="preserve">
     <value>Ngày chiếu:</value>
     <comment>Label for showtime date</comment>
@@ -108,8 +209,10 @@
     <value>Phòng:</value>
     <comment>Label for room name</comment>
   </data>
+
+	<!-- Action Buttons -->
 	<data name="SelectThisShowtime" xml:space="preserve">
-    <value>Chọn lịch này</value>
+    <value>Chọn Lịch Này</value>
     <comment>Button to select showtime</comment>
   </data>
 	<data name="Edit" xml:space="preserve">
@@ -120,16 +223,64 @@
     <value>Xóa</value>
     <comment>Delete button</comment>
   </data>
+
+	<!-- Messages -->
 	<data name="NoShowtimesAvailable" xml:space="preserve">
     <value>Không có lịch chiếu nào cho phim này!</value>
-    <comment>Alert when no showtimes</comment>
+    <comment>Message when no showtimes available</comment>
   </data>
+
+	<!-- Navigation Buttons -->
 	<data name="CreateNewShowtime" xml:space="preserve">
-    <value>Tạo lịch chiếu mới</value>
+    <value>Tạo Lịch Chiếu Mới</value>
     <comment>Create showtime button</comment>
   </data>
 	<data name="BackToMovieList" xml:space="preserve">
-    <value>Quay lại danh sách phim</value>
-    <comment>Back button</comment>
+    <value>Quay Lại Danh Sách Phim</value>
+    <comment>Back to movie list button</comment>
+  </data>
+
+	<!-- Sidebar Navigation -->
+	<data name="Dashboard" xml:space="preserve">
+    <value>Trang Chủ</value>
+    <comment>Dashboard menu item</comment>
+  </data>
+	<data name="ManageMovies" xml:space="preserve">
+    <value>Quản Lý Phim</value>
+    <comment>Manage movies menu item</comment>
+  </data>
+	<data name="ManageShowtimes" xml:space="preserve">
+    <value>Quản Lý Lịch Chiếu</value>
+    <comment>Manage showtimes menu item</comment>
+  </data>
+	<data name="ManageRooms" xml:space="preserve">
+    <value>Quản Lý Phòng</value>
+    <comment>Manage rooms menu item</comment>
+  </data>
+	<data name="ManageSeats" xml:space="preserve">
+    <value>Quản Lý Ghế</value>
+    <comment>Manage seats menu item</comment>
+  </data>
+	<data name="ManageFoods" xml:space="preserve">
+    <value>Quản Lý Đồ Ăn</value>
+    <comment>Manage foods menu item</comment>
+  </data>
+	<data name="ManageBookings" xml:space="preserve">
+    <value>Quản Lý Đặt Vé</value>
+    <comment>Manage bookings menu item</comment>
+  </data>
+	<data name="RevenueStatistics" xml:space="preserve">
+    <value>Thống Kê Doanh Thu</value>
+    <comment>Revenue statistics menu item</comment>
+  </data>
+	<data name="Vouchers" xml:space="preserve">
+    <value>Phiếu Giảm Giá</value>
+    <comment>Vouchers menu item</comment>
+  </data>
+
+	<!-- Footer -->
+	<data name="Copyright" xml:space="preserve">
+    <value>© 2025 CinemaX. Mọi quyền được bảo lưu.</value>
+    <comment>Footer copyright text</comment>
   </data>
 </root>

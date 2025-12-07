@@ -7,6 +7,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Resources\Views\NewFolder\**" />
+    <Content Remove="Resources\Views\NewFolder\**" />
+    <EmbeddedResource Remove="Resources\Views\NewFolder\**" />
+    <None Remove="Resources\Views\NewFolder\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="9.0.3" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="9.0.3" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.3" />
@@ -24,10 +31,6 @@
     <EmbeddedResource Update="Resources\Views\Tickets\SelectFood.en.resx">
       <SubType>Designer</SubType>
     </EmbeddedResource>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Resources\Views\NewFolder\" />
   </ItemGroup>
 
 </Project>
