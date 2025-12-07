@@ -6,7 +6,7 @@
     ViewData["Title"] = Localizer["MovieList"].Value;
     Layout = "~/Views/Shared/_Layout.cshtml";
     bool isAdmin = User.IsInRole("Admin");
-    // Pagination setup
+
     var moviesList = Model.ToList();
     int pageSize = 5;
     int totalMovies = moviesList.Count;
@@ -16,173 +16,149 @@
     if (currentPage > totalPages) currentPage = totalPages;
     var paginatedMovies = moviesList.Skip((currentPage - 1) * pageSize).Take(pageSize);
 }
+
 <div class="container-fluid d-flex position-relative">
-    <!-- Toggle Button -->
-    @if (isAdmin)
-    {
-        <button id="sidebar-toggle" class="sidebar-toggle">
-            <i class="fas fa-bars"></i>
-        </button>
-    }
-    <!-- SIDEBAR -->
-    @if (isAdmin)
-    {
-        <aside class="sidebar">
-            <div class="sidebar-header">
-                <h3 class="sidebar-title">🎬 CinemaX Admin</h3>
-            </div>
-            <nav class="sidebar-nav">
-                <a href="/Admin/Index"
-                   class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Admin" && ViewContext.RouteData.Values["Action"]?.ToString() == "Index" ? "active" : "")">
-                    <i class="fas fa-tachometer-alt"></i> @Localizer["Dashboard"]
-                </a>
-                <a href="/Movies"
-                   class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Movies" ? "active" : "")">
-                    <i class="fas fa-film"></i> @Localizer["ManageMovies"]
-                </a>
-                <a href="/Showtimes"
-                   class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Showtimes" ? "active" : "")">
-                    <i class="fas fa-clock"></i> @Localizer["ManageShowtimes"]
-                </a>
-                <a href="/Rooms"
-                   class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Rooms" ? "active" : "")">
-                    <i class="fas fa-door-open"></i> @Localizer["ManageRooms"]
-                </a>
-                <a href="/Seats"
-                   class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Seats" ? "active" : "")">
-                    <i class="fas fa-chair"></i> @Localizer["ManageSeats"]
-                </a>
-                <a href="/Admin/ManageFoods"
-                   class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "ManageFoods" ? "active" : "")">
-                    <i class="fas fa-utensils"></i> @Localizer["ManageFoods"]
-                </a>
-                <a href="/Admin/ManageBookings"
-                   class="nav-item @(ViewContext.RouteData.Values["Action"]?.ToString() == "ManageBookings" ? "active" : "")">
-                    <i class="fas fa-ticket-alt"></i> @Localizer["ManageBookings"]
-                </a>
-                <a href="/Admin/RevenueStatistics"
-                   class="nav-item @(ViewContext.RouteData.Values["Action"]?.ToString() == "RevenueStatistics" ? "active" : "")">
-                    <i class="fas fa-chart-bar"></i> @Localizer["RevenueStatistics"]
-                </a>
-                <a href="/Vouchers"
-                   class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Vouchers" ? "active" : "")">
-                    <i class="fas fa-gift"></i> @Localizer["Vouchers"]
-                </a>
-                <div class="nav-divider"></div>
-                <a href="#" class="nav-item"><i class="fab fa-facebook"></i> Facebook</a>
-                <a href="#" class="nav-item"><i class="fab fa-twitter"></i> Twitter</a>
-                <a href="#" class="nav-item"><i class="fab fa-google"></i> Google</a>
-            </nav>
-        </aside>
-    }
-    <!-- MAIN CONTENT -->
+    @await Html.PartialAsync("_ChristmasDashboard")
+
     <div class="frame-wrapper flex-grow-1 @(isAdmin ? "admin-view" : "")">
         <div class="d-flex justify-content-between align-items-center mb-4">
-            <div>
-                <h1 class="title-gradient">@Localizer["MovieList"]</h1>
-            </div>
+            <h1 class="title-gradient">
+                <span class="christmas-icon">🎬</span>
+                @Localizer["MovieList"]
+                <span class="christmas-icon">🎄</span>
+            </h1>
             @if (isAdmin)
             {
                 <div class="header-actions">
-                    <button class="btn btn-create glow-effect" data-bs-toggle="modal" data-bs-target="#addMovieModal">
-                        @Localizer["AddNewMovie"]
+                    <button class="btn btn-create christmas-btn" data-bs-toggle="modal" data-bs-target="#addMovieModal">
+                        <i class="fas fa-plus"></i> @Localizer["AddNewMovie"]
                     </button>
-                    <span class="order-count ms-3">@totalMovies @Localizer["MoviesFound"]</span>
+                    <span class="order-count ms-3">
+                        <i class="fas fa-film"></i> @totalMovies @Localizer["MoviesFound"]
+                    </span>
                 </div>
             }
         </div>
+
         @if (isAdmin)
         {
             <div id="alert-container" class="mb-4"></div>
         }
-        @* Admin Table View *@
+
         @if (isAdmin)
         {
             <div class="admin-section">
-                <h3 class="section-subtitle title-gradient">@Localizer["MovieListManagement"]</h3>
                 <div class="table-container">
-                    <div class="table-responsive-wrapper">
-                        <table class="table table-custom">
-                            <thead>
-                                <tr>
-                                    <th style="min-width: 150px;">@Localizer["MovieName"]</th>
-                                    <th style="min-width: 100px;">@Localizer["Poster"]</th>
-                                    <th style="min-width: 120px;">@Localizer["Genre"]</th>
-                                    <th style="min-width: 100px;">@Localizer["Duration"]</th>
-                                    <th style="min-width: 120px;">@Localizer["Director"]</th>
-                                    <th style="min-width: 150px;">@Localizer["Actors"]</th>
-                                    <th style="min-width: 200px;">@Localizer["Description"]</th>
-                                    <th style="min-width: 120px;">@Localizer["TrailerURL"]</th>
-                                    <th style="min-width: 300px;">@Localizer["Actions"]</th>
-                                </tr>
-                            </thead>
-                            <tbody id="movies-table">
-                                @if (paginatedMovies.Any())
+                    <table class="table table-custom christmas-table">
+                        <thead>
+                            <tr>
+                                <th><i class="fas fa-image"></i> @Localizer["Poster"]</th>
+                                <th><i class="fas fa-film"></i> @Localizer["MovieName"]</th>
+                                <th><i class="fas fa-tags"></i> @Localizer["Genre"]</th>
+                                <th><i class="fas fa-clock"></i> @Localizer["Duration"]</th>
+                                <th><i class="fas fa-user-tie"></i> @Localizer["Director"]</th>
+                                <th><i class="fas fa-users"></i> @Localizer["Actors"]</th>
+                                <th><i class="fas fa-align-left"></i> @Localizer["Description"]</th>
+                                <th><i class="fas fa-play-circle"></i> @Localizer["TrailerURL"]</th>
+                                <th><i class="fas fa-tools"></i> @Localizer["Actions"]</th>
+                            </tr>
+                        </thead>
+                        <tbody id="movies-table">
+                            @if (paginatedMovies.Any())
+                            {
+                                @foreach (var movie in paginatedMovies)
                                 {
-                                    @foreach (var movie in paginatedMovies)
-                                    {
-                                        <tr data-id="@movie.MovieId">
-                                            <td>@(movie.Title ?? Localizer["N/A"].Value)</td>
-                                            <td>
-                                                @if (!string.IsNullOrEmpty(movie.Poster))
-                                                {
-                                                    <img src="@movie.Poster" alt="@movie.Title" style="width: 50px; height: auto; border-radius: 5px;" />
-                                                }
-                                                else
-                                                {
-                                                    <span>@Localizer["N/A"]</span>
-                                                }
-                                            </td>
-                                            <td>@(movie.Genre ?? Localizer["N/A"].Value)</td>
-                                            <td>@(movie.Duration != 0 ? $"{movie.Duration} {Localizer["Minutes"].Value}" : Localizer["N/A"].Value)</td>
-                                            <td>@(movie.Director ?? Localizer["N/A"].Value)</td>
-                                            <td>
-                                                @{
-                                                    var actorsText = string.IsNullOrEmpty(movie.Actors)
-                                                    ? Localizer["N/A"].Value
-                                                    : (movie.Actors.Length > 50 ? movie.Actors.Substring(0, 50) + "..." : movie.Actors);
-                                                }
-                                                @actorsText
-                                            </td>
-                                            <td>
-                                                @{
-                                                    var descText = string.IsNullOrEmpty(movie.Description)
-                                                    ? Localizer["N/A"].Value
-                                                    : (movie.Description.Length > 50 ? movie.Description.Substring(0, 50) + "..." : movie.Description);
-                                                }
-                                                @descText
-                                            </td>
-                                            <td>
-                                                @if (!string.IsNullOrEmpty(movie.TrailerUrl))
-                                                {
-                                                    <a href="@movie.TrailerUrl" target="_blank" class="trailer-link">@Localizer["ViewTrailer"]</a>
-                                                }
-                                                else
-                                                {
-                                                    <span>@Localizer["N/A"]</span>
-                                                }
-                                            </td>
-                                            <td>
-                                                <div class="action-buttons-wrapper">
-                                                    <a asp-action="Details" asp-route-id="@movie.MovieId" class="btn btn-sm btn-create glow-effect action-btn">@Localizer["Details"]</a>
-                                                    <button class="btn btn-sm btn-warning glow-effect action-btn edit-movie-btn" data-id="@movie.MovieId">@Localizer["Edit"]</button>
-                                                    <button class="btn btn-sm btn-danger glow-effect action-btn delete-movie-btn" data-id="@movie.MovieId">@Localizer["Delete"]</button>
+                                    <tr data-id="@movie.MovieId">
+                                        <td>
+                                            @if (!string.IsNullOrEmpty(movie.Poster))
+                                            {
+                                                <img src="@movie.Poster" alt="@movie.Title" class="movie-poster-thumb" />
+                                            }
+                                            else
+                                            {
+                                                <div class="no-poster-badge">
+                                                    <i class="fas fa-film"></i>
                                                 </div>
-                                            </td>
-                                        </tr>
-                                    }
-                                }
-                                else
-                                {
-                                    <tr>
-                                        <td colspan="9" class="text-center">@Localizer["NoMovies"]</td>
+                                            }
+                                        </td>
+                                        <td class="fw-bold text-warning">@(movie.Title ?? Localizer["N/A"].Value)</td>
+                                        <td>
+                                            @if (!string.IsNullOrEmpty(movie.Genre))
+                                            {
+                                                <span class="genre-badge">@movie.Genre</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="text-muted">@Localizer["N/A"]</span>
+                                            }
+                                        </td>
+                                        <td>
+                                            @if (movie.Duration != 0)
+                                            {
+                                                <span class="duration-badge">
+                                                    <i class="fas fa-stopwatch"></i> @movie.Duration @Localizer["Minutes"].Value
+                                                </span>
+                                            }
+                                            else
+                                            {
+                                                <span class="text-muted">@Localizer["N/A"]</span>
+                                            }
+                                        </td>
+                                        <td>@(movie.Director ?? Localizer["N/A"].Value)</td>
+                                        <td>
+                                            @{
+                                                var actorsText = string.IsNullOrEmpty(movie.Actors)
+                                                ? Localizer["N/A"].Value
+                                                : (movie.Actors.Length > 50 ? movie.Actors.Substring(0, 50) + "..." : movie.Actors);
+                                            }
+                                            <span class="actors-text">@actorsText</span>
+                                        </td>
+                                        <td>
+                                            @{
+                                                var descText = string.IsNullOrEmpty(movie.Description)
+                                                ? Localizer["N/A"].Value
+                                                : (movie.Description.Length > 50 ? movie.Description.Substring(0, 50) + "..." : movie.Description);
+                                            }
+                                            <span class="description-text">@descText</span>
+                                        </td>
+                                        <td>
+                                            @if (!string.IsNullOrEmpty(movie.TrailerUrl))
+                                            {
+                                                <a href="@movie.TrailerUrl" target="_blank" class="trailer-link">
+                                                    <i class="fas fa-external-link-alt"></i> @Localizer["ViewTrailer"]
+                                                </a>
+                                            }
+                                            else
+                                            {
+                                                <span class="text-muted">@Localizer["N/A"]</span>
+                                            }
+                                        </td>
+                                        <td>
+                                            <div class="action-buttons">
+                                                <a asp-action="Details" asp-route-id="@movie.MovieId" class="btn btn-sm btn-info action-btn" title="@Localizer["Details"]">
+                                                    <i class="fas fa-eye"></i>
+                                                </a>
+                                                <button class="btn btn-sm btn-warning action-btn edit-movie-btn" data-id="@movie.MovieId" title="@Localizer["Edit"]">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-danger action-btn delete-movie-btn" data-id="@movie.MovieId" title="@Localizer["Delete"]">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </div>
+                                        </td>
                                     </tr>
                                 }
-                            </tbody>
-                        </table>
-                    </div>
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td colspan="9" class="text-center text-muted">@Localizer["NoMovies"]</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
                 </div>
-                @* Admin Pagination *@
+
                 @if (totalPages > 1)
                 {
                     <div class="pagination">
@@ -190,34 +166,22 @@
                         <div class="pagination-controls">
                             @if (currentPage > 1)
                             {
-                                <a href="?page=@(currentPage - 1)" class="btn-pag glow-effect"><i class="fas fa-angle-left"></i></a>
-                            }
-                            else
-                            {
-                                <button class="btn-pag" disabled><i class="fas fa-angle-left"></i></button>
+                                <a href="?page=@(currentPage - 1)" class="btn-pag christmas-btn-small"><i class="fas fa-angle-left"></i></a>
                             }
                             @for (int i = Math.Max(1, currentPage - 2); i <= Math.Min(totalPages, currentPage + 2); i++)
                             {
-                                <a href="?page=@i" class="btn-pag @(i == currentPage ? "active" : "") glow-effect">@i</a>
-                            }
-                            @if (totalPages > currentPage + 2)
-                            {
-                                <span>...</span>
+                                <a href="?page=@i" class="btn-pag christmas-btn-small @(i == currentPage ? "active" : "")">@i</a>
                             }
                             @if (currentPage < totalPages)
                             {
-                                <a href="?page=@(currentPage + 1)" class="btn-pag glow-effect"><i class="fas fa-angle-right"></i></a>
-                            }
-                            else
-                            {
-                                <button class="btn-pag" disabled><i class="fas fa-angle-right"></i></button>
+                                <a href="?page=@(currentPage + 1)" class="btn-pag christmas-btn-small"><i class="fas fa-angle-right"></i></a>
                             }
                         </div>
                     </div>
                 }
             </div>
         }
-        @* User Grid View *@
+
         @if (!isAdmin)
         {
             <div class="movie-grid">
@@ -233,8 +197,9 @@
                             var descText = string.IsNullOrEmpty(item.Description)
                             ? Localizer["NoDescription"].Value
                             : (item.Description.Length > 120 ? item.Description.Substring(0, 120) + "..." : item.Description);
+
                             <div class="col-md-6 col-lg-4 mb-4">
-                                <div class="card movie-card">
+                                <div class="card movie-card christmas-card">
                                     <div class="poster-container">
                                         @if (!string.IsNullOrEmpty(item.Poster))
                                         {
@@ -273,16 +238,16 @@
                                         <div class="movie-actions">
                                             @if (!string.IsNullOrEmpty(item.TrailerUrl))
                                             {
-                                                <a href="@item.TrailerUrl" target="_blank" class="btn btn-danger btn-sm me-2 trailer-link">@Localizer["ViewTrailer"]</a>
+                                                <a href="@item.TrailerUrl" target="_blank" class="btn btn-danger btn-sm me-2">@Localizer["ViewTrailer"]</a>
                                             }
-                                            <a asp-action="Details" asp-route-id="@item.MovieId" class="btn btn-primary btn-sm">@Localizer["Details"]</a>
+                                            <a asp-action="Details" asp-route-id="@item.MovieId" class="btn btn-primary btn-sm christmas-btn">@Localizer["Details"]</a>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         }
                     </div>
-                    @* User Pagination *@
+
                     @if (totalPages > 1)
                     {
                         <div class="pagination">
@@ -290,27 +255,15 @@
                             <div class="pagination-controls">
                                 @if (currentPage > 1)
                                 {
-                                    <a href="?page=@(currentPage - 1)" class="btn-pag glow-effect"><i class="fas fa-angle-left"></i></a>
-                                }
-                                else
-                                {
-                                    <button class="btn-pag" disabled><i class="fas fa-angle-left"></i></button>
+                                    <a href="?page=@(currentPage - 1)" class="btn-pag christmas-btn-small"><i class="fas fa-angle-left"></i></a>
                                 }
                                 @for (int i = Math.Max(1, currentPage - 2); i <= Math.Min(totalPages, currentPage + 2); i++)
                                 {
-                                    <a href="?page=@i" class="btn-pag @(i == currentPage ? "active" : "") glow-effect">@i</a>
-                                }
-                                @if (totalPages > currentPage + 2)
-                                {
-                                    <span>...</span>
+                                    <a href="?page=@i" class="btn-pag christmas-btn-small @(i == currentPage ? "active" : "")">@i</a>
                                 }
                                 @if (currentPage < totalPages)
                                 {
-                                    <a href="?page=@(currentPage + 1)" class="btn-pag glow-effect"><i class="fas fa-angle-right"></i></a>
-                                }
-                                else
-                                {
-                                    <button class="btn-pag" disabled><i class="fas fa-angle-right"></i></button>
+                                    <a href="?page=@(currentPage + 1)" class="btn-pag christmas-btn-small"><i class="fas fa-angle-right"></i></a>
                                 }
                             </div>
                         </div>
@@ -326,16 +279,16 @@
                 }
             </div>
         }
-        <!-- Admin Modals -->
+
         @if (isAdmin)
         {
             <!-- Add Movie Modal -->
-            <div class="modal fade" id="addMovieModal" tabindex="-1" aria-labelledby="addMovieModalLabel" aria-hidden="true">
+            <div class="modal fade" id="addMovieModal" tabindex="-1">
                 <div class="modal-dialog modal-xl">
-                    <div class="modal-content">
+                    <div class="modal-content christmas-modal">
                         <div class="modal-header">
-                            <h5 class="modal-title title-gradient" id="addMovieModalLabel">@Localizer["AddMovie"]</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            <h5 class="modal-title">🎄 @Localizer["AddMovie"]</h5>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                         </div>
                         <div class="modal-body">
                             <form id="add-movie-form" method="post" action="/Admin/CreateMovie">
@@ -343,56 +296,57 @@
                                 <div class="row">
                                     <div class="col-md-6 mb-3">
                                         <label class="form-label">@Localizer["MovieName"]</label>
-                                        <input name="Title" class="form-control glow-effect" required />
+                                        <input name="Title" class="form-control" required />
                                     </div>
                                     <div class="col-md-6 mb-3">
                                         <label class="form-label">@Localizer["Duration"] (@Localizer["Minutes"])</label>
-                                        <input name="Duration" type="number" class="form-control glow-effect" required min="1" />
+                                        <input name="Duration" type="number" class="form-control" required min="1" />
                                     </div>
                                 </div>
                                 <div class="row">
                                     <div class="col-md-6 mb-3">
                                         <label class="form-label">@Localizer["Genre"]</label>
-                                        <input name="Genre" class="form-control glow-effect" />
+                                        <input name="Genre" class="form-control" />
                                     </div>
                                     <div class="col-md-6 mb-3">
                                         <label class="form-label">@Localizer["Director"]</label>
-                                        <input name="Director" class="form-control glow-effect" />
+                                        <input name="Director" class="form-control" />
                                     </div>
                                 </div>
                                 <div class="row">
                                     <div class="col-md-12 mb-3">
                                         <label class="form-label">@Localizer["Actors"]</label>
-                                        <input name="Actors" class="form-control glow-effect" />
+                                        <input name="Actors" class="form-control" />
                                     </div>
                                 </div>
                                 <div class="row">
                                     <div class="col-md-6 mb-3">
                                         <label class="form-label">@Localizer["Poster"] URL</label>
-                                        <input name="Poster" type="url" class="form-control glow-effect" />
+                                        <input name="Poster" type="url" class="form-control" />
                                     </div>
                                     <div class="col-md-6 mb-3">
                                         <label class="form-label">@Localizer["TrailerURL"] (YouTube)</label>
-                                        <input name="TrailerUrl" type="url" class="form-control glow-effect" placeholder="https://www.youtube.com/watch?v=VIDEO_ID" />
+                                        <input name="TrailerUrl" type="url" class="form-control" />
                                     </div>
                                 </div>
                                 <div class="mb-3">
                                     <label class="form-label">@Localizer["Description"]</label>
-                                    <textarea name="Description" class="form-control glow-effect" rows="4"></textarea>
+                                    <textarea name="Description" class="form-control" rows="4"></textarea>
                                 </div>
-                                <button type="submit" class="btn btn-primary glow-effect">@Localizer["AddMovie"]</button>
+                                <button type="submit" class="btn btn-primary christmas-btn">@Localizer["AddMovie"]</button>
                             </form>
                         </div>
                     </div>
                 </div>
             </div>
+
             <!-- Edit Movie Modal -->
-            <div class="modal fade" id="editMovieModal" tabindex="-1" aria-labelledby="editMovieModalLabel" aria-hidden="true">
+            <div class="modal fade" id="editMovieModal" tabindex="-1">
                 <div class="modal-dialog modal-xl">
-                    <div class="modal-content">
+                    <div class="modal-content christmas-modal">
                         <div class="modal-header">
-                            <h5 class="modal-title title-gradient" id="editMovieModalLabel">@Localizer["EditMovie"]</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            <h5 class="modal-title">🎅 @Localizer["EditMovie"]</h5>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                         </div>
                         <div class="modal-body">
                             <form id="edit-movie-form" method="post" action="/Admin/EditMovie">
@@ -401,44 +355,44 @@
                                 <div class="row">
                                     <div class="col-md-6 mb-3">
                                         <label class="form-label">@Localizer["MovieName"]</label>
-                                        <input name="Title" id="editTitle" class="form-control glow-effect" required />
+                                        <input name="Title" id="editTitle" class="form-control" required />
                                     </div>
                                     <div class="col-md-6 mb-3">
                                         <label class="form-label">@Localizer["Duration"] (@Localizer["Minutes"])</label>
-                                        <input name="Duration" id="editDuration" type="number" class="form-control glow-effect" required min="1" />
+                                        <input name="Duration" id="editDuration" type="number" class="form-control" required min="1" />
                                     </div>
                                 </div>
                                 <div class="row">
                                     <div class="col-md-6 mb-3">
                                         <label class="form-label">@Localizer["Genre"]</label>
-                                        <input name="Genre" id="editGenre" class="form-control glow-effect" />
+                                        <input name="Genre" id="editGenre" class="form-control" />
                                     </div>
                                     <div class="col-md-6 mb-3">
                                         <label class="form-label">@Localizer["Director"]</label>
-                                        <input name="Director" id="editDirector" class="form-control glow-effect" />
+                                        <input name="Director" id="editDirector" class="form-control" />
                                     </div>
                                 </div>
                                 <div class="row">
                                     <div class="col-md-12 mb-3">
                                         <label class="form-label">@Localizer["Actors"]</label>
-                                        <input name="Actors" id="editActors" class="form-control glow-effect" />
+                                        <input name="Actors" id="editActors" class="form-control" />
                                     </div>
                                 </div>
                                 <div class="row">
                                     <div class="col-md-6 mb-3">
                                         <label class="form-label">@Localizer["Poster"] URL</label>
-                                        <input name="Poster" id="editPoster" type="url" class="form-control glow-effect" />
+                                        <input name="Poster" id="editPoster" type="url" class="form-control" />
                                     </div>
                                     <div class="col-md-6 mb-3">
                                         <label class="form-label">@Localizer["TrailerURL"] (YouTube)</label>
-                                        <input name="TrailerUrl" id="editTrailerUrl" type="url" class="form-control glow-effect" placeholder="https://www.youtube.com/watch?v=VIDEO_ID" />
+                                        <input name="TrailerUrl" id="editTrailerUrl" type="url" class="form-control" />
                                     </div>
                                 </div>
                                 <div class="mb-3">
                                     <label class="form-label">@Localizer["Description"]</label>
-                                    <textarea name="Description" id="editDescription" class="form-control glow-effect" rows="4"></textarea>
+                                    <textarea name="Description" id="editDescription" class="form-control" rows="4"></textarea>
                                 </div>
-                                <button type="submit" class="btn btn-primary glow-effect">@Localizer["SaveChanges"]</button>
+                                <button type="submit" class="btn btn-primary christmas-btn">@Localizer["SaveChanges"]</button>
                             </form>
                         </div>
                     </div>
@@ -446,143 +400,54 @@
             </div>
         }
     </div>
+
+    <footer class="footer text-center py-3">
+        <p class="text-white mb-0">
+            <span class="christmas-icon-small">🎅</span>
+            @Localizer["Copyright"] 2025 CinemaX. @Localizer["AllRightsReserved"]
+            <span class="christmas-icon-small">🎁</span>
+        </p>
+    </footer>
 </div>
-<!-- CSS Styles -->
+
 <style>
-    :root {
-        --primary-color: #FFDAB9;
-        --secondary-color: #F5A89A;
-        --bg-dark: #1C2526;
-        --card-bg: #0F1213;
-        --border-red: #ff0000;
-        --text-light: #ffffff;
-        --text-dark: #000000;
-    }
-
     body {
-        background-color: var(--bg-dark);
-        margin: 0;
-        font-family: 'Roboto', sans-serif;
-        color: var(--text-light);
+        background-color: #0F0F0F;
+        color: #ffffff;
+        font-family: 'Montserrat', sans-serif;
     }
 
-    .container-fluid {
-        display: flex;
-        width: 100%;
-        min-height: calc(100vh - 150px);
-    }
-    /* ===== SIDEBAR STYLE (GIỐNG SHOWTIME) ===== */
-    .sidebar {
-        background: #111;
-        width: 250px;
-        height: 100vh;
-        position: fixed;
-        top: 0;
-        left: 0;
-        padding: 25px 20px;
-        overflow-y: auto;
-        border-right: 2px solid #e50914;
-        box-shadow: 2px 0 10px rgba(0,0,0,0.4);
-        transition: width 0.3s ease, transform 0.3s ease;
-        z-index: 1000;
-    }
-
-        .sidebar.collapsed {
-            width: 0;
-            padding: 0;
-            transform: translateX(-100%);
-        }
-
-    .sidebar-title {
-        color: #fff;
-        font-weight: 700;
-        font-size: 1.4rem;
-    }
-
-    .sidebar-nav .nav-item {
-        color: #ddd;
-        padding: 12px 15px;
-        border-radius: 8px;
-        margin-bottom: 5px;
-        font-size: 1rem;
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        text-decoration: none;
-        transition: 0.25s;
-    }
-
-    .nav-item i {
-        width: 20px;
-    }
-
-    .nav-item:hover {
-        background-color: #e50914;
-        color: #fff;
-        transform: translateX(5px);
-    }
-
-    .nav-item.active {
-        background-color: #e50914;
-        color: #fff;
-        font-weight: 600;
-    }
-
-    .nav-divider {
-        height: 1px;
-        background: #444;
-        margin: 15px 0;
-    }
-
-    .frame-wrapper.admin-view {
-        margin-left: 250px;
-        transition: margin-left 0.3s ease;
-    }
-
-        .frame-wrapper.admin-view.shifted {
-            margin-left: 0;
-        }
-
-    .content-inner {
-        max-width: 1200px;
-        width: 100%;
-    }
-    /* Frame Wrapper */
-    .frame-wrapper {
-        flex: 1;
-        background: rgba(51, 51, 51, 0.7);
-        border-radius: 20px;
-        border: 4px solid var(--border-red);
-        box-shadow: 0 0 15px rgba(255, 0, 0, 0.3);
-        padding: 30px;
-        margin: 0 auto 20px;
-        width: 90%;
-        max-width: 1400px;
-    }
-
-        .frame-wrapper.admin-view {
-            margin-left: 250px;
-            width: calc(100% - 250px);
-        }
-
-        .frame-wrapper.user-view {
-            width: 90%;
-        }
-    /* Title */
     .title-gradient {
-        font-size: 2rem;
-        font-weight: 700;
-        background: linear-gradient(90deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+        background: linear-gradient(90deg, #FFD700, #FF4500);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
-        margin-bottom: 10px;
+        font-size: 2.5rem;
+        font-weight: 700;
     }
 
-    .section-subtitle {
-        font-size: 1.5rem;
-        margin-bottom: 20px;
+    .christmas-icon {
+        font-size: 2rem;
+        animation: bounce 2s infinite;
     }
-    /* Header Actions */
+
+    .christmas-icon-small {
+        font-size: 1.2rem;
+        animation: bounce 2s infinite;
+    }
+
+    @@keyframes bounce {
+        0%, 100%
+
+    {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-5px);
+    }
+
+    }
+
     .header-actions {
         display: flex;
         align-items: center;
@@ -590,507 +455,280 @@
     }
 
     .order-count {
-        font-size: 14px;
-        color: var(--primary-color);
-    }
-    /* Table Styles for Admin */
-    .table-container {
-        max-height: calc(100vh - 300px);
-        overflow-y: auto;
-    }
-
-    .table-responsive-wrapper {
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
-    }
-
-    .table-custom {
-        width: 100%;
-        min-width: 1200px; /* Ensure horizontal scroll */
-        background: var(--card-bg);
-        color: var(--text-light);
-        border-radius: 10px;
-        overflow: hidden;
-        margin-bottom: 20px;
-    }
-
-        .table-custom thead th {
-            background: var(--bg-dark);
-            color: var(--text-light);
-            font-weight: 600;
-            padding: 12px;
-            position: sticky;
-            top: 0;
-            z-index: 10;
-            border-bottom: 1px solid #ff0033;
-        }
-
-        .table-custom tbody td {
-            padding: 12px;
-            border-bottom: 1px solid #ff0033;
-            color: var(--text-dark); /* Dark text for cells */
-            vertical-align: middle;
-        }
-
-        .table-custom tr:hover {
-            background: rgba(255, 0, 51, 0.1);
-        }
-
-    .action-buttons-wrapper {
-        display: flex;
-        gap: 5px;
-    }
-    /* User Grid Styles */
-    .movie-grid {
-        flex-grow: 1;
-    }
-
-    .movie-card {
-        background: var(--card-bg);
-        border-radius: 15px;
-        border: 2px solid var(--border-red);
-        box-shadow: 0 4px 15px rgba(255, 0, 0, 0.2);
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
-        height: 100%;
-        overflow: hidden;
-        display: flex;
-        flex-direction: column;
-    }
-
-        .movie-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 25px rgba(255, 0, 0, 0.3);
-        }
-
-    .poster-container {
-        height: 250px;
-        overflow: hidden;
-        position: relative;
-    }
-
-    .movie-poster {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        transition: transform 0.3s ease;
-    }
-
-        .movie-poster:hover {
-            transform: scale(1.05);
-        }
-
-    .placeholder-poster {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        height: 100%;
-        background: #333;
-        color: #999;
+        color: #FFD700;
+        font-weight: 600;
         font-size: 1rem;
     }
 
-    .card-body {
-        padding: 15px;
-        flex-grow: 1;
-        display: flex;
-        flex-direction: column;
+    .christmas-btn {
+        background: linear-gradient(135deg, #C41E3A, #165B33);
+        border: 2px solid #FFD700;
+        color: white;
+        padding: 10px 25px;
+        border-radius: 12px;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        display: inline-block;
     }
 
-    .card-title {
-        font-size: 1.2rem;
-        font-weight: 700;
-        margin-bottom: 10px;
-        color: var(--primary-color);
-    }
-
-    .star-rating {
-        margin-bottom: 10px;
-    }
-
-        .star-rating .fas {
-            margin-right: 2px;
-            font-size: 1rem;
+        .christmas-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(255, 215, 0, 0.6);
+            color: white;
         }
 
-    .rating-text {
-        font-size: 0.9rem;
-        color: var(--primary-color);
-        margin-left: 5px;
-    }
-
-    .card-text {
-        font-size: 0.9rem;
-        margin-bottom: 5px;
-        color: var(--text-light);
-    }
-
-    .movie-actions {
-        margin-top: auto;
-        display: flex;
-        gap: 10px;
-        flex-wrap: wrap;
-    }
-    /* Trailer Link */
-    .trailer-link {
-        font-weight: bold;
-        color: #ff0000 !important;
-        text-decoration: underline;
-        border: none;
-        background: none;
-        padding: 0;
-    }
-
-        .trailer-link:hover {
-            color: #cc0000 !important;
-            text-decoration: none;
+        .christmas-btn i {
+            margin-right: 8px;
         }
-    /* Buttons */
-    .btn {
+
+    .christmas-btn-small {
+        background: linear-gradient(135deg, #C41E3A, #165B33);
+        border: 2px solid #FFD700;
+        color: white;
+        padding: 8px 15px;
         border-radius: 8px;
         font-weight: 600;
         transition: all 0.3s ease;
-        border: none;
+        text-decoration: none;
     }
 
-    .btn-primary {
-        background: var(--secondary-color);
-        color: var(--text-dark);
-    }
-
-        .btn-primary:hover {
-            background: var(--primary-color);
-            transform: translateY(-2px);
+        .christmas-btn-small:hover, .christmas-btn-small.active {
+            background: linear-gradient(135deg, #FFD700, #FFA500);
+            color: #000;
         }
 
-    .btn-danger {
-        background: #DC3545;
-        color: var(--text-light);
+    .table-container {
+        overflow-x: auto;
+        border-radius: 15px;
     }
 
-        .btn-danger:hover {
-            background: #C82333;
-            transform: translateY(-2px);
-        }
-
-    .btn-create {
-        background: #28A745;
-        color: var(--text-light);
+    .christmas-table {
+        width: 100%;
+        background-color: #1c1c1c;
+        border: 2px solid #FFD700;
+        border-radius: 15px;
+        overflow: hidden;
     }
 
-        .btn-create:hover {
-            background: #218838;
-            transform: translateY(-2px);
+        .christmas-table thead tr {
+            background: linear-gradient(135deg, #8B0000, #165B33);
+            color: #FFFAFA;
         }
 
-    .btn-warning {
-        background: #FFC107;
-        color: var(--text-dark);
+        .christmas-table th {
+            padding: 18px 15px;
+            border: none;
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 1px;
+            border-bottom: 2px solid #FFD700;
+        }
+
+            .christmas-table th i {
+                margin-right: 8px;
+            }
+
+        .christmas-table td {
+            padding: 15px;
+            border: none;
+            color: #FFFAFA;
+            border-bottom: 1px solid rgba(255, 215, 0, 0.3);
+            vertical-align: middle;
+        }
+
+        .christmas-table tr:hover {
+            background: linear-gradient(90deg, rgba(139, 0, 0, 0.3), rgba(22, 91, 51, 0.3));
+        }
+
+        .christmas-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+    .movie-poster-thumb {
+        width: 60px;
+        height: 80px;
+        object-fit: cover;
+        border-radius: 8px;
+        border: 2px solid #FFD700;
     }
 
-        .btn-warning:hover {
-            background: #E0A800;
+    .no-poster-badge {
+        width: 60px;
+        height: 80px;
+        background: linear-gradient(135deg, #6B7280, #4B5563);
+        border: 2px solid #FFD700;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #FFFAFA;
+        font-size: 1.5rem;
+    }
+
+    .genre-badge {
+        padding: 6px 12px;
+        border-radius: 10px;
+        background: linear-gradient(135deg, #3B82F6, #2563EB);
+        color: white;
+        font-weight: 600;
+        font-size: 0.85rem;
+        display: inline-block;
+    }
+
+    .duration-badge {
+        padding: 6px 12px;
+        border-radius: 10px;
+        background: linear-gradient(135deg, #8B5CF6, #7C3AED);
+        color: white;
+        font-weight: 600;
+        font-size: 0.85rem;
+        display: inline-block;
+    }
+
+        .duration-badge i {
+            margin-right: 5px;
         }
+
+    .actors-text, .description-text {
+        font-size: 0.9rem;
+        color: #d1d5db;
+    }
+
+    .trailer-link {
+        color: #60A5FA;
+        text-decoration: none;
+        font-weight: 600;
+    }
+
+        .trailer-link:hover {
+            color: #3B82F6;
+            text-decoration: underline;
+        }
+
+        .trailer-link i {
+            margin-right: 5px;
+        }
+
+    .action-buttons {
+        display: flex;
+        gap: 5px;
+        justify-content: center;
+    }
 
     .action-btn {
-        min-width: 70px;
-        padding: 6px 10px;
+        padding: 8px 12px;
+        border-radius: 8px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        border: 2px solid #FFD700;
     }
-    /* Pagination */
+
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 215, 0, 0.5);
+        }
+
+    .btn-info {
+        background: linear-gradient(135deg, #0EA5E9, #0284C7);
+        color: white;
+    }
+
+    .btn-warning {
+        background: linear-gradient(135deg, #FFD700, #FFA500);
+        color: #000;
+    }
+
+    .btn-danger {
+        background: linear-gradient(135deg, #8B0000, #C41E3A);
+        color: white;
+    }
+
     .pagination {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-top: 30px;
-        padding: 15px;
-        background: rgba(15, 18, 19, 0.5);
-        border-radius: 10px;
+        margin-top: 20px;
+        color: #FFD700;
     }
 
     .pagination-controls {
         display: flex;
         gap: 5px;
-        align-items: center;
     }
 
-    .btn-pag {
-        background: var(--card-bg);
-        color: var(--primary-color);
-        border: 1px solid var(--primary-color);
-        padding: 8px 12px;
-        border-radius: 5px;
-        text-decoration: none;
-        transition: all 0.3s ease;
+    .christmas-modal {
+        background: linear-gradient(180deg, #8B0000, #165B33);
+        border: 3px solid #FFD700;
+        color: #FFFAFA;
     }
 
-        .btn-pag:hover:not(:disabled),
-        .btn-pag.active {
-            background: var(--primary-color);
-            color: var(--text-dark);
+        .christmas-modal .modal-header {
+            border-bottom: 2px solid #FFD700;
         }
 
-        .btn-pag:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-    /* Glow Effect */
-    .glow-effect:hover {
-        box-shadow: 0 0 15px rgba(245, 168, 154, 0.5);
-    }
-    /* Alerts */
-    .alert {
-        border-radius: 8px;
-        padding: 12px;
-        margin-bottom: 15px;
-    }
-
-    .alert-success {
-        background: #d4edda;
-        color: #155724;
-        border: 1px solid #c3e6cb;
-    }
-
-    .alert-danger {
-        background: #f8d7da;
-        color: #721c24;
-        border: 1px solid #f5c6cb;
-    }
-    /* Modals */
-    .modal-content {
-        background: var(--bg-dark);
-        color: var(--primary-color);
-        border-radius: 15px;
-        border: 1px solid var(--primary-color);
-    }
-
-    .modal-header {
-        border-bottom: 1px solid var(--primary-color);
-    }
-
-    .modal-body {
-        border-bottom: 1px solid var(--primary-color);
-    }
-
-    .form-label {
-        color: var(--primary-color);
-        font-weight: 600;
-    }
-
-    .form-control {
-        background: var(--card-bg);
-        border: 1px solid var(--primary-color);
-        color: var(--primary-color);
-        border-radius: 8px;
-    }
-
-        .form-control:focus {
-            border-color: var(--secondary-color);
-            box-shadow: 0 0 10px rgba(245, 168, 154, 0.5);
-            color: var(--primary-color);
+        .christmas-modal .form-label {
+            color: #FFD700;
+            font-weight: 600;
         }
 
-    .no-movies-text {
-        font-size: 1.2rem;
-        color: var(--primary-color);
-        margin: 50px 0;
-    }
-    /* Scrollbar Styles */
-    .table-responsive-wrapper::-webkit-scrollbar,
-    .table-container::-webkit-scrollbar {
-        width: 8px;
-        height: 8px;
-    }
-
-    .table-responsive-wrapper::-webkit-scrollbar-track,
-    .table-container::-webkit-scrollbar-track {
-        background: var(--bg-dark);
-        border-radius: 10px;
-    }
-
-    .table-responsive-wrapper::-webkit-scrollbar-thumb,
-    .table-container::-webkit-scrollbar-thumb {
-        background: var(--primary-color);
-        border-radius: 10px;
-    }
-
-        .table-responsive-wrapper::-webkit-scrollbar-thumb:hover,
-        .table-container::-webkit-scrollbar-thumb:hover {
-            background: var(--secondary-color);
-        }
-    /* Toggle Button - Compact and Beautiful */
-    .sidebar-toggle {
-        position: fixed;
-        top: 15px;
-        left: 15px;
-        z-index: 1001;
-        background: linear-gradient(135deg, #ff0033, #e50914);
-        color: #fff;
-        border: none;
-        border-radius: 50%;
-        width: 35px;
-        height: 35px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        box-shadow: 0 4px 15px rgba(229, 9, 20, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1);
-        transition: all 0.3s ease;
-        cursor: pointer;
-        font-size: 14px;
-    }
-
-        .sidebar-toggle:hover {
-            transform: scale(1.05) rotate(5deg);
-            box-shadow: 0 6px 20px rgba(229, 9, 20, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        .christmas-modal .form-control {
+            background-color: rgba(0, 0, 0, 0.3);
+            border: 1px solid #FFD700;
+            color: #FFFAFA;
         }
 
-        .sidebar-toggle:active {
-            transform: scale(0.95);
-        }
-
-    .sidebar.collapsed + .frame-wrapper.admin-view .sidebar-toggle {
-        left: 15px;
-    }
-    /* Media Queries */
-    @@media (max-width: 768px) {
-        .sidebar {
-            width: 200px;
-        }
-
-        .frame-wrapper.admin-view {
-            margin-left: 200px;
-        }
-
-        .sidebar.collapsed {
-            width: 0;
-            padding: 0;
-            transform: translateX(-100%);
-        }
-
-        .frame-wrapper.admin-view.shifted {
-            margin-left: 0;
-        }
-
-        .frame-wrapper {
-            width: 98%;
-            padding: 15px;
-        }
-
-            .frame-wrapper.admin-view {
-                margin-left: 200px;
-                width: calc(100% - 200px);
+            .christmas-modal .form-control:focus {
+                background-color: rgba(0, 0, 0, 0.5);
+                border-color: #FFD700;
+                box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+                color: #FFFAFA;
             }
 
-        .col-md-6, .col-lg-4 {
-            flex: 0 0 100%;
-            max-width: 100%;
-        }
-
-        .movie-card {
-            margin-bottom: 20px;
-        }
-
-        .pagination {
-            flex-direction: column;
-            gap: 10px;
-            text-align: center;
-        }
-
-        .table-responsive-wrapper {
-            font-size: 0.85rem;
-        }
-
-        .search-input {
-            width: 120px; /* Even smaller width for smaller screens */
-            font-size: 0.8rem;
-            height: 28px;
-        }
-
-        .search-btn {
-            font-size: 0.8rem;
-            padding: 4px 10px;
-            height: 28px;
-        }
-
-        .sidebar-toggle {
-            top: 10px;
-            left: 10px;
-            width: 32px;
-            height: 32px;
-            font-size: 13px;
-        }
+    .footer {
+        background: linear-gradient(135deg, #8B0000, #165B33);
+        border-top: 2px solid #FFD700;
+        margin-top: 50px;
     }
 
-    @@media (max-width: 576px) {
-        .container-fluid.d-flex {
-            flex-direction: column;
-        }
+    @@media (max-width: 768px) {
+        .title-gradient
 
-        .sidebar {
-            position: relative;
-            width: 100%;
-            height: auto;
-        }
+    {
+        font-size: 2rem;
+    }
 
-        .frame-wrapper.admin-view {
-            margin-left: 0;
-            width: 100%;
-            min-height: auto;
-        }
+    .header-actions {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
 
-        .content-inner {
-            width: 100%;
-            padding: 20px;
-        }
+    .christmas-table {
+        font-size: 0.85rem;
+    }
 
-        .search-form {
-            flex-direction: column;
-            align-items: stretch;
-        }
+    .action-buttons {
+        flex-direction: column;
+    }
 
-        .search-input, .search-btn {
-            width: 100%; /* Full width on very small screens */
-            margin: 5px 0; /* Add vertical spacing */
-        }
-
-        .search-btn {
-            justify-content: center;
-        }
-
-        .sidebar.collapsed {
-            display: none;
-        }
-
-        .sidebar-toggle {
-            position: relative;
-            margin: 10px auto;
-            display: block;
-        }
-
-        .title-gradient {
-            font-size: 1.5rem;
-        }
-
-        .action-buttons-wrapper {
-            flex-direction: column;
-            gap: 5px;
-        }
-
-        .movie-actions {
-            justify-content: center;
-        }
     }
 </style>
-<!-- JavaScript -->
+
 @section Scripts {
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const toggleBtn = document.getElementById('sidebar-toggle');
-            const sidebar = document.querySelector('.sidebar');
+            const sidebar = document.querySelector('.christmas-sidebar');
             const frameWrapper = document.querySelector('.frame-wrapper');
+
             if (toggleBtn && sidebar && frameWrapper) {
                 toggleBtn.addEventListener('click', function() {
                     sidebar.classList.toggle('collapsed');
                     frameWrapper.classList.toggle('shifted');
+
                     const icon = toggleBtn.querySelector('i');
                     if (sidebar.classList.contains('collapsed')) {
                         icon.className = 'fas fa-bars';
@@ -1100,43 +738,20 @@
                 });
             }
         });
+
         $(document).ready(function () {
-            // Alert function
             function showAlert(message, type = 'danger') {
                 const alertHtml = `
-                    <div class="alert alert-${type} alert-dismissible fade show" role="alert">
+                    <div class="alert alert-${type} christmas-alert alert-dismissible fade show" role="alert">
+                        <i class="fas fa-${type === 'success' ? 'check' : 'exclamation'}-circle"></i>
                         ${message}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                     </div>
                 `;
                 $('#alert-container').html(alertHtml);
                 setTimeout(() => $('.alert').fadeOut(), 5000);
             }
-            // Add Movie (AJAX fallback if form not used)
-            $('#add-movie-form').on('submit', function (e) {
-                e.preventDefault();
-                const formData = new FormData(this);
-                $.ajax({
-                    url: $(this).attr('action'),
-                    type: 'POST',
-                    data: formData,
-                    processData: false,
-                    contentType: false,
-                    success: function (response) {
-                        if (response.success) {
-                            showAlert(response.message, 'success');
-                            $('#addMovieModal').modal('hide');
-                            location.reload();
-                        } else {
-                            showAlert(response.message || '@Localizer["AddMovieError"].Value');
-                        }
-                    },
-                    error: function () {
-                        showAlert('@Localizer["AddMovieError"].Value');
-                    }
-                });
-            });
-            // Edit Movie
+
             $(document).on('click', '.edit-movie-btn', function () {
                 const movieId = $(this).data('id');
                 $('#editMovieId').val(movieId);
@@ -1154,39 +769,14 @@
                             $('#editActors').val(data.actors || '');
                             $('#editTrailerUrl').val(data.trailerUrl || '');
                             $('#editMovieModal').modal('show');
-                        } else {
-                            showAlert('@Localizer["LoadMovieError"].Value');
                         }
                     },
-                    error: function () {
-                        showAlert('@Localizer["LoadMovieError"].Value');
+                    error: function() {
+                        showAlert('@Localizer["ServerError"]', 'danger');
                     }
                 });
             });
-            $('#edit-movie-form').on('submit', function (e) {
-                e.preventDefault();
-                const formData = new FormData(this);
-                $.ajax({
-                    url: $(this).attr('action'),
-                    type: 'POST',
-                    data: formData,
-                    processData: false,
-                    contentType: false,
-                    success: function (response) {
-                        if (response.success) {
-                            showAlert(response.message, 'success');
-                            $('#editMovieModal').modal('hide');
-                            location.reload();
-                        } else {
-                            showAlert(response.message || '@Localizer["EditMovieError"].Value');
-                        }
-                    },
-                    error: function () {
-                        showAlert('@Localizer["EditMovieError"].Value');
-                    }
-                });
-            });
-            // Delete Movie
+
             $(document).on('click', '.delete-movie-btn', function () {
                 if (!confirm('@Localizer["ConfirmDelete"].Value')) return;
                 const movieId = $(this).data('id');
@@ -1200,15 +790,25 @@
                     success: function (response) {
                         if (response.success) {
                             showAlert(response.message, 'success');
-                            location.reload();
+                            setTimeout(() => location.reload(), 1500);
                         } else {
-                            showAlert(response.message || '@Localizer["DeleteMovieError"].Value');
+                            showAlert(response.message || '@Localizer["DeleteFailed"]', 'danger');
                         }
                     },
-                    error: function () {
-                        showAlert('@Localizer["DeleteMovieError"].Value');
+                    error: function() {
+                        showAlert('@Localizer["ServerError"]', 'danger');
                     }
                 });
+            });
+
+            $('#add-movie-form').submit(function(e) {
+                const form = this;
+                setTimeout(() => form.submit(), 100);
+            });
+
+            $('#edit-movie-form').submit(function(e) {
+                const form = this;
+                setTimeout(() => form.submit(), 100);
             });
         });
     </script>

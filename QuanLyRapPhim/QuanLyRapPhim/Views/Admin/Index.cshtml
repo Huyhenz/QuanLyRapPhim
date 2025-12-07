@@ -9,71 +9,53 @@
 }
 
 <div class="container-fluid d-flex position-relative">
-    <!-- Toggle Button -->
-    @if (isAdmin)
-    {
-        <button id="sidebar-toggle" class="sidebar-toggle">
-            <i class="fas fa-bars"></i>
-        </button>
-    }
-    <!-- SIDEBAR -->
-    @if (isAdmin)
-    {
-        <aside class="sidebar">
-            <div class="sidebar-header">
-                <h3 class="sidebar-title">🎬 @Localizer["CinemaXAdmin"]</h3>
-            </div>
-            <nav class="sidebar-nav">
-                <a href="/Admin/Index"
-                   class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Admin" && ViewContext.RouteData.Values["Action"]?.ToString() == "Index" ? "active" : "")">
-                    <i class="fas fa-tachometer-alt"></i> @Localizer["Dashboard"]
-                </a>
-                <a href="/Movies"
-                   class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Movies" ? "active" : "")">
-                    <i class="fas fa-film"></i> @Localizer["ManageMovies"]
-                </a>
-                <a href="/Showtimes"
-                   class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Showtimes" ? "active" : "")">
-                    <i class="fas fa-clock"></i> @Localizer["ManageShowtimes"]
-                </a>
-                <a href="/Rooms"
-                   class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Rooms" ? "active" : "")">
-                    <i class="fas fa-door-open"></i> @Localizer["ManageRooms"]
-                </a>
-                <a href="/Seats"
-                   class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Seats" ? "active" : "")">
-                    <i class="fas fa-chair"></i> @Localizer["ManageSeats"]
-                </a>
-                <a href="/Admin/ManageFoods"
-                   class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "ManageFoods" ? "active" : "")">
-                    <i class="fas fa-utensils"></i> @Localizer["ManageFoods"]
-                </a>
-                <a href="/Admin/ManageBookings"
-                   class="nav-item @(ViewContext.RouteData.Values["Action"]?.ToString() == "ManageBookings" ? "active" : "")">
-                    <i class="fas fa-ticket-alt"></i> @Localizer["ManageBookings"]
-                </a>
-                <a href="/Admin/RevenueStatistics"
-                   class="nav-item @(ViewContext.RouteData.Values["Action"]?.ToString() == "RevenueStatistics" ? "active" : "")">
-                    <i class="fas fa-chart-bar"></i> @Localizer["RevenueStatistics"]
-                </a>
-                <a href="/Vouchers"
-                   class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Vouchers" ? "active" : "")">
-                    <i class="fas fa-gift"></i> @Localizer["Vouchers"]
-                </a>
-                <div class="nav-divider"></div>
-                <a href="#" class="nav-item"><i class="fab fa-facebook"></i> Facebook</a>
-                <a href="#" class="nav-item"><i class="fab fa-twitter"></i> Twitter</a>
-                <a href="#" class="nav-item"><i class="fab fa-google"></i> Google</a>
-            </nav>
-        </aside>
-    }
-    <!-- MAIN CONTENT -->
+    @await Html.PartialAsync("_ChristmasDashboard")
+
     <div class="frame-wrapper flex-grow-1 @(isAdmin ? "admin-view" : "")">
         <div class="content-inner">
-            <h1 class="title-gradient">@Localizer["AdminDashboard"]</h1>
-            <!-- Add your dashboard content here -->
+            <h1 class="title-gradient">
+                <span class="christmas-icon">🎄</span>
+                @Localizer["AdminDashboard"]
+                <span class="christmas-icon">🎅</span>
+            </h1>
+
+            <!-- Dashboard Content -->
+            <div class="dashboard-cards">
+                <div class="stat-card glow-effect">
+                    <div class="stat-icon">🎬</div>
+                    <div class="stat-content">
+                        <h3>@Localizer["TotalMovies"]</h3>
+                        <p class="stat-number">42</p>
+                    </div>
+                </div>
+
+                <div class="stat-card glow-effect">
+                    <div class="stat-icon">🎫</div>
+                    <div class="stat-content">
+                        <h3>@Localizer["TotalBookings"]</h3>
+                        <p class="stat-number">156</p>
+                    </div>
+                </div>
+
+                <div class="stat-card glow-effect">
+                    <div class="stat-icon">💰</div>
+                    <div class="stat-content">
+                        <h3>@Localizer["TotalRevenue"]</h3>
+                        <p class="stat-number">50,000,000 VND</p>
+                    </div>
+                </div>
+
+                <div class="stat-card glow-effect">
+                    <div class="stat-icon">👥</div>
+                    <div class="stat-content">
+                        <h3>@Localizer["TotalUsers"]</h3>
+                        <p class="stat-number">89</p>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
+
     <footer class="footer text-center py-3">
         <p class="text-white mb-0">© 2025 CinemaX. @Localizer["AllRightsReserved"]</p>
     </footer>
@@ -85,140 +67,112 @@
         font-family: 'Montserrat', sans-serif;
     }
 
-    .sidebar {
-        background: #111;
-        width: 250px;
-        height: 100vh;
-        position: fixed;
-        top: 0;
-        left: 0;
-        padding: 25px 20px;
-        overflow-y: auto;
-        border-right: 2px solid #e50914;
-        box-shadow: 2px 0 10px rgba(0,0,0,0.4);
-        transition: width 0.3s ease, transform 0.3s ease;
-        z-index: 1000;
-    }
-
-        .sidebar.collapsed {
-            width: 0;
-            padding: 0;
-            transform: translateX(-100%);
-        }
-
-    .sidebar-title {
-        color: #fff;
-        font-weight: 700;
-        font-size: 1.4rem;
-    }
-
-    .sidebar-nav .nav-item {
-        color: #ddd;
-        padding: 12px 15px;
-        border-radius: 8px;
-        margin-bottom: 5px;
-        font-size: 1rem;
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        text-decoration: none;
-        transition: 0.25s;
-    }
-
-    .nav-item i {
-        width: 20px;
-    }
-
-    .nav-item:hover {
-        background-color: #e50914;
-        color: #fff;
-        transform: translateX(5px);
-    }
-
-    .nav-item.active {
-        background-color: #e50914;
-        color: #fff;
-        font-weight: 600;
-    }
-
-    .nav-divider {
-        height: 1px;
-        background: #444;
-        margin: 15px 0;
-    }
-
-    .frame-wrapper.admin-view {
-        margin-left: 250px;
-        transition: margin-left 0.3s ease;
-    }
-
-        .frame-wrapper.admin-view.shifted {
-            margin-left: 0;
-        }
-
-    .title-gradient {
-        background: linear-gradient(90deg, #ff0033, #e50914);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        font-size: 2rem;
-        font-weight: 700;
-        text-transform: uppercase;
-    }
-
     .content-inner {
         max-width: 1200px;
         width: 100%;
         padding: 20px;
     }
 
-    .sidebar-toggle {
-        position: fixed;
-        top: 15px;
-        left: 15px;
-        z-index: 1001;
-        background: linear-gradient(135deg, #ff0033, #e50914);
-        color: #fff;
-        border: none;
-        border-radius: 50%;
-        width: 35px;
-        height: 35px;
+    .title-gradient {
+        background: linear-gradient(90deg, #FFD700, #FF4500);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        font-size: 2.5rem;
+        font-weight: 800;
+        text-align: center;
+        margin-bottom: 40px;
+        text-transform: uppercase;
+    }
+
+    .christmas-icon {
+        font-size: 2rem;
+        animation: bounce 2s infinite;
+    }
+
+    @@keyframes bounce {
+        0%, 100%
+
+    {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-10px);
+    }
+
+    }
+
+    .dashboard-cards {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+        margin-top: 30px;
+    }
+
+    .stat-card {
+        background: linear-gradient(135deg, #8B0000, #165B33);
+        border: 3px solid #FFD700;
+        border-radius: 20px;
+        padding: 30px;
         display: flex;
         align-items: center;
-        justify-content: center;
-        box-shadow: 0 4px 15px rgba(229, 9, 20, 0.4);
+        gap: 20px;
         transition: all 0.3s ease;
-        cursor: pointer;
-        font-size: 14px;
+        box-shadow: 0 5px 15px rgba(255, 215, 0, 0.3);
     }
 
-        .sidebar-toggle:hover {
-            transform: scale(1.05) rotate(5deg);
-            box-shadow: 0 6px 20px rgba(229, 9, 20, 0.6);
+        .stat-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 10px 30px rgba(255, 215, 0, 0.6);
         }
+
+    .stat-icon {
+        font-size: 3rem;
+        min-width: 60px;
+        text-align: center;
+    }
+
+    .stat-content h3 {
+        color: #FFD700;
+        font-size: 1rem;
+        margin-bottom: 10px;
+        text-transform: uppercase;
+        font-weight: 600;
+    }
+
+    .stat-number {
+        color: #FFFAFA;
+        font-size: 2rem;
+        font-weight: 800;
+        margin: 0;
+    }
+
+    .glow-effect {
+        animation: glow 2s ease-in-out infinite;
+    }
+
+    @@keyframes glow {
+        0%, 100%
+
+    {
+        box-shadow: 0 5px 15px rgba(255, 215, 0, 0.3);
+    }
+
+    50% {
+        box-shadow: 0 10px 30px rgba(255, 215, 0, 0.6);
+    }
+
+    }
+
     @@media (max-width: 768px) {
-        .sidebar
+        .dashboard-cards
 
     {
-        width: 200px;
+        grid-template-columns: 1fr;
     }
 
-    .frame-wrapper.admin-view {
-        margin-left: 200px;
-    }
-
-    }
-    @@media (max-width: 576px) {
-        .sidebar
-
-    {
-        position: relative;
-        width: 100%;
-        height: auto;
-    }
-
-    .frame-wrapper.admin-view {
-        margin-left: 0;
-        width: 100%;
+    .title-gradient {
+        font-size: 2rem;
     }
 
     }
@@ -227,14 +181,20 @@
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const toggleBtn = document.getElementById('sidebar-toggle');
-        const sidebar = document.querySelector('.sidebar');
+        const sidebar = document.querySelector('.christmas-sidebar');
         const frameWrapper = document.querySelector('.frame-wrapper');
+
         if (toggleBtn && sidebar && frameWrapper) {
             toggleBtn.addEventListener('click', function() {
                 sidebar.classList.toggle('collapsed');
                 frameWrapper.classList.toggle('shifted');
+
                 const icon = toggleBtn.querySelector('i');
-                icon.className = sidebar.classList.contains('collapsed') ? 'fas fa-bars' : 'fas fa-times';
+                if (sidebar.classList.contains('collapsed')) {
+                    icon.className = 'fas fa-bars';
+                } else {
+                    icon.className = 'fas fa-times';
+                }
             });
         }
     });

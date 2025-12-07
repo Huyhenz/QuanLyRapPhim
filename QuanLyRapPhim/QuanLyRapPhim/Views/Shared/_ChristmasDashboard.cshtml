@@ -1,0 +1,673 @@
+﻿@* File: Views/Shared/_ChristmasDashboard.cshtml *@
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+@{
+    bool isAdmin = User.IsInRole("Admin");
+    var currentController = ViewContext.RouteData.Values["Controller"]?.ToString();
+    var currentAction = ViewContext.RouteData.Values["Action"]?.ToString();
+}
+
+@if (isAdmin)
+{
+    <!-- Snowflakes Animation -->
+    <div class="snowflakes" aria-hidden="true">
+        <div class="snowflake">❅</div>
+        <div class="snowflake">❆</div>
+        <div class="snowflake">❅</div>
+        <div class="snowflake">❆</div>
+        <div class="snowflake">❅</div>
+        <div class="snowflake">❆</div>
+        <div class="snowflake">❅</div>
+        <div class="snowflake">❆</div>
+        <div class="snowflake">❅</div>
+        <div class="snowflake">❆</div>
+    </div>
+
+    <!-- Toggle Button -->
+    <button id="sidebar-toggle" class="sidebar-toggle christmas-glow">
+        <i class="fas fa-bars"></i>
+    </button>
+
+    <!-- SIDEBAR with Christmas Theme -->
+    <aside class="sidebar christmas-sidebar">
+        <div class="sidebar-header">
+            <div class="christmas-lights">
+                <span class="light red"></span>
+                <span class="light green"></span>
+                <span class="light gold"></span>
+                <span class="light red"></span>
+                <span class="light green"></span>
+            </div>
+            <h3 class="sidebar-title">
+                <span class="christmas-icon">🎄</span>
+                CinemaX Admin
+                <span class="christmas-icon">🎅</span>
+            </h3>
+            <p class="christmas-subtitle">Merry Christmas! 🎁</p>
+        </div>
+
+        <nav class="sidebar-nav">
+            <a href="/Admin/Index"
+               class="nav-item @(currentController == "Admin" && currentAction == "Index" ? "active" : "")">
+                <i class="fas fa-tachometer-alt"></i>
+                <span>@Localizer["Dashboard"]</span>
+                <span class="nav-decoration">⭐</span>
+            </a>
+
+            <a href="/Movies"
+               class="nav-item @(currentController == "Movies" ? "active" : "")">
+                <i class="fas fa-film"></i>
+                <span>@Localizer["ManageMovies"]</span>
+                <span class="nav-decoration">🎬</span>
+            </a>
+
+            <a href="/Showtimes"
+               class="nav-item @(currentController == "Showtimes" ? "active" : "")">
+                <i class="fas fa-clock"></i>
+                <span>@Localizer["ManageShowtimes"]</span>
+                <span class="nav-decoration">⏰</span>
+            </a>
+
+            <a href="/Rooms"
+               class="nav-item @(currentController == "Rooms" ? "active" : "")">
+                <i class="fas fa-door-open"></i>
+                <span>@Localizer["ManageRooms"]</span>
+                <span class="nav-decoration">🚪</span>
+            </a>
+
+            <a href="/Seats"
+               class="nav-item @(currentController == "Seats" ? "active" : "")">
+                <i class="fas fa-chair"></i>
+                <span>@Localizer["ManageSeats"]</span>
+                <span class="nav-decoration">💺</span>
+            </a>
+
+            <a href="/Admin/ManageFoods"
+               class="nav-item @(currentAction == "ManageFoods" ? "active" : "")">
+                <i class="fas fa-utensils"></i>
+                <span>@Localizer["ManageFoods"]</span>
+                <span class="nav-decoration">🍿</span>
+            </a>
+
+            <a href="/Admin/ManageBookings"
+               class="nav-item @(currentAction == "ManageBookings" ? "active" : "")">
+                <i class="fas fa-ticket-alt"></i>
+                <span>@Localizer["ManageBookings"]</span>
+                <span class="nav-decoration">🎫</span>
+            </a>
+
+            <a href="/Admin/RevenueStatistics"
+               class="nav-item @(currentAction == "RevenueStatistics" ? "active" : "")">
+                <i class="fas fa-chart-bar"></i>
+                <span>@Localizer["RevenueStatistics"]</span>
+                <span class="nav-decoration">📊</span>
+            </a>
+
+            <a href="/Vouchers"
+               class="nav-item @(currentController == "Vouchers" ? "active" : "")">
+                <i class="fas fa-gift"></i>
+                <span>@Localizer["Vouchers"]</span>
+                <span class="nav-decoration">🎁</span>
+            </a>
+
+            <div class="nav-divider christmas-divider">
+                <span class="divider-decoration">❄️ ❄️ ❄️</span>
+            </div>
+
+            <div class="social-links">
+                <p class="social-title">Connect With Us</p>
+                <a href="#" class="nav-item social-item">
+                    <i class="fab fa-facebook"></i>
+                    <span>Facebook</span>
+                </a>
+                <a href="#" class="nav-item social-item">
+                    <i class="fab fa-twitter"></i>
+                    <span>Twitter</span>
+                </a>
+                <a href="#" class="nav-item social-item">
+                    <i class="fab fa-google"></i>
+                    <span>Google</span>
+                </a>
+            </div>
+        </nav>
+
+        <div class="sidebar-footer">
+            <div class="christmas-tree-small">
+                <div class="tree-line">🌟</div>
+                <div class="tree-line">🎄</div>
+                <div class="tree-line">🎁🎁</div>
+            </div>
+        </div>
+    </aside>
+}
+
+<style>
+    /* ==================== CHRISTMAS THEME COLORS ==================== */
+    :root {
+        --christmas-red: #C41E3A;
+        --christmas-green: #165B33;
+        --christmas-gold: #FFD700;
+        --christmas-white: #FFFAFA;
+        --christmas-dark-red: #8B0000;
+        --christmas-light-green: #2F7C31;
+        --christmas-silver: #C0C0C0;
+    }
+
+    /* ==================== SNOWFLAKES ANIMATION ==================== */
+    .snowflakes {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: 999;
+    }
+
+    .snowflake {
+        position: absolute;
+        top: -10%;
+        color: var(--christmas-white);
+        font-size: 1.5rem;
+        animation: fall linear infinite;
+        opacity: 0.8;
+    }
+
+        .snowflake:nth-child(1) {
+            left: 10%;
+            animation-duration: 10s;
+            animation-delay: 0s;
+        }
+
+        .snowflake:nth-child(2) {
+            left: 20%;
+            animation-duration: 12s;
+            animation-delay: 2s;
+        }
+
+        .snowflake:nth-child(3) {
+            left: 30%;
+            animation-duration: 8s;
+            animation-delay: 4s;
+        }
+
+        .snowflake:nth-child(4) {
+            left: 40%;
+            animation-duration: 14s;
+            animation-delay: 1s;
+        }
+
+        .snowflake:nth-child(5) {
+            left: 50%;
+            animation-duration: 11s;
+            animation-delay: 3s;
+        }
+
+        .snowflake:nth-child(6) {
+            left: 60%;
+            animation-duration: 9s;
+            animation-delay: 5s;
+        }
+
+        .snowflake:nth-child(7) {
+            left: 70%;
+            animation-duration: 13s;
+            animation-delay: 2s;
+        }
+
+        .snowflake:nth-child(8) {
+            left: 80%;
+            animation-duration: 10s;
+            animation-delay: 4s;
+        }
+
+        .snowflake:nth-child(9) {
+            left: 90%;
+            animation-duration: 12s;
+            animation-delay: 1s;
+        }
+
+        .snowflake:nth-child(10) {
+            left: 95%;
+            animation-duration: 11s;
+            animation-delay: 3s;
+        }
+
+    @@keyframes fall {
+        to
+
+    {
+        transform: translateY(100vh) rotate(360deg);
+    }
+
+    }
+
+    /* ==================== SIDEBAR CHRISTMAS THEME ==================== */
+    .christmas-sidebar {
+        background: linear-gradient(180deg, var(--christmas-dark-red) 0%, var(--christmas-green) 100%);
+        width: 280px;
+        height: 100vh;
+        position: fixed;
+        top: 0;
+        left: 0;
+        padding: 20px 15px;
+        overflow-y: auto;
+        border-right: 4px solid var(--christmas-gold);
+        box-shadow: 4px 0 20px rgba(255, 215, 0, 0.4), inset 0 0 30px rgba(0, 0, 0, 0.3);
+        transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        z-index: 1000;
+    }
+
+        .christmas-sidebar.collapsed {
+            width: 0;
+            padding: 0;
+            transform: translateX(-100%);
+        }
+
+    /* ==================== CHRISTMAS LIGHTS ==================== */
+    .christmas-lights {
+        display: flex;
+        justify-content: space-around;
+        margin-bottom: 15px;
+        padding: 10px 0;
+    }
+
+    .light {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        animation: blink 1.5s infinite;
+    }
+
+        .light.red {
+            background: var(--christmas-red);
+            box-shadow: 0 0 10px var(--christmas-red);
+            animation-delay: 0s;
+        }
+
+        .light.green {
+            background: var(--christmas-light-green);
+            box-shadow: 0 0 10px var(--christmas-light-green);
+            animation-delay: 0.5s;
+        }
+
+        .light.gold {
+            background: var(--christmas-gold);
+            box-shadow: 0 0 10px var(--christmas-gold);
+            animation-delay: 1s;
+        }
+
+    @@keyframes blink {
+        0%, 100%
+
+    {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.3;
+    }
+
+    }
+
+    /* ==================== SIDEBAR HEADER ==================== */
+    .sidebar-header {
+        text-align: center;
+        padding-bottom: 20px;
+        border-bottom: 2px solid var(--christmas-gold);
+        margin-bottom: 20px;
+    }
+
+    .sidebar-title {
+        color: var(--christmas-white);
+        font-weight: 800;
+        font-size: 1.5rem;
+        margin: 10px 0;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5), 0 0 10px var(--christmas-gold);
+    }
+
+    .christmas-icon {
+        font-size: 1.3rem;
+        animation: bounce 2s infinite;
+    }
+
+    @@keyframes bounce {
+        0%, 100%
+
+    {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-5px);
+    }
+
+    }
+
+    .christmas-subtitle {
+        color: var(--christmas-gold);
+        font-size: 0.9rem;
+        font-weight: 600;
+        margin: 5px 0 0 0;
+        animation: pulse 2s infinite;
+    }
+
+    @@keyframes pulse {
+        0%, 100%
+
+    {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.7;
+    }
+
+    }
+
+    /* ==================== NAVIGATION ITEMS ==================== */
+    .sidebar-nav {
+        padding: 0 5px;
+    }
+
+    .nav-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 14px 16px;
+        margin-bottom: 8px;
+        color: var(--christmas-white);
+        text-decoration: none;
+        border-radius: 12px;
+        font-size: 1rem;
+        font-weight: 600;
+        background: rgba(255, 255, 255, 0.1);
+        border: 2px solid transparent;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+
+        .nav-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 215, 0, 0.3), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .nav-item:hover::before {
+            left: 100%;
+        }
+
+        .nav-item:hover {
+            background: linear-gradient(135deg, var(--christmas-red), var(--christmas-dark-red));
+            border-color: var(--christmas-gold);
+            transform: translateX(8px) scale(1.02);
+            box-shadow: 0 5px 15px rgba(255, 215, 0, 0.4);
+        }
+
+        .nav-item.active {
+            background: linear-gradient(135deg, var(--christmas-gold), var(--christmas-red));
+            color: var(--christmas-green);
+            border-color: var(--christmas-white);
+            font-weight: 700;
+            box-shadow: 0 5px 20px rgba(255, 215, 0, 0.6), inset 0 0 10px rgba(255, 255, 255, 0.2);
+        }
+
+        .nav-item i {
+            width: 22px;
+            font-size: 1.1rem;
+            text-align: center;
+        }
+
+    .nav-decoration {
+        margin-left: auto;
+        font-size: 1rem;
+        animation: rotate 3s linear infinite;
+    }
+
+    @@keyframes rotate {
+        from
+
+    {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+
+    }
+
+    /* ==================== DIVIDER ==================== */
+    .christmas-divider {
+        height: 2px;
+        background: linear-gradient(90deg, transparent, var(--christmas-gold), transparent);
+        margin: 20px 0;
+        position: relative;
+    }
+
+    .divider-decoration {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: var(--christmas-green);
+        padding: 5px 15px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+    }
+
+    /* ==================== SOCIAL LINKS ==================== */
+    .social-links {
+        margin-top: 15px;
+    }
+
+    .social-title {
+        color: var(--christmas-gold);
+        font-size: 0.85rem;
+        font-weight: 700;
+        text-align: center;
+        margin-bottom: 10px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .social-item {
+        padding: 10px 16px;
+        font-size: 0.9rem;
+        background: rgba(255, 255, 255, 0.05);
+    }
+
+        .social-item:hover {
+            background: rgba(255, 215, 0, 0.2);
+        }
+
+    /* ==================== SIDEBAR FOOTER ==================== */
+    .sidebar-footer {
+        margin-top: 20px;
+        padding-top: 20px;
+        border-top: 2px solid var(--christmas-gold);
+    }
+
+    .christmas-tree-small {
+        text-align: center;
+        font-size: 1rem;
+        line-height: 1.2;
+    }
+
+    .tree-line {
+        animation: sway 3s ease-in-out infinite;
+    }
+
+    @@keyframes sway {
+        0%, 100%
+
+    {
+        transform: rotate(0deg);
+    }
+
+    50% {
+        transform: rotate(2deg);
+    }
+
+    }
+
+    /* ==================== TOGGLE BUTTON ==================== */
+    .sidebar-toggle {
+        position: fixed;
+        top: 20px;
+        left: 20px;
+        z-index: 1001;
+        background: linear-gradient(135deg, var(--christmas-red), var(--christmas-green));
+        color: var(--christmas-white);
+        border: 3px solid var(--christmas-gold);
+        border-radius: 50%;
+        width: 50px;
+        height: 50px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 6px 20px rgba(255, 215, 0, 0.5), 0 0 20px rgba(196, 30, 58, 0.3);
+        transition: all 0.3s ease;
+        cursor: pointer;
+        font-size: 1.2rem;
+    }
+
+        .sidebar-toggle:hover {
+            transform: scale(1.1) rotate(90deg);
+            box-shadow: 0 8px 25px rgba(255, 215, 0, 0.7), 0 0 30px rgba(196, 30, 58, 0.5);
+        }
+
+    .christmas-glow {
+        animation: glow 2s ease-in-out infinite;
+    }
+
+    @@keyframes glow {
+        0%, 100%
+
+    {
+        box-shadow: 0 6px 20px rgba(255, 215, 0, 0.5), 0 0 20px rgba(196, 30, 58, 0.3);
+    }
+
+    50% {
+        box-shadow: 0 6px 30px rgba(255, 215, 0, 0.8), 0 0 40px rgba(196, 30, 58, 0.6);
+    }
+
+    }
+
+    /* ==================== FRAME WRAPPER ADJUSTMENTS ==================== */
+    .frame-wrapper.admin-view {
+        margin-left: 280px;
+        transition: margin-left 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    }
+
+        .frame-wrapper.admin-view.shifted {
+            margin-left: 0;
+        }
+
+    /* ==================== SCROLLBAR STYLING ==================== */
+    .christmas-sidebar::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    .christmas-sidebar::-webkit-scrollbar-track {
+        background: rgba(0, 0, 0, 0.2);
+        border-radius: 10px;
+    }
+
+    .christmas-sidebar::-webkit-scrollbar-thumb {
+        background: var(--christmas-gold);
+        border-radius: 10px;
+        border: 2px solid var(--christmas-green);
+    }
+
+        .christmas-sidebar::-webkit-scrollbar-thumb:hover {
+            background: var(--christmas-red);
+        }
+
+    /* ==================== RESPONSIVE DESIGN ==================== */
+    @@media (max-width: 768px) {
+        .christmas-sidebar
+
+    {
+        width: 220px;
+    }
+
+    .frame-wrapper.admin-view {
+        margin-left: 220px;
+    }
+
+    .sidebar-toggle {
+        width: 45px;
+        height: 45px;
+        font-size: 1rem;
+    }
+
+    .sidebar-title {
+        font-size: 1.2rem;
+    }
+
+    .nav-item {
+        padding: 12px 14px;
+        font-size: 0.9rem;
+    }
+
+    }
+
+    @@media (max-width: 576px) {
+        .christmas-sidebar
+
+    {
+        width: 100%;
+        height: auto;
+        position: relative;
+    }
+
+    .frame-wrapper.admin-view {
+        margin-left: 0;
+        width: 100%;
+    }
+
+    .christmas-sidebar.collapsed {
+        display: none;
+    }
+
+    .sidebar-toggle {
+        position: relative;
+        margin: 15px auto;
+        display: block;
+    }
+
+    .snowflake {
+        font-size: 1rem;
+    }
+
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const toggleBtn = document.getElementById('sidebar-toggle');
+        const sidebar = document.querySelector('.christmas-sidebar');
+        const frameWrapper = document.querySelector('.frame-wrapper');
+
+        if (toggleBtn && sidebar && frameWrapper) {
+            toggleBtn.addEventListener('click', function() {
+                sidebar.classList.toggle('collapsed');
+                frameWrapper.classList.toggle('shifted');
+
+                const icon = toggleBtn.querySelector('i');
+                if (sidebar.classList.contains('collapsed')) {
+                    icon.className = 'fas fa-bars';
+                } else {
+                    icon.className = 'fas fa-times';
+                }
+            });
+        }
+    });
+</script>
