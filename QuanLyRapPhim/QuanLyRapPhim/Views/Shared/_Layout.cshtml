@@ -10,419 +10,58 @@
     <title>@ViewData["Title"] - QuanLyRapPhim</title>
 
     <!-- Font tiếng Việt -->
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Mountains+of+Christmas:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
 
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
 
     <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
 
     <!-- Custom CSS -->
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/QuanLyRapPhim.styles.css" asp-append-version="true" />
 
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
         body {
             font-family: 'Roboto', sans-serif;
-            background: linear-gradient(135deg, #0d4d3d 0%, #1a6b5a 30%, #e8f5f0 100%);
-            position: relative;
-            overflow-x: hidden;
-            min-height: 100vh;
+            background-color: #F5A89A;
         }
 
-        /* ===== HIỆU ỨNG TUYẾT RƠI ===== */
-        .snowflake {
-            position: fixed;
-            top: -10px;
-            z-index: 9999;
-            user-select: none;
-            cursor: default;
-            animation: fall linear infinite;
-            color: #fff;
-            font-size: 1em;
-            opacity: 0.8;
-        }
-
-        @@keyframes fall {
-            to
-
-        {
-            transform: translateY(100vh);
-        }
-
-        }
-
-        /* Tạo tuyết rơi với nhiều tốc độ khác nhau */
-        .snowflake:nth-child(1) {
-            left: 5%;
-            animation-duration: 12s;
-            animation-delay: 0s;
-            font-size: 1.2em;
-        }
-
-        .snowflake:nth-child(2) {
-            left: 15%;
-            animation-duration: 9s;
-            animation-delay: 2s;
-            font-size: 0.8em;
-        }
-
-        .snowflake:nth-child(3) {
-            left: 25%;
-            animation-duration: 15s;
-            animation-delay: 4s;
-            font-size: 1em;
-        }
-
-        .snowflake:nth-child(4) {
-            left: 35%;
-            animation-duration: 11s;
-            animation-delay: 1s;
-            font-size: 1.5em;
-        }
-
-        .snowflake:nth-child(5) {
-            left: 45%;
-            animation-duration: 13s;
-            animation-delay: 3s;
-            font-size: 0.9em;
-        }
-
-        .snowflake:nth-child(6) {
-            left: 55%;
-            animation-duration: 10s;
-            animation-delay: 5s;
-            font-size: 1.1em;
-        }
-
-        .snowflake:nth-child(7) {
-            left: 65%;
-            animation-duration: 14s;
-            animation-delay: 2s;
-            font-size: 1.3em;
-        }
-
-        .snowflake:nth-child(8) {
-            left: 75%;
-            animation-duration: 12s;
-            animation-delay: 4s;
-            font-size: 0.7em;
-        }
-
-        .snowflake:nth-child(9) {
-            left: 85%;
-            animation-duration: 11s;
-            animation-delay: 1s;
-            font-size: 1.4em;
-        }
-
-        .snowflake:nth-child(10) {
-            left: 95%;
-            animation-duration: 13s;
-            animation-delay: 3s;
-            font-size: 1em;
-        }
-
-        .snowflake:nth-child(11) {
-            left: 10%;
-            animation-duration: 10s;
-            animation-delay: 6s;
-            font-size: 1.2em;
-        }
-
-        .snowflake:nth-child(12) {
-            left: 20%;
-            animation-duration: 14s;
-            animation-delay: 2s;
-            font-size: 0.9em;
-        }
-
-        .snowflake:nth-child(13) {
-            left: 30%;
-            animation-duration: 12s;
-            animation-delay: 5s;
-            font-size: 1.1em;
-        }
-
-        .snowflake:nth-child(14) {
-            left: 40%;
-            animation-duration: 11s;
-            animation-delay: 1s;
-            font-size: 1.3em;
-        }
-
-        .snowflake:nth-child(15) {
-            left: 50%;
-            animation-duration: 15s;
-            animation-delay: 4s;
-            font-size: 0.8em;
-        }
-
-        .snowflake:nth-child(16) {
-            left: 60%;
-            animation-duration: 13s;
-            animation-delay: 0s;
-            font-size: 1.5em;
-        }
-
-        .snowflake:nth-child(17) {
-            left: 70%;
-            animation-duration: 10s;
-            animation-delay: 3s;
-            font-size: 1em;
-        }
-
-        .snowflake:nth-child(18) {
-            left: 80%;
-            animation-duration: 12s;
-            animation-delay: 6s;
-            font-size: 1.2em;
-        }
-
-        .snowflake:nth-child(19) {
-            left: 90%;
-            animation-duration: 14s;
-            animation-delay: 2s;
-            font-size: 0.9em;
-        }
-
-        .snowflake:nth-child(20) {
-            left: 92%;
-            animation-duration: 11s;
-            animation-delay: 5s;
-            font-size: 1.1em;
-        }
-
-        /* ===== TRANG TRÍ GIÁNG SINH ===== */
-        .christmas-decoration {
-            position: fixed;
-            z-index: 100;
-            pointer-events: none;
-        }
-
-        .santa-hat {
-            top: 10px;
-            right: 10px;
-            font-size: 3em;
-            animation: swing 3s ease-in-out infinite;
-        }
-
-        .christmas-tree-left {
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            font-size: 12em;
-            opacity: 0.15;
-            filter: drop-shadow(0 0 30px rgba(0, 128, 0, 0.3));
-        }
-
-        /* Santa bay qua màn hình */
-        .santa-sleigh {
-            position: fixed;
-            top: 15%;
-            left: -400px;
-            z-index: 9998;
-            animation: fly-across 15s linear infinite;
-            filter: drop-shadow(0 8px 20px rgba(0, 0, 0, 0.3));
-        }
-
-            .santa-sleigh img {
-                width: 350px;
-                height: auto;
-            }
-
-        /* Vầng sáng sao phía sau Santa */
-        .santa-glow {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 400px;
-            height: 400px;
-            background: radial-gradient(circle, rgba(255, 223, 0, 0.4) 0%, transparent 70%);
-            animation: glow-pulse 2s ease-in-out infinite;
-            z-index: -1;
-        }
-
-        .santa-stars {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            font-size: 2em;
-            animation: twinkle-stars 1.5s ease-in-out infinite;
-        }
-
-        @@keyframes fly-across {
-            0%
-
-        {
-            left: -400px;
-            top: 15%;
-        }
-
-        50% {
-            top: 20%;
-        }
-
-        100% {
-            left: calc(100% + 400px);
-            top: 15%;
-        }
-
-        }
-
-        @@keyframes glow-pulse {
-            0%, 100%
-
-        {
-            opacity: 0.6;
-            transform: translate(-50%, -50%) scale(1);
-        }
-
-        50% {
-            opacity: 0.9;
-            transform: translate(-50%, -50%) scale(1.1);
-        }
-
-        }
-
-        @@keyframes twinkle-stars {
-            0%, 100%
-
-        {
-            opacity: 0.5;
-            transform: translate(-50%, -50%) scale(0.8);
-        }
-
-        50% {
-            opacity: 1;
-            transform: translate(-50%, -50%) scale(1.2);
-        }
-
-        }
-
-        .christmas-tree-right {
-            bottom: 0;
-            right: 20px;
-            font-size: 5em;
-            opacity: 0.6;
-        }
-
-        .christmas-lights {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 25px;
-            background: repeating-linear-gradient( 90deg, #c41e3a 0px, #c41e3a 20px, #ffd700 20px, #ffd700 40px, #0d4d3d 40px, #0d4d3d 60px, #ffffff 60px, #ffffff 80px );
-            animation: lights-blink 1s infinite;
-            z-index: 1000;
-            box-shadow: 0 5px 15px rgba(196, 30, 58, 0.5);
-        }
-
-        @@keyframes lights-blink {
-            0%, 100%
-
-        {
-            opacity: 1;
-        }
-
-        50% {
-            opacity: 0.7;
-        }
-
-        }
-
-        @@keyframes swing {
-            0%, 100%
-
-        {
-            transform: rotate(-5deg);
-        }
-
-        50% {
-            transform: rotate(5deg);
-        }
-
-        }
-
-        /* ===== NAVBAR GIÁNG SINH ===== */
         .navbar {
-            background: linear-gradient(135deg, #0d4d3d 0%, #165c4a 100%) !important;
-            border-bottom: 3px solid #c41e3a;
-            box-shadow: 0 4px 20px rgba(196, 30, 58, 0.3);
-            position: relative;
-            z-index: 1001;
-        }
-
-            .navbar::before {
-                content: '🎄 ❄️ 🎅 ❄️ 🎁 ❄️ 🔔 ❄️ ⛄ ❄️ 🎄 ❄️ 🎅 ❄️ 🎁 ❄️ 🔔 ❄️ ⛄ ❄️ 🎄';
-                position: absolute;
-                top: -25px;
-                left: 0;
-                width: 200%;
-                text-align: center;
-                font-size: 1.2em;
-                animation: slide 20s linear infinite;
-            }
-
-        @@keyframes slide {
-            0%
-
-        {
-            transform: translateX(0);
-        }
-
-        100% {
-            transform: translateX(-50%);
-        }
-
+            background-color: #1C2526 !important;
+            border-bottom: 1px solid #0F1213;
         }
 
         .navbar-brand {
-            color: #fff !important;
+            color: #FFDAB9 !important;
             font-weight: bold;
-            font-family: 'Mountains of Christmas', cursive;
-            font-size: 1.8em !important;
-            text-shadow: 2px 2px 4px rgba(196, 30, 58, 0.8);
         }
 
         .nav-link {
-            color: #ffd700 !important;
-            transition: all 0.3s ease;
-            font-weight: 500;
-            position: relative;
+            color: #FFDAB9 !important;
+            transition: color 0.3s ease;
         }
 
             .nav-link:hover {
-                color: #ffffff !important;
-                text-shadow: 0 0 10px rgba(255, 215, 0, 0.8);
-                transform: translateY(-2px);
+                color: #FFFFFF !important;
             }
 
         .navbar-toggler-icon {
-            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='%23ffd700' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e") !important;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='%23FFDAB9' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e") !important;
         }
 
-        /* ===== LANGUAGE SWITCHER - GIÁNG SINH ===== */
+        /* Language Switcher */
         .language-switcher {
             display: flex;
             align-items: center;
         }
 
         .btn-language {
-            background: linear-gradient(135deg, #c41e3a 0%, #8b1a2e 100%);
-            border: 2px solid #ffd700;
-            color: #fff !important;
-            padding: 8px 18px;
+            background-color: transparent;
+            border: 2px solid #FFDAB9;
+            color: #FFDAB9 !important;
+            padding: 5px 15px;
             font-size: 14px;
             font-weight: 600;
             display: flex;
@@ -430,222 +69,56 @@
             gap: 5px;
             transition: all 0.3s ease;
             border-radius: 0;
-            box-shadow: 0 4px 10px rgba(196, 30, 58, 0.3);
         }
 
             .btn-language:first-child {
-                border-top-left-radius: 25px;
-                border-bottom-left-radius: 25px;
-                border-right: 1px solid #ffd700;
+                border-top-left-radius: 20px;
+                border-bottom-left-radius: 20px;
+                border-right: 1px solid #FFDAB9;
             }
 
             .btn-language:last-child {
-                border-top-right-radius: 25px;
-                border-bottom-right-radius: 25px;
-                border-left: 1px solid #ffd700;
+                border-top-right-radius: 20px;
+                border-bottom-right-radius: 20px;
+                border-left: 1px solid #FFDAB9;
             }
 
             .btn-language:hover {
-                background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
-                color: #165028 !important;
-                border-color: #fff;
-                transform: translateY(-2px);
-                box-shadow: 0 6px 15px rgba(255, 215, 0, 0.5);
+                background-color: rgba(255, 218, 185, 0.1);
+                color: #FFFFFF !important;
+                border-color: #FFFFFF;
             }
 
             .btn-language.active {
-                background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
-                color: #165028 !important;
-                border-color: #fff;
-                box-shadow: 0 6px 15px rgba(255, 215, 0, 0.6);
+                background-color: #FFDAB9;
+                color: #1C2526 !important;
+                border-color: #FFDAB9;
             }
 
         .flag-icon {
             width: 20px;
             height: 15px;
             object-fit: cover;
-            border-radius: 3px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            border-radius: 2px;
         }
-
-        /* ===== CONTAINER ===== */
-        .container {
-            position: relative;
-            z-index: 10;
-        }
-
-        main {
-            min-height: 60vh;
-            padding: 40px 0;
-        }
-
-        /* ===== FOOTER GIÁNG SINH ===== */
-        footer {
-            background: linear-gradient(135deg, #0d4d3d 0%, #1a6b5a 100%) !important;
-            border-top: 3px solid #c41e3a;
-            box-shadow: 0 -4px 20px rgba(196, 30, 58, 0.3);
-            position: relative;
-        }
-
-            footer h5 {
-                color: #ffd700;
-                font-family: 'Mountains of Christmas', cursive;
-                font-size: 1.5em;
-                text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
-            }
-
-            footer p, footer a {
-                color: #fff !important;
-            }
-
-                footer a:hover {
-                    color: #ffd700 !important;
-                    text-shadow: 0 0 10px rgba(255, 215, 0, 0.6);
-                }
-
-        .btn-outline-secondary {
-            border-color: #ffd700 !important;
-            color: #ffd700 !important;
-            transition: all 0.3s ease;
-        }
-
-            .btn-outline-secondary:hover {
-                background-color: #ffd700 !important;
-                color: #165028 !important;
-                transform: translateY(-2px);
-                box-shadow: 0 4px 10px rgba(255, 215, 0, 0.4);
-            }
-
-        /* ===== CHATBOT GIÁNG SINH ===== */
-        #chatbot-toggle {
-            background: linear-gradient(135deg, #c41e3a 0%, #8b1a2e 100%) !important;
-            box-shadow: 0 8px 25px rgba(196, 30, 58, 0.5) !important;
-            border: 3px solid #ffd700;
-            animation: pulse-christmas 2s ease-in-out infinite;
-        }
-
-        @@keyframes pulse-christmas {
-            0%, 100%
-
-        {
-            transform: scale(1);
-            box-shadow: 0 8px 25px rgba(196, 30, 58, 0.5);
-        }
-
-        50% {
-            transform: scale(1.05);
-            box-shadow: 0 10px 30px rgba(255, 215, 0, 0.6);
-        }
-
-        }
-
-        #chatbot-toggle:hover {
-            transform: scale(1.1) rotate(5deg) !important;
-        }
-
-        #chatbot-box {
-            border: 3px solid #ffd700 !important;
-            box-shadow: 0 15px 50px rgba(196, 30, 58, 0.4) !important;
-        }
-
-            #chatbot-box > div:first-child {
-                background: linear-gradient(135deg, #c41e3a 0%, #8b1a2e 100%) !important;
-                border-bottom: 2px solid #ffd700;
-            }
-
-        #chat-messages {
-            background: linear-gradient(135deg, #f0f8f0 0%, #e8f5e9 100%) !important;
-        }
-
-        #chat-input {
-            background: #fff !important;
-            border: 2px solid #c41e3a !important;
-        }
-
-            #chat-input:focus {
-                border-color: #ffd700 !important;
-                box-shadow: 0 0 10px rgba(255, 215, 0, 0.4) !important;
-            }
-
-        button[onclick="sendMessage()"] {
-            background: linear-gradient(135deg, #c41e3a 0%, #8b1a2e 100%) !important;
-            border: 2px solid #ffd700 !important;
-        }
-
-            button[onclick="sendMessage()"]:hover {
-                background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%) !important;
-                color: #165028 !important;
-                transform: scale(1.1) rotate(-5deg);
-            }
 
         @@media (max-width: 991px) {
-            .language-switcher
-
-        {
-            margin-top: 10px;
-            margin-bottom: 10px;
-        }
-
-        .christmas-tree-left, .christmas-tree-right {
-            font-size: 3em;
-        }
-
-        .santa-sleigh img {
-            width: 250px;
-        }
-
-        .santa-glow {
-            width: 300px;
-            height: 300px;
-        }
-
+            .language-switcher {
+                margin-top: 10px;
+                margin-bottom: 10px;
+            }
         }
     </style>
 </head>
 
 <body>
-    <!-- Hiệu ứng tuyết rơi -->
-    <div class="snowflake">❄</div>
-    <div class="snowflake">❅</div>
-    <div class="snowflake">❆</div>
-    <div class="snowflake">❄</div>
-    <div class="snowflake">❅</div>
-    <div class="snowflake">❆</div>
-    <div class="snowflake">❄</div>
-    <div class="snowflake">❅</div>
-    <div class="snowflake">❆</div>
-    <div class="snowflake">❄</div>
-    <div class="snowflake">❅</div>
-    <div class="snowflake">❆</div>
-    <div class="snowflake">❄</div>
-    <div class="snowflake">❅</div>
-    <div class="snowflake">❆</div>
-    <div class="snowflake">❄</div>
-    <div class="snowflake">❅</div>
-    <div class="snowflake">❆</div>
-    <div class="snowflake">❄</div>
-    <div class="snowflake">❅</div>
-
-    <!-- Đèn Giáng sinh -->
-    <div class="christmas-lights"></div>
-
-    <!-- Santa bay qua màn hình -->
-    <div class="santa-sleigh">
-        <div class="santa-glow"></div>
-        <div class="santa-stars">✨ ⭐ ✨</div>
-        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 300'%3E%3Cg%3E%3C!-- Reindeer 1 --%3E%3Cellipse cx='120' cy='180' rx='35' ry='45' fill='%238B4513'/%3E%3Ccircle cx='120' cy='160' r='25' fill='%238B4513'/%3E%3Cpath d='M110 140 L100 110 M130 140 L140 110' stroke='%234B2B14' stroke-width='5' fill='none'/%3E%3Cellipse cx='115' cy='158' rx='4' ry='5' fill='%23000'/%3E%3Cellipse cx='125' cy='158' rx='4' ry='5' fill='%23000'/%3E%3Cellipse cx='120' cy='168' rx='6' ry='4' fill='%23D2691E'/%3E%3Cpath d='M100 195 L90 230 M110 195 L110 230 M130 195 L130 230 M140 195 L150 230' stroke='%238B4513' stroke-width='8'/%3E%3C!-- Reindeer 2 --%3E%3Cellipse cx='220' cy='185' rx='35' ry='45' fill='%238B4513'/%3E%3Ccircle cx='220' cy='165' r='25' fill='%238B4513'/%3E%3Cpath d='M210 145 L200 115 M230 145 L240 115' stroke='%234B2B14' stroke-width='5' fill='none'/%3E%3Cellipse cx='215' cy='163' rx='4' ry='5' fill='%23000'/%3E%3Cellipse cx='225' cy='163' rx='4' ry='5' fill='%23000'/%3E%3Cellipse cx='220' cy='173' rx='6' ry='4' fill='%23D2691E'/%3E%3Cpath d='M200 200 L190 235 M210 200 L210 235 M230 200 L230 235 M240 200 L250 235' stroke='%238B4513' stroke-width='8'/%3E%3C!-- Reindeer 3 --%3E%3Cellipse cx='320' cy='180' rx='35' ry='45' fill='%238B4513'/%3E%3Ccircle cx='320' cy='160' r='25' fill='%238B4513'/%3E%3Cpath d='M310 140 L300 110 M330 140 L340 110' stroke='%234B2B14' stroke-width='5' fill='none'/%3E%3Cellipse cx='315' cy='158' rx='4' ry='5' fill='%23000'/%3E%3Cellipse cx='325' cy='158' rx='4' ry='5' fill='%23000'/%3E%3Cellipse cx='320' cy='168' rx='6' ry='4' fill='%23D2691E'/%3E%3Ccircle cx='320' cy='168' r='8' fill='%23FF0000' opacity='0.8'/%3E%3Cpath d='M300 195 L290 230 M310 195 L310 230 M330 195 L330 230 M340 195 L350 230' stroke='%238B4513' stroke-width='8'/%3E%3C!-- Sleigh --%3E%3Cpath d='M380 160 Q390 140 420 140 L580 140 Q610 140 620 160 L640 220 Q640 230 630 235 L400 235 Q390 235 385 225 Z' fill='%23C41E3A'/%3E%3Cpath d='M385 225 Q380 235 370 240 L360 245 Q350 248 345 240 L340 230' stroke='%23FFD700' stroke-width='4' fill='none'/%3E%3Cpath d='M640 225 Q645 235 655 240 L665 245 Q675 248 680 240 L685 230' stroke='%23FFD700' stroke-width='4' fill='none'/%3E%3Crect x='400' y='150' width='200' height='70' fill='%23A0152A'/%3E%3Cpath d='M390 150 L410 150 L410 220 L390 225 Z' fill='%238B0A1A'/%3E%3Cpath d='M420 145 L580 145 L600 150 L440 150 Z' fill='%23FFD700'/%3E%3C!-- Santa --%3E%3Cellipse cx='500' cy='180' rx='40' ry='50' fill='%23C41E3A'/%3E%3Ccircle cx='500' cy='155' r='25' fill='%23FFC0CB'/%3E%3Cpath d='M475 150 Q475 135 500 135 Q525 135 525 150' fill='%23FFFFFF'/%3E%3Ccircle cx='500' cy='135' r='20' fill='%23C41E3A'/%3E%3Cellipse cx='500' cy='125' rx='22' ry='8' fill='%23FFFFFF'/%3E%3Ccircle cx='507' cy='120' r='8' fill='%23FFFFFF'/%3E%3Cellipse cx='493' cy='155' rx='3' ry='4' fill='%23000'/%3E%3Cellipse cx='507' cy='155' rx='3' ry='4' fill='%23000'/%3E%3Ccircle cx='500' cy='163' r='4' fill='%23FF6B6B'/%3E%3Cpath d='M485 168 Q500 175 515 168' stroke='%23C41E3A' stroke-width='2' fill='none'/%3E%3Cpath d='M475 170 Q470 200 475 220 L485 220 Q483 200 485 175' fill='%23C41E3A'/%3E%3Cpath d='M525 170 Q530 200 525 220 L515 220 Q517 200 515 175' fill='%23C41E3A'/%3E%3Cellipse cx='465' cy='215' rx='12' ry='18' fill='%23000'/%3E%3Cellipse cx='535' cy='215' rx='12' ry='18' fill='%23000'/%3E%3Cpath d='M475 145 L465 155 Q463 160 468 162 L475 160' fill='%23FFC0CB'/%3E%3Cpath d='M525 145 L535 155 Q537 160 532 162 L525 160' fill='%23FFC0CB'/%3E%3C!-- Gift bag --%3E%3Cellipse cx='560' cy='190' rx='30' ry='35' fill='%238B4513'/%3E%3Crect x='545' y='170' width='30' height='15' fill='%23FFD700'/%3E%3Cpath d='M545 175 L575 175 M545 180 L575 180' stroke='%23C41E3A' stroke-width='2'/%3E%3Crect x='548' y='165' width='8' height='12' fill='%23FF0000' rx='2'/%3E%3Crect x='564' y='165' width='8' height='12' fill='%2300AA00' rx='2'/%3E%3C/g%3E%3C/svg%3E" alt="Santa Sleigh">
-    </div>
-
-    <!-- Trang trí Giáng sinh -->
-    <div class="christmas-decoration santa-hat">🎅</div>
-    <div class="christmas-decoration christmas-tree-left">🎄</div>
-
     <header>
         <nav class="navbar navbar-expand-lg shadow">
             <div class="container">
+
                 <!-- Logo -->
                 <a class="navbar-brand fw-bold" asp-area="" asp-controller="Home" asp-action="Index">
-                    <i class="fas fa-film"></i> 🎄 CinemaX 🎅
+                    <i class="fas fa-film"></i> CinemaX
                 </a>
 
                 <!-- Navbar Toggler -->
@@ -655,6 +128,7 @@
                 </button>
 
                 <div class="collapse navbar-collapse" id="navbarNav">
+
                     <!-- Menu -->
                     <ul class="navbar-nav me-auto">
                         <li class="nav-item">
@@ -669,7 +143,7 @@
                         </li>
                     </ul>
 
-                    <!-- CHUYỂN ĐỔI NGÔN NGỮ -->
+                    <!-- NÚT CHUYỂN ĐỔI NGÔN NGỮ -->
                     <div class="language-switcher me-3">
                         <div class="btn-group" role="group">
                             <button type="button"
@@ -685,6 +159,7 @@
                         </div>
                     </div>
 
+
                     <!-- Login Partial -->
                     <partial name="_LoginPartial" />
                 </div>
@@ -698,15 +173,15 @@
         </main>
     </div>
 
-    <footer class="text-white py-5">
+    <footer class="bg-dark text-white py-5">
         <div class="container">
             <div class="row">
+
                 <!-- Logo and Slogan -->
                 <div class="col-md-3">
                     <img src="https://i.pinimg.com/736x/84/bb/7d/84bb7dc83f72e12a7098a5e31c484baf.jpg" alt="CinemaX Logo" height="50" />
-                    <h5>🎄 CinemaX 🎅</h5>
-                    <p>✨ BE HAPPY, BE A STAR ✨</p>
-                    <p style="font-size: 1.5em;">🎁 🔔 ⛄</p>
+                    <h5>CinemaX</h5>
+                    <p>BE HAPPY, BE A STAR</p>
                 </div>
 
                 <!-- Tài khoản -->
@@ -721,7 +196,7 @@
                                 </span>
                             </li>
                             <li>
-                                <a href="/Identity/Account/Manage/Index" class="btn btn-outline-secondary mt-2">
+                                <a href="/Identity/Account/Manage/Index" class="btn btn-outline-secondary">
                                     @Localizer["Profile"]
                                 </a>
                             </li>
@@ -752,39 +227,38 @@
                     </ul>
                 </div>
             </div>
-            <div class="text-center mt-4">
-                <p style="color: #ffd700; font-size: 1.2em;">🎄 Merry Christmas & Happy New Year! 🎅</p>
-            </div>
         </div>
     </footer>
 
-    <!-- CHATBOT GIÁNG SINH -->
+    <!-- CHATBOT ĐẸP NHƯ ẢNH – CHỈ THAY NÚT CHAT & SEND BẰNG ICON -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
     <div id="chatbot-container" style="position:fixed;bottom:20px;right:20px;z-index:9999;font-family:'Segoe UI',Roboto,sans-serif;">
-        <!-- Nút mở chatbot -->
+        <!-- Nút mở chatbot: icon robot thay chữ "Chat" -->
         <div id="chatbot-toggle"
-             style="color:white;width:60px;height:60px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:30px;transition:all 0.3s;">
-            🎅
+             style="background:#e50914;color:white;width:56px;height:56px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 6px 20px rgba(229,9,20,0.4);font-size:28px;transition:transform 0.3s;">
+            <i class="fas fa-robot"></i>
         </div>
 
         <!-- Hộp chat -->
-        <div id="chatbot-box" style="display:none;position:absolute;bottom:76px;right:0;width:360px;height:520px;background:#fff;border-radius:20px;overflow:hidden;flex-direction:column;">
-            <!-- Header -->
-            <div style="color:white;padding:16px;text-align:center;font-weight:600;font-size:17px;position:relative;">
-                🎄 Trợ lý CinemaX 🎅
+        <div id="chatbot-box" style="display:none;position:absolute;bottom:76px;right:0;width:360px;height:520px;background:#fff;border-radius:18px;overflow:hidden;box-shadow:0 10px 35px rgba(0,0,0,0.2);border:1px solid #eee;flex-direction:column;">
+            <!-- Header đỏ -->
+            <div style="background:#e50914;color:white;padding:16px;text-align:center;font-weight:600;font-size:17px;position:relative;">
+                Trợ lý đặt vé CinemaX
                 <div style="position:absolute;top:12px;right:16px;font-size:22px;cursor:pointer;" onclick="document.getElementById('chatbot-box').style.display='none'">
-                    ❌
+                    x
                 </div>
             </div>
 
             <!-- Tin nhắn -->
-            <div id="chat-messages" style="flex:1;padding:16px;overflow-y:auto;display:flex;flex-direction:column;gap:12px;"></div>
+            <div id="chat-messages" style="flex:1;padding:16px;overflow-y:auto;background:#f8f9fa;display:flex;flex-direction:column;gap:12px;"></div>
 
-            <!-- Ô nhập -->
-            <div style="padding:12px 16px;background:#fff;border-top:2px solid #c41e3a;display:flex;align-items:center;gap:10px;">
-                <input type="text" id="chat-input" placeholder="Nhập tin nhắn... 🎁"
-                       style="flex:1;padding:12px 16px;border-radius:30px;outline:none;font-size:15px;">
+            <!-- Ô nhập + nút gửi icon máy bay -->
+            <div style="padding:12px 16px;background:#fff;border-top:1px solid #eee;display:flex;align-items:center;gap:10px;">
+                <input type="text" id="chat-input" placeholder="Nhập tin nhắn..."
+                       style="flex:1;padding:12px 16px;border-radius:30px;border:1px solid #ddd;outline:none;font-size:15px;background:#f9f9f9;">
                 <button onclick="sendMessage()"
-                        style="color:white;width:44px;height:44px;border-radius:50%;border:none;cursor:pointer;font-size:20px;display:flex;align-items:center;justify-content:center;transition:all 0.3s;">
+                        style="background:#e50914;color:white;width:42px;height:42px;border-radius:50%;border:none;cursor:pointer;font-size:19px;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 15px rgba(229,9,20,0.4);">
                     <i class="fas fa-paper-plane"></i>
                 </button>
             </div>
@@ -814,10 +288,9 @@
                 font-size: 14.5px;
                 line-height: 1.4;
                 align-self: ${isUser ? 'flex-end' : 'flex-start'};
-                background: ${isUser ? 'linear-gradient(135deg, #c41e3a 0%, #8b1a2e 100%)' : 'linear-gradient(135deg, #ffffff 0%, #f0f0f0 100%)'};
+                background: ${isUser ? '#e50914' : '#ffffff'};
                 color: ${isUser ? 'white' : '#333'};
-                box-shadow: 0 3px 10px rgba(0,0,0,${isUser ? '0.2' : '0.1'});
-                border: 2px solid ${isUser ? '#ffd700' : '#ddd'};
+                box-shadow: 0 2px 8px rgba(0,0,0,${isUser ? '0.15' : '0.08'});
             `;
             bubble.innerHTML = text;
             container.appendChild(bubble);
@@ -837,7 +310,7 @@
                 body: JSON.stringify({ Message: msg })
             });
             const data = await res.json();
-            addMessage(data.reply || "🎅 Xin lỗi, mình chưa hiểu. Bạn hỏi lại nhé! 🎄");
+            addMessage(data.reply || "Xin lỗi, mình chưa hiểu. Bạn hỏi lại nhé!");
         }
 
         // Enter để gửi
@@ -845,11 +318,11 @@
             if (e.key === 'Enter') sendMessage();
         });
 
-        // Lời chào
+        // Lời chào khi mở lần đầu
         document.getElementById('chatbot-toggle').addEventListener('click', function firstGreeting() {
             if (document.getElementById('chat-messages').children.length === 0) {
                 setTimeout(() => {
-                    addMessage("🎄 Chào bạn! Mình là trợ lý CinemaX 🎅<br>Mùa Giáng sinh này bạn muốn xem phim gì nào? 🎁");
+                    addMessage("Chào bạn! Mình là trợ lý đặt vé CinemaX<br>Hôm nay bạn muốn xem phim gì nào?");
                 }, 600);
             }
             this.removeEventListener('click', firstGreeting);
@@ -863,14 +336,22 @@
 
     <script>
         function changeLanguage(culture) {
+            // Lấy URL hiện tại (bao gồm cả query string)
             var currentUrl = window.location.pathname + window.location.search;
+
+            // Loại bỏ hash nếu có
             if (window.location.hash) {
                 currentUrl += window.location.hash;
             }
+
+            // Gọi API để set ngôn ngữ
             var setLanguageUrl = '/Localization/SetLanguage?culture=' + culture + '&returnUrl=' + encodeURIComponent(currentUrl);
+
+            // Redirect
             window.location.href = setLanguageUrl;
         }
 
+        // Cập nhật trạng thái active của button khi trang load
         document.addEventListener('DOMContentLoaded', function() {
             var currentCulture = '@System.Globalization.CultureInfo.CurrentCulture.Name';
             document.querySelectorAll('.btn-language').forEach(function(btn) {
