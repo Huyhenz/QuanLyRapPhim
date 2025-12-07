@@ -1,14 +1,15 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using QuanLyRapPhim.Models;
-using QuanLyRapPhim.Service; // nếu có lớp xử lý thanh toán tách riêng
+using QuanLyRapPhim.Service;
 using System.Threading.Tasks;
 using QuanLyRapPhim.Service.VNPay;
+using System.Text.RegularExpressions;
+using System.Web;
 
 namespace LearningManagementSystem.Controllers
 {
     public class CheckoutController : Controller
     {
-        //private readonly ICourseRepository _courseRepo;
         private readonly IVnPayService _vnPayService;
 
         public CheckoutController(IVnPayService vnPayService)
@@ -16,52 +17,48 @@ namespace LearningManagementSystem.Controllers
             _vnPayService = vnPayService;
         }
 
-        //[HttpPost]
-        //[ValidateAntiForgeryToken]
-        //public async Task<IActionResult> CreatePaymentVnPay(string courseId)
+        //[HttpGet]
+        //public IActionResult PaymentCallbackVnpay()
         //{
-        //    var course = await _courseRepo.GetCourseByIdAsync(courseId);
-        //    if (course == null)
+        //    // Lấy response từ VNPay service
+        //    var response = _vnPayService.PaymentExecute(Request.Query);
+
+        //    // ===== FIX: Tách số tiền từ vnp_OrderInfo hoặc vnp_Amount =====
+        //    decimal amount = 0;
+
+        //    // Cách 1: Lấy từ vnp_OrderInfo (ưu tiên)
+        //    var orderInfo = Request.Query["vnp_OrderInfo"].ToString();
+        //    if (!string.IsNullOrEmpty(orderInfo))
         //    {
-        //        TempData["Error"] = "Không tìm thấy khóa học.";
-        //        return RedirectToAction("Index", "Home");
+        //        // Decode URL: "tudomb2002%40gmail.com+Thanh+to%C3%A1n+VNPay+140000"
+        //        var decoded = HttpUtility.UrlDecode(orderInfo);
+                
+        //        // Tìm số ở cuối chuỗi: "tudomb2002@gmail.com Thanh toán VNPay 140000"
+        //        var match = Regex.Match(decoded, @"(\d+)$");
+        //        if (match.Success)
+        //        {
+        //            amount = decimal.Parse(match.Groups[1].Value);
+        //        }
         //    }
 
-        //    // Tạo link thanh toán VNPay
-        //    string paymentUrl = GenerateVnPayUrl(course);
+        //    // Cách 2: Nếu không tìm thấy, lấy từ vnp_Amount (fallback)
+        //    if (amount == 0)
+        //    {
+        //        var vnpAmount = Request.Query["vnp_Amount"].ToString();
+        //        if (!string.IsNullOrEmpty(vnpAmount) && decimal.TryParse(vnpAmount, out var parsedAmount))
+        //        {
+        //            // vnp_Amount có đơn vị là đồng * 100
+        //            amount = parsedAmount / 100;
+        //        }
+        //    }
 
-        //    return Redirect(paymentUrl);
-        //}
+        //    // Set Amount vào response model
+        //    response.Amount = amount;
 
+        //    // Set ViewBag nếu cần (cho view sử dụng)
+        //    ViewBag.BookingId = 0; // Nếu có BookingId thì set ở đây
 
-
-        //private string GenerateVnPayUrl(Course course)
-        //{
-        //    string baseUrl = "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html";
-        //    return $"{baseUrl}?amount={course.Price}&orderInfo=KhoaHoc_{course.CourseId}";
-        //}
-
-
-        [HttpGet]
-        public IActionResult PaymentCallbackVnpay()
-        {
-            var response = _vnPayService.PaymentExecute(Request.Query);
-            return View(response);
-        }
-
-
-
-        // Thêm các action để xử lý kết quả
-        //public IActionResult PaymentSuccess(string transactionId)
-        //{
-        //    ViewBag.TransactionId = transactionId;
-        //    return View();
-        //}
-
-        //public IActionResult PaymentFailed(string error)
-        //{
-        //    ViewBag.Error = error;
-        //    return View();
+        //    return View(response);
         //}
     }
 }

@@ -8,7 +8,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore.Storage;
+using Microsoft.AspNetCore.Http;
+using System.Text.Json;
 
 namespace QuanLyRapPhim.Controllers
 {
@@ -28,361 +29,294 @@ namespace QuanLyRapPhim.Controllers
         public async Task<IActionResult> SelectRoomAndSeat(int showtimeId)
         {
             var showtime = await _context.Showtimes
-                .Include(s => s.Movie)
                 .Include(s => s.Room)
-                    .ThenInclude(r => r.Seats)
+                .ThenInclude(r => r.Seats)
+                .Include(s => s.Movie)
+                .AsNoTracking() // Thêm AsNoTracking
                 .FirstOrDefaultAsync(s => s.ShowtimeId == showtimeId);
 
-            if (showtime == null)
-                return NotFound();
+            if (showtime == null) return NotFound();
 
-            var bookedSeats = await _context.BookingDetails
-                .Where(bd => bd.Booking.ShowtimeId == showtimeId)
-                .Select(bd => bd.SeatId)
-                .ToListAsync();
-
-            foreach (var seat in showtime.Room.Seats)
+            // Load TempBooking từ Session
+            var tempBooking = GetTempBookingFromSession();
+            if (tempBooking == null || tempBooking.ShowtimeId != showtimeId)
             {
-                seat.Status = bookedSeats.Contains(seat.SeatId) ? "Đã đặt" : "Trống";
+                tempBooking = new TempBooking { ShowtimeId = showtimeId };
+                SaveTempBookingToSession(tempBooking);
             }
+
+            // Truyền selected seats từ temp để hiển thị (nếu quay lại)
+            ViewBag.SelectedSeats = tempBooking.SelectedSeatIds;
+            ViewBag.Showtime = showtime;
 
             return View(showtime);
         }
 
-        // POST: Tickets/ConfirmBooking → Tạo Booking tạm + khóa ghế → Chuyển sang chọn bắp nước
+ 
+        // POST: Tickets/SelectRoomAndSeat
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> ConfirmBooking(int showtimeId, List<int> selectedSeats)
+        public async Task<IActionResult> SelectRoomAndSeat(int showtimeId, List<int> selectedSeatIds)
         {
-            if (selectedSeats == null || !selectedSeats.Any())
+            if (selectedSeatIds == null || !selectedSeatIds.Any())
             {
                 TempData["ErrorMessage"] = "Vui lòng chọn ít nhất một ghế.";
-                return RedirectToAction("SelectRoomAndSeat", new { showtimeId });
+                return RedirectToAction(nameof(SelectRoomAndSeat), new { showtimeId });
             }
 
-            var showtime = await _context.Showtimes
-                .Include(s => s.Movie)
-                .Include(s => s.Room)
-                    .ThenInclude(r => r.Seats)
-                .FirstOrDefaultAsync(s => s.ShowtimeId == showtimeId);
-
-            if (showtime == null)
-                return NotFound();
-
+            // Kiểm tra ghế có sẵn (không lưu DB, chỉ check)
             var bookedSeats = await _context.BookingDetails
                 .Where(bd => bd.Booking.ShowtimeId == showtimeId)
                 .Select(bd => bd.SeatId)
                 .ToListAsync();
 
-            if (selectedSeats.Any(s => bookedSeats.Contains(s)))
+            if (selectedSeatIds.Any(s => bookedSeats.Contains(s)))
             {
                 TempData["ErrorMessage"] = "Một hoặc nhiều ghế đã được đặt. Vui lòng chọn ghế khác.";
                 return RedirectToAction("SelectRoomAndSeat", new { showtimeId });
             }
 
-            var user = await _userManager.GetUserAsync(User);
-            var totalRows = (int)Math.Ceiling((double)showtime.Room.Seats.Count / 10);
+            // Load showtime để tính giá
+            var showtime = await _context.Showtimes
+                .Include(s => s.Room)
+                .AsNoTracking()
+                .FirstOrDefaultAsync(s => s.ShowtimeId == showtimeId);
+
+            if (showtime == null)
+            {
+                TempData["ErrorMessage"] = "Không tìm thấy suất chiếu.";
+                return RedirectToAction("Index", "Showtimes");
+            }
+
+            if (showtime.Room == null)
+            {
+                TempData["ErrorMessage"] = "Thông tin phòng chiếu không hợp lệ.";
+                return RedirectToAction("Index", "Showtimes");
+            }
+
+            // Load hoặc tạo TempBooking
+            var tempBooking = GetTempBookingFromSession() ?? new TempBooking();
+            tempBooking.ShowtimeId = showtimeId;
+            tempBooking.SelectedSeatIds = selectedSeatIds;
+
+            // Tính số hàng để xác định giá
+            var totalSeatsInRoom = await _context.Seats.CountAsync(s => s.RoomId == showtime.RoomId);
+            var totalRows = (int)Math.Ceiling((double)totalSeatsInRoom / 10);
             char lastRowLabel = (char)('A' + totalRows - 1);
             const decimal normalPrice = 50000;
             const decimal couplePrice = 100000;
 
-            var booking = new Booking
-            {
-                ShowtimeId = showtimeId,
-                BookingDate = DateTime.Now,
-                UserId = user?.Id,
-                TotalPrice = 0, // Sẽ cập nhật sau khi chọn bắp nước
-                BookingDetails = new List<BookingDetail>()
-            };
+            // Load seat info riêng để tính giá
+            var seatInfos = await _context.Seats
+                .Where(s => selectedSeatIds.Contains(s.SeatId))
+                .Select(s => new { s.SeatId, s.SeatNumber })
+                .AsNoTracking()
+                .ToListAsync();
 
-            foreach (var seatId in selectedSeats)
+            decimal totalSeatPrice = 0;
+            foreach (var seatInfo in seatInfos)
             {
-                var seat = showtime.Room.Seats.FirstOrDefault(s => s.SeatId == seatId);
-                if (seat != null)
+                totalSeatPrice += seatInfo.SeatNumber.StartsWith(lastRowLabel.ToString())
+                    ? couplePrice
+                    : normalPrice;
+            }
+
+            // Cộng thêm giá đồ ăn nếu đã chọn trước đó
+            decimal existingFoodPrice = tempBooking.SelectedFoods?.Sum(f => f.Quantity * f.UnitPrice) ?? 0;
+            tempBooking.TotalPrice = totalSeatPrice + existingFoodPrice;
+            tempBooking.FinalAmount = tempBooking.TotalPrice;
+
+            // Lưu vào Session
+            SaveTempBookingToSession(tempBooking);
+
+            TempData["SuccessMessage"] = "Đã chọn ghế thành công!";
+            return RedirectToAction("SelectFood");
+        }
+
+        // GET: Tickets/SelectFood
+        // GET: Tickets/SelectFood
+        public async Task<IActionResult> SelectFood()
+        {
+            // Load TempBooking từ Session
+            var tempBooking = GetTempBookingFromSession();
+            if (tempBooking == null)
+            {
+                TempData["ErrorMessage"] = "Vui lòng chọn lịch chiếu và ghế trước.";
+                return RedirectToAction("Index", "Showtimes");
+            }
+
+            var foodItems = await _context.FoodItems.ToListAsync();
+            ViewBag.FoodItems = foodItems;
+            ViewBag.SelectedFoods = tempBooking.SelectedFoods;
+
+            // Truyền thêm info showtime nếu có
+            if (tempBooking.ShowtimeId.HasValue)
+            {
+                var showtime = await _context.Showtimes
+                    .Include(s => s.Movie)
+                    .Include(s => s.Room) // QUAN TRỌNG: Phải Include Room
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(s => s.ShowtimeId == tempBooking.ShowtimeId);
+
+                // Kiểm tra showtime có tồn tại không
+                if (showtime == null)
                 {
-                    decimal price = seat.SeatNumber.StartsWith(lastRowLabel.ToString()) ? couplePrice : normalPrice;
-                    booking.BookingDetails.Add(new BookingDetail
+                    TempData["ErrorMessage"] = "Không tìm thấy suất chiếu. Vui lòng chọn lại.";
+                    HttpContext.Session.Remove("TempBooking");
+                    return RedirectToAction("Index", "Showtimes");
+                }
+
+                ViewBag.Showtime = showtime;
+            }
+            else
+            {
+                // Trường hợp QuickFoodBooking (mua đồ ăn không cần vé)
+                ViewBag.Showtime = null;
+            }
+
+            return View();
+        }
+
+        // POST: Tickets/SelectFood - LƯU VÀO SESSION
+        // POST: Tickets/SelectFood
+        [HttpPost]
+        public async Task<IActionResult> SelectFood(Dictionary<int, int> selectedFoods)
+        {
+            // Load TempBooking
+            var tempBooking = GetTempBookingFromSession();
+            if (tempBooking == null)
+            {
+                TempData["ErrorMessage"] = "Không tìm thấy dữ liệu tạm.";
+                return RedirectToAction("Index", "Showtimes");
+            }
+
+            // Cập nhật danh sách thức ăn
+            tempBooking.SelectedFoods.Clear();
+            foreach (var item in selectedFoods.Where(s => s.Value > 0))
+            {
+                var food = await _context.FoodItems.FindAsync(item.Key);
+                if (food != null)
+                {
+                    tempBooking.SelectedFoods.Add(new TempFoodItem
                     {
-                        SeatId = seatId,
-                        Price = price
+                        FoodItemId = item.Key,
+                        Quantity = item.Value,
+                        UnitPrice = food.Price
                     });
                 }
             }
 
-            // Tạm tính tiền vé
-            booking.TotalPrice = booking.BookingDetails.Sum(bd => bd.Price);
+            // Tính lại tổng giá (ghế + đồ ăn)
+            decimal totalFoodPrice = tempBooking.SelectedFoods.Sum(f => f.Quantity * f.UnitPrice);
+            decimal totalSeatPrice = 0;
 
-            using var transaction = await _context.Database.BeginTransactionAsync();
-            try
+            // Tính giá ghế nếu có showtime
+            if (tempBooking.ShowtimeId.HasValue && tempBooking.SelectedSeatIds.Any())
             {
-                _context.Bookings.Add(booking);
-                await _context.SaveChangesAsync();
+                var showtime = await _context.Showtimes
+                    .Include(s => s.Room)
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(s => s.ShowtimeId == tempBooking.ShowtimeId.Value);
 
-                // Cập nhật trạng thái ghế
-                foreach (var seatId in selectedSeats)
+                if (showtime != null && showtime.Room != null)
                 {
-                    var seat = await _context.Seats.FindAsync(seatId);
-                    if (seat != null)
-                        seat.Status = "Đã đặt";
+                    var totalSeatsInRoom = await _context.Seats.CountAsync(s => s.RoomId == showtime.RoomId);
+                    var totalRows = (int)Math.Ceiling((double)totalSeatsInRoom / 10);
+                    char lastRowLabel = (char)('A' + totalRows - 1);
+                    const decimal normalPrice = 50000;
+                    const decimal couplePrice = 100000;
+
+                    var seatInfos = await _context.Seats
+                        .Where(s => tempBooking.SelectedSeatIds.Contains(s.SeatId))
+                        .Select(s => new { s.SeatId, s.SeatNumber })
+                        .AsNoTracking()
+                        .ToListAsync();
+
+                    foreach (var seatInfo in seatInfos)
+                    {
+                        totalSeatPrice += seatInfo.SeatNumber.StartsWith(lastRowLabel.ToString())
+                            ? couplePrice
+                            : normalPrice;
+                    }
                 }
-                await _context.SaveChangesAsync();
-
-                await transaction.CommitAsync();
-            }
-            catch (Exception)
-            {
-                await transaction.RollbackAsync();
-                TempData["ErrorMessage"] = "Đã xảy ra lỗi khi đặt ghế. Vui lòng thử lại.";
-                return RedirectToAction("SelectRoomAndSeat", new { showtimeId });
+                else
+                {
+                    // Showtime không tồn tại hoặc Room null
+                    TempData["ErrorMessage"] = "Suất chiếu không hợp lệ. Vui lòng chọn lại.";
+                    HttpContext.Session.Remove("TempBooking");
+                    return RedirectToAction("Index", "Showtimes");
+                }
             }
 
-            // Lưu thông tin tạm để hiển thị ở trang bắp nước
-            TempData["BookingId"] = booking.BookingId;
-            TempData["SelectedSeats"] = string.Join(", ", selectedSeats.Select(id => showtime.Room.Seats.First(s => s.SeatId == id).SeatNumber));
-            TempData["SeatCount"] = selectedSeats.Count;
+            tempBooking.TotalPrice = totalSeatPrice + totalFoodPrice;
+            tempBooking.FinalAmount = tempBooking.TotalPrice;
 
-            // Chuyển sang chọn bắp nước
-            return RedirectToAction("SelectFood", new { bookingId = booking.BookingId });
+            SaveTempBookingToSession(tempBooking);
+
+            TempData["SuccessMessage"] = "Đã chọn thức ăn thành công!";
+            return RedirectToAction("Create", "Payments");
         }
 
-        // GET: Tickets/SelectFood
-        public async Task<IActionResult> SelectFood(int bookingId)
+        // GET: Tickets/QuickFoodBooking (Mua đồ ăn không cần xem phim)
+        public IActionResult QuickFoodBooking()
         {
-            var booking = await _context.Bookings
-                .Include(b => b.Showtime).ThenInclude(s => s.Movie)
-                .Include(b => b.Showtime).ThenInclude(s => s.Room)
-                .Include(b => b.BookingDetails).ThenInclude(bd => bd.Seat)
-                .Include(b => b.BookingFoods).ThenInclude(bf => bf.FoodItem)
-                .FirstOrDefaultAsync(b => b.BookingId == bookingId);
-
-            if (booking == null) return NotFound();
-
-            ViewBag.FoodItems = await _context.FoodItems.ToListAsync();
-            ViewBag.CurrentQuantities = booking.BookingFoods?
-                .ToDictionary(bf => bf.FoodItemId, bf => bf.Quantity) ?? new Dictionary<int, int>();
-
-            // Truyền toàn bộ booking
-            return View(booking);
+            var tempBooking = new TempBooking { ShowtimeId = null };
+            SaveTempBookingToSession(tempBooking);
+            return RedirectToAction("SelectFood");
         }
-        // POST: Tickets/ConfirmFood
+
+        // POST: Tickets/CancelBooking (Hủy toàn bộ và xóa Session)
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult CancelBooking()
+        {
+            HttpContext.Session.Remove("TempBooking");
+            TempData["SuccessMessage"] = "Đã hủy thành công! Bạn có thể chọn lại ghế và đồ ăn.";
+            return RedirectToAction("Index", "Home");
+        }
+
+        // Helper methods
+        private TempBooking GetTempBookingFromSession()
+        {
+            var tempBookingJson = HttpContext.Session.GetString("TempBooking");
+            return string.IsNullOrEmpty(tempBookingJson)
+                ? null
+                : JsonSerializer.Deserialize<TempBooking>(tempBookingJson);
+        }
+
+        private void SaveTempBookingToSession(TempBooking tempBooking)
+        {
+            HttpContext.Session.SetString("TempBooking", JsonSerializer.Serialize(tempBooking));
+        }
+
+        // ============================================================================
+        // CÁC METHODS DƯỚI ĐÂY KHÔNG DÙNG - XÓA HOẶC COMMENT
+        // Vì bạn đang dùng Session-based flow, không lưu DB cho đến khi thanh toán
+        // ============================================================================
+
+        /*
+        // XÓA - Method này lưu DB ngay, không theo Session flow
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ConfirmBooking(int showtimeId, List<int> selectedSeats)
+        {
+            // ... code ...
+        }
+
+        // XÓA - Method này lưu DB ngay, không cần thiết
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> ConfirmFood(int bookingId, int showtimeId, Dictionary<int, int> quantities)
         {
-            if (quantities == null)
-                quantities = new Dictionary<int, int>();
-
-            var booking = await _context.Bookings
-                .Include(b => b.BookingDetails)
-                .Include(b => b.BookingFoods)
-                .FirstOrDefaultAsync(b => b.BookingId == bookingId);
-
-            if (booking == null)
-                return NotFound();
-
-            using var transaction = await _context.Database.BeginTransactionAsync();
-            try
-            {
-                // Xóa bắp nước cũ
-                if (booking.BookingFoods != null && booking.BookingFoods.Any())
-                    _context.BookingFoods.RemoveRange(booking.BookingFoods);
-
-                decimal foodTotal = 0;
-                foreach (var kvp in quantities.Where(q => q.Value > 0))
-                {
-                    var food = await _context.FoodItems.FindAsync(kvp.Key);
-                    if (food != null)
-                    {
-                        var bookingFood = new BookingFood
-                        {
-                            BookingId = bookingId,
-                            FoodItemId = food.FoodItemId,
-                            Quantity = kvp.Value,
-                            UnitPrice = food.Price
-                        };
-                        _context.BookingFoods.Add(bookingFood);
-                        foodTotal += food.Price * kvp.Value;
-                    }
-                }
-
-                // Cập nhật tổng tiền: vé + bắp nước
-                booking.TotalPrice = booking.BookingDetails.Sum(bd => bd.Price) + foodTotal;
-                decimal ticketTotal = booking.BookingDetails?.Sum(bd => bd.Price) ?? 0;
-                booking.TotalPrice = ticketTotal + foodTotal;
-                await _context.SaveChangesAsync();
-                await transaction.CommitAsync();
-
-                // Tạo Payment
-                var payment = new Payment
-                {
-                    BookingId = booking.BookingId,
-                    Amount = booking.TotalPrice,
-                    PaymentDate = DateTime.Now,
-                    PaymentMethod = "VNPay",
-                    PaymentStatus = "Completed" // Sẽ cập nhật khi thanh toán thành công
-                };
-                _context.Payments.Add(payment);
-                await _context.SaveChangesAsync();
-
-                return RedirectToAction("Create", "Payments", new { bookingId = booking.BookingId });
-            }
-            catch (Exception ex)
-            {
-                await transaction.RollbackAsync();
-                TempData["ErrorMessage"] = "Lỗi khi lưu đồ ăn: " + ex.Message;
-                return RedirectToAction("SelectFood", new { bookingId });
-            }
+            // ... code ...
         }
 
-        // GET: Tickets/QuickFoodBooking
-        public async Task<IActionResult> QuickFoodBooking()
-        {
-            var user = await _userManager.GetUserAsync(User);
-
-            var booking = new Booking
-            {
-                ShowtimeId = null,           // KHÔNG gắn suất chiếu → chỉ đặt bắp nước
-                BookingDate = DateTime.Now,
-                UserId = user?.Id,
-                TotalPrice = 0,
-                BookingDetails = new List<BookingDetail>(),
-                BookingFoods = new List<BookingFood>()
-            };
-
-            using var transaction = await _context.Database.BeginTransactionAsync();
-            try
-            {
-                _context.Bookings.Add(booking);
-                await _context.SaveChangesAsync();
-                await transaction.CommitAsync();
-            }
-            catch
-            {
-                await transaction.RollbackAsync();
-                TempData["ErrorMessage"] = "Không thể tạo đơn hàng. Vui lòng thử lại.";
-                return RedirectToAction("Index", "Home");
-            }
-
-            TempData["BookingId"] = booking.BookingId;
-            TempData["SelectedSeats"] = "Chỉ đặt bắp nước";
-            TempData["SeatCount"] = 0;
-
-            return RedirectToAction("SelectFood", new { bookingId = booking.BookingId });
-        }
-
-
-        // POST: HỦY ĐỒ ĂN → QUAY LẠI TRANG CHỌN ĐỒ ĂN
-        // POST: HỦY ĐỒ ĂN → KHÔNG LƯU LỊCH SỬ
+        // XÓA - Method này xử lý BookingFoods đã lưu DB, không cần vì chưa lưu DB
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> CancelFood(int bookingId)
         {
-            var booking = await _context.Bookings
-                .Include(b => b.BookingFoods)
-                .Include(b => b.BookingDetails)
-                .FirstOrDefaultAsync(b => b.BookingId == bookingId);
-
-            if (booking == null)
-            {
-                TempData["ErrorMessage"] = "Không tìm thấy đơn hàng.";
-                return RedirectToAction("Index", "Home");
-            }
-
-            using var transaction = await _context.Database.BeginTransactionAsync();
-            try
-            {
-                if (booking.BookingFoods != null && booking.BookingFoods.Any())
-                {
-                    _context.BookingFoods.RemoveRange(booking.BookingFoods);
-
-                    // Cập nhật lại tổng tiền (chỉ còn tiền vé)
-                    booking.TotalPrice = booking.BookingDetails?.Sum(bd => bd.Price) ?? 0;
-
-                    await _context.SaveChangesAsync();
-                    await transaction.CommitAsync();
-
-                    TempData["SuccessMessage"] = "Đã hủy đồ ăn thành công! Ghế vẫn được giữ.";
-                }
-                else
-                {
-                    TempData["InfoMessage"] = "Bạn chưa chọn đồ ăn nào.";
-                }
-            }
-            catch
-            {
-                await transaction.RollbackAsync();
-                TempData["ErrorMessage"] = "Lỗi khi hủy đồ ăn.";
-            }
-
-            return RedirectToAction("SelectFood", new { bookingId });
+            // ... code ...
         }
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> CancelBooking(int bookingId)
-        {
-            var booking = await _context.Bookings
-                .Include(b => b.BookingDetails).ThenInclude(bd => bd.Seat)
-                .Include(b => b.BookingFoods)
-                .Include(b => b.Payment)
-                .FirstOrDefaultAsync(b => b.BookingId == bookingId);
-
-            if (booking == null)
-            {
-                TempData["ErrorMessage"] = "Không tìm thấy đơn hàng.";
-                return RedirectToAction("Index", "Home");
-            }
-
-            using var transaction = await _context.Database.BeginTransactionAsync();
-            try
-            {
-                // 1. Mở khóa ghế (nếu có)
-                if (booking.BookingDetails?.Any() == true)
-                {
-                    var seatIds = booking.BookingDetails.Select(bd => bd.SeatId).ToList();
-                    foreach (var seatId in seatIds)
-                    {
-                        var seat = await _context.Seats.FindAsync(seatId);
-                        if (seat != null) seat.Status = "Trống";
-                    }
-                    _context.BookingDetails.RemoveRange(booking.BookingDetails);
-                }
-
-                // 2. Xóa hết đồ ăn
-                if (booking.BookingFoods?.Any() == true)
-                    _context.BookingFoods.RemoveRange(booking.BookingFoods);
-
-                // 3. Xóa Payment nếu đã tạo nhầm (dự phòng)
-                if (booking.Payment != null)
-                    _context.Payments.Remove(booking.Payment);
-
-                // 4. Reset lại Booking: giữ nguyên ID, giữ ShowtimeId (nếu có), nhưng tiền = 0
-                booking.TotalPrice = 0;
-                booking.BookingDetails = new List<BookingDetail>();   // để không bị lỗi khi load lại
-                booking.BookingFoods = new List<BookingFood>();       // sạch sẽ
-
-                await _context.SaveChangesAsync();
-                await transaction.CommitAsync();
-
-                TempData["SuccessMessage"] = "Đã hủy thành công! Bạn có thể chọn lại ghế và đồ ăn.";
-            }
-            catch (Exception ex)
-            {
-                await transaction.RollbackAsync();
-                TempData["ErrorMessage"] = "Lỗi khi hủy đơn hàng: " + ex.Message;
-                return RedirectToAction("Index", "Home");
-            }
-
-            // QUAN TRỌNG: Quay lại đúng trang người dùng đang ở
-            if (booking.ShowtimeId.HasValue)
-            {
-                // Có suất chiếu → quay lại trang chọn ghế (với cùng suất chiếu)
-                return RedirectToAction("SelectRoomAndSeat", new { showtimeId = booking.ShowtimeId.Value });
-            }
-            else
-            {
-                // Chỉ đặt đồ ăn nhanh → quay lại trang chọn đồ ăn (với BookingId cũ)
-                return RedirectToAction("SelectFood", new { bookingId = booking.BookingId });
-            }
-        }
+        */
     }
 }

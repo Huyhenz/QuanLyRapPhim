@@ -57,6 +57,12 @@ builder.Services.AddControllersWithViews()
 builder.Services.Configure<MomoOptionModel>(builder.Configuration.GetSection("MomoAPI"));
 builder.Services.AddScoped<IMomoService, MomoService>();
 builder.Services.AddScoped<IVnPayService, VnPayService>();
+builder.Services.AddDistributedMemoryCache();
+builder.Services.AddSession(options => {
+    options.IdleTimeout = TimeSpan.FromMinutes(30); // Thời gian hết hạn Session
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+});
 
 // =============================
 // DbContext
@@ -120,6 +126,7 @@ app.UseRequestLocalization();
 // Routing
 app.UseRouting();
 app.UseAuthentication();
+app.UseSession();
 app.UseAuthorization();
 
 app.MapRazorPages();
