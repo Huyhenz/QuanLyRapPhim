@@ -371,7 +371,7 @@ namespace QuanLyRapPhim.Controllers
                     _logger.LogInformation("✓ {Count} BookingFoods saved successfully", tempBooking.SelectedFoods.Count);
                 }
 
-                // 7. Tạo Payment với PaymentStatus = "Đã thanh toán"
+                // 7. ✅ FIX: Tạo Payment với PaymentStatus = PaymentStatus.Completed (English constant)
                 _logger.LogInformation("Creating Payment record");
 
                 var payment = new Payment
@@ -380,7 +380,7 @@ namespace QuanLyRapPhim.Controllers
                     Amount = booking.FinalAmount ?? booking.TotalPrice ?? 0m,
                     PaymentDate = DateTime.Now,
                     PaymentMethod = "VNPay",
-                    PaymentStatus = "Đã thanh toán" // FIX: Đổi từ "Completed" thành "Đã thanh toán"
+                    PaymentStatus = PaymentStatus.Completed // ✅ FIX: Use constant "Completed" instead of "Đã thanh toán"
                 };
 
                 _context.Payments.Add(payment);
@@ -403,7 +403,7 @@ namespace QuanLyRapPhim.Controllers
                     if (userVoucher != null)
                     {
                         userVoucher.IsUsed = true;
-                        userVoucher.ClaimDate = DateTime.Now; // Thêm ngày sử dụng nếu có field này
+                        userVoucher.ClaimDate = DateTime.Now;
                         _context.UserVouchers.Update(userVoucher);
                         _logger.LogInformation("Marked UserVoucher as used");
                     }
@@ -452,7 +452,7 @@ namespace QuanLyRapPhim.Controllers
                 };
 
                 ViewBag.BookingId = booking.BookingId;
-                ViewBag.PaymentId = payment.PaymentId; // Thêm PaymentId cho view
+                ViewBag.PaymentId = payment.PaymentId;
 
                 _logger.LogInformation("=== PaymentCallbackVnpay SUCCESS - BookingId: {BookingId}, Amount: {Amount} ===",
                     booking.BookingId, viewModel.Amount);
@@ -581,7 +581,7 @@ namespace QuanLyRapPhim.Controllers
                 .ThenInclude(b => b.BookingDetails)
                 .ThenInclude(bd => bd.Seat)
                 .Include(p => p.Booking)
-                .ThenInclude(b => b.BookingFoods) // Thêm foods
+                .ThenInclude(b => b.BookingFoods)
                 .ThenInclude(bf => bf.FoodItem)
                 .FirstOrDefaultAsync(p => p.PaymentId == paymentId);
 
@@ -653,13 +653,13 @@ namespace QuanLyRapPhim.Controllers
                 .Include(b => b.Showtime).ThenInclude(st => st.Movie)
                 .Include(b => b.Showtime).ThenInclude(st => st.Room)
                 .Include(b => b.BookingDetails).ThenInclude(bd => bd.Seat)
-                .Include(b => b.BookingFoods).ThenInclude(bf => bf.FoodItem) // Thêm foods
+                .Include(b => b.BookingFoods).ThenInclude(bf => bf.FoodItem)
                 .Where(b => b.UserId == userId)
                 .ToList();
 
-            // FIX: Đổi từ "Completed" thành "Đã thanh toán"
+            // ✅ FIX: Use PaymentStatus constant
             var payments = _context.Payments
-                .Where(p => p.PaymentStatus == "Đã thanh toán")
+                .Where(p => p.PaymentStatus == PaymentStatus.Completed)
                 .ToList();
 
             var paidBookingIds = payments.Select(p => p.BookingId).ToHashSet();

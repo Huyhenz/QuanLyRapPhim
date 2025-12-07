@@ -18,10 +18,12 @@ namespace QuanLyRapPhim.Controllers
     public class AdminController : Controller
     {
         private readonly DBContext _context;
+        private readonly ILogger<AdminController> _logger;
 
-        public AdminController(DBContext context)
+        public AdminController(DBContext context, ILogger<AdminController> logger)
         {
             _context = context;
+            _logger = logger;
         }
 
         // GET: Admin Dashboard
@@ -47,19 +49,20 @@ namespace QuanLyRapPhim.Controllers
             if (!ModelState.IsValid)
             {
                 var errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage);
-                return Json(new { success = false, message = "Dữ liệu không hợp lệ.", errors });
+                return Json(new { success = false, message = "Invalid data.", errors });
             }
 
             try
             {
                 _context.Movies.Add(movie);
                 await _context.SaveChangesAsync();
-                return Json(new { success = true, message = "Thêm phim thành công!" });
+                return Json(new { success = true, message = "Movie added successfully!" });
             }
             catch (Exception ex)
             {
                 var errorMsg = ex.InnerException?.Message ?? ex.Message;
-                return Json(new { success = false, message = "Lỗi khi thêm phim: " + errorMsg });
+                _logger.LogError(ex, "Error creating movie");
+                return Json(new { success = false, message = "Error adding movie: " + errorMsg });
             }
         }
 
@@ -70,19 +73,18 @@ namespace QuanLyRapPhim.Controllers
             if (!ModelState.IsValid)
             {
                 var errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage);
-                return Json(new { success = false, message = "Dữ liệu không hợp lệ.", errors });
+                return Json(new { success = false, message = "Invalid data.", errors });
             }
 
             if (movie.MovieId <= 0)
-                return Json(new { success = false, message = "ID phim không hợp lệ." });
+                return Json(new { success = false, message = "Invalid movie ID." });
 
             try
             {
                 var existingMovie = await _context.Movies.FindAsync(movie.MovieId);
                 if (existingMovie == null)
-                    return Json(new { success = false, message = "Không tìm thấy phim để sửa." });
+                    return Json(new { success = false, message = "Movie not found." });
 
-                // Cập nhật các trường
                 existingMovie.Title = movie.Title?.Trim();
                 existingMovie.Description = movie.Description?.Trim();
                 existingMovie.Duration = movie.Duration;
@@ -93,12 +95,13 @@ namespace QuanLyRapPhim.Controllers
                 existingMovie.TrailerUrl = movie.TrailerUrl?.Trim();
 
                 await _context.SaveChangesAsync();
-                return Json(new { success = true, message = "Cập nhật phim thành công!" });
+                return Json(new { success = true, message = "Movie updated successfully!" });
             }
             catch (Exception ex)
             {
                 var errorMsg = ex.InnerException?.Message ?? ex.Message;
-                return Json(new { success = false, message = "Lỗi khi sửa phim: " + errorMsg });
+                _logger.LogError(ex, "Error updating movie {MovieId}", movie.MovieId);
+                return Json(new { success = false, message = "Error updating movie: " + errorMsg });
             }
         }
 
@@ -107,7 +110,7 @@ namespace QuanLyRapPhim.Controllers
         public async Task<IActionResult> DeleteMovie(int id)
         {
             if (id <= 0)
-                return Json(new { success = false, message = "ID phim không hợp lệ." });
+                return Json(new { success = false, message = "Invalid movie ID." });
 
             var movie = await _context.Movies
                 .Include(m => m.Showtimes)
@@ -115,42 +118,40 @@ namespace QuanLyRapPhim.Controllers
                 .FirstOrDefaultAsync(m => m.MovieId == id);
 
             if (movie == null)
-                return Json(new { success = false, message = "Không tìm thấy phim để xóa." });
+                return Json(new { success = false, message = "Movie not found." });
 
             try
             {
-                // Xóa tất cả Showtimes liên quan (cascade)
                 if (movie.Showtimes != null && movie.Showtimes.Any())
                 {
                     _context.Showtimes.RemoveRange(movie.Showtimes);
                 }
 
-                // Xóa đánh giá (Reviews) nếu có
                 if (movie.Reviews != null && movie.Reviews.Any())
                 {
                     _context.Reviews.RemoveRange(movie.Reviews);
                 }
 
-                // Xóa phim
                 _context.Movies.Remove(movie);
                 await _context.SaveChangesAsync();
 
-                return Json(new { success = true, message = $"Đã xóa phim \"{movie.Title}\" và tất cả lịch chiếu liên quan thành công!" });
+                return Json(new { success = true, message = $"Movie \"{movie.Title}\" and all related showtimes deleted successfully!" });
             }
             catch (Exception ex)
             {
                 var errorMsg = ex.InnerException?.Message ?? ex.Message;
+                _logger.LogError(ex, "Error deleting movie {MovieId}", id);
 
                 if (errorMsg.Contains("REFERENCE constraint") || errorMsg.Contains("foreign key"))
                 {
                     return Json(new
                     {
                         success = false,
-                        message = $"Không thể xóa phim \"{movie.Title}\" vì đang được sử dụng ở đặt vé hoặc các bảng khác!"
+                        message = $"Cannot delete movie \"{movie.Title}\" because it is being used in bookings or other tables!"
                     });
                 }
 
-                return Json(new { success = false, message = "Lỗi khi xóa phim: " + errorMsg });
+                return Json(new { success = false, message = "Error deleting movie: " + errorMsg });
             }
         }
 
@@ -207,6 +208,7 @@ namespace QuanLyRapPhim.Controllers
                 }
                 catch (Exception ex)
                 {
+                    _logger.LogError(ex, "Error creating showtime");
                     return Json(new { success = false, message = $"Failed to add showtime: {ex.Message}" });
                 }
             }
@@ -245,6 +247,7 @@ namespace QuanLyRapPhim.Controllers
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Error getting showtime details {ShowtimeId}", id);
                 return Json(new { success = false, message = $"An error occurred: {ex.Message}" });
             }
         }
@@ -290,6 +293,7 @@ namespace QuanLyRapPhim.Controllers
                 }
                 catch (Exception ex)
                 {
+                    _logger.LogError(ex, "Error updating showtime {ShowtimeId}", showtime.ShowtimeId);
                     return Json(new { success = false, message = $"Failed to update showtime: {ex.Message}" });
                 }
             }
@@ -318,6 +322,7 @@ namespace QuanLyRapPhim.Controllers
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Error deleting showtime {ShowtimeId}", id);
                 return Json(new { success = false, message = $"Failed to delete showtime: {ex.Message}" });
             }
         }
@@ -349,36 +354,52 @@ namespace QuanLyRapPhim.Controllers
 
         public async Task<IActionResult> ManageBookings()
         {
-            var bookings = await _context.Bookings
-                .Include(b => b.User) // Để hiển thị User.FullName hoặc Email
-                .Include(b => b.Showtime) // Để hiển thị Showtime.Date, StartTime
-                    .ThenInclude(s => s.Movie) // Để hiển thị Movie.Title
-                .Include(b => b.Showtime)
-                    .ThenInclude(s => s.Room) // Để hiển thị Room.RoomName
-                .Include(b => b.BookingDetails) // Để hiển thị BookingDetails (ghế)
-                    .ThenInclude(bd => bd.Seat) // Để hiển thị Seat.SeatNumber
-                .Include(b => b.BookingFoods) // Để hiển thị BookingFoods (đồ ăn/đồ uống) <--- Sửa chính ở đây
-                    .ThenInclude(bf => bf.FoodItem) // Để hiển thị FoodItem.Name
-                .OrderByDescending(b => b.BookingDate) // Tùy chọn: Sắp xếp theo ngày đặt mới nhất
-                .ToListAsync();
+            try
+            {
+                var bookings = await _context.Bookings
+                    .Include(b => b.User)
+                    .Include(b => b.Showtime)
+                        .ThenInclude(s => s.Movie)
+                    .Include(b => b.Showtime)
+                        .ThenInclude(s => s.Room)
+                    .Include(b => b.BookingDetails)
+                        .ThenInclude(bd => bd.Seat)
+                    .Include(b => b.BookingFoods)
+                        .ThenInclude(bf => bf.FoodItem)
+                    .Include(b => b.Payment) // ✅ Load Payment to check status
+                    .AsNoTracking() // Performance improvement
+                    .OrderByDescending(b => b.BookingDate)
+                    .ToListAsync();
 
-            return View(bookings);
+                _logger.LogInformation("Loaded {Count} bookings for management", bookings.Count);
+                return View(bookings);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error loading bookings");
+                TempData["ErrorMessage"] = "Error loading bookings. Please try again.";
+                return RedirectToAction(nameof(Index));
+            }
         }
 
         // ==================== THỐNG KÊ DOANH THU ====================
+
+        // ==================== THỐNG KÊ DOANH THU ====================
+        // (Thay thế method RevenueStatistics trong AdminController.cs)
 
         public IActionResult RevenueStatistics(DateTime? fromDate, DateTime? toDate)
         {
             fromDate ??= DateTime.Now.AddMonths(-1).Date;
             toDate ??= DateTime.Now.Date;
 
+            // ✅ FIX: Using PaymentStatus.Completed constant
             var validBookings = _context.Bookings
                 .Include(b => b.Showtime).ThenInclude(s => s.Movie)
                 .Include(b => b.BookingDetails!).ThenInclude(bd => bd.Seat)
                 .Include(b => b.BookingFoods!).ThenInclude(bf => bf.FoodItem)
                 .Include(b => b.Payment)
                 .Where(b => b.Payment != null
-                            && b.Payment.PaymentStatus == "Completed"
+                            && b.Payment.PaymentStatus == PaymentStatus.Completed // ✅ Use constant
                             && b.TotalPrice > 0
                             && b.BookingDate >= fromDate
                             && b.BookingDate <= toDate)
@@ -396,7 +417,7 @@ namespace QuanLyRapPhim.Controllers
                 .GroupBy(b => b.Showtime.Movie.Title)
                 .Select(g => new
                 {
-                    MovieTitle = g.Key ?? "Không xác định",
+                    MovieTitle = g.Key ?? "Unknown",
                     TicketRevenue = g.Sum(b => b.BookingDetails?.Sum(bd => bd.Price) ?? 0m),
                     TotalRevenue = g.Sum(b => b.TotalPrice)
                 })
@@ -437,7 +458,7 @@ namespace QuanLyRapPhim.Controllers
                 .SelectMany(b => b.BookingFoods ?? new List<BookingFood>());
 
             var revenueByFoodCategoryByDate = allBookingFoods
-                .GroupBy(bf => new { Date = bf.Booking.BookingDate.Date, Category = bf.FoodItem?.Category ?? "Không xác định" })
+                .GroupBy(bf => new { Date = bf.Booking.BookingDate.Date, Category = bf.FoodItem?.Category ?? "Unknown" })
                 .Select(g => new FoodRevenueByDateItem
                 {
                     Date = g.Key.Date,
@@ -540,7 +561,7 @@ namespace QuanLyRapPhim.Controllers
         public async Task<IActionResult> CreateFood([FromForm] FoodItem food, IFormFile imageFile)
         {
             if (!ModelState.IsValid)
-                return Json(new { success = false, message = "Dữ liệu không hợp lệ." });
+                return Json(new { success = false, message = "Invalid data." });
 
             if (imageFile != null && imageFile.Length > 0)
             {
@@ -555,7 +576,7 @@ namespace QuanLyRapPhim.Controllers
 
             _context.FoodItems.Add(food);
             await _context.SaveChangesAsync();
-            return Json(new { success = true, message = "Thêm món thành công!" });
+            return Json(new { success = true, message = "Food item added successfully!" });
         }
 
         [HttpPost]
@@ -568,11 +589,11 @@ namespace QuanLyRapPhim.Controllers
             [FromForm] IFormFile imageFile)
         {
             if (string.IsNullOrWhiteSpace(name) || price < 0)
-                return Json(new { success = false, message = "Dữ liệu không hợp lệ." });
+                return Json(new { success = false, message = "Invalid data." });
 
             var existing = await _context.FoodItems.FindAsync(foodItemId);
             if (existing == null)
-                return Json(new { success = false, message = "Không tìm thấy món ăn." });
+                return Json(new { success = false, message = "Food item not found." });
 
             existing.Name = name.Trim();
             existing.Size = size;
@@ -581,7 +602,6 @@ namespace QuanLyRapPhim.Controllers
 
             if (imageFile != null && imageFile.Length > 0)
             {
-                // Xóa ảnh cũ
                 if (!string.IsNullOrEmpty(existing.ImageUrl))
                 {
                     var oldPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", existing.ImageUrl.TrimStart('/'));
@@ -601,11 +621,12 @@ namespace QuanLyRapPhim.Controllers
             try
             {
                 await _context.SaveChangesAsync();
-                return Json(new { success = true, message = "Cập nhật thành công!" });
+                return Json(new { success = true, message = "Food item updated successfully!" });
             }
             catch (Exception ex)
             {
-                return Json(new { success = false, message = "Lỗi lưu dữ liệu: " + ex.Message });
+                _logger.LogError(ex, "Error updating food item {FoodItemId}", foodItemId);
+                return Json(new { success = false, message = "Error saving data: " + ex.Message });
             }
         }
 
@@ -614,9 +635,8 @@ namespace QuanLyRapPhim.Controllers
         {
             var food = await _context.FoodItems.FindAsync(id);
             if (food == null)
-                return Json(new { success = false, message = "Không tìm thấy món ăn." });
+                return Json(new { success = false, message = "Food item not found." });
 
-            // Xóa ảnh
             if (!string.IsNullOrEmpty(food.ImageUrl))
             {
                 var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", food.ImageUrl.TrimStart('/'));
@@ -626,7 +646,7 @@ namespace QuanLyRapPhim.Controllers
 
             _context.FoodItems.Remove(food);
             await _context.SaveChangesAsync();
-            return Json(new { success = true, message = "Xóa thành công!" });
+            return Json(new { success = true, message = "Food item deleted successfully!" });
         }
     }
 

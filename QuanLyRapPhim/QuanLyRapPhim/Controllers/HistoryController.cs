@@ -25,6 +25,7 @@ namespace QuanLyRapPhim.Controllers
             if (string.IsNullOrEmpty(userId))
                 return RedirectToAction("Login", "Account");
 
+            // ✅ FIX: Use PaymentStatus.Completed constant
             var bookings = await _context.Bookings
                 .Include(b => b.Showtime).ThenInclude(s => s.Movie)
                 .Include(b => b.Showtime).ThenInclude(s => s.Room)
@@ -33,8 +34,7 @@ namespace QuanLyRapPhim.Controllers
                 .Include(b => b.Payment)
                 .Where(b => b.UserId == userId &&
                            b.Payment != null &&
-                           b.Payment.PaymentStatus == "Completed" &&
-                           b.TotalPrice > 0)  // Add back filters to show only completed payments
+                           b.Payment.PaymentStatus == PaymentStatus.Completed) // ✅ Use constant "Completed"
                 .OrderByDescending(b => b.BookingDate)
                 .ToListAsync();
 

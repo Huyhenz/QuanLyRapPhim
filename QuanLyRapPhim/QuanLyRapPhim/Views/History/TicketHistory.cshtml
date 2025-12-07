@@ -1,4 +1,5 @@
 ﻿@model IEnumerable<QuanLyRapPhim.Models.Booking>
+@using QuanLyRapPhim.Models
 
 @{
     ViewData["Title"] = "Ticket History";
@@ -6,7 +7,7 @@
 }
 
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="en">
 <head>
     <meta charset="utf-8" />
     <title>Ticket History</title>
@@ -92,16 +93,16 @@
                 <thead>
                     <tr>
                         <th>ID</th>
-                        <th>Phim</th>
-                        <th>Phòng</th>
-                        <th>Ghế</th>
-                        <th>Ngày chiếu</th>
-                        <th>Giờ chiếu</th>
-                        <th>Đồ ăn/Đồ uống</th>
-                        <th>Số tiền</th>
+                        <th>Movie</th>
+                        <th>Room</th>
+                        <th>Seats</th>
+                        <th>Show Date</th>
+                        <th>Show Time</th>
+                        <th>Food/Drinks</th>
+                        <th>Amount</th>
                         <th>Voucher</th>
-                        <th>Ngày đặt</th>
-                        <th>Trạng thái</th>
+                        <th>Booking Date</th>
+                        <th>Status</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -112,13 +113,14 @@
                             var showtime = booking.Showtime;
                             var isFoodOnly = showtime == null;
                             var payment = booking.Payment;
-                            var displayAmount = (booking.FinalAmount ?? 0m) > 0m ? (booking.FinalAmount ?? 0m) : (booking.TotalPrice ?? 0m); // Use TotalPrice if FinalAmount is 0 or invalid
+                            var displayAmount = (booking.FinalAmount ?? 0m) > 0m ? (booking.FinalAmount ?? 0m) : (booking.TotalPrice ?? 0m);
                             var hasDiscount = !string.IsNullOrEmpty(booking.VoucherUsed) && (booking.FinalAmount ?? 0m) < (booking.TotalPrice ?? 0m) && (booking.FinalAmount ?? 0m) > 0m;
                             var discountAmount = hasDiscount ? ((booking.TotalPrice ?? 0m) - (booking.FinalAmount ?? 0m)) : 0m;
+
                             <tr class="text-center align-middle">
                                 <td class="fw-bold text-info">#@booking.BookingId</td>
                                 <td>
-                                    @(isFoodOnly ? "Chỉ mua đồ ăn" : showtime.Movie.Title)
+                                    @(isFoodOnly ? "Food Only" : showtime.Movie.Title)
                                 </td>
                                 <td>@(isFoodOnly ? "—" : showtime.Room.RoomName)</td>
                                 <td>
@@ -140,15 +142,15 @@
                                     }
                                     else
                                     {
-                                        <em class="text-muted">Không</em>
+                                        <em class="text-muted">None</em>
                                     }
                                 </td>
                                 <td class="text-end text-warning fw-bold fs-5">
-                                    @(displayAmount.ToString("N0") ?? "0") <small class="text-white-50">VNĐ</small>
+                                    @(displayAmount.ToString("N0") ?? "0") <small class="text-white-50">VND</small>
                                     @if (hasDiscount)
                                     {
                                         <br />
-                                        <small class="text-success">(Giảm @(discountAmount.ToString("N0") ?? "0") VNĐ từ voucher)</small>
+                                        <small class="text-success">(Saved @(discountAmount.ToString("N0") ?? "0") VND from voucher)</small>
                                     }
                                 </td>
                                 <td>
@@ -156,24 +158,17 @@
                                 </td>
                                 <td>@booking.BookingDate.ToString("dd/MM/yyyy")<br><small>@booking.BookingDate.ToString("HH:mm")</small></td>
                                 <td>
-                                    @if (booking.Payment != null)
+                                    @if (payment != null)
                                     {
-                                        @if (booking.Payment.PaymentStatus == "Completed")
-                                        {
-                                            <span class="badge bg-success px-3 py-2">Đã thanh toán</span>
-                                        }
-                                        else if (booking.Payment.PaymentStatus == "Pending")
-                                        {
-                                            <span class="badge bg-warning px-3 py-2">Đang chờ</span>
-                                        }
-                                        else
-                                        {
-                                            <span class="badge bg-danger px-3 py-2">@booking.Payment.PaymentStatus</span>
-                                        }
+                                        @* ✅ FIX: Use PaymentStatus helper to get badge class and display text *@
+                                        var badgeClass = PaymentStatus.GetBadgeClass(payment.PaymentStatus);
+                                        var displayText = PaymentStatus.GetDisplayText(payment.PaymentStatus, "en");
+
+                                        <span class="badge @badgeClass px-3 py-2">@displayText</span>
                                     }
                                     else
                                     {
-                                        <span class="badge bg-secondary px-3 py-2">Chưa thanh toán</span>
+                                        <span class="badge bg-secondary px-3 py-2">No Payment</span>
                                     }
                                 </td>
                             </tr>
