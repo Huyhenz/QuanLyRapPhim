@@ -8,130 +8,124 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
     bool isAdmin = User.IsInRole("Admin");
 }
-
 <div class="container-fluid d-flex position-relative">
-    @await Html.PartialAsync("_ChristmasDashboard")
-
+    <!-- Toggle Button -->
+    @if (isAdmin)
+    {
+        <button id="sidebar-toggle" class="sidebar-toggle">
+            <i class="fas fa-bars"></i>
+        </button>
+    }
+    <!-- SIDEBAR -->
+    @if (isAdmin)
+    {
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h3 class="sidebar-title">🎬 CinemaX Admin</h3>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="/Admin/Index"
+                   class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Admin" && ViewContext.RouteData.Values["Action"]?.ToString() == "Index" ? "active" : "")">
+                    <i class="fas fa-tachometer-alt"></i> @Localizer["Dashboard"]
+                </a>
+                <a href="/Movies"
+                   class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Movies" ? "active" : "")">
+                    <i class="fas fa-film"></i> @Localizer["ManageMovies"]
+                </a>
+                <a href="/Showtimes"
+                   class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Showtimes" ? "active" : "")">
+                    <i class="fas fa-clock"></i> @Localizer["ManageShowtimes"]
+                </a>
+                <a href="/Rooms"
+                   class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Rooms" ? "active" : "")">
+                    <i class="fas fa-door-open"></i> @Localizer["ManageRooms"]
+                </a>
+                <a href="/Seats"
+                   class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Seats" ? "active" : "")">
+                    <i class="fas fa-chair"></i> @Localizer["ManageSeats"]
+                </a>
+                <a href="/Admin/ManageFoods"
+                   class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "ManageFoods" ? "active" : "")">
+                    <i class="fas fa-utensils"></i> @Localizer["ManageFoods"]
+                </a>
+                <a href="/Admin/ManageBookings"
+                   class="nav-item @(ViewContext.RouteData.Values["Action"]?.ToString() == "ManageBookings" ? "active" : "")">
+                    <i class="fas fa-ticket-alt"></i> @Localizer["ManageBookings"]
+                </a>
+                <a href="/Admin/RevenueStatistics"
+                   class="nav-item @(ViewContext.RouteData.Values["Action"]?.ToString() == "RevenueStatistics" ? "active" : "")">
+                    <i class="fas fa-chart-bar"></i> @Localizer["RevenueStatistics"]
+                </a>
+                <a href="/Vouchers"
+                   class="nav-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Vouchers" ? "active" : "")">
+                    <i class="fas fa-gift"></i> @Localizer["Vouchers"]
+                </a>
+                <div class="nav-divider"></div>
+                <a href="#" class="nav-item"><i class="fab fa-facebook"></i> Facebook</a>
+                <a href="#" class="nav-item"><i class="fab fa-twitter"></i> Twitter</a>
+                <a href="#" class="nav-item"><i class="fab fa-google"></i> Google</a>
+            </nav>
+        </aside>
+    }
+    <!-- MAIN CONTENT -->
     <div class="frame-wrapper flex-grow-1 @(isAdmin ? "admin-view" : "")">
         <div class="d-flex justify-content-between align-items-center mb-4">
-            <h1 class="title-gradient">
-                <span class="christmas-icon">🎁</span>
-                @Localizer["VoucherList"]
-                <span class="christmas-icon">🎄</span>
-            </h1>
+            <h1 class="title-gradient">@Localizer["VoucherList"]</h1>
             @if (isAdmin)
             {
                 <div class="header-actions">
-                    <a asp-action="Create" class="btn btn-create christmas-btn">
-                        <i class="fas fa-plus"></i> @Localizer["CreateVoucher"]
-                    </a>
-                    <span class="order-count ms-3">
-                        <i class="fas fa-gift"></i> @Model.Count() @Localizer["VouchersFound"]
-                    </span>
+                    <a asp-action="Create" class="btn btn-create glow-effect">@Localizer["CreateVoucher"]</a>
+                    <span class="order-count ms-3">@Localizer["VoucherCountFound", Model.Count()]</span>
                 </div>
             }
         </div>
-
         @if (TempData["SuccessMessage"] != null)
         {
-            <div class="alert alert-success christmas-alert fade show" role="alert">
-                <i class="fas fa-check-circle"></i>
+            <div class="alert alert-success alert-dismissible fade show glow-effect" role="alert">
                 @TempData["SuccessMessage"]
                 <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
             </div>
         }
-
         @if (TempData["ErrorMessage"] != null)
         {
-            <div class="alert alert-danger christmas-alert fade show" role="alert">
-                <i class="fas fa-exclamation-circle"></i>
+            <div class="alert alert-danger alert-dismissible fade show glow-effect" role="alert">
                 @TempData["ErrorMessage"]
                 <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
             </div>
         }
-
         <div class="table-container">
-            <table class="table table-custom christmas-table">
+            <table class="table table-custom">
                 <thead>
                     <tr>
-                        <th><i class="fas fa-barcode"></i> @Localizer["VoucherCode"]</th>
-                        <th><i class="fas fa-coins"></i> @Localizer["FixedDiscount"]</th>
-                        <th><i class="fas fa-percentage"></i> @Localizer["PercentageDiscount"]</th>
-                        <th><i class="fas fa-calendar-times"></i> @Localizer["ExpiryDate"]</th>
-                        <th><i class="fas fa-toggle-on"></i> @Localizer["Status"]</th>
-                        <th><i class="fas fa-hashtag"></i> @Localizer["UsageLimit"]</th>
-                        <th><i class="fas fa-chart-line"></i> @Localizer["UsedCount"]</th>
-                        <th><i class="fas fa-tools"></i> @Localizer["Actions"]</th>
+                        <th>@Localizer["VoucherCode"]</th>
+                        <th>@Localizer["FixedDiscount"]</th>
+                        <th>@Localizer["PercentageDiscount"]</th>
+                        <th>@Localizer["ExpiryDate"]</th>
+                        <th>@Localizer["Status"]</th>
+                        <th>@Localizer["UsageLimit"]</th>
+                        <th>@Localizer["UsedCount"]</th>
+                        <th>@Localizer["Actions"]</th>
                     </tr>
                 </thead>
                 <tbody>
                     @foreach (var item in Model)
                     {
                         <tr>
-                            <td class="fw-bold text-warning">
-                                <span class="voucher-code">@item.Code</span>
-                            </td>
-                            <td>
-                                @if (item.DiscountAmount > 0)
-                                {
-                                    <span class="discount-badge fixed">@item.DiscountAmount.ToString("N0") VND</span>
-                                }
-                                else
-                                {
-                                    <span class="text-muted">-</span>
-                                }
-                            </td>
-                            <td>
-                                @if (item.DiscountPercentage > 0)
-                                {
-                                    <span class="discount-badge percent">@item.DiscountPercentage%</span>
-                                }
-                                else
-                                {
-                                    <span class="text-muted">-</span>
-                                }
-                            </td>
+                            <td><strong>@item.Code</strong></td>
+                            <td>@(item.DiscountAmount > 0 ? item.DiscountAmount.ToString("N0") : "-")</td>
+                            <td>@(item.DiscountPercentage > 0 ? item.DiscountPercentage + "%" : "-")</td>
                             <td>@item.ExpiryDate.ToString("dd/MM/yyyy")</td>
                             <td>
-                                @if (item.IsActive)
-                                {
-                                    <span class="badge badge-active">
-                                        <i class="fas fa-check-circle"></i> @Localizer["Active"]
-                                    </span>
-                                }
-                                else
-                                {
-                                    <span class="badge badge-inactive">
-                                        <i class="fas fa-times-circle"></i> @Localizer["Inactive"]
-                                    </span>
-                                }
+                                <span class="badge @(item.IsActive ? "bg-success" : "bg-secondary")">
+                                    @(item.IsActive ? Localizer["Active"] : Localizer["Inactive"])
+                                </span>
                             </td>
+                            <td>@item.UsageLimit</td>
+                            <td>@item.UsedCount</td>
                             <td>
-                                <span class="usage-count">@item.UsageLimit</span>
-                            </td>
-                            <td>
-                                <span class="usage-count used">@item.UsedCount / @item.UsageLimit</span>
-                                <div class="progress mt-1" style="height: 6px;">
-                                    <div class="progress-bar bg-warning" role="progressbar"
-                                         style="width: @((item.UsedCount * 100.0 / item.UsageLimit).ToString("F2"))%">
-                                    </div>
-                                </div>
-                            </td>
-                            <td>
-                                <div class="action-buttons">
-                                    <a asp-action="Details" asp-route-id="@item.VoucherId"
-                                       class="btn btn-sm btn-info action-btn" title="@Localizer["Details"]">
-                                        <i class="fas fa-eye"></i>
-                                    </a>
-                                    <a asp-action="Edit" asp-route-id="@item.VoucherId"
-                                       class="btn btn-sm btn-warning action-btn" title="@Localizer["Edit"]">
-                                        <i class="fas fa-edit"></i>
-                                    </a>
-                                    <a asp-action="Delete" asp-route-id="@item.VoucherId"
-                                       class="btn btn-sm btn-danger action-btn" title="@Localizer["Delete"]">
-                                        <i class="fas fa-trash"></i>
-                                    </a>
-                                </div>
+                                <a asp-action="Details" asp-route-id="@item.VoucherId" class="btn btn-sm btn-create glow-effect action-btn">@Localizer["Details"]</a>
+                                <a asp-action="Edit" asp-route-id="@item.VoucherId" class="btn btn-sm btn-warning glow-effect action-btn">@Localizer["Edit"]</a>
+                                <a asp-action="Delete" asp-route-id="@item.VoucherId" class="btn btn-sm btn-danger glow-effect action-btn">@Localizer["Delete"]</a>
                             </td>
                         </tr>
                     }
@@ -139,288 +133,238 @@
             </table>
         </div>
     </div>
-
     <footer class="footer text-center py-3">
-        <p class="text-white mb-0">
-            <span class="christmas-icon-small">🎅</span>
-            @Localizer["Copyright"] 2025 CinemaX. @Localizer["AllRightsReserved"]
-            <span class="christmas-icon-small">🎁</span>
-        </p>
+        <p class="text-white mb-0">@Localizer["Copyright"] 2025 CinemaX. @Localizer["AllRightsReserved"]</p>
     </footer>
 </div>
-
 <style>
     body {
         background-color: #0F0F0F;
         font-family: 'Montserrat', sans-serif;
     }
+    /* ===== SIDEBAR STYLE (GIỐNG SHOWTIME) ===== */
+    .sidebar {
+        background: #111;
+        width: 250px;
+        height: 100vh;
+        position: fixed;
+        top: 0;
+        left: 0;
+        padding: 25px 20px;
+        overflow-y: auto;
+        border-right: 2px solid #e50914;
+        box-shadow: 2px 0 10px rgba(0,0,0,0.4);
+        transition: width 0.3s ease, transform 0.3s ease;
+        z-index: 1000;
+    }
 
-    .title-gradient {
-        background: linear-gradient(90deg, #FFD700, #FF4500);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        font-size: 2.5rem;
+        .sidebar.collapsed {
+            width: 0;
+            padding: 0;
+            transform: translateX(-100%);
+        }
+
+    .sidebar-title {
+        color: #fff;
         font-weight: 700;
+        font-size: 1.4rem;
     }
 
-    .christmas-icon {
-        font-size: 2rem;
-        animation: bounce 2s infinite;
-    }
-
-    .christmas-icon-small {
-        font-size: 1.2rem;
-        animation: bounce 2s infinite;
-    }
-
-    @@keyframes bounce {
-        0%, 100%
-
-    {
-        transform: translateY(0);
-    }
-
-    50% {
-        transform: translateY(-5px);
-    }
-
-    }
-
-    .header-actions {
+    .sidebar-nav .nav-item {
+        color: #ddd;
+        padding: 12px 15px;
+        border-radius: 8px;
+        margin-bottom: 5px;
+        font-size: 1rem;
         display: flex;
         align-items: center;
-        gap: 15px;
-    }
-
-    .order-count {
-        color: #FFD700;
-        font-weight: 600;
-        font-size: 1rem;
-    }
-
-    .christmas-btn {
-        background: linear-gradient(135deg, #C41E3A, #165B33);
-        border: 2px solid #FFD700;
-        color: white;
-        padding: 10px 25px;
-        border-radius: 12px;
-        font-weight: 600;
+        gap: 12px;
         text-decoration: none;
-        transition: all 0.3s ease;
-        display: inline-block;
+        transition: 0.25s;
     }
 
-        .christmas-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 20px rgba(255, 215, 0, 0.6);
-            color: white;
-        }
-
-        .christmas-btn i {
-            margin-right: 8px;
-        }
-
-    .christmas-alert {
-        background: linear-gradient(135deg, rgba(139, 0, 0, 0.3), rgba(22, 91, 51, 0.3));
-        color: #FFD700;
-        border: 2px solid #FFD700;
-        border-radius: 15px;
-        padding: 15px;
+    .nav-item i {
+        width: 20px;
     }
 
-        .christmas-alert i {
-            margin-right: 10px;
-        }
-
-    .table-container {
-        overflow-x: auto;
-        border-radius: 15px;
+    .nav-item:hover {
+        background-color: #e50914;
+        color: #fff;
+        transform: translateX(5px);
     }
 
-    .christmas-table {
-        width: 100%;
-        background-color: #1c1c1c;
-        border: 2px solid #FFD700;
-        border-radius: 15px;
-        overflow: hidden;
+    .nav-item.active {
+        background-color: #e50914;
+        color: #fff;
+        font-weight: 600;
     }
 
-        .christmas-table thead tr {
-            background: linear-gradient(135deg, #8B0000, #165B33);
-            color: #FFFAFA;
+    .nav-divider {
+        height: 1px;
+        background: #444;
+        margin: 15px 0;
+    }
+
+    .frame-wrapper.admin-view {
+        margin-left: 250px;
+        transition: margin-left 0.3s ease;
+    }
+
+        .frame-wrapper.admin-view.shifted {
+            margin-left: 0;
         }
 
-        .christmas-table th {
-            padding: 18px 15px;
-            border: none;
-            font-weight: 700;
-            text-transform: uppercase;
-            font-size: 0.85rem;
-            letter-spacing: 1px;
-            border-bottom: 2px solid #FFD700;
-        }
-
-            .christmas-table th i {
-                margin-right: 8px;
-            }
-
-        .christmas-table td {
-            padding: 15px;
-            border: none;
-            color: #FFFAFA;
-            border-bottom: 1px solid rgba(255, 215, 0, 0.3);
-            vertical-align: middle;
-        }
-
-        .christmas-table tr:hover {
-            background: linear-gradient(90deg, rgba(139, 0, 0, 0.3), rgba(22, 91, 51, 0.3));
-        }
-
-        .christmas-table tbody tr:last-child td {
-            border-bottom: none;
-        }
-
-    .voucher-code {
-        font-family: 'Courier New', monospace;
-        background: linear-gradient(135deg, #FFD700, #FFA500);
-        color: #000;
-        padding: 6px 12px;
-        border-radius: 8px;
+    .title-gradient {
+        background: linear-gradient(90deg, #ff0033, #e50914);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        font-size: 2rem;
         font-weight: 700;
-        letter-spacing: 2px;
+        text-transform: uppercase;
     }
 
-    .discount-badge {
-        padding: 6px 12px;
-        border-radius: 10px;
-        font-weight: 600;
-        font-size: 0.9rem;
-        display: inline-block;
+    .btn-create {
+        background: linear-gradient(90deg, #ff0033, #e50914);
+        border: none;
+        color: #fff;
+        padding: 10px 20px;
+        border-radius: 8px;
+        transition: 0.3s;
     }
 
-        .discount-badge.fixed {
-            background: linear-gradient(135deg, #22C55E, #16A34A);
-            color: white;
+        .btn-create:hover {
+            background: linear-gradient(90deg, #e6002e, #d30912);
+            transform: translateY(-2px);
         }
 
-        .discount-badge.percent {
-            background: linear-gradient(135deg, #3B82F6, #2563EB);
-            color: white;
-        }
-
-    .badge {
-        padding: 8px 16px;
-        border-radius: 12px;
-        font-weight: 600;
-        font-size: 0.85rem;
-        display: inline-block;
-    }
-
-        .badge i {
-            margin-right: 5px;
-        }
-
-    .badge-active {
-        background: linear-gradient(135deg, #22C55E, #16A34A);
+    .table-custom th {
+        background: #1C2526;
         color: white;
-        border: 2px solid #FFD700;
+        position: sticky;
+        top: 0;
     }
 
-    .badge-inactive {
-        background: linear-gradient(135deg, #6B7280, #4B5563);
+    .table-custom td {
+        border-bottom: 1px solid #ff0033;
         color: white;
-        border: 2px solid #FFD700;
     }
 
-    .usage-count {
-        font-weight: 600;
-        color: #FFD700;
-    }
-
-        .usage-count.used {
-            color: #FFFAFA;
-        }
-
-    .action-buttons {
-        display: flex;
-        gap: 5px;
-        justify-content: center;
+    .glow-effect:hover {
+        box-shadow: 0 0 15px rgba(255,0,51,0.5);
     }
 
     .action-btn {
-        padding: 8px 12px;
-        border-radius: 8px;
-        font-weight: 600;
+        margin: 2px;
+    }
+    /* Toggle Button - Compact and Beautiful */
+    .sidebar-toggle {
+        position: fixed;
+        top: 15px;
+        left: 15px;
+        z-index: 1001;
+        background: linear-gradient(135deg, #ff0033, #e50914);
+        color: #fff;
+        border: none;
+        border-radius: 50%;
+        width: 35px;
+        height: 35px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 4px 15px rgba(229, 9, 20, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1);
         transition: all 0.3s ease;
-        border: 2px solid #FFD700;
+        cursor: pointer;
+        font-size: 14px;
     }
 
-        .action-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(255, 215, 0, 0.5);
+        .sidebar-toggle:hover {
+            transform: scale(1.05) rotate(5deg);
+            box-shadow: 0 6px 20px rgba(229, 9, 20, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.1);
         }
 
-    .btn-info {
-        background: linear-gradient(135deg, #0EA5E9, #0284C7);
-        color: white;
-    }
+        .sidebar-toggle:active {
+            transform: scale(0.95);
+        }
 
-    .btn-warning {
-        background: linear-gradient(135deg, #FFD700, #FFA500);
-        color: #000;
+    .sidebar.collapsed + .frame-wrapper.admin-view .sidebar-toggle {
+        left: 15px;
     }
-
-    .btn-danger {
-        background: linear-gradient(135deg, #8B0000, #C41E3A);
-        color: white;
-    }
-
-    .progress {
-        background-color: rgba(255, 255, 255, 0.1);
-        border-radius: 4px;
-    }
-
-    .footer {
-        background: linear-gradient(135deg, #8B0000, #165B33);
-        border-top: 2px solid #FFD700;
-        margin-top: 50px;
-    }
-
+    /* Media Queries */
     @@media (max-width: 768px) {
-        .title-gradient
+        .sidebar
 
     {
-        font-size: 2rem;
+        width: 200px;
     }
 
-    .header-actions {
+    .frame-wrapper.admin-view {
+        margin-left: 200px;
+    }
+
+    .sidebar.collapsed {
+        width: 0;
+        padding: 0;
+        transform: translateX(-100%);
+    }
+
+    .frame-wrapper.admin-view.shifted {
+        margin-left: 0;
+    }
+
+    .sidebar-toggle {
+        top: 10px;
+        left: 10px;
+        width: 32px;
+        height: 32px;
+        font-size: 13px;
+    }
+
+    }
+    @@media (max-width: 576px) {
+        .container-fluid.d-flex
+
+    {
         flex-direction: column;
-        align-items: flex-start;
-        gap: 10px;
     }
 
-    .christmas-table {
-        font-size: 0.85rem;
+    .sidebar {
+        position: relative;
+        width: 100%;
+        height: auto;
     }
 
-    .action-buttons {
-        flex-direction: column;
+    .frame-wrapper.admin-view {
+        margin-left: 0;
+        width: 100%;
+        min-height: auto;
+    }
+
+    .content-inner {
+        width: 100%;
+        padding: 20px;
+    }
+
+    .sidebar.collapsed {
+        display: none;
+    }
+
+    .sidebar-toggle {
+        position: relative;
+        margin: 10px auto;
+        display: block;
     }
 
     }
 </style>
-
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const toggleBtn = document.getElementById('sidebar-toggle');
-        const sidebar = document.querySelector('.christmas-sidebar');
+        const sidebar = document.querySelector('.sidebar');
         const frameWrapper = document.querySelector('.frame-wrapper');
-
         if (toggleBtn && sidebar && frameWrapper) {
             toggleBtn.addEventListener('click', function() {
                 sidebar.classList.toggle('collapsed');
                 frameWrapper.classList.toggle('shifted');
-
                 const icon = toggleBtn.querySelector('i');
                 if (sidebar.classList.contains('collapsed')) {
                     icon.className = 'fas fa-bars';
@@ -431,7 +375,6 @@
         }
     });
 </script>
-
 @section Scripts {
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");

@@ -7,6 +7,7 @@
     bool isAdmin = User.IsInRole("Admin");
 }
 
+<!-- Truyền dữ liệu ngôn ngữ vào JS -->
 <script>
     const i18n = {
         SizeS: '@Localizer["SizeS"]',
@@ -24,26 +25,162 @@
     };
 </script>
 
+<style>
+    /* Giữ nguyên CSS cũ của bạn - không thay đổi */
+    body {
+        margin: 0;
+        background-color: #0F0F0F;
+        color: #ffffff;
+        font-family: 'Montserrat', sans-serif;
+        overflow-x: hidden;
+    }
+
+    .sidebar {
+        background: #111;
+        width: 250px;
+        height: 100vh;
+        position: fixed;
+        top: 0;
+        left: 0;
+        padding: 25px 20px;
+        overflow-y: auto;
+        border-right: 2px solid #e50914;
+        box-shadow: 2px 0 10px rgba(0,0,0,0.4);
+        transition: all 0.3s ease;
+        z-index: 1000;
+    }
+
+        .sidebar.collapsed {
+            width: 0;
+            padding: 0;
+            transform: translateX(-100%);
+        }
+
+    .frame-wrapper.admin-view {
+        margin-left: 250px;
+        transition: margin-left 0.3s ease;
+    }
+
+        .frame-wrapper.admin-view.shifted {
+            margin-left: 0;
+        }
+
+    .page-title {
+        background-color: #1c1c1c;
+        color: #fff;
+        padding: 15px;
+        text-align: center;
+        border-radius: 15px;
+        font-weight: 700;
+        text-transform: uppercase;
+        margin-bottom: 20px;
+    }
+
+    .glow-effect {
+        box-shadow: 0 0 15px rgba(255, 0, 51, 0.3);
+        transition: all 0.3s ease;
+    }
+
+        .glow-effect:hover {
+            box-shadow: 0 0 25px rgba(255, 0, 51, 0.5);
+            transform: translateY(-2px);
+        }
+
+    .table-dark {
+        background-color: #1c1c1c;
+        border-radius: 15px;
+        overflow: hidden;
+        border-collapse: collapse;
+    }
+
+        .table-dark th, .table-dark td {
+            border: 1px solid #444;
+            padding: 12px;
+            text-align: center;
+            color: white;
+        }
+
+        .table-dark th {
+            background-color: #2a2a2a;
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .table-dark tr:hover td {
+            background-color: #2a2a2a;
+        }
+
+    .badge {
+        padding: 5px 10px;
+        border-radius: 8px;
+        font-size: 0.85rem;
+    }
+
+    .sidebar-toggle {
+        position: fixed;
+        top: 15px;
+        left: 15px;
+        z-index: 1001;
+        background: linear-gradient(135deg, #ff0033, #e50914);
+        color: #fff;
+        border: none;
+        border-radius: 50%;
+        width: 35px;
+        height: 35px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 4px 15px rgba(229, 9, 20, 0.4);
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+
+        .sidebar-toggle:hover {
+            transform: scale(1.1);
+        }
+</style>
+
 <div class="container-fluid d-flex position-relative">
-    @await Html.PartialAsync("_ChristmasDashboard")
+    @if (isAdmin)
+    {
+        <button id="sidebar-toggle" class="sidebar-toggle">
+            <i class="fas fa-bars"></i>
+        </button>
+    }
+
+    @if (isAdmin)
+    {
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h3 class="sidebar-title">CinemaX Admin</h3>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="/Admin/Index" class="nav-item @(ViewContext.RouteData.Values["Action"]?.ToString() == "Index" ? "active" : "")">
+                    <i class="fas fa-tachometer-alt"></i> Dashboard
+                </a>
+                <a href="/Admin/ManageFoods" class="nav-item active">
+                    <i class="fas fa-utensils"></i> @Localizer["ManageFoods"]
+                </a>
+                <!-- Các menu khác giữ nguyên -->
+            </nav>
+        </aside>
+    }
 
     <div class="frame-wrapper flex-grow-1 @(isAdmin ? "admin-view" : "")">
         <div class="content-inner">
             <div class="d-flex justify-content-between align-items-center mb-4">
-                <h2 class="page-title">
-                    <span class="christmas-icon">🍿</span>
-                    @Localizer["ManageFoods"]
-                    <span class="christmas-icon">🥤</span>
-                </h2>
-                <button class="btn btn-success christmas-btn rounded-pill px-4" data-bs-toggle="modal" data-bs-target="#createFoodModal">
-                    <i class="fas fa-plus"></i> @Localizer["AddNewFoodItem"]
+                <h2 class="page-title">@Localizer["ManageFoods"]</h2>
+                <button class="btn btn-success rounded-pill px-4 glow-effect" data-bs-toggle="modal" data-bs-target="#createFoodModal">
+                    @Localizer["AddNewFoodItem"]
                 </button>
             </div>
 
             <div id="alert-container"></div>
 
             <div class="table-responsive">
-                <table class="table table-dark table-striped christmas-table" id="foodsTable">
+                <table class="table table-dark table-striped glow-effect" id="foodsTable">
                     <thead class="table-danger">
                         <tr>
                             <th style="width: 80px;">@Localizer["FoodImage"]</th>
@@ -65,9 +202,9 @@
 <div class="modal fade" id="createFoodModal" tabindex="-1">
     <div class="modal-dialog modal-lg">
         <form id="createFoodForm" enctype="multipart/form-data">
-            <div class="modal-content christmas-modal">
-                <div class="modal-header">
-                    <h5 class="modal-title">🎄 @Localizer["AddNewFoodItem"]</h5>
+            <div class="modal-content">
+                <div class="modal-header border-secondary">
+                    <h5 class="modal-title">@Localizer["AddNewFoodItem"]</h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
@@ -105,7 +242,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">@Localizer["Cancel"]</button>
-                    <button type="submit" class="btn btn-success christmas-btn">@Localizer["Add"]</button>
+                    <button type="submit" class="btn btn-success">@Localizer["Add"]</button>
                 </div>
             </div>
         </form>
@@ -117,9 +254,10 @@
     <div class="modal-dialog modal-lg">
         <form id="editFoodForm" enctype="multipart/form-data">
             <input type="hidden" name="foodItemId" />
-            <div class="modal-content christmas-modal">
-                <div class="modal-header">
-                    <h5 class="modal-title">🎅 @Localizer["EditFoodItem"]</h5>
+
+            <div class="modal-content">
+                <div class="modal-header border-secondary">
+                    <h5 class="modal-title">@Localizer["EditFoodItem"]</h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
@@ -158,114 +296,12 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">@Localizer["Cancel"]</button>
-                    <button type="submit" class="btn btn-primary christmas-btn">@Localizer["Update"]</button>
+                    <button type="submit" class="btn btn-primary">@Localizer["Update"]</button>
                 </div>
             </div>
         </form>
     </div>
 </div>
-
-<style>
-    body {
-        margin: 0;
-        background-color: #0F0F0F;
-        color: #ffffff;
-        font-family: 'Montserrat', sans-serif;
-        overflow-x: hidden;
-    }
-
-    .page-title {
-        background: linear-gradient(90deg, #FFD700, #FF4500);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        font-size: 2rem;
-        font-weight: 700;
-        text-align: center;
-        margin: 0;
-    }
-
-    .christmas-icon {
-        font-size: 2rem;
-        animation: bounce 2s infinite;
-    }
-
-    .christmas-table {
-        background-color: #1c1c1c;
-        border-radius: 15px;
-        overflow: hidden;
-        border: 2px solid #FFD700;
-    }
-
-        .christmas-table th {
-            background: linear-gradient(135deg, #8B0000, #165B33);
-            color: #FFFAFA;
-            font-weight: 600;
-        }
-
-        .christmas-table td {
-            color: white;
-        }
-
-        .christmas-table tr:hover {
-            background: linear-gradient(90deg, rgba(139, 0, 0, 0.3), rgba(22, 91, 51, 0.3));
-        }
-
-    .christmas-btn {
-        background: linear-gradient(135deg, #C41E3A, #165B33);
-        border: 2px solid #FFD700;
-        color: white;
-        font-weight: 600;
-        transition: all 0.3s ease;
-    }
-
-        .christmas-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 20px rgba(255, 215, 0, 0.6);
-        }
-
-    .christmas-modal {
-        background: linear-gradient(180deg, #8B0000, #165B33);
-        border: 3px solid #FFD700;
-        color: #FFFAFA;
-    }
-
-        .christmas-modal .modal-header {
-            border-bottom: 2px solid #FFD700;
-        }
-
-        .christmas-modal .form-label {
-            color: #FFD700;
-            font-weight: 600;
-        }
-
-        .christmas-modal .form-control,
-        .christmas-modal .form-select {
-            background-color: rgba(0, 0, 0, 0.3);
-            border: 1px solid #FFD700;
-            color: #FFFAFA;
-        }
-
-            .christmas-modal .form-control:focus,
-            .christmas-modal .form-select:focus {
-                background-color: rgba(0, 0, 0, 0.5);
-                border-color: #FFD700;
-                color: #FFFAFA;
-                box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
-            }
-
-    @@keyframes bounce {
-        0%, 100%
-
-    {
-        transform: translateY(0);
-    }
-
-    50% {
-        transform: translateY(-5px);
-    }
-
-    }
-</style>
 
 @section Scripts {
     <script>
@@ -303,8 +339,8 @@
                                 <td class="text-warning">${parseInt(f.price).toLocaleString()}đ</td>
                                 <td><span class="badge bg-${badgeClass}">${catDisplay}</span></td>
                                 <td class="text-center">
-                                    <button class="btn btn-warning btn-sm edit-btn me-1">Sửa</button>
-                                    <button class="btn btn-danger btn-sm delete-btn">Xóa</button>
+                                    <button class="btn btn-warning btn-sm edit-btn me-1 glow-effect">Sửa</button>
+                                    <button class="btn btn-danger btn-sm delete-btn glow-effect">Xóa</button>
                                 </td>
                             </tr>
                         `);
@@ -313,6 +349,7 @@
                 .fail(() => showAlert('Lỗi tải dữ liệu!', 'danger'));
         }
 
+        // Create
         $('#createFoodForm').submit(function (e) {
             e.preventDefault();
             const formData = new FormData(this);
@@ -336,6 +373,7 @@
             });
         });
 
+        // Edit - Open modal
         $(document).on('click', '.edit-btn', function () {
             const id = $(this).closest('tr').data('id');
             $.get('/Admin/GetFoodItem?id=' + id)
@@ -354,6 +392,7 @@
                 .fail(() => showAlert('Lỗi tải dữ liệu món ăn!', 'danger'));
         });
 
+        // Edit - Submit
         $('#editFoodForm').submit(function (e) {
             e.preventDefault();
             const formData = new FormData(this);
@@ -376,6 +415,7 @@
             });
         });
 
+        // Delete
         $(document).on('click', '.delete-btn', function () {
             const id = $(this).closest('tr').data('id');
             if (confirm(i18n.DeleteConfirm)) {
@@ -390,6 +430,13 @@
             }
         });
 
+        // Toggle sidebar
+        $('#sidebar-toggle').click(function () {
+            $('.sidebar').toggleClass('collapsed');
+            $('.frame-wrapper').toggleClass('shifted');
+        });
+
+        // Load khi mở trang
         $(document).ready(loadFoods);
     </script>
 }

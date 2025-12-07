@@ -477,7 +477,7 @@ namespace QuanLyRapPhim.Controllers
                     ComboCount = g.Sum(b => b.BookingFoods?
                         .Where(bf => bf.FoodItem?.Category == "Combo")
                         .Sum(bf => bf.Quantity) ?? 0),
-                    TotalRevenue = g.Sum(b => b.TotalPrice ?? 0m)
+                    TotalRevenue = g.Sum(b => b.TotalPrice)
                 })
                 .OrderBy(x => x.Date)
                 .ToList();
@@ -510,7 +510,7 @@ namespace QuanLyRapPhim.Controllers
                     ComboCount = g.Sum(b => b.BookingFoods?
                         .Where(bf => bf.FoodItem?.Category == "Combo")
                         .Sum(bf => bf.Quantity) ?? 0),
-                    TotalRevenue = g.Sum(b => b.TotalPrice ?? 0m)
+                    TotalRevenue = g.Sum(b => b.TotalPrice)
                 })
                 .OrderBy(x => x.Year).ThenBy(x => x.Month)
                 .ToList();
