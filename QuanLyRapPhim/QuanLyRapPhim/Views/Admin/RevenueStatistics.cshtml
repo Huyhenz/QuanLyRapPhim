@@ -89,17 +89,106 @@
             </div>
             <!-- Alerts -->
             <div id="alert-container" class="mb-4"></div>
-            <!-- Revenue Summary -->
+            <!-- Revenue Summary with Quantity -->
             <div class="admin-section">
                 <h3 class="section-subtitle">@Localizer["Summary"]</h3>
-                <div class="summary-card">
-                    <div class="summary-row">
-                        <span>@Localizer["TotalTicketRevenue"]: @(((dynamic)ViewBag.RevenueData)?.TotalTicketRevenue.ToString("C", new System.Globalization.CultureInfo("vi-VN")) ?? Localizer["N/A"].Value)</span>
-                        <span>@Localizer["TotalFoodRevenue"]: @(((dynamic)ViewBag.RevenueData)?.TotalFoodRevenue.ToString("C", new System.Globalization.CultureInfo("vi-VN")) ?? Localizer["N/A"].Value)</span>
-                        <span>@Localizer["TotalDrinkRevenue"]: @(((dynamic)ViewBag.RevenueData)?.TotalDrinkRevenue.ToString("C", new System.Globalization.CultureInfo("vi-VN")) ?? Localizer["N/A"].Value)</span>
-                        <span>@Localizer["TotalComboRevenue"]: @(((dynamic)ViewBag.RevenueData)?.TotalComboRevenue.ToString("C", new System.Globalization.CultureInfo("vi-VN")) ?? Localizer["N/A"].Value)</span>
-                        <span>@Localizer["TotalRevenue"]: @(((dynamic)ViewBag.RevenueData)?.TotalRevenue.ToString("C", new System.Globalization.CultureInfo("vi-VN")) ?? Localizer["N/A"].Value)</span>
+                <div class="summary-grid">
+                    <div class="summary-card-item">
+                        <div class="summary-icon">🎟️</div>
+                        <div class="summary-details">
+                            <h4>@Localizer["TotalTicketRevenue"]</h4>
+                            <p class="revenue-amount">@(((dynamic)ViewBag.RevenueData)?.TotalTicketRevenue.ToString("C", new System.Globalization.CultureInfo("vi-VN")) ?? Localizer["N/A"].Value)</p>
+                            <p class="quantity-label">Số lượng vé: <strong>@(((dynamic)ViewBag.RevenueData)?.TotalTicketCount ?? 0)</strong></p>
+                        </div>
                     </div>
+                    <div class="summary-card-item">
+                        <div class="summary-icon">🍿</div>
+                        <div class="summary-details">
+                            <h4>@Localizer["TotalFoodRevenue"]</h4>
+                            <p class="revenue-amount">@(((dynamic)ViewBag.RevenueData)?.TotalFoodRevenue.ToString("C", new System.Globalization.CultureInfo("vi-VN")) ?? Localizer["N/A"].Value)</p>
+                            <p class="quantity-label">Số lượng: <strong>@(((dynamic)ViewBag.RevenueData)?.TotalFoodCount ?? 0)</strong></p>
+                        </div>
+                    </div>
+                    <div class="summary-card-item">
+                        <div class="summary-icon">🥤</div>
+                        <div class="summary-details">
+                            <h4>@Localizer["TotalDrinkRevenue"]</h4>
+                            <p class="revenue-amount">@(((dynamic)ViewBag.RevenueData)?.TotalDrinkRevenue.ToString("C", new System.Globalization.CultureInfo("vi-VN")) ?? Localizer["N/A"].Value)</p>
+                            <p class="quantity-label">Số lượng: <strong>@(((dynamic)ViewBag.RevenueData)?.TotalDrinkCount ?? 0)</strong></p>
+                        </div>
+                    </div>
+                    <div class="summary-card-item">
+                        <div class="summary-icon">🎁</div>
+                        <div class="summary-details">
+                            <h4>@Localizer["TotalComboRevenue"]</h4>
+                            <p class="revenue-amount">@(((dynamic)ViewBag.RevenueData)?.TotalComboRevenue.ToString("C", new System.Globalization.CultureInfo("vi-VN")) ?? Localizer["N/A"].Value)</p>
+                            <p class="quantity-label">Số lượng: <strong>@(((dynamic)ViewBag.RevenueData)?.TotalComboCount ?? 0)</strong></p>
+                        </div>
+                    </div>
+                    <div class="summary-card-item highlight">
+                        <div class="summary-icon">💰</div>
+                        <div class="summary-details">
+                            <h4>@Localizer["TotalRevenue"]</h4>
+                            <p class="revenue-amount-large">@(((dynamic)ViewBag.RevenueData)?.TotalRevenue.ToString("C", new System.Globalization.CultureInfo("vi-VN")) ?? Localizer["N/A"].Value)</p>
+                            <p class="quantity-label">Tổng đơn hàng: <strong>@(((dynamic)ViewBag.RevenueData)?.TotalBookingCount ?? 0)</strong></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Detailed Food Item Statistics -->
+            <div class="admin-section">
+                <h3 class="section-subtitle">📊 Thống Kê Chi Tiết Món Ăn/Thức Uống</h3>
+                <div class="table-responsive">
+                    <table class="table table-custom">
+                        <thead>
+                            <tr>
+                                <th>Tên món</th>
+                                <th>Danh mục</th>
+                                <th>Số lượng bán</th>
+                                <th>Doanh thu (VND)</th>
+                                <th>Giá trung bình (VND)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @{
+                                var foodStats = ((dynamic)ViewBag.RevenueData)?.FoodItemStatistics as IEnumerable<dynamic> ?? new List<dynamic>();
+                                if (foodStats.Any())
+                                {
+                                    foreach (var item in foodStats)
+                                    {
+                                        <tr>
+                                            <td>@(item.Name ?? Localizer["N/A"].Value)</td>
+                                            <td>
+                                                @if (item.Category == "Food")
+                                                {
+                                                    <span class="badge badge-food">🍿 Thức ăn</span>
+                                                }
+                                                else if (item.Category == "Drink")
+                                                {
+                                                    <span class="badge badge-drink">🥤 Thức uống</span>
+                                                }
+                                                else if (item.Category == "Combo")
+                                                {
+                                                    <span class="badge badge-combo">🎁 Combo</span>
+                                                }
+                                                else
+                                                {
+                                                    <span>@(item.Category ?? Localizer["N/A"].Value)</span>
+                                                }
+                                            </td>
+                                            <td><strong>@(item.TotalQuantity)</strong></td>
+                                            <td>@(item.TotalRevenue?.ToString("C", new System.Globalization.CultureInfo("vi-VN")) ?? Localizer["N/A"].Value)</td>
+                                            <td>@(item.AveragePrice?.ToString("C", new System.Globalization.CultureInfo("vi-VN")) ?? Localizer["N/A"].Value)</td>
+                                        </tr>
+                                    }
+                                }
+                                else
+                                {
+                                    <tr><td colspan="5" class="text-center">@Localizer["NoData"].Value</td></tr>
+                                }
+                            }
+                        </tbody>
+                    </table>
                 </div>
             </div>
             <!-- Revenue by Movie -->
@@ -137,7 +226,7 @@
                     </table>
                 </div>
             </div>
-            <!-- Revenue by Date Table -->
+            <!-- Revenue by Date with Quantity -->
             <div class="admin-section">
                 <h3 class="section-subtitle">@Localizer["RevenueByDate"]</h3>
                 <div class="table-responsive">
@@ -145,10 +234,10 @@
                         <thead>
                             <tr>
                                 <th>@Localizer["Date"]</th>
-                                <th>@Localizer["TicketRevenue"] (VND)</th>
-                                <th>@Localizer["FoodRevenue"] (VND)</th>
-                                <th>@Localizer["DrinkRevenue"] (VND)</th>
-                                <th>@Localizer["ComboRevenue"] (VND)</th>
+                                <th>Vé (VND / SL)</th>
+                                <th>Thức ăn (VND / SL)</th>
+                                <th>Thức uống (VND / SL)</th>
+                                <th>Combo (VND / SL)</th>
                                 <th>@Localizer["Total"] (VND)</th>
                             </tr>
                         </thead>
@@ -161,11 +250,23 @@
                                     {
                                         <tr>
                                             <td>@(((dynamic)item).Date?.ToString("dd/MM/yyyy") ?? Localizer["N/A"].Value)</td>
-                                            <td>@(((dynamic)item).TicketRevenue?.ToString("C", new System.Globalization.CultureInfo("vi-VN")) ?? Localizer["N/A"].Value)</td>
-                                            <td>@(((dynamic)item).FoodRevenue?.ToString("C", new System.Globalization.CultureInfo("vi-VN")) ?? Localizer["N/A"].Value)</td>
-                                            <td>@(((dynamic)item).DrinkRevenue?.ToString("C", new System.Globalization.CultureInfo("vi-VN")) ?? Localizer["N/A"].Value)</td>
-                                            <td>@(((dynamic)item).ComboRevenue?.ToString("C", new System.Globalization.CultureInfo("vi-VN")) ?? Localizer["N/A"].Value)</td>
-                                            <td>@(((dynamic)item).TotalRevenue?.ToString("C", new System.Globalization.CultureInfo("vi-VN")) ?? Localizer["N/A"].Value)</td>
+                                            <td>
+                                                <div>@(((dynamic)item).TicketRevenue?.ToString("C", new System.Globalization.CultureInfo("vi-VN")) ?? Localizer["N/A"].Value)</div>
+                                                <small class="text-muted">SL: @(((dynamic)item).TicketCount ?? 0)</small>
+                                            </td>
+                                            <td>
+                                                <div>@(((dynamic)item).FoodRevenue?.ToString("C", new System.Globalization.CultureInfo("vi-VN")) ?? Localizer["N/A"].Value)</div>
+                                                <small class="text-muted">SL: @(((dynamic)item).FoodCount ?? 0)</small>
+                                            </td>
+                                            <td>
+                                                <div>@(((dynamic)item).DrinkRevenue?.ToString("C", new System.Globalization.CultureInfo("vi-VN")) ?? Localizer["N/A"].Value)</div>
+                                                <small class="text-muted">SL: @(((dynamic)item).DrinkCount ?? 0)</small>
+                                            </td>
+                                            <td>
+                                                <div>@(((dynamic)item).ComboRevenue?.ToString("C", new System.Globalization.CultureInfo("vi-VN")) ?? Localizer["N/A"].Value)</div>
+                                                <small class="text-muted">SL: @(((dynamic)item).ComboCount ?? 0)</small>
+                                            </td>
+                                            <td><strong>@(((dynamic)item).TotalRevenue?.ToString("C", new System.Globalization.CultureInfo("vi-VN")) ?? Localizer["N/A"].Value)</strong></td>
                                         </tr>
                                     }
                                 }
@@ -219,7 +320,7 @@
                     </table>
                 </div>
             </div>
-            <!-- Food Revenue by Category by Date -->
+            <!-- Food Revenue by Category by Date with Quantity -->
             <div class="admin-section">
                 <h3 class="section-subtitle">@Localizer["FoodRevenueByCategoryAndDate"]</h3>
                 <div class="table-responsive">
@@ -228,6 +329,7 @@
                             <tr>
                                 <th>@Localizer["Date"]</th>
                                 <th>@Localizer["Category"]</th>
+                                <th>Số lượng</th>
                                 <th>@Localizer["Revenue"] (VND)</th>
                             </tr>
                         </thead>
@@ -247,7 +349,25 @@
                                             {
                                                 <tr>
                                                     <td>@(dg.Date?.ToString("dd/MM/yyyy") ?? Localizer["N/A"].Value)</td>
-                                                    <td>@(item.Category ?? Localizer["N/A"].Value)</td>
+                                                    <td>
+                                                        @if (item.Category == "Food")
+                                                        {
+                                                            <span class="badge badge-food">🍿 Thức ăn</span>
+                                                        }
+                                                        else if (item.Category == "Drink")
+                                                        {
+                                                            <span class="badge badge-drink">🥤 Thức uống</span>
+                                                        }
+                                                        else if (item.Category == "Combo")
+                                                        {
+                                                            <span class="badge badge-combo">🎁 Combo</span>
+                                                        }
+                                                        else
+                                                        {
+                                                            <span>@(item.Category ?? Localizer["N/A"].Value)</span>
+                                                        }
+                                                    </td>
+                                                    <td><strong>@(item.Quantity ?? 0)</strong></td>
                                                     <td>@(item.Revenue?.ToString("C", new System.Globalization.CultureInfo("vi-VN")) ?? Localizer["N/A"].Value)</td>
                                                 </tr>
                                             }
@@ -256,7 +376,7 @@
                                 }
                                 else
                                 {
-                                    <tr><td colspan="3" class="text-center">@Localizer["NoData"].Value</td></tr>
+                                    <tr><td colspan="4" class="text-center">@Localizer["NoData"].Value</td></tr>
                                 }
                             }
                         </tbody>
@@ -465,19 +585,99 @@
             color: #000000;
         }
 
-    .summary-card {
-        background: #1c1c1c;
-        padding: 20px;
-        border-radius: 15px;
-        border: 1px solid #ff0033;
-        margin-bottom: 20px;
+        .table-custom td small.text-muted {
+            color: #999;
+            display: block;
+            margin-top: 3px;
+        }
+
+    .summary-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+        margin-bottom: 30px;
     }
 
-        .summary-card h4 {
-            color: #ffffff;
-            font-size: 1.2rem;
-            margin: 0;
+    .summary-card-item {
+        background: linear-gradient(135deg, #1c1c1c 0%, #2a2a2a 100%);
+        padding: 20px;
+        border-radius: 15px;
+        border: 2px solid #ff0033;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+        .summary-card-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(255, 0, 51, 0.3);
         }
+
+        .summary-card-item.highlight {
+            background: linear-gradient(135deg, #ff0033 0%, #cc0026 100%);
+            border-color: #ffffff;
+        }
+
+    .summary-icon {
+        font-size: 3rem;
+        min-width: 60px;
+        text-align: center;
+    }
+
+    .summary-details h4 {
+        color: #ffffff;
+        font-size: 0.9rem;
+        margin: 0 0 8px 0;
+        text-transform: uppercase;
+    }
+
+    .revenue-amount {
+        color: #4CAF50;
+        font-size: 1.5rem;
+        font-weight: 700;
+        margin: 5px 0;
+    }
+
+    .revenue-amount-large {
+        color: #ffffff;
+        font-size: 2rem;
+        font-weight: 700;
+        margin: 5px 0;
+    }
+
+    .quantity-label {
+        color: #d3d3d3;
+        font-size: 0.85rem;
+        margin: 5px 0 0 0;
+    }
+
+        .quantity-label strong {
+            color: #ffffff;
+            font-size: 1.1rem;
+        }
+
+    .badge {
+        padding: 5px 12px;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 600;
+    }
+
+    .badge-food {
+        background: #FFA726;
+        color: #000;
+    }
+
+    .badge-drink {
+        background: #42A5F5;
+        color: #fff;
+    }
+
+    .badge-combo {
+        background: #AB47BC;
+        color: #fff;
+    }
 
     #revenueChart {
         max-width: 100%;
@@ -503,23 +703,6 @@
         color: #dc3545;
         border-color: #dc3545;
     }
-
-    .summary-row {
-        display: flex;
-        justify-content: space-around;
-        flex-wrap: wrap;
-        gap: 10px;
-    }
-
-        .summary-row span {
-            background: #000000;
-            padding: 10px;
-            border-radius: 10px;
-            border: 1px solid #ff0033;
-            flex: 1;
-            min-width: 200px;
-            text-align: center;
-        }
 
     .filter-btn {
         padding: 8px 12px;
