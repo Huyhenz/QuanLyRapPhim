@@ -156,24 +156,42 @@
                                 {
                                     foreach (var item in foodStats)
                                     {
+                                        // ✅ Normalize category để hiển thị đúng
+                                        var category = item.Category?.ToString()?.ToLower() ?? "";
+                                        var displayCategory = "";
+                                        var badgeClass = "";
+
+                                        if (category == "food" || category == "bắp" || category == "thức ăn")
+                                        {
+                                            displayCategory = "🍿 Thức ăn";
+                                            badgeClass = "badge-food";
+                                        }
+                                        else if (category == "drink" || category == "nước" || category == "thức uống" || category == "nước uống")
+                                        {
+                                            displayCategory = "🥤 Thức uống";
+                                            badgeClass = "badge-drink";
+                                        }
+                                        else if (category == "combo")
+                                        {
+                                            displayCategory = "🎁 Combo";
+                                            badgeClass = "badge-combo";
+                                        }
+                                        else
+                                        {
+                                            displayCategory = item.Category ?? "Unknown";
+                                            badgeClass = "";
+                                        }
+
                                         <tr>
                                             <td>@(item.Name ?? Localizer["N/A"].Value)</td>
                                             <td>
-                                                @if (item.Category == "Food")
+                                                @if (!string.IsNullOrEmpty(badgeClass))
                                                 {
-                                                    <span class="badge badge-food">🍿 Thức ăn</span>
-                                                }
-                                                else if (item.Category == "Drink")
-                                                {
-                                                    <span class="badge badge-drink">🥤 Thức uống</span>
-                                                }
-                                                else if (item.Category == "Combo")
-                                                {
-                                                    <span class="badge badge-combo">🎁 Combo</span>
+                                                    <span class="badge @badgeClass">@displayCategory</span>
                                                 }
                                                 else
                                                 {
-                                                    <span>@(item.Category ?? Localizer["N/A"].Value)</span>
+                                                    <span>@displayCategory</span>
                                                 }
                                             </td>
                                             <td><strong>@(item.TotalQuantity)</strong></td>
@@ -347,24 +365,42 @@
                                         {
                                             foreach (var item in categories)
                                             {
+                                                // ✅ Normalize category
+                                                var category = item.Category?.ToString()?.ToLower() ?? "";
+                                                var displayCategory = "";
+                                                var badgeClass = "";
+
+                                                if (category == "food" || category == "bắp" || category == "thức ăn")
+                                                {
+                                                    displayCategory = "🍿 Thức ăn";
+                                                    badgeClass = "badge-food";
+                                                }
+                                                else if (category == "drink" || category == "nước" || category == "thức uống" || category == "nước uống")
+                                                {
+                                                    displayCategory = "🥤 Thức uống";
+                                                    badgeClass = "badge-drink";
+                                                }
+                                                else if (category == "combo")
+                                                {
+                                                    displayCategory = "🎁 Combo";
+                                                    badgeClass = "badge-combo";
+                                                }
+                                                else
+                                                {
+                                                    displayCategory = item.Category ?? "Unknown";
+                                                    badgeClass = "";
+                                                }
+
                                                 <tr>
                                                     <td>@(dg.Date?.ToString("dd/MM/yyyy") ?? Localizer["N/A"].Value)</td>
                                                     <td>
-                                                        @if (item.Category == "Food")
+                                                        @if (!string.IsNullOrEmpty(badgeClass))
                                                         {
-                                                            <span class="badge badge-food">🍿 Thức ăn</span>
-                                                        }
-                                                        else if (item.Category == "Drink")
-                                                        {
-                                                            <span class="badge badge-drink">🥤 Thức uống</span>
-                                                        }
-                                                        else if (item.Category == "Combo")
-                                                        {
-                                                            <span class="badge badge-combo">🎁 Combo</span>
+                                                            <span class="badge @badgeClass">@displayCategory</span>
                                                         }
                                                         else
                                                         {
-                                                            <span>@(item.Category ?? Localizer["N/A"].Value)</span>
+                                                            <span>@displayCategory</span>
                                                         }
                                                     </td>
                                                     <td><strong>@(item.Quantity ?? 0)</strong></td>
@@ -812,11 +848,45 @@
         }
     }
 </style>
+// Thêm vào đầu section Scripts trong View
 @section Scripts {
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
+        // ✅ Helper function để normalize category
+        function normalizeCategory(category) {
+            if (!category) return 'Unknown';
+            const lower = category.toLowerCase();
+
+            // Food categories
+            if (lower === 'food' || lower === 'bắp' || lower === 'thức ăn') {
+                return 'Food';
+            }
+            // Drink categories
+            if (lower === 'drink' || lower === 'nước' || lower === 'thức uống' || lower === 'nước uống') {
+                return 'Drink';
+            }
+            // Combo
+            if (lower === 'combo') {
+                return 'Combo';
+            }
+
+            return category;
+        }
+
+        // ✅ Helper function để lấy display name cho category
+        function getCategoryDisplayName(category) {
+            const normalized = normalizeCategory(category);
+            switch(normalized) {
+                case 'Food': return '🍿 Thức ăn';
+                case 'Drink': return '🥤 Thức uống';
+                case 'Combo': return '🎁 Combo';
+                default: return category;
+            }
+        }
+
         document.addEventListener('DOMContentLoaded', function() {
+            // Sidebar toggle code...
             const toggleBtn = document.getElementById('sidebar-toggle');
             const sidebar = document.querySelector('.sidebar');
             const frameWrapper = document.querySelector('.frame-wrapper');
@@ -833,18 +903,25 @@
                 });
             }
         });
+
         $(document).ready(function () {
-            // Set initial date values
+            // Date filter setup...
             $('#fromDate').val('@(((dynamic)ViewBag.RevenueData)?.FromDate ?? DateTime.Now.AddMonths(-1).ToString("yyyy-MM-dd"))');
             $('#toDate').val('@(((dynamic)ViewBag.RevenueData)?.ToDate ?? DateTime.Now.ToString("yyyy-MM-dd"))');
-            // Update hidden inputs on date change
+
             function updateFilter() {
                 $('#fromDateInput').val($('#fromDate').val());
                 $('#toDateInput').val($('#toDate').val());
             }
+
             // Parse JSON data for charts
             var revenueByDateData = JSON.parse('@Html.Raw(ViewBag.FormattedRevenueByDate ?? "[]")');
             var revenueByMonthData = JSON.parse('@Html.Raw(ViewBag.FormattedRevenueByMonth ?? "[]")');
+
+            // ✅ Log dữ liệu để debug
+            console.log('Revenue by Date Data:', revenueByDateData);
+            console.log('Revenue by Month Data:', revenueByMonthData);
+
             // Chart theo ngày
             if (revenueByDateData.length > 0) {
                 var ctxDate = document.getElementById('revenueByDateChart').getContext('2d');
