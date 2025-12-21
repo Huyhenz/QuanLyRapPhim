@@ -7,7 +7,6 @@
 }
 
 <div class="dashboard-container">
-    <!-- No admin sidebar for user ticket history -->
     <!-- Main Content Area -->
     <main class="main-content">
         <div class="content-wrapper">
@@ -53,7 +52,25 @@
                                     var hasDiscount = !string.IsNullOrEmpty(booking.VoucherUsed) && (booking.FinalAmount ?? 0m) < (booking.TotalPrice ?? 0m) && (booking.FinalAmount ?? 0m) > 0m;
                                     var discountAmount = hasDiscount ? ((booking.TotalPrice ?? 0m) - (booking.FinalAmount ?? 0m)) : 0m;
 
-                                    <tr class="text-center align-middle">
+                                    // ✅ Xác định màu row dựa trên payment status
+                                    var rowClass = "";
+                                    if (payment != null)
+                                    {
+                                        if (PaymentStatus.IsCompleted(payment.PaymentStatus))
+                                        {
+                                            rowClass = "row-success";
+                                        }
+                                        else if (PaymentStatus.IsFailedOrCancelled(payment.PaymentStatus))
+                                        {
+                                            rowClass = "row-failed";
+                                        }
+                                        else if (PaymentStatus.IsPending(payment.PaymentStatus))
+                                        {
+                                            rowClass = "row-pending";
+                                        }
+                                    }
+
+                                    <tr class="text-center align-middle @rowClass">
                                         <td class="fw-bold text-info">#@booking.BookingId</td>
                                         <td>
                                             @(isFoodOnly ? "Food Only" : showtime.Movie.Title)
@@ -98,8 +115,11 @@
                                             {
                                                 var badgeClass = PaymentStatus.GetBadgeClass(payment.PaymentStatus);
                                                 var displayText = PaymentStatus.GetDisplayText(payment.PaymentStatus, "en");
+                                                var icon = PaymentStatus.GetIcon(payment.PaymentStatus);
 
-                                                <span class="badge @badgeClass px-3 py-2">@displayText</span>
+                                                <span class="badge @badgeClass px-3 py-2">
+                                                    <i class="fas @icon me-1"></i>@displayText
+                                                </span>
                                             }
                                             else
                                             {
@@ -256,6 +276,34 @@
                 background: rgba(220, 38, 38, 0.05);
             }
 
+    /* ✅ ROW STATUS COLORS */
+    .row-success {
+        border-left: 4px solid #22c55e !important;
+        background: rgba(34, 197, 94, 0.03) !important;
+    }
+
+        .row-success:hover {
+            background: rgba(34, 197, 94, 0.08) !important;
+        }
+
+    .row-failed {
+        border-left: 4px solid #ef4444 !important;
+        background: rgba(239, 68, 68, 0.05) !important;
+    }
+
+        .row-failed:hover {
+            background: rgba(239, 68, 68, 0.1) !important;
+        }
+
+    .row-pending {
+        border-left: 4px solid #f59e0b !important;
+        background: rgba(245, 158, 11, 0.03) !important;
+    }
+
+        .row-pending:hover {
+            background: rgba(245, 158, 11, 0.08) !important;
+        }
+
     /* Buttons */
     .btn {
         display: inline-flex;
@@ -282,6 +330,13 @@
             box-shadow: 0 6px 20px rgba(220, 38, 38, 0.4);
             color: white;
         }
+
+    /* Badge Styles */
+    .badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+    }
 
     /* Footer */
     .dashboard-footer {
@@ -350,16 +405,6 @@
     }
 
     }
-
-    /* Additional Styles from Original */
-    .glow-effect {
-        box-shadow: 0 0 20px rgba(255,0,51,0.3);
-        transition: all 0.3s ease;
-    }
-
-        .glow-effect:hover {
-            box-shadow: 0 0 30px rgba(255,0,51,0.6);
-        }
 
     .text-muted {
         color: #aaaaaa !important;

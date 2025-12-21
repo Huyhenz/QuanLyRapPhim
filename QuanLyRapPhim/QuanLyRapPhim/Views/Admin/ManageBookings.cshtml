@@ -146,7 +146,25 @@
                                     var hasDiscount = !string.IsNullOrEmpty(booking.VoucherUsed) && (booking.FinalAmount ?? 0m) < (booking.TotalPrice ?? 0m) && (booking.FinalAmount ?? 0m) > 0m;
                                     var discountAmount = hasDiscount ? ((booking.TotalPrice ?? 0m) - (booking.FinalAmount ?? 0m)) : 0m;
 
-                                    <tr>
+                                    // ✅ Xác định màu row dựa trên payment status
+                                    var rowClass = "";
+                                    if (payment != null)
+                                    {
+                                        if (PaymentStatus.IsCompleted(payment.PaymentStatus))
+                                        {
+                                            rowClass = "row-success";
+                                        }
+                                        else if (PaymentStatus.IsFailedOrCancelled(payment.PaymentStatus))
+                                        {
+                                            rowClass = "row-failed";
+                                        }
+                                        else if (PaymentStatus.IsPending(payment.PaymentStatus))
+                                        {
+                                            rowClass = "row-pending";
+                                        }
+                                    }
+
+                                    <tr class="@rowClass">
                                         <td>
                                             <span class="booking-id">#@booking.BookingId</span>
                                         </td>
@@ -210,7 +228,11 @@
                                             {
                                                 var badgeClass = PaymentStatus.GetBadgeClass(payment.PaymentStatus);
                                                 var displayText = PaymentStatus.GetDisplayText(payment.PaymentStatus, "en");
-                                                <span class="status-badge @badgeClass">@displayText</span>
+                                                var icon = PaymentStatus.GetIcon(payment.PaymentStatus);
+                                                <span class="status-badge @badgeClass">
+                                                    <i class="fas @icon"></i>
+                                                    @displayText
+                                                </span>
                                             }
                                             else
                                             {
@@ -516,6 +538,34 @@
                 background: rgba(220, 38, 38, 0.05);
             }
 
+    /* ✅ ROW STATUS COLORS */
+    .row-success {
+        border-left: 4px solid #22c55e !important;
+        background: rgba(34, 197, 94, 0.03) !important;
+    }
+
+        .row-success:hover {
+            background: rgba(34, 197, 94, 0.08) !important;
+        }
+
+    .row-failed {
+        border-left: 4px solid #ef4444 !important;
+        background: rgba(239, 68, 68, 0.05) !important;
+    }
+
+        .row-failed:hover {
+            background: rgba(239, 68, 68, 0.1) !important;
+        }
+
+    .row-pending {
+        border-left: 4px solid #f59e0b !important;
+        background: rgba(245, 158, 11, 0.03) !important;
+    }
+
+        .row-pending:hover {
+            background: rgba(245, 158, 11, 0.08) !important;
+        }
+
     /* Booking Specific Styles */
     .booking-id {
         display: inline-block;
@@ -585,7 +635,9 @@
         }
 
     .status-badge {
-        display: inline-block;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
         padding: 6px 14px;
         border-radius: 20px;
         font-size: 12px;
@@ -634,79 +686,70 @@
 
     /* Responsive Design */
     @@media (max-width: 1024px) {
-        .admin-sidebar
+        .admin-sidebar {
+            width: 240px;
+        }
 
-    {
-        width: 240px;
-    }
-
-    .main-content.with-sidebar {
-        margin-left: 240px;
-    }
-
+        .main-content.with-sidebar {
+            margin-left: 240px;
+        }
     }
 
     @@media (max-width: 768px) {
-        .admin-sidebar
+        .admin-sidebar {
+            transform: translateX(-100%);
+        }
 
-    {
-        transform: translateX(-100%);
-    }
+            .admin-sidebar.show {
+                transform: translateX(0);
+            }
 
-    .admin-sidebar.show {
-        transform: translateX(0);
-    }
+        .main-content.with-sidebar {
+            margin-left: 0;
+        }
 
-    .main-content.with-sidebar {
-        margin-left: 0;
-    }
+        .content-wrapper {
+            padding: 20px;
+        }
 
-    .content-wrapper {
-        padding: 20px;
-    }
+        .page-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 16px;
+        }
 
-    .page-header {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 16px;
-    }
+        .page-title {
+            font-size: 24px;
+        }
 
-    .page-title {
-        font-size: 24px;
-    }
-
-    .data-table th,
-    .data-table td {
-        padding: 12px 8px;
-        font-size: 13px;
-    }
-
+        .data-table th,
+        .data-table td {
+            padding: 12px 8px;
+            font-size: 13px;
+        }
     }
 
     @@media (max-width: 480px) {
-        .sidebar-toggle
+        .sidebar-toggle {
+            top: 12px;
+            left: 12px;
+            width: 40px;
+            height: 40px;
+        }
 
-    {
-        top: 12px;
-        left: 12px;
-        width: 40px;
-        height: 40px;
-    }
+        .content-wrapper {
+            padding: 16px;
+        }
 
-    .content-wrapper {
-        padding: 16px;
-    }
+        .page-title {
+            font-size: 20px;
+        }
 
-    .page-title {
-        font-size: 20px;
-    }
-
-    .data-table th,
-    .data-table td {
-        padding: 10px 6px;
-        font-size: 12px;
-    }
-
+        .data-table th,
+        .data-table td {
+            padding: 10px 6px;
+            font-size: 12px;
+        }
     }
 </style>
 
