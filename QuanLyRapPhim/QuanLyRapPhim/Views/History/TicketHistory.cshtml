@@ -6,191 +6,363 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="utf-8" />
-    <title>Ticket History</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
-    <style>
-        body {
-            background-color: #0F0F0F;
-            color: white;
-            font-family: 'Montserrat', sans-serif;
-        }
+<div class="dashboard-container">
+    <!-- No admin sidebar for user ticket history -->
+    <!-- Main Content Area -->
+    <main class="main-content">
+        <div class="content-wrapper">
+            <!-- Page Header -->
+            <div class="page-header">
+                <div class="header-left">
+                    <h1 class="page-title">
+                        <i class="fas fa-ticket-alt me-2"></i>
+                        Ticket History
+                    </h1>
+                    <p class="page-subtitle">Your past bookings and purchases</p>
+                </div>
+            </div>
 
-        .table-dark {
-            background-color: #1c1c1c;
-            border-radius: 15px;
-            overflow: hidden;
-        }
-
-            .table-dark th {
-                background-color: #2a2a2a;
-                font-weight: 600;
-                text-align: center;
-            }
-
-            .table-dark td {
-                vertical-align: middle;
-                text-align: center;
-            }
-
-        .title-gradient {
-            background: linear-gradient(90deg, #ff0033, #ff8c00);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            font-size: 2.5rem;
-            font-weight: bold;
-            text-align: center;
-            margin-bottom: 40px;
-        }
-
-        .badge-success {
-            background-color: #28a745;
-            font-weight: 600;
-            padding: 8px 16px;
-            border-radius: 20px;
-        }
-
-        .btn-back {
-            background: linear-gradient(45deg, #ff0033, #cc002a);
-            border: none;
-            color: white;
-            padding: 14px 40px;
-            border-radius: 30px;
-            font-weight: 600;
-            font-size: 1.1rem;
-            transition: all 0.3s ease;
-        }
-
-            .btn-back:hover {
-                transform: translateY(-3px);
-                box-shadow: 0 10px 20px rgba(255,0,51,0.4);
-            }
-
-        .glow-effect {
-            box-shadow: 0 0 20px rgba(255,0,51,0.3);
-            transition: all 0.3s ease;
-        }
-
-            .glow-effect:hover {
-                box-shadow: 0 0 30px rgba(255,0,51,0.6);
-            }
-
-        .text-muted {
-            color: #aaaaaa !important;
-            font-style: italic;
-        }
-    </style>
-</head>
-<body>
-    <div class="container py-5">
-        <h1 class="title-gradient">Ticket History</h1>
-        <div class="table-responsive">
-            <table class="table table-dark table-hover glow-effect">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Movie</th>
-                        <th>Room</th>
-                        <th>Seats</th>
-                        <th>Show Date</th>
-                        <th>Show Time</th>
-                        <th>Food/Drinks</th>
-                        <th>Amount</th>
-                        <th>Voucher</th>
-                        <th>Booking Date</th>
-                        <th>Status</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @if (Model?.Any() == true)
-                    {
-                        @foreach (var booking in Model)
-                        {
-                            var showtime = booking.Showtime;
-                            var isFoodOnly = showtime == null;
-                            var payment = booking.Payment;
-                            var displayAmount = (booking.FinalAmount ?? 0m) > 0m ? (booking.FinalAmount ?? 0m) : (booking.TotalPrice ?? 0m);
-                            var hasDiscount = !string.IsNullOrEmpty(booking.VoucherUsed) && (booking.FinalAmount ?? 0m) < (booking.TotalPrice ?? 0m) && (booking.FinalAmount ?? 0m) > 0m;
-                            var discountAmount = hasDiscount ? ((booking.TotalPrice ?? 0m) - (booking.FinalAmount ?? 0m)) : 0m;
-
-                            <tr class="text-center align-middle">
-                                <td class="fw-bold text-info">#@booking.BookingId</td>
-                                <td>
-                                    @(isFoodOnly ? "Food Only" : showtime.Movie.Title)
-                                </td>
-                                <td>@(isFoodOnly ? "—" : showtime.Room.RoomName)</td>
-                                <td>
-                                    @(booking.BookingDetails?.Any() == true
-                                        ? string.Join(", ", booking.BookingDetails.Select(bd => bd.Seat.SeatNumber))
-                                        : Html.Raw("<em class='text-muted'>—</em>"))
-                                </td>
-                                <td>@(isFoodOnly ? "—" : showtime.Date.ToString("dd/MM/yyyy"))</td>
-                                <td>@(isFoodOnly ? "—" : showtime.StartTime.ToString(@"hh\:mm"))</td>
-                                <td>
-                                    @if (booking.BookingFoods?.Any() == true)
-                                    {
-                                        <div class="text-start">
-                                            @foreach (var bf in booking.BookingFoods)
-                                            {
-                                                <div>@bf.FoodItem.Name × @bf.Quantity</div>
-                                            }
-                                        </div>
-                                    }
-                                    else
-                                    {
-                                        <em class="text-muted">None</em>
-                                    }
-                                </td>
-                                <td class="text-end text-warning fw-bold fs-5">
-                                    @(displayAmount.ToString("N0") ?? "0") <small class="text-white-50">VND</small>
-                                    @if (hasDiscount)
-                                    {
-                                        <br />
-                                        <small class="text-success">(Saved @(discountAmount.ToString("N0") ?? "0") VND from voucher)</small>
-                                    }
-                                </td>
-                                <td>
-                                    @(booking.VoucherUsed ?? "—")
-                                </td>
-                                <td>@booking.BookingDate.ToString("dd/MM/yyyy")<br><small>@booking.BookingDate.ToString("HH:mm")</small></td>
-                                <td>
-                                    @if (payment != null)
-                                    {
-                                        @* ✅ FIX: Use PaymentStatus helper to get badge class and display text *@
-                                        var badgeClass = PaymentStatus.GetBadgeClass(payment.PaymentStatus);
-                                        var displayText = PaymentStatus.GetDisplayText(payment.PaymentStatus, "en");
-
-                                        <span class="badge @badgeClass px-3 py-2">@displayText</span>
-                                    }
-                                    else
-                                    {
-                                        <span class="badge bg-secondary px-3 py-2">No Payment</span>
-                                    }
-                                </td>
+            <!-- Ticket Table -->
+            <div class="data-table-container">
+                <div class="table-responsive">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Movie</th>
+                                <th>Room</th>
+                                <th>Seats</th>
+                                <th>Show Date</th>
+                                <th>Show Time</th>
+                                <th>Food/Drinks</th>
+                                <th>Amount</th>
+                                <th>Voucher</th>
+                                <th>Booking Date</th>
+                                <th>Status</th>
                             </tr>
-                        }
-                    }
-                    else
-                    {
-                        <tr>
-                            <td colspan="11" class="text-center py-5">
-                                <i class="fas fa-receipt fa-3x mb-3 text-muted"></i><br>
-                                <em class="text-muted fs-4">No ticket history</em>
-                            </td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
+                        </thead>
+                        <tbody>
+                            @if (Model?.Any() == true)
+                            {
+                                @foreach (var booking in Model)
+                                {
+                                    var showtime = booking.Showtime;
+                                    var isFoodOnly = showtime == null;
+                                    var payment = booking.Payment;
+                                    var displayAmount = (booking.FinalAmount ?? 0m) > 0m ? (booking.FinalAmount ?? 0m) : (booking.TotalPrice ?? 0m);
+                                    var hasDiscount = !string.IsNullOrEmpty(booking.VoucherUsed) && (booking.FinalAmount ?? 0m) < (booking.TotalPrice ?? 0m) && (booking.FinalAmount ?? 0m) > 0m;
+                                    var discountAmount = hasDiscount ? ((booking.TotalPrice ?? 0m) - (booking.FinalAmount ?? 0m)) : 0m;
+
+                                    <tr class="text-center align-middle">
+                                        <td class="fw-bold text-info">#@booking.BookingId</td>
+                                        <td>
+                                            @(isFoodOnly ? "Food Only" : showtime.Movie.Title)
+                                        </td>
+                                        <td>@(isFoodOnly ? "—" : showtime.Room.RoomName)</td>
+                                        <td>
+                                            @(booking.BookingDetails?.Any() == true
+                                                ? string.Join(", ", booking.BookingDetails.Select(bd => bd.Seat.SeatNumber))
+                                                : Html.Raw("<em class='text-muted'>—</em>"))
+                                        </td>
+                                        <td>@(isFoodOnly ? "—" : showtime.Date.ToString("dd/MM/yyyy"))</td>
+                                        <td>@(isFoodOnly ? "—" : showtime.StartTime.ToString(@"hh\:mm"))</td>
+                                        <td>
+                                            @if (booking.BookingFoods?.Any() == true)
+                                            {
+                                                <div class="text-start">
+                                                    @foreach (var bf in booking.BookingFoods)
+                                                    {
+                                                        <div>@bf.FoodItem.Name × @bf.Quantity</div>
+                                                    }
+                                                </div>
+                                            }
+                                            else
+                                            {
+                                                <em class="text-muted">None</em>
+                                            }
+                                        </td>
+                                        <td class="text-end text-warning fw-bold fs-5">
+                                            @(displayAmount.ToString("N0") ?? "0") <small class="text-white-50">VND</small>
+                                            @if (hasDiscount)
+                                            {
+                                                <br />
+                                                <small class="text-success">(Saved @(discountAmount.ToString("N0") ?? "0") VND from voucher)</small>
+                                            }
+                                        </td>
+                                        <td>
+                                            @(booking.VoucherUsed ?? "—")
+                                        </td>
+                                        <td>@booking.BookingDate.ToString("dd/MM/yyyy")<br><small>@booking.BookingDate.ToString("HH:mm")</small></td>
+                                        <td>
+                                            @if (payment != null)
+                                            {
+                                                var badgeClass = PaymentStatus.GetBadgeClass(payment.PaymentStatus);
+                                                var displayText = PaymentStatus.GetDisplayText(payment.PaymentStatus, "en");
+
+                                                <span class="badge @badgeClass px-3 py-2">@displayText</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge bg-secondary px-3 py-2">No Payment</span>
+                                            }
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td colspan="11" class="text-center py-5">
+                                        <i class="fas fa-receipt fa-3x mb-3 text-muted"></i><br>
+                                        <em class="text-muted fs-4">No ticket history</em>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="text-center mt-5">
+                <a asp-controller="Home" asp-action="Index" class="btn btn-primary">
+                    <i class="fas fa-home me-2"></i> Back to Home
+                </a>
+            </div>
         </div>
-        <div class="text-center mt-5">
-            <a asp-controller="Home" asp-action="Index" class="btn btn-back glow-effect">
-                <i class="fas fa-home me-2"></i> Back to Home
-            </a>
-        </div>
-    </div>
-</body>
-</html>
+
+        <!-- Footer -->
+        <footer class="dashboard-footer">
+            <p class="mb-0">
+                Copyright 2025 CinemaX. All Rights Reserved
+            </p>
+        </footer>
+    </main>
+</div>
+
+<style>
+    /* Reset & Base Styles */
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: 'Inter', 'Segoe UI', sans-serif;
+        background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+        color: #e0e0e0;
+        overflow-x: hidden;
+    }
+
+    /* Dashboard Container */
+    .dashboard-container {
+        display: flex;
+        min-height: 100vh;
+        position: relative;
+    }
+
+    /* Main Content */
+    .main-content {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+    }
+
+    .content-wrapper {
+        flex: 1;
+        padding: 32px;
+        max-width: 1400px;
+        margin: 0 auto;
+        width: 100%;
+    }
+
+    /* Page Header */
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 32px;
+        padding-bottom: 24px;
+        border-bottom: 2px solid rgba(220, 38, 38, 0.2);
+    }
+
+    .page-title {
+        font-size: 32px;
+        font-weight: 700;
+        background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin: 0;
+        display: flex;
+        align-items: center;
+    }
+
+    .page-subtitle {
+        color: #9ca3af;
+        font-size: 14px;
+        margin-top: 8px;
+        margin-bottom: 0;
+    }
+
+    /* Data Table Container */
+    .data-table-container {
+        background: rgba(26, 26, 26, 0.6);
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        border: 1px solid rgba(220, 38, 38, 0.1);
+    }
+
+    .table-responsive {
+        overflow-x: auto;
+    }
+
+    /* Data Table */
+    .data-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 0;
+    }
+
+        .data-table thead {
+            background: linear-gradient(135deg, rgba(220, 38, 38, 0.2) 0%, rgba(220, 38, 38, 0.1) 100%);
+        }
+
+        .data-table th {
+            padding: 16px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #dc2626;
+            border-bottom: 2px solid rgba(220, 38, 38, 0.3);
+        }
+
+        .data-table td {
+            padding: 16px;
+            border-bottom: 1px solid rgba(220, 38, 38, 0.1);
+            color: #e0e0e0;
+            font-size: 14px;
+        }
+
+        .data-table tbody tr {
+            transition: all 0.3s ease;
+        }
+
+            .data-table tbody tr:hover {
+                background: rgba(220, 38, 38, 0.05);
+            }
+
+    /* Buttons */
+    .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 10px 20px;
+        border-radius: 10px;
+        font-weight: 600;
+        font-size: 14px;
+        transition: all 0.3s ease;
+        border: none;
+        cursor: pointer;
+        text-decoration: none;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
+        color: white;
+        box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+    }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(220, 38, 38, 0.4);
+            color: white;
+        }
+
+    /* Footer */
+    .dashboard-footer {
+        padding: 24px 32px;
+        text-align: center;
+        border-top: 1px solid rgba(220, 38, 38, 0.2);
+        background: rgba(26, 26, 26, 0.6);
+        color: #9ca3af;
+        font-size: 14px;
+    }
+
+    /* Scrollbar Styling */
+    ::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+        background: rgba(0, 0, 0, 0.2);
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background: rgba(220, 38, 38, 0.5);
+        border-radius: 4px;
+    }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(220, 38, 38, 0.7);
+        }
+
+    /* Responsive Design */
+    @@media (max-width: 768px) {
+        .content-wrapper
+
+    {
+        padding: 20px;
+    }
+
+    .page-title {
+        font-size: 24px;
+    }
+
+    .data-table th,
+    .data-table td {
+        padding: 12px 8px;
+        font-size: 13px;
+    }
+
+    }
+
+    @@media (max-width: 480px) {
+        .content-wrapper
+
+    {
+        padding: 16px;
+    }
+
+    .page-title {
+        font-size: 20px;
+    }
+
+    .data-table th,
+    .data-table td {
+        padding: 10px 6px;
+        font-size: 12px;
+    }
+
+    }
+
+    /* Additional Styles from Original */
+    .glow-effect {
+        box-shadow: 0 0 20px rgba(255,0,51,0.3);
+        transition: all 0.3s ease;
+    }
+
+        .glow-effect:hover {
+            box-shadow: 0 0 30px rgba(255,0,51,0.6);
+        }
+
+    .text-muted {
+        color: #aaaaaa !important;
+        font-style: italic;
+    }
+</style>
