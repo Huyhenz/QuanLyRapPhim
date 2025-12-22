@@ -32,7 +32,7 @@ namespace QuanLyRapPhim.Controllers
                 .Include(s => s.Room)
                 .ThenInclude(r => r.Seats)
                 .Include(s => s.Movie)
-                .AsNoTracking() // Thêm AsNoTracking
+                .AsNoTracking()
                 .FirstOrDefaultAsync(s => s.ShowtimeId == showtimeId);
 
             if (showtime == null) return NotFound();
@@ -52,7 +52,6 @@ namespace QuanLyRapPhim.Controllers
             return View(showtime);
         }
 
- 
         // POST: Tickets/SelectRoomAndSeat
         [HttpPost]
         public async Task<IActionResult> SelectRoomAndSeat(int showtimeId, List<int> selectedSeatIds)
@@ -63,9 +62,13 @@ namespace QuanLyRapPhim.Controllers
                 return RedirectToAction(nameof(SelectRoomAndSeat), new { showtimeId });
             }
 
-            // Kiểm tra ghế có sẵn (không lưu DB, chỉ check)
+            // ✅ FIX: Kiểm tra ghế có available không - CHỈ CHECK BOOKINGS ĐÃ THANH TOÁN THÀNH CÔNG
             var bookedSeats = await _context.BookingDetails
-                .Where(bd => bd.Booking.ShowtimeId == showtimeId)
+                .Include(bd => bd.Booking)
+                    .ThenInclude(b => b.Payment)
+                .Where(bd => bd.Booking.ShowtimeId == showtimeId
+                    && bd.Booking.Payment != null
+                    && bd.Booking.Payment.PaymentStatus == PaymentStatus.Completed) // ✅ CHỈ CHECK COMPLETED
                 .Select(bd => bd.SeatId)
                 .ToListAsync();
 
@@ -133,7 +136,6 @@ namespace QuanLyRapPhim.Controllers
         }
 
         // GET: Tickets/SelectFood
-        // GET: Tickets/SelectFood
         public async Task<IActionResult> SelectFood()
         {
             // Load TempBooking từ Session
@@ -153,7 +155,7 @@ namespace QuanLyRapPhim.Controllers
             {
                 var showtime = await _context.Showtimes
                     .Include(s => s.Movie)
-                    .Include(s => s.Room) // QUAN TRỌNG: Phải Include Room
+                    .Include(s => s.Room)
                     .AsNoTracking()
                     .FirstOrDefaultAsync(s => s.ShowtimeId == tempBooking.ShowtimeId);
 
@@ -176,7 +178,6 @@ namespace QuanLyRapPhim.Controllers
             return View();
         }
 
-        // POST: Tickets/SelectFood - LƯU VÀO SESSION
         // POST: Tickets/SelectFood
         [HttpPost]
         public async Task<IActionResult> SelectFood(Dictionary<int, int> selectedFoods)
@@ -287,36 +288,5 @@ namespace QuanLyRapPhim.Controllers
         {
             HttpContext.Session.SetString("TempBooking", JsonSerializer.Serialize(tempBooking));
         }
-
-        // ============================================================================
-        // CÁC METHODS DƯỚI ĐÂY KHÔNG DÙNG - XÓA HOẶC COMMENT
-        // Vì bạn đang dùng Session-based flow, không lưu DB cho đến khi thanh toán
-        // ============================================================================
-
-        /*
-        // XÓA - Method này lưu DB ngay, không theo Session flow
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> ConfirmBooking(int showtimeId, List<int> selectedSeats)
-        {
-            // ... code ...
-        }
-
-        // XÓA - Method này lưu DB ngay, không cần thiết
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> ConfirmFood(int bookingId, int showtimeId, Dictionary<int, int> quantities)
-        {
-            // ... code ...
-        }
-
-        // XÓA - Method này xử lý BookingFoods đã lưu DB, không cần vì chưa lưu DB
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> CancelFood(int bookingId)
-        {
-            // ... code ...
-        }
-        */
     }
 }

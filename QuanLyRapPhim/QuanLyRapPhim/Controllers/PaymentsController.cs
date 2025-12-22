@@ -154,8 +154,8 @@ namespace QuanLyRapPhim.Controllers
 
             var response = _vnPayService.PaymentExecute(Request.Query);
 
-            _logger.LogInformation("VNPay Response: Success={Success}, OrderId={OrderId}, TransactionId={TransactionId}, ResponseCode={ResponseCode}",
-                response.Success, response.OrderId, response.TransactionId, response.VnPayResponseCode);
+            _logger.LogInformation("VNPay Response: Success={Success}, OrderId={OrderId}, TransactionId={TransactionId}, ResponseCode={ResponseCode}, TransactionStatus={TransactionStatus}",
+                response.Success, response.OrderId, response.TransactionId, response.VnPayResponseCode, response.TransactionStatus ?? "N/A");
 
             var tempBookingJson = TempData["TempBookingJson"] as string;
             if (string.IsNullOrEmpty(tempBookingJson))
@@ -186,28 +186,60 @@ namespace QuanLyRapPhim.Controllers
 
             _logger.LogInformation("User: {UserId}, Email: {Email}", userId ?? "NULL", user?.Email ?? "NULL");
 
-            // ===== THANH TOÁN THẤT BẠI =====
+            // ===== ✅ FIX: THANH TOÁN THẤT BẠI - KHÔNG LƯU GÌ VÀO DATABASE =====
             if (!response.Success)
             {
-                _logger.LogWarning("Payment FAILED - ResponseCode: {ResponseCode}", response.VnPayResponseCode);
+                _logger.LogWarning("Payment FAILED - ResponseCode: {ResponseCode}, TransactionStatus: {TransactionStatus}",
+                    response.VnPayResponseCode, response.TransactionStatus ?? "N/A");
 
+                // ✅ XÓA SESSION - KHÔNG LƯU DATABASE
                 HttpContext.Session.Remove("TempBooking");
                 TempData.Remove("TempBookingJson");
 
+                _logger.LogInformation("✓ Session cleared - No database records created for failed payment");
+
+                // ✅ Map error message
+                string GetVnpayErrorMessage(string code)
+                {
+                    return code switch
+                    {
+                        "24" => "Bạn đã hủy giao dịch thanh toán",
+                        "11" => "Giao dịch đã hết hạn chờ thanh toán",
+                        "07" => "Giao dịch bị nghi vấn (cần xác minh với ngân hàng)",
+                        "09" => "Thẻ/Tài khoản chưa đăng ký Internet Banking",
+                        "10" => "Xác thực thông tin không đúng quá nhiều lần",
+                        "12" => "Thẻ/Tài khoản đã bị khóa",
+                        "13" => "Mã OTP không chính xác",
+                        "51" => "Tài khoản không đủ số dư",
+                        "65" => "Vượt quá hạn mức giao dịch",
+                        "75" => "Ngân hàng đang bảo trì",
+                        "79" => "Nhập sai mật khẩu quá nhiều lần",
+                        "97" => "Chữ ký không hợp lệ",
+                        "99" => "Giao dịch thất bại",
+                        _ => "Giao dịch không thành công"
+                    };
+                }
+
+                var failureReason = GetVnpayErrorMessage(response.VnPayResponseCode);
+
+                // Prepare model for View
                 var failedModel = new PaymentResponseModel
                 {
                     Success = false,
                     TransactionId = response.TransactionId ?? "N/A",
                     OrderId = response.OrderId ?? "N/A",
-                    PaymentMethod = response.PaymentMethod ?? "VNPay",
+                    PaymentMethod = "VNPay",
                     OrderDescription = user?.Email ?? "Unknown",
                     VnPayResponseCode = response.VnPayResponseCode,
                     Amount = tempBooking.FinalAmount ?? tempBooking.TotalPrice
                 };
 
-                _logger.LogInformation("Returning failed view with Amount: {Amount}", failedModel.Amount);
+                ViewBag.BookingId = 0; // No booking created
+                ViewBag.PaymentId = 0; // No payment created
+                ViewBag.FailureReason = failureReason;
 
-                ViewBag.BookingId = 0;
+                _logger.LogInformation("=== PaymentCallbackVnpay FAILED - No records saved, Reason: {Reason} ===", failureReason);
+
                 return View(failedModel);
             }
 
@@ -217,15 +249,12 @@ namespace QuanLyRapPhim.Controllers
             using var transaction = await _context.Database.BeginTransactionAsync();
             try
             {
-                // 1. Load showtime
                 Showtime showtime = null;
                 int totalRows = 0;
                 char lastRowLabel = 'A';
 
                 if (tempBooking.ShowtimeId.HasValue)
                 {
-                    _logger.LogInformation("Loading showtime: {ShowtimeId}", tempBooking.ShowtimeId.Value);
-
                     showtime = await _context.Showtimes
                         .Include(s => s.Room)
                         .Include(s => s.Movie)
@@ -234,39 +263,29 @@ namespace QuanLyRapPhim.Controllers
 
                     if (showtime == null)
                     {
-                        _logger.LogError("Showtime not found: {ShowtimeId}", tempBooking.ShowtimeId.Value);
                         throw new Exception($"Không tìm thấy suất chiếu ID {tempBooking.ShowtimeId.Value}");
                     }
 
-                    _logger.LogInformation("Showtime loaded: Movie={MovieTitle}, Room={RoomName}",
-                        showtime.Movie?.Title ?? "N/A", showtime.Room?.RoomName ?? "N/A");
-
-                    // 2. Double-check ghế có còn available
-                    _logger.LogInformation("Checking seat availability for {Count} seats", tempBooking.SelectedSeatIds.Count);
-
+                    // ✅ CHECK SEATS AVAILABILITY
                     var bookedSeats = await _context.BookingDetails
-                        .Where(bd => bd.Booking.ShowtimeId == tempBooking.ShowtimeId)
+                        .Include(bd => bd.Booking)
+                            .ThenInclude(b => b.Payment)
+                        .Where(bd => bd.Booking.ShowtimeId == tempBooking.ShowtimeId
+                            && bd.Booking.Payment != null
+                            && bd.Booking.Payment.PaymentStatus == PaymentStatus.Completed)
                         .Select(bd => bd.SeatId)
                         .ToListAsync();
 
                     var conflictSeats = tempBooking.SelectedSeatIds.Where(s => bookedSeats.Contains(s)).ToList();
                     if (conflictSeats.Any())
                     {
-                        _logger.LogError("Seats already booked: {Seats}", string.Join(", ", conflictSeats));
                         throw new Exception($"Ghế {string.Join(", ", conflictSeats)} đã được đặt bởi người khác.");
                     }
-
-                    _logger.LogInformation("Seat availability check PASSED");
 
                     var totalSeatsInRoom = await _context.Seats.CountAsync(s => s.RoomId == showtime.RoomId);
                     totalRows = (int)Math.Ceiling((double)totalSeatsInRoom / 10);
                     lastRowLabel = (char)('A' + totalRows - 1);
-
-                    _logger.LogInformation("Room has {TotalRows} rows, last row: {LastRow}", totalRows, lastRowLabel);
                 }
-
-                // 3. Tạo Booking entity
-                _logger.LogInformation("Creating Booking entity");
 
                 var booking = new Booking
                 {
@@ -282,28 +301,16 @@ namespace QuanLyRapPhim.Controllers
                 _context.Bookings.Add(booking);
                 await _context.SaveChangesAsync();
 
-                _logger.LogInformation("✓ Booking created successfully - BookingId: {BookingId}", booking.BookingId);
-
-                // 4. Thêm BookingDetails (ghế)
                 const decimal normalPrice = 50000;
                 const decimal couplePrice = 100000;
 
                 if (tempBooking.SelectedSeatIds.Any())
                 {
-                    _logger.LogInformation("Creating BookingDetails for {Count} seats", tempBooking.SelectedSeatIds.Count);
-
                     var seatInfos = await _context.Seats
                         .Where(s => tempBooking.SelectedSeatIds.Contains(s.SeatId))
                         .Select(s => new { s.SeatId, s.SeatNumber })
                         .AsNoTracking()
                         .ToListAsync();
-
-                    if (seatInfos.Count != tempBooking.SelectedSeatIds.Count)
-                    {
-                        _logger.LogError("Seat count mismatch: Expected {Expected}, Found {Found}",
-                            tempBooking.SelectedSeatIds.Count, seatInfos.Count);
-                        throw new Exception("Không tìm thấy đầy đủ thông tin ghế.");
-                    }
 
                     foreach (var seatInfo in seatInfos)
                     {
@@ -319,38 +326,26 @@ namespace QuanLyRapPhim.Controllers
                         };
 
                         _context.BookingDetails.Add(bookingDetail);
-
-                        _logger.LogInformation("Added BookingDetail: SeatId={SeatId}, SeatNumber={SeatNumber}, Price={Price}",
-                            seatInfo.SeatId, seatInfo.SeatNumber, price);
                     }
 
                     await _context.SaveChangesAsync();
-                    _logger.LogInformation("✓ {Count} BookingDetails saved successfully", seatInfos.Count);
 
-                    // 5. Cập nhật trạng thái ghế
-                    _logger.LogInformation("Updating seat statuses to 'Đã đặt'");
-
+                    // ✅ UPDATE SEAT STATUS
                     var seatsToUpdate = await _context.Seats
                         .Where(s => tempBooking.SelectedSeatIds.Contains(s.SeatId))
                         .ToListAsync();
 
                     foreach (var seat in seatsToUpdate)
                     {
-                        _logger.LogInformation("Updating Seat {SeatId} ({SeatNumber}): '{OldStatus}' -> 'Đã đặt'",
-                            seat.SeatId, seat.SeatNumber, seat.Status);
                         seat.Status = "Đã đặt";
                     }
 
                     _context.Seats.UpdateRange(seatsToUpdate);
                     await _context.SaveChangesAsync();
-                    _logger.LogInformation("✓ {Count} seat statuses updated successfully", seatsToUpdate.Count);
                 }
 
-                // 6. Thêm BookingFoods
                 if (tempBooking.SelectedFoods.Any())
                 {
-                    _logger.LogInformation("Creating BookingFoods for {Count} items", tempBooking.SelectedFoods.Count);
-
                     foreach (var tf in tempBooking.SelectedFoods)
                     {
                         var bookingFood = new BookingFood
@@ -362,17 +357,10 @@ namespace QuanLyRapPhim.Controllers
                         };
 
                         _context.BookingFoods.Add(bookingFood);
-
-                        _logger.LogInformation("Added BookingFood: FoodItemId={FoodItemId}, Quantity={Quantity}, UnitPrice={UnitPrice}",
-                            tf.FoodItemId, tf.Quantity, tf.UnitPrice);
                     }
 
                     await _context.SaveChangesAsync();
-                    _logger.LogInformation("✓ {Count} BookingFoods saved successfully", tempBooking.SelectedFoods.Count);
                 }
-
-                // 7. ✅ FIX: Tạo Payment với PaymentStatus = PaymentStatus.Completed (English constant)
-                _logger.LogInformation("Creating Payment record");
 
                 var payment = new Payment
                 {
@@ -380,20 +368,14 @@ namespace QuanLyRapPhim.Controllers
                     Amount = booking.FinalAmount ?? booking.TotalPrice ?? 0m,
                     PaymentDate = DateTime.Now,
                     PaymentMethod = "VNPay",
-                    PaymentStatus = PaymentStatus.Completed // ✅ FIX: Use constant "Completed" instead of "Đã thanh toán"
+                    PaymentStatus = PaymentStatus.Completed
                 };
 
                 _context.Payments.Add(payment);
                 await _context.SaveChangesAsync();
 
-                _logger.LogInformation("✓ Payment created - PaymentId: {PaymentId}, Amount: {Amount}, Status: {Status}",
-                    payment.PaymentId, payment.Amount, payment.PaymentStatus);
-
-                // 8. Cập nhật Voucher usage
                 if (booking.VoucherId.HasValue && userId != null)
                 {
-                    _logger.LogInformation("Updating voucher usage for VoucherId: {VoucherId}", booking.VoucherId);
-
                     var userVoucher = await _context.UserVouchers
                         .FirstOrDefaultAsync(uv =>
                             uv.UserId == userId &&
@@ -405,12 +387,6 @@ namespace QuanLyRapPhim.Controllers
                         userVoucher.IsUsed = true;
                         userVoucher.ClaimDate = DateTime.Now;
                         _context.UserVouchers.Update(userVoucher);
-                        _logger.LogInformation("Marked UserVoucher as used");
-                    }
-                    else
-                    {
-                        _logger.LogWarning("UserVoucher not found for UserId={UserId}, VoucherId={VoucherId}",
-                            userId, booking.VoucherId);
                     }
 
                     var voucher = await _context.Vouchers.FindAsync(booking.VoucherId);
@@ -418,27 +394,16 @@ namespace QuanLyRapPhim.Controllers
                     {
                         voucher.UsedCount++;
                         _context.Vouchers.Update(voucher);
-                        _logger.LogInformation("Incremented voucher UsedCount to {UsedCount}/{UsageLimit}",
-                            voucher.UsedCount, voucher.UsageLimit);
                     }
 
                     await _context.SaveChangesAsync();
-                    _logger.LogInformation("✓ Voucher usage updated successfully");
                 }
 
-                // Commit transaction
                 await transaction.CommitAsync();
-                _logger.LogInformation("✓✓✓ TRANSACTION COMMITTED SUCCESSFULLY ✓✓✓");
-                _logger.LogInformation("Summary: BookingId={BookingId}, PaymentId={PaymentId}, Amount={Amount}, Seats={SeatCount}, Foods={FoodCount}",
-                    booking.BookingId, payment.PaymentId, payment.Amount,
-                    tempBooking.SelectedSeatIds.Count, tempBooking.SelectedFoods.Count);
 
-                // Xóa Session/TempData
                 HttpContext.Session.Remove("TempBooking");
                 TempData.Remove("TempBookingJson");
-                _logger.LogInformation("Cleaned up session and TempData");
 
-                // Prepare model for View
                 var viewModel = new PaymentResponseModel
                 {
                     Success = true,
@@ -454,35 +419,13 @@ namespace QuanLyRapPhim.Controllers
                 ViewBag.BookingId = booking.BookingId;
                 ViewBag.PaymentId = payment.PaymentId;
 
-                _logger.LogInformation("=== PaymentCallbackVnpay SUCCESS - BookingId: {BookingId}, Amount: {Amount} ===",
-                    booking.BookingId, viewModel.Amount);
-
                 return View(viewModel);
-            }
-            catch (DbUpdateException dbEx)
-            {
-                await transaction.RollbackAsync();
-
-                var innerMsg = dbEx.InnerException?.Message ?? dbEx.Message;
-                var stackTrace = dbEx.StackTrace ?? "No stack trace";
-
-                _logger.LogError(dbEx, "DATABASE ERROR: {Message}\nInner: {Inner}\nStack: {Stack}",
-                    dbEx.Message, innerMsg, stackTrace);
-
-                TempData["ErrorMessage"] = $"Lỗi cơ sở dữ liệu: {innerMsg}";
-                return RedirectToAction("Index", "Home");
             }
             catch (Exception ex)
             {
                 await transaction.RollbackAsync();
-
-                var innerMsg = ex.InnerException?.Message ?? ex.Message;
-                var stackTrace = ex.StackTrace ?? "No stack trace";
-
-                _logger.LogError(ex, "GENERAL ERROR: {Message}\nInner: {Inner}\nStack: {Stack}",
-                    ex.Message, innerMsg, stackTrace);
-
-                TempData["ErrorMessage"] = $"Lỗi khi lưu dữ liệu: {innerMsg}";
+                _logger.LogError(ex, "Error in success transaction");
+                TempData["ErrorMessage"] = $"Lỗi khi lưu dữ liệu: {ex.Message}";
                 return RedirectToAction("Index", "Home");
             }
         }
@@ -654,18 +597,10 @@ namespace QuanLyRapPhim.Controllers
                 .Include(b => b.Showtime).ThenInclude(st => st.Room)
                 .Include(b => b.BookingDetails).ThenInclude(bd => bd.Seat)
                 .Include(b => b.BookingFoods).ThenInclude(bf => bf.FoodItem)
+                .Include(b => b.Payment)
                 .Where(b => b.UserId == userId)
+                .OrderByDescending(b => b.BookingDate)
                 .ToList();
-
-            // ✅ FIX: Use PaymentStatus constant
-            var payments = _context.Payments
-                .Where(p => p.PaymentStatus == PaymentStatus.Completed)
-                .ToList();
-
-            var paidBookingIds = payments.Select(p => p.BookingId).ToHashSet();
-            bookings = bookings.Where(b => paidBookingIds.Contains(b.BookingId)).ToList();
-
-            ViewBag.Payments = payments;
 
             return View(bookings);
         }

@@ -15,9 +15,11 @@ namespace QuanLyRapPhim.Library
         private readonly SortedList<string, string> _requestData = new SortedList<string, string>(new VnPayCompare());
         private readonly SortedList<string, string> _responseData = new SortedList<string, string>(new VnPayCompare());
 
+        // ✅ ✅ ✅ FIXED METHOD - CRITICAL FIX
         public PaymentResponseModel GetFullResponseData(IQueryCollection collection, string hashSecret)
         {
             var vnPay = new VnPayLibrary();
+
             foreach (var (key, value) in collection)
             {
                 if (!string.IsNullOrEmpty(key) && key.StartsWith("vnp_"))
@@ -25,29 +27,72 @@ namespace QuanLyRapPhim.Library
                     vnPay.AddResponseData(key, value);
                 }
             }
-            var orderId = Convert.ToInt64(vnPay.GetResponseData("vnp_TxnRef"));
-            var vnPayTranId = Convert.ToInt64(vnPay.GetResponseData("vnp_TransactionNo"));
+
+            // Lấy các giá trị từ response
+            var orderId = vnPay.GetResponseData("vnp_TxnRef");
+            var vnPayTranId = vnPay.GetResponseData("vnp_TransactionNo");
             var vnpResponseCode = vnPay.GetResponseData("vnp_ResponseCode");
-            var vnpSecureHash =
-                collection.FirstOrDefault(k => k.Key == "vnp_SecureHash").Value; //hash của dữ liệu trả về
+            var vnpTransactionStatus = vnPay.GetResponseData("vnp_TransactionStatus"); // ✅ THÊM
+            var vnpSecureHash = collection.FirstOrDefault(k => k.Key == "vnp_SecureHash").Value;
             var orderInfo = vnPay.GetResponseData("vnp_OrderInfo");
-            var checkSignature =
-                vnPay.ValidateSignature(vnpSecureHash, hashSecret); //check Signature
+
+            // ✅ Parse amount
+            var vnpAmountString = vnPay.GetResponseData("vnp_Amount");
+            decimal amount = 0m;
+            if (!string.IsNullOrEmpty(vnpAmountString) && long.TryParse(vnpAmountString, out var vnpAmount))
+            {
+                amount = vnpAmount / 100m; // VNPay trả về amount * 100
+            }
+
+            // ✅ DEBUG LOG
+            Console.WriteLine("=== VNPAY CALLBACK DEBUG ===");
+            Console.WriteLine($"vnp_ResponseCode: '{vnpResponseCode}'");
+            Console.WriteLine($"vnp_TransactionStatus: '{vnpTransactionStatus}'");
+            Console.WriteLine($"vnp_TransactionNo: '{vnPayTranId}'");
+            Console.WriteLine($"vnp_TxnRef: '{orderId}'");
+            Console.WriteLine($"vnp_Amount: {amount:N0} VND");
+
+            // Check signature
+            var checkSignature = vnPay.ValidateSignature(vnpSecureHash, hashSecret);
+
             if (!checkSignature)
+            {
+                Console.WriteLine("❌ SIGNATURE VALIDATION FAILED!");
+                Console.WriteLine("============================");
                 return new PaymentResponseModel()
                 {
-                    Success = false
+                    Success = false,
+                    VnPayResponseCode = "97", // Invalid signature
+                    TransactionStatus = vnpTransactionStatus,
+                    OrderDescription = "Chữ ký không hợp lệ",
+                    OrderId = orderId,
+                    TransactionId = vnPayTranId,
+                    Token = vnpSecureHash,
+                    Amount = amount
                 };
+            }
+
+            // ✅ ✅ ✅ CRITICAL FIX: CHỈ SUCCESS KHI CẢ 2 = "00"
+            bool isSuccess = (vnpResponseCode == "00" && vnpTransactionStatus == "00");
+
+            Console.WriteLine($"✓ Signature Valid");
+            Console.WriteLine($"Is Success: {isSuccess}");
+            Console.WriteLine($"  - ResponseCode == '00': {vnpResponseCode == "00"}");
+            Console.WriteLine($"  - TransactionStatus == '00': {vnpTransactionStatus == "00"}");
+            Console.WriteLine("============================");
+
             return new PaymentResponseModel()
             {
-                Success = true,
+                Success = isSuccess, // ✅ FIX: Không còn luôn true nữa!
                 PaymentMethod = "VnPay",
                 OrderDescription = orderInfo,
-                OrderId = orderId.ToString(),
-                PaymentId = vnPayTranId.ToString(),
-                TransactionId = vnPayTranId.ToString(),
+                OrderId = orderId,
+                PaymentId = vnPayTranId,
+                TransactionId = vnPayTranId,
                 Token = vnpSecureHash,
-                VnPayResponseCode = vnpResponseCode
+                VnPayResponseCode = vnpResponseCode,
+                TransactionStatus = vnpTransactionStatus, // ✅ THÊM
+                Amount = amount // ✅ THÊM
             };
         }
 
@@ -99,6 +144,7 @@ namespace QuanLyRapPhim.Library
         {
             return _responseData.TryGetValue(key, out var retValue) ? retValue : string.Empty;
         }
+
         public string CreateRequestUrl(string baseUrl, string vnpHashSecret)
         {
             var data = new StringBuilder();
@@ -129,6 +175,7 @@ namespace QuanLyRapPhim.Library
             var myChecksum = HmacSha512(secretKey, rspRaw);
             return myChecksum.Equals(inputHash, StringComparison.InvariantCultureIgnoreCase);
         }
+
         private string HmacSha512(string key, string inputData)
         {
             var hash = new StringBuilder();

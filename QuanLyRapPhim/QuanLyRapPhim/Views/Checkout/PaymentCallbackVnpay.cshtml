@@ -1,23 +1,42 @@
 ﻿@model QuanLyRapPhim.Models.VNPay.PaymentResponseModel
 @using Microsoft.AspNetCore.Mvc.Localization
 @using System.Globalization;
-@using QuanLyRapPhim.Data;
 @inject IViewLocalizer Localizer
-@inject DBContext Context
 
 @{
-    ViewData["Title"] = Localizer["VNPayPayment"].Value;
+    ViewData["Title"] = Model.Success ? "Payment Successful" : "Payment Failed";
 
-    // Lấy BookingId từ ViewBag (đã set trong controller)
     int bookingId = ViewBag.BookingId ?? 0;
 
-    // Lấy email từ OrderDescription: phần đầu trước space
     var descriptionParts = Model.OrderDescription.Split(new char[] { ' ' }, 2);
-    var email = descriptionParts.Length > 0 ? descriptionParts[0] : Localizer["Unidentified"].Value;
+    var email = descriptionParts.Length > 0 ? descriptionParts[0] : "Unknown";
 
-    // Format amount từ Model.Amount (đã được set trong controller)
     var culture = new CultureInfo("vi-VN");
     var amount = Model.Amount.ToString("#,##0", culture);
+
+    // ✅ Map VNPAY Response Code thành message
+    string GetVnpayErrorMessage(string code)
+    {
+        return code switch
+        {
+            "24" => "Bạn đã hủy giao dịch thanh toán",
+            "11" => "Giao dịch đã hết hạn chờ thanh toán",
+            "07" => "Giao dịch bị nghi vấn (cần xác minh với ngân hàng)",
+            "09" => "Thẻ/Tài khoản chưa đăng ký Internet Banking",
+            "10" => "Xác thực thông tin không đúng quá nhiều lần",
+            "12" => "Thẻ/Tài khoản đã bị khóa",
+            "13" => "Mã OTP không chính xác",
+            "51" => "Tài khoản không đủ số dư",
+            "65" => "Vượt quá hạn mức giao dịch",
+            "75" => "Ngân hàng đang bảo trì",
+            "79" => "Nhập sai mật khẩu quá nhiều lần",
+            "97" => "Chữ ký không hợp lệ",
+            "99" => "Giao dịch thất bại",
+            _ => "Giao dịch không thành công"
+        };
+    }
+
+    string errorMessage = !Model.Success ? GetVnpayErrorMessage(Model.VnPayResponseCode) : "";
 }
 
 <div class="container my-5">
@@ -32,14 +51,22 @@
                             <div class="success-icon mb-3">
                                 <i class="fas fa-check-circle"></i>
                             </div>
-                            <h3 class="title-gradient fw-bold">@Localizer["PaymentSuccessful"]</h3>
+                            <h3 class="title-gradient fw-bold">Payment Successful</h3>
+                            <p class="text-success mt-2">Thanh toán của bạn đã được xử lý thành công!</p>
                         }
                         else
                         {
                             <div class="error-icon mb-3">
                                 <i class="fas fa-times-circle"></i>
                             </div>
-                            <h3 class="title-gradient-error fw-bold">@Localizer["PaymentFailed"]</h3>
+                            <h3 class="title-gradient-error fw-bold">Payment Failed</h3>
+                            @if (!string.IsNullOrEmpty(errorMessage))
+                            {
+                                <div class="alert alert-danger mt-3 error-message">
+                                    <i class="fas fa-exclamation-triangle me-2"></i>
+                                    <strong>@errorMessage</strong>
+                                </div>
+                            }
                         }
                     </div>
 
@@ -47,39 +74,49 @@
                     <div class="payment-details">
                         <dl class="row">
                             <dt class="col-sm-5 text-muted">
-                                <i class="fas fa-hashtag me-2"></i>@Localizer["TransactionId"]
+                                <i class="fas fa-hashtag me-2"></i>Transaction ID
                             </dt>
                             <dd class="col-sm-7">@Model.TransactionId</dd>
 
                             <dt class="col-sm-5 text-muted">
-                                <i class="fas fa-envelope me-2"></i>@Localizer["Email"]
+                                <i class="fas fa-envelope me-2"></i>Email
                             </dt>
                             <dd class="col-sm-7">@email</dd>
 
                             <dt class="col-sm-5 text-muted">
-                                <i class="fas fa-money-bill-wave me-2"></i>@Localizer["Amount"]
+                                <i class="fas fa-money-bill-wave me-2"></i>Amount
                             </dt>
                             <dd class="col-sm-7 text-warning fw-bold">@amount VNĐ</dd>
 
                             <dt class="col-sm-5 text-muted">
-                                <i class="fas fa-credit-card me-2"></i>@Localizer["PaymentMethod"]
+                                <i class="fas fa-credit-card me-2"></i>Payment Method
                             </dt>
                             <dd class="col-sm-7">@Model.PaymentMethod</dd>
 
+                            @if (!Model.Success && !string.IsNullOrEmpty(Model.VnPayResponseCode))
+                            {
+                                <dt class="col-sm-5 text-muted">
+                                    <i class="fas fa-code me-2"></i>Error Code
+                                </dt>
+                                <dd class="col-sm-7">
+                                    <span class="badge bg-danger">@Model.VnPayResponseCode</span>
+                                </dd>
+                            }
+
                             <dt class="col-sm-5 text-muted">
-                                <i class="fas fa-info-circle me-2"></i>@Localizer["Status"]
+                                <i class="fas fa-info-circle me-2"></i>Status
                             </dt>
                             <dd class="col-sm-7">
                                 @if (Model.Success)
                                 {
                                     <span class="badge bg-success px-3 py-2">
-                                        <i class="fas fa-check me-1"></i>@Localizer["Successful"]
+                                        <i class="fas fa-check me-1"></i>Successful
                                     </span>
                                 }
                                 else
                                 {
                                     <span class="badge bg-danger px-3 py-2">
-                                        <i class="fas fa-times me-1"></i>@Localizer["Failed"]
+                                        <i class="fas fa-times me-1"></i>Failed
                                     </span>
                                 }
                             </dd>
@@ -88,14 +125,20 @@
 
                     <!-- Nút hành động -->
                     <div class="text-center mt-4">
+                        @if (!Model.Success)
+                        {
+                            <a asp-controller="Movies" asp-action="Index" class="btn btn-warning glow-effect me-2">
+                                <i class="fas fa-redo me-2"></i>Thử lại
+                            </a>
+                        }
                         <a asp-controller="Movies" asp-action="Index" class="btn btn-secondary glow-effect me-2">
-                            <i class="fas fa-film me-2"></i>@Localizer["BackToMovies"]
+                            <i class="fas fa-film me-2"></i>Back to Movies
                         </a>
                         @if (User.IsInRole("Admin"))
                         {
                             <a asp-controller="Admin" asp-action="ManageBookings"
-                               class="btn btn-admin glow-effect" id="viewBookingsBtn">
-                                <i class="fas fa-ticket-alt me-2"></i>@Localizer["ViewBookings"]
+                               class="btn btn-admin glow-effect">
+                                <i class="fas fa-ticket-alt me-2"></i>View Bookings
                             </a>
                         }
                     </div>
@@ -105,7 +148,6 @@
     </div>
 </div>
 
-<!-- CSS -->
 <style>
     body {
         background-color: #0F0F0F;
@@ -124,7 +166,6 @@
             padding: 40px;
         }
 
-    /* Icon thành công/thất bại */
     .success-icon i {
         font-size: 5rem;
         color: #00ff88;
@@ -169,7 +210,6 @@
         }
     }
 
-    /* Tiêu đề */
     .title-gradient {
         background: linear-gradient(90deg, #00ff88, #00cc66);
         -webkit-background-clip: text;
@@ -190,6 +230,26 @@
         margin-top: 10px;
     }
 
+    .error-message {
+        background: rgba(239, 68, 68, 0.15);
+        border: 2px solid #ef4444;
+        border-radius: 12px;
+        padding: 15px 20px;
+        animation: slideDown 0.4s ease;
+    }
+
+    @@keyframes slideDown {
+        from {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
     .glow-effect {
         box-shadow: 0 0 15px rgba(255, 0, 51, 0.3);
         transition: all 0.3s ease;
@@ -200,7 +260,6 @@
             transform: translateY(-3px);
         }
 
-    /* Thông tin chi tiết */
     .payment-details {
         background: rgba(0, 0, 0, 0.3);
         border-radius: 15px;
@@ -230,14 +289,12 @@
             text-align: center;
         }
 
-    /* Badge */
     .badge {
         font-size: 1rem;
         font-weight: 600;
         border-radius: 20px;
     }
 
-    /* Nút */
     .btn-secondary {
         border: 2px solid #ff0033;
         color: #ff0033;
@@ -254,6 +311,25 @@
             color: #ffffff;
             border-color: #ff0033;
             transform: scale(1.05);
+        }
+
+    .btn-warning {
+        border: 2px solid #f59e0b;
+        color: #f59e0b;
+        background-color: transparent;
+        border-radius: 25px;
+        padding: 12px 30px;
+        font-weight: 600;
+        font-size: 1.1rem;
+        transition: all 0.3s ease;
+    }
+
+        .btn-warning:hover {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            color: #ffffff;
+            border-color: #f59e0b;
+            transform: scale(1.05);
+            box-shadow: 0 8px 20px rgba(245, 158, 11, 0.4);
         }
 
     .btn-admin {
@@ -275,7 +351,6 @@
             box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
         }
 
-    /* Responsive */
     @@media (max-width: 768px) {
         .payment-card .card-body {
             padding: 20px;
@@ -296,6 +371,7 @@
         }
 
         .btn-secondary,
+        .btn-warning,
         .btn-admin {
             display: block;
             width: 100%;
@@ -305,27 +381,3 @@
 </style>
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
-
-<script>
-    // Trigger immediate status update in ManageBookings when admin clicks the button
-    document.getElementById("viewBookingsBtn")?.addEventListener("click", function () {
-        const bookingId = @ViewBag.BookingId;
-        if (bookingId) {
-            fetch(`/Admin/UpdatePaymentStatus?bookingId=${bookingId}`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    console.log(`Status updated for booking ${bookingId} to ${data.paymentStatus}`);
-                } else {
-                    console.error('Failed to update status:', data.message);
-                }
-            })
-            .catch(error => console.error('Error updating status:', error));
-        }
-    });
-</script>

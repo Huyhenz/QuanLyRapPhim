@@ -1,6 +1,168 @@
 ﻿@{
     ViewData["Title"] = "Privacy Policy";
 }
-<h1>@ViewData["Title"]</h1>
 
-<p>Use this page to detail your site's privacy policy.</p>
+<div class="dashboard-container">
+    <!-- No sidebar for privacy page -->
+    <!-- Main Content Area -->
+    <main class="main-content">
+        <div class="content-wrapper">
+            <!-- Page Header -->
+            <div class="page-header">
+                <div class="header-left">
+                    <h1 class="page-title">
+                        <i class="fas fa-shield-alt me-2"></i>
+                        @ViewData["Title"]
+                    </h1>
+                    <p class="page-subtitle">Our commitment to your privacy</p>
+                </div>
+            </div>
+
+            <!-- Privacy Content -->
+            <div class="privacy-content">
+                <p>Use this page to detail your site's privacy policy.</p>
+                <!-- Add more detailed privacy policy content here as needed -->
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="dashboard-footer">
+            <p class="mb-0">
+                Copyright 2025 CinemaX. All Rights Reserved
+            </p>
+        </footer>
+    </main>
+</div>
+
+<style>
+    /* Reset & Base Styles */
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: 'Inter', 'Segoe UI', sans-serif;
+        background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+        color: #e0e0e0;
+        overflow-x: hidden;
+    }
+
+    /* Dashboard Container */
+    .dashboard-container {
+        display: flex;
+        min-height: 100vh;
+        position: relative;
+    }
+
+    /* Main Content */
+    .main-content {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+    }
+
+    .content-wrapper {
+        flex: 1;
+        padding: 32px;
+        max-width: 1400px;
+        margin: 0 auto;
+        width: 100%;
+    }
+
+    /* Page Header */
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 32px;
+        padding-bottom: 24px;
+        border-bottom: 2px solid rgba(220, 38, 38, 0.2);
+    }
+
+    .page-title {
+        font-size: 32px;
+        font-weight: 700;
+        background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin: 0;
+        display: flex;
+        align-items: center;
+    }
+
+    .page-subtitle {
+        color: #9ca3af;
+        font-size: 14px;
+        margin-top: 8px;
+        margin-bottom: 0;
+    }
+
+    /* Privacy Content */
+    .privacy-content {
+        background: rgba(26, 26, 26, 0.6);
+        border-radius: 16px;
+        padding: 24px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        border: 1px solid rgba(220, 38, 38, 0.1);
+    }
+
+    /* Footer */
+    .dashboard-footer {
+        padding: 24px 32px;
+        text-align: center;
+        border-top: 1px solid rgba(220, 38, 38, 0.2);
+        background: rgba(26, 26, 26, 0.6);
+        color: #9ca3af;
+        font-size: 14px;
+    }
+
+    /* Scrollbar Styling */
+    ::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+        background: rgba(0, 0, 0, 0.2);
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background: rgba(220, 38, 38, 0.5);
+        border-radius: 4px;
+    }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(220, 38, 38, 0.7);
+        }
+
+    /* Responsive Design */
+    @@media (max-width: 768px) {
+        .content-wrapper
+
+    {
+        padding: 20px;
+    }
+
+    .page-title {
+        font-size: 24px;
+    }
+
+    }
+
+    @@media (max-width: 480px) {
+        .content-wrapper
+
+    {
+        padding: 16px;
+    }
+
+    .page-title {
+        font-size: 20px;
+    }
+
+    }
+</style>

@@ -9,9 +9,17 @@
         public string PaymentId { get; set; }
         public bool Success { get; set; }
         public string Token { get; set; }
+
+        /// <summary>
+        /// Mã phản hồi từ VNPAY (00 = success, 24 = cancelled, etc.)
+        /// </summary>
         public string VnPayResponseCode { get; set; }
 
-        public decimal Amount { get; set; }
+        /// <summary>
+        /// Trạng thái giao dịch từ VNPAY (00 = success, 02 = failed, etc.)
+        /// </summary>
+        public string TransactionStatus { get; set; }
 
+        public decimal Amount { get; set; }
     }
 }
