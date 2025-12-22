@@ -120,6 +120,9 @@
   <data name="ManageBookingsTitle" xml:space="preserve">
     <value>Manage Bookings</value>
   </data>
+  <data name="FailedBookings" xml:space="preserve">
+    <value>Failed Bookings</value>
+  </data>
   <data name="WalkInCustomer" xml:space="preserve">
     <value>Walk-in Customer</value>
   </data>
@@ -161,5 +164,68 @@
   </data>
   <data name="LoadError" xml:space="preserve">
     <value>LoadError</value>
+  </data>
+  <data name="None" xml:space="preserve">
+    <value>None</value>
+  </data>
+  <data name="NoPayment" xml:space="preserve">
+    <value>No Payment</value>
+  </data>
+  <data name="NoBookingsFound" xml:space="preserve">
+    <value>No bookings found</value>
+  </data>
+  <data name="BookingCountFound" xml:space="preserve">
+    <value>Found {0} bookings</value>
+  </data>
+  <data name="ManageBookings" xml:space="preserve">
+    <value>Manage Bookings</value>
+  </data>
+  <data name="ID" xml:space="preserve">
+    <value>ID</value>
+  </data>
+  <data name="Movie" xml:space="preserve">
+    <value>Movie</value>
+  </data>
+  <data name="Room" xml:space="preserve">
+    <value>Room</value>
+  </data>
+  <data name="Seats" xml:space="preserve">
+    <value>Seats</value>
+  </data>
+  <data name="FoodDrinks" xml:space="preserve">
+    <value>Food/Drinks</value>
+  </data>
+  <data name="Amount" xml:space="preserve">
+    <value>Amount</value>
+  </data>
+  <data name="Voucher" xml:space="preserve">
+    <value>Voucher</value>
+  </data>
+  <data name="Status" xml:space="preserve">
+    <value>Status</value>
+  </data>
+  <data name="Dashboard" xml:space="preserve">
+    <value>Dashboard</value>
+  </data>
+  <data name="ManageMovies" xml:space="preserve">
+    <value>Manage Movies</value>
+  </data>
+  <data name="ManageShowtimes" xml:space="preserve">
+    <value>Manage Showtimes</value>
+  </data>
+  <data name="ManageRooms" xml:space="preserve">
+    <value>Manage Rooms</value>
+  </data>
+  <data name="ManageSeats" xml:space="preserve">
+    <value>Manage Seats</value>
+  </data>
+  <data name="ManageFoods" xml:space="preserve">
+    <value>Manage Foods</value>
+  </data>
+  <data name="RevenueStatistics" xml:space="preserve">
+    <value>Revenue Statistics</value>
+  </data>
+  <data name="Vouchers" xml:space="preserve">
+    <value>Vouchers</value>
   </data>
 </root>

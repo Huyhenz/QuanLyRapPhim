@@ -1,8 +1,10 @@
 ﻿@model IEnumerable<QuanLyRapPhim.Models.Booking>
 @using QuanLyRapPhim.Models
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
 
 @{
-    ViewData["Title"] = "Ticket History";
+    ViewData["Title"] = Localizer["TicketHistory"].Value;
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
@@ -15,9 +17,9 @@
                 <div class="header-left">
                     <h1 class="page-title">
                         <i class="fas fa-ticket-alt me-2"></i>
-                        Ticket History
+                        @Localizer["TicketHistory"]
                     </h1>
-                    <p class="page-subtitle">Your past bookings and purchases</p>
+                    <p class="page-subtitle">@Localizer["TicketHistorySubtitle"]</p>
                 </div>
             </div>
 
@@ -27,17 +29,17 @@
                     <table class="data-table">
                         <thead>
                             <tr>
-                                <th>ID</th>
-                                <th>Movie</th>
-                                <th>Room</th>
-                                <th>Seats</th>
-                                <th>Show Date</th>
-                                <th>Show Time</th>
-                                <th>Food/Drinks</th>
-                                <th>Amount</th>
-                                <th>Voucher</th>
-                                <th>Booking Date</th>
-                                <th>Status</th>
+                                <th>@Localizer["ID"]</th>
+                                <th>@Localizer["Movie"]</th>
+                                <th>@Localizer["Room"]</th>
+                                <th>@Localizer["Seats"]</th>
+                                <th>@Localizer["ShowDate"]</th>
+                                <th>@Localizer["ShowTime"]</th>
+                                <th>@Localizer["FoodDrinks"]</th>
+                                <th>@Localizer["Amount"]</th>
+                                <th>@Localizer["Voucher"]</th>
+                                <th>@Localizer["BookingDate"]</th>
+                                <th>@Localizer["Status"]</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -73,7 +75,7 @@
                                     <tr class="text-center align-middle @rowClass">
                                         <td class="fw-bold text-info">#@booking.BookingId</td>
                                         <td>
-                                            @(isFoodOnly ? "Food Only" : showtime.Movie.Title)
+                                            @(isFoodOnly ? Localizer["FoodOnly"].Value : showtime.Movie.Title)
                                         </td>
                                         <td>@(isFoodOnly ? "—" : showtime.Room.RoomName)</td>
                                         <td>
@@ -95,15 +97,15 @@
                                             }
                                             else
                                             {
-                                                <em class="text-muted">None</em>
+                                                <em class="text-muted">@Localizer["None"]</em>
                                             }
                                         </td>
                                         <td class="text-end text-warning fw-bold fs-5">
-                                            @(displayAmount.ToString("N0") ?? "0") <small class="text-white-50">VND</small>
+                                            @(displayAmount.ToString("N0") ?? "0") <small class="text-white-50">@Localizer["VND"]</small>
                                             @if (hasDiscount)
                                             {
                                                 <br />
-                                                <small class="text-success">(Saved @(discountAmount.ToString("N0") ?? "0") VND from voucher)</small>
+                                                <small class="text-success">@Localizer["SavedFromVoucher", discountAmount.ToString("N0") ?? "0"]</small>
                                             }
                                         </td>
                                         <td>
@@ -114,7 +116,8 @@
                                             @if (payment != null)
                                             {
                                                 var badgeClass = PaymentStatus.GetBadgeClass(payment.PaymentStatus);
-                                                var displayText = PaymentStatus.GetDisplayText(payment.PaymentStatus, "en");
+                                                var currentCulture = System.Globalization.CultureInfo.CurrentCulture.Name;
+                                                var displayText = PaymentStatus.GetDisplayText(payment.PaymentStatus, currentCulture);
                                                 var icon = PaymentStatus.GetIcon(payment.PaymentStatus);
 
                                                 <span class="badge @badgeClass px-3 py-2">
@@ -123,7 +126,7 @@
                                             }
                                             else
                                             {
-                                                <span class="badge bg-secondary px-3 py-2">No Payment</span>
+                                                <span class="badge bg-secondary px-3 py-2">@Localizer["NoPayment"]</span>
                                             }
                                         </td>
                                     </tr>
@@ -134,7 +137,7 @@
                                 <tr>
                                     <td colspan="11" class="text-center py-5">
                                         <i class="fas fa-receipt fa-3x mb-3 text-muted"></i><br>
-                                        <em class="text-muted fs-4">No ticket history</em>
+                                        <em class="text-muted fs-4">@Localizer["NoTicketHistory"]</em>
                                     </td>
                                 </tr>
                             }
@@ -145,7 +148,7 @@
 
             <div class="text-center mt-5">
                 <a asp-controller="Home" asp-action="Index" class="btn btn-primary">
-                    <i class="fas fa-home me-2"></i> Back to Home
+                    <i class="fas fa-home me-2"></i> @Localizer["BackToHome"]
                 </a>
             </div>
         </div>
@@ -153,7 +156,7 @@
         <!-- Footer -->
         <footer class="dashboard-footer">
             <p class="mb-0">
-                Copyright 2025 CinemaX. All Rights Reserved
+                @Localizer["Copyright"] 2025 CinemaX. @Localizer["AllRightsReserved"]
             </p>
         </footer>
     </main>

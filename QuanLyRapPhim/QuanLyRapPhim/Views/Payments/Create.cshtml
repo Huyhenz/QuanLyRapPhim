@@ -52,14 +52,14 @@
             {
                 <p class="text-success">
                     <i class="fas fa-check-circle me-2"></i>
-                    <strong>Voucher đã áp dụng:</strong> @booking.VoucherUsed
+                    <strong>@Localizer["VoucherApplied"]:</strong> @booking.VoucherUsed
                 </p>
             }
 
-            <p id="discountInfo" class="text-success" style="display: none;"><strong>Giảm giá:</strong> <span id="discountValue"></span> VNĐ</p>
+            <p id="discountInfo" class="text-success" style="display: none;"><strong>@Localizer["Discount"]:</strong> <span id="discountValue"></span> @Localizer["VND"]</p>
             <p id="finalAmount" @(booking?.FinalAmount != booking?.TotalPrice ? "" : "style=display:none;") class="text-warning">
-                <strong>Tổng thanh toán:</strong>
-                <span id="newAmount">@((booking?.FinalAmount ?? booking?.TotalPrice)?.ToString("N0") ?? "0")</span> VNĐ
+                <strong>@Localizer["FinalAmount"]:</strong>
+                <span id="newAmount">@((booking?.FinalAmount ?? booking?.TotalPrice)?.ToString("N0") ?? "0")</span> @Localizer["VND"]
             </p>
         </div>
     </div>
@@ -105,7 +105,7 @@
     <form method="POST" asp-action="CreatePaymentMomo" asp-controller="Payments" class="mb-3">
         <input type="hidden" name="FullName" value="@User.Identity.Name" />
         <input type="hidden" id="momoAmount" name="Amount" value="@(booking?.FinalAmount ?? booking?.TotalPrice ?? 0m)" />
-        <input type="hidden" name="OrderInfo" value="Thanh toán MoMo" />
+        <input type="hidden" name="OrderInfo" value="@Localizer["MomoPayment"].Value" />
         <div class="text-center">
             <button class="btn btn-primary btn-lg rounded-pill px-5 glow-effect title-gradient" type="submit">
                 <i class="fas fa-wallet me-2"></i> @Localizer["PayWithMomo"]
@@ -117,7 +117,7 @@
     <form method="POST" asp-action="CreatePaymentUrlVnpay" asp-controller="Payments" class="mb-3">
         <input type="hidden" name="Name" value="@User.Identity.Name" />
         <input type="hidden" id="vnpayAmount" name="Amount" value="@(booking?.FinalAmount ?? booking?.TotalPrice ?? 0m)" />
-        <input type="hidden" name="OrderDescription" value="Thanh toán VNPay" />
+        <input type="hidden" name="OrderDescription" value="@Localizer["VNPayPayment"].Value" />
         <input type="hidden" name="OrderType" value="2500" />
         <div class="text-center">
             <button class="btn btn-primary btn-lg rounded-pill px-5 glow-effect title-gradient" type="submit">
@@ -128,12 +128,12 @@
 
     <!-- Form hủy đặt -->
     <form asp-controller="Tickets" asp-action="CancelBooking" method="post"
-          onsubmit="return confirm('Bạn có chắc muốn hủy và chọn lại?');">
+          onsubmit="return confirm('@Localizer["ConfirmCancelBooking"].Value');">
         @Html.AntiForgeryToken()
         <div class="text-center mt-4">
             <button type="submit" class="btn btn-danger btn-lg rounded-pill px-5 glow-effect">
                 <i class="fas fa-times-circle me-2"></i>
-                Hủy và chọn lại
+                @Localizer["CancelAndReselect"]
             </button>
         </div>
     </form>

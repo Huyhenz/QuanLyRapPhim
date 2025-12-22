@@ -48,4 +48,7 @@
 	<data name="NoSeatsSelected" xml:space="preserve">
     <value>Chưa chọn ghế</value>
   </data>
+	<data name="ContinueToSelectFood" xml:space="preserve">
+    <value>Tiếp tục chọn đồ ăn</value>
+  </data>
 </root>

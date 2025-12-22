@@ -44,47 +44,54 @@
                     </div>
 
                     <!-- Thông tin giao dịch -->
-                    <div class="payment-details">
-                        <dl class="row">
-                            <dt class="col-sm-5 text-muted">
-                                <i class="fas fa-hashtag me-2"></i>@Localizer["TransactionId"]
-                            </dt>
-                            <dd class="col-sm-7">@Model.TransactionId</dd>
+                    @if (Model.Success)
+                    {
+                        <div class="payment-details">
+                            <dl class="row">
+                                <dt class="col-sm-5 text-muted">
+                                    <i class="fas fa-hashtag me-2"></i>@Localizer["TransactionId"]
+                                </dt>
+                                <dd class="col-sm-7">@Model.TransactionId</dd>
 
-                            <dt class="col-sm-5 text-muted">
-                                <i class="fas fa-envelope me-2"></i>@Localizer["Email"]
-                            </dt>
-                            <dd class="col-sm-7">@email</dd>
+                                <dt class="col-sm-5 text-muted">
+                                    <i class="fas fa-envelope me-2"></i>@Localizer["Email"]
+                                </dt>
+                                <dd class="col-sm-7">@email</dd>
 
-                            <dt class="col-sm-5 text-muted">
-                                <i class="fas fa-money-bill-wave me-2"></i>@Localizer["Amount"]
-                            </dt>
-                            <dd class="col-sm-7 text-warning fw-bold">@amount VNĐ</dd>
+                                <dt class="col-sm-5 text-muted">
+                                    <i class="fas fa-money-bill-wave me-2"></i>@Localizer["Amount"]
+                                </dt>
+                                <dd class="col-sm-7 text-warning fw-bold">@amount VNĐ</dd>
 
-                            <dt class="col-sm-5 text-muted">
-                                <i class="fas fa-credit-card me-2"></i>@Localizer["PaymentMethod"]
-                            </dt>
-                            <dd class="col-sm-7">@Model.PaymentMethod</dd>
+                                <dt class="col-sm-5 text-muted">
+                                    <i class="fas fa-credit-card me-2"></i>@Localizer["PaymentMethod"]
+                                </dt>
+                                <dd class="col-sm-7">@Model.PaymentMethod</dd>
 
-                            <dt class="col-sm-5 text-muted">
-                                <i class="fas fa-info-circle me-2"></i>@Localizer["Status"]
-                            </dt>
-                            <dd class="col-sm-7">
-                                @if (Model.Success)
-                                {
+                                <dt class="col-sm-5 text-muted">
+                                    <i class="fas fa-info-circle me-2"></i>@Localizer["Status"]
+                                </dt>
+                                <dd class="col-sm-7">
                                     <span class="badge bg-success px-3 py-2">
                                         <i class="fas fa-check me-1"></i>@Localizer["Successful"]
                                     </span>
-                                }
-                                else
-                                {
-                                    <span class="badge bg-danger px-3 py-2">
-                                        <i class="fas fa-times me-1"></i>@Localizer["Failed"]
-                                    </span>
-                                }
-                            </dd>
-                        </dl>
-                    </div>
+                                </dd>
+                            </dl>
+                        </div>
+                    }
+                    else
+                    {
+                        <!-- View đơn giản cho thanh toán thất bại -->
+                        <div class="payment-details text-center">
+                            <p class="text-danger mb-3" style="font-size: 1.2rem;">
+                                <i class="fas fa-exclamation-triangle me-2"></i>
+                                @(ViewBag.FailureReason ?? "Giao dịch không thành công")
+                            </p>
+                            <p class="text-muted">
+                                Vui lòng thử lại hoặc liên hệ hỗ trợ nếu vấn đề vẫn tiếp tục.
+                            </p>
+                        </div>
+                    }
 
                     <!-- Nút hành động -->
                     <div class="text-center mt-4">

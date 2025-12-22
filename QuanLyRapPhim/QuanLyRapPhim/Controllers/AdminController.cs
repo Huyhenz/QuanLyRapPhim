@@ -382,6 +382,27 @@ namespace QuanLyRapPhim.Controllers
             }
         }
 
+        // GET: Admin/FailedBookings - Quản lý đặt vé thất bại
+        public async Task<IActionResult> FailedBookings()
+        {
+            try
+            {
+                // Lấy danh sách thanh toán thất bại từ bảng PaymentFaileds (tất cả users cho admin)
+                var failedPayments = await _context.PaymentFaileds
+                    .OrderByDescending(pf => pf.FailedDate)
+                    .ToListAsync();
+
+                _logger.LogInformation("Loaded {Count} failed bookings for management", failedPayments.Count);
+                return View(failedPayments);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error loading failed bookings");
+                TempData["ErrorMessage"] = "Error loading failed bookings. Please try again.";
+                return RedirectToAction(nameof(Index));
+            }
+        }
+
         // ==================== THỐNG KÊ DOANH THU (CẢI TIẾN) ====================
 
         // ==================== THỐNG KÊ DOANH THU ====================

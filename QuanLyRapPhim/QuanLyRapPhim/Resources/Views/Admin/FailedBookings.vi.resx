@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="FailedBookings" xml:space="preserve">
+    <value>Đặt vé thất bại</value>
+  </data>
+  <data name="ID" xml:space="preserve">
+    <value>ID</value>
+  </data>
+  <data name="Customer" xml:space="preserve">
+    <value>Khách hàng (Email)</value>
+  </data>
+  <data name="Movie" xml:space="preserve">
+    <value>Phim</value>
+  </data>
+  <data name="Room" xml:space="preserve">
+    <value>Phòng</value>
+  </data>
+  <data name="Seats" xml:space="preserve">
+    <value>Ghế</value>
+  </data>
+  <data name="ShowDate" xml:space="preserve">
+    <value>Ngày chiếu</value>
+  </data>
+  <data name="ShowTime" xml:space="preserve">
+    <value>Giờ chiếu</value>
+  </data>
+  <data name="FoodDrinks" xml:space="preserve">
+    <value>Đồ ăn</value>
+  </data>
+  <data name="Amount" xml:space="preserve">
+    <value>Số tiền</value>
+  </data>
+  <data name="Voucher" xml:space="preserve">
+    <value>Voucher</value>
+  </data>
+  <data name="FailedDate" xml:space="preserve">
+    <value>Ngày thất bại</value>
+  </data>
+  <data name="FailureReason" xml:space="preserve">
+    <value>Lý do</value>
+  </data>
+  <data name="Status" xml:space="preserve">
+    <value>Trạng thái</value>
+  </data>
+  <data name="NoFailedBookingsFound" xml:space="preserve">
+    <value>Không có giao dịch thất bại nào</value>
+  </data>
+  <data name="FailedBookingsSubtitle" xml:space="preserve">
+    <value>Quản lý các giao dịch thanh toán không thành công</value>
+  </data>
+  <data name="FailedCountFound" xml:space="preserve">
+    <value>Tìm thấy {0} giao dịch thất bại</value>
+  </data>
+  <data name="Copyright" xml:space="preserve">
+    <value>Copyright</value>
+  </data>
+  <data name="AllRightsReserved" xml:space="preserve">
+    <value>Tất cả quyền được bảo lưu</value>
+  </data>
+  <data name="None" xml:space="preserve">
+    <value>Không có</value>
+  </data>
+  <data name="Failed" xml:space="preserve">
+    <value>Thất bại</value>
+  </data>
+  <data name="NA" xml:space="preserve">
+    <value>N/A</value>
+  </data>
+  <data name="Dashboard" xml:space="preserve">
+    <value>Bảng điều khiển</value>
+  </data>
+  <data name="ManageMovies" xml:space="preserve">
+    <value>Quản lý phim</value>
+  </data>
+  <data name="ManageShowtimes" xml:space="preserve">
+    <value>Quản lý lịch chiếu</value>
+  </data>
+  <data name="ManageRooms" xml:space="preserve">
+    <value>Quản lý phòng</value>
+  </data>
+  <data name="ManageSeats" xml:space="preserve">
+    <value>Quản lý ghế</value>
+  </data>
+  <data name="ManageFoods" xml:space="preserve">
+    <value>Quản lý đồ ăn</value>
+  </data>
+  <data name="ManageBookings" xml:space="preserve">
+    <value>Quản lý đặt vé</value>
+  </data>
+  <data name="RevenueStatistics" xml:space="preserve">
+    <value>Báo cáo thống kê</value>
+  </data>
+  <data name="Vouchers" xml:space="preserve">
+    <value>Voucher</value>
+  </data>
+</root>
+

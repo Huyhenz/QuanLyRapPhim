@@ -152,6 +152,9 @@
 	<data name="ManageBookings" xml:space="preserve">
     <value>Quản lý đặt vé</value>
   </data>
+	<data name="FailedBookings" xml:space="preserve">
+    <value>Đặt vé thất bại</value>
+  </data>
 	<data name="RevenueStatistics" xml:space="preserve">
     <value>Báo cáo thống kê</value>
   </data>
@@ -193,6 +196,9 @@
   </data>
 	<data name="Screen4K" xml:space="preserve">
     <value>Màn Hình 4K.</value>
+  </data>
+	<data name="Screen4KDesc" xml:space="preserve">
+    <value>Màn hình độ phân giải 4K Ultra HD, mang đến hình ảnh sắc nét và sống động nhất.</value>
   </data>
 	<data name="OnlineBooking" xml:space="preserve">
     <value>Đặt Vé Online.</value>

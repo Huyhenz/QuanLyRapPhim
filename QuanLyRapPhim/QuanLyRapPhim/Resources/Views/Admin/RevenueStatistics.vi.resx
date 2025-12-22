@@ -56,6 +56,10 @@
     <value>Quản lý đặt vé</value>
     <comment>Sidebar: Manage Bookings</comment>
   </data>
+  <data name="FailedBookings" xml:space="preserve">
+    <value>Đặt vé thất bại</value>
+    <comment>Sidebar: Failed Bookings</comment>
+  </data>
   <data name="RevenueDataOverview" xml:space="preserve">
     <value>Tổng quan về dữ liệu doanh thu</value>
     <comment>Header span for revenue overview</comment>

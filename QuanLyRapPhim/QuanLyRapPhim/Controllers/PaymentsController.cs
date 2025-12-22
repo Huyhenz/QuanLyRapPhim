@@ -226,7 +226,91 @@ namespace QuanLyRapPhim.Controllers
 
                 var failureReason = GetVnpayErrorMessage(response.VnPayResponseCode);
 
-                // Prepare model for View
+                // Lưu thông tin thanh toán thất bại vào DB (bảng PaymentFailed)
+                try
+                {
+                    var paymentFailed = new PaymentFailed
+                    {
+                        TransactionId = response.TransactionId ?? "N/A",
+                        OrderId = response.OrderId ?? "N/A",
+                        Email = user?.Email ?? "Unknown",
+                        UserId = userId,
+                        Amount = tempBooking.FinalAmount ?? tempBooking.TotalPrice,
+                        PaymentMethod = "VNPay",
+                        FailureReason = failureReason,
+                        VnPayResponseCode = response.VnPayResponseCode,
+                        FailedDate = DateTime.Now,
+                        ShowtimeId = tempBooking.ShowtimeId,
+                        VoucherUsed = tempBooking.VoucherUsed,
+                        TotalPrice = tempBooking.TotalPrice,
+                        FinalAmount = tempBooking.FinalAmount
+                    };
+
+                    // Load thông tin showtime, seats, foods để lưu đầy đủ
+                    if (tempBooking.ShowtimeId.HasValue)
+                    {
+                        var showtime = await _context.Showtimes
+                            .Include(s => s.Movie)
+                            .Include(s => s.Room)
+                            .AsNoTracking()
+                            .FirstOrDefaultAsync(s => s.ShowtimeId == tempBooking.ShowtimeId.Value);
+
+                        if (showtime != null)
+                        {
+                            paymentFailed.MovieTitle = showtime.Movie?.Title ?? "N/A";
+                            paymentFailed.RoomName = showtime.Room?.RoomName ?? "N/A";
+                            paymentFailed.ShowDate = showtime.Date;
+                            paymentFailed.ShowTime = showtime.StartTime;
+                        }
+
+                        // Load seat names
+                        if (tempBooking.SelectedSeatIds.Any())
+                        {
+                            var seats = await _context.Seats
+                                .Where(s => tempBooking.SelectedSeatIds.Contains(s.SeatId))
+                                .Select(s => s.SeatNumber)
+                                .AsNoTracking()
+                                .ToListAsync();
+                            paymentFailed.SelectedSeats = seats;
+                        }
+                    }
+
+                    // Load food items
+                    if (tempBooking.SelectedFoods.Any())
+                    {
+                        var foodItems = new List<FailedFoodItem>();
+                        foreach (var tf in tempBooking.SelectedFoods)
+                        {
+                            var food = await _context.FoodItems
+                                .AsNoTracking()
+                                .FirstOrDefaultAsync(f => f.FoodItemId == tf.FoodItemId);
+
+                            if (food != null)
+                            {
+                                foodItems.Add(new FailedFoodItem
+                                {
+                                    Name = food.Name,
+                                    Quantity = tf.Quantity,
+                                    UnitPrice = tf.UnitPrice
+                                });
+                            }
+                        }
+                        paymentFailed.SelectedFoods = foodItems;
+                    }
+
+                    _context.PaymentFaileds.Add(paymentFailed);
+                    await _context.SaveChangesAsync();
+
+                    _logger.LogInformation("Saved failed payment to PaymentFailed table. PaymentFailedId: {Id}, Email: {Email}", 
+                        paymentFailed.PaymentFailedId, paymentFailed.Email);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Error saving failed payment to PaymentFailed table");
+                    // Không throw để không làm gián đoạn flow
+                }
+
+                // Prepare model for View (đơn giản hóa)
                 var failedModel = new PaymentResponseModel
                 {
                     Success = false,
@@ -242,7 +326,7 @@ namespace QuanLyRapPhim.Controllers
                 ViewBag.PaymentId = 0; // No payment created
                 ViewBag.FailureReason = failureReason;
 
-                _logger.LogInformation("=== PaymentCallbackVnpay FAILED - No records saved, Reason: {Reason} ===", failureReason);
+                _logger.LogInformation("=== PaymentCallbackVnpay FAILED - Saved to PaymentFailed table, Reason: {Reason} ===", failureReason);
 
                 return View(failedModel);
             }

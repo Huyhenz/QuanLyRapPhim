@@ -56,7 +56,7 @@
             else
             {
                 <a asp-action="Index" asp-controller="Showtimes" class="btn btn-secondary glow-effect">
-                    <i class="fas fa-arrow-left me-2"></i>Quay lại chọn suất chiếu
+                    <i class="fas fa-arrow-left me-2"></i>@Localizer["BackToShowtimes"]
                 </a>
             }
         </div>
@@ -161,7 +161,7 @@
         <!-- NÚT XÁC NHẬN -->
         <div class="text-center">
             <button type="submit" class="btn btn-payment btn-lg px-5 py-3 glow-effect">
-                <i class="fas fa-arrow-right me-2"></i>Tiếp tục thanh toán
+                <i class="fas fa-arrow-right me-2"></i>@Localizer["ProceedToPayment"]
             </button>
         </div>
     </form>
@@ -335,7 +335,7 @@
             const foodData = @Html.Raw(Json.Serialize(ViewBag.FoodItems));
             const orderList = document.getElementById('food-order-list');
             const foodTotal = document.getElementById('food-total');
-            const noItemsText = 'Chưa chọn món nào';
+            const noItemsText = '@Localizer["NoItemsSelectedYet"]';
 
             function updateOrder() {
                 let total = 0;

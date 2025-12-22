@@ -120,6 +120,9 @@
   <data name="ManageBookingsTitle" xml:space="preserve">
     <value>Quản lý đặt vé</value>
   </data>
+  <data name="FailedBookings" xml:space="preserve">
+    <value>Đặt vé thất bại</value>
+  </data>
   <data name="WalkInCustomer" xml:space="preserve">
     <value>Khách vãng lai</value>
   </data>
@@ -161,5 +164,68 @@
   </data>
   <data name="LoadError" xml:space="preserve">
     <value>Lỗi tải</value>
+  </data>
+  <data name="None" xml:space="preserve">
+    <value>Không có</value>
+  </data>
+  <data name="NoPayment" xml:space="preserve">
+    <value>Chưa thanh toán</value>
+  </data>
+  <data name="NoBookingsFound" xml:space="preserve">
+    <value>Chưa có đặt vé nào</value>
+  </data>
+  <data name="BookingCountFound" xml:space="preserve">
+    <value>Tìm thấy {0} đặt vé</value>
+  </data>
+  <data name="ManageBookings" xml:space="preserve">
+    <value>Quản lý đặt vé</value>
+  </data>
+  <data name="ID" xml:space="preserve">
+    <value>ID</value>
+  </data>
+  <data name="Movie" xml:space="preserve">
+    <value>Phim</value>
+  </data>
+  <data name="Room" xml:space="preserve">
+    <value>Phòng</value>
+  </data>
+  <data name="Seats" xml:space="preserve">
+    <value>Ghế</value>
+  </data>
+  <data name="FoodDrinks" xml:space="preserve">
+    <value>Đồ ăn/Nước uống</value>
+  </data>
+  <data name="Amount" xml:space="preserve">
+    <value>Số tiền</value>
+  </data>
+  <data name="Voucher" xml:space="preserve">
+    <value>Voucher</value>
+  </data>
+  <data name="Status" xml:space="preserve">
+    <value>Trạng thái</value>
+  </data>
+  <data name="Dashboard" xml:space="preserve">
+    <value>Bảng điều khiển</value>
+  </data>
+  <data name="ManageMovies" xml:space="preserve">
+    <value>Quản lý phim</value>
+  </data>
+  <data name="ManageShowtimes" xml:space="preserve">
+    <value>Quản lý lịch chiếu</value>
+  </data>
+  <data name="ManageRooms" xml:space="preserve">
+    <value>Quản lý phòng</value>
+  </data>
+  <data name="ManageSeats" xml:space="preserve">
+    <value>Quản lý ghế</value>
+  </data>
+  <data name="ManageFoods" xml:space="preserve">
+    <value>Quản lý đồ ăn</value>
+  </data>
+  <data name="RevenueStatistics" xml:space="preserve">
+    <value>Báo cáo thống kê</value>
+  </data>
+  <data name="Vouchers" xml:space="preserve">
+    <value>Voucher</value>
   </data>
 </root>

@@ -174,4 +174,22 @@
   <data name="Screen4K" xml:space="preserve">
     <value>4KScreen</value>
   </data>
+  <data name="Voucher" xml:space="preserve">
+    <value>Voucher</value>
+  </data>
+  <data name="MyVoucher" xml:space="preserve">
+    <value>My Voucher</value>
+  </data>
+  <data name="AdminVoucher" xml:space="preserve">
+    <value>Admin Voucher</value>
+  </data>
+  <data name="ViewAllVouchers" xml:space="preserve">
+    <value>View all vouchers</value>
+  </data>
+  <data name="MyVouchers" xml:space="preserve">
+    <value>My Vouchers</value>
+  </data>
+  <data name="ManageVouchers" xml:space="preserve">
+    <value>Manage Vouchers</value>
+  </data>
 </root>

@@ -269,6 +269,10 @@
     <value>Quản Lý Đặt Vé</value>
     <comment>Manage bookings menu item</comment>
   </data>
+	<data name="FailedBookings" xml:space="preserve">
+    <value>Đặt Vé Thất Bại</value>
+    <comment>Failed bookings menu item</comment>
+  </data>
 	<data name="RevenueStatistics" xml:space="preserve">
     <value>Thống Kê Doanh Thu</value>
     <comment>Revenue statistics menu item</comment>

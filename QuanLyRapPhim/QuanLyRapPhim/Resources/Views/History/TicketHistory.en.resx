@@ -100,4 +100,37 @@
     <value>Back to Home</value>
     <comment>Back button text</comment>
   </data>
+  <data name="TicketHistory" xml:space="preserve">
+    <value>Ticket History</value>
+  </data>
+  <data name="TicketHistorySubtitle" xml:space="preserve">
+    <value>Your past bookings and purchases</value>
+  </data>
+  <data name="ID" xml:space="preserve">
+    <value>ID</value>
+  </data>
+  <data name="FoodDrinks" xml:space="preserve">
+    <value>Food/Drinks</value>
+  </data>
+  <data name="Amount" xml:space="preserve">
+    <value>Amount</value>
+  </data>
+  <data name="None" xml:space="preserve">
+    <value>None</value>
+  </data>
+  <data name="SavedFromVoucher" xml:space="preserve">
+    <value>(Saved {0} VND from voucher)</value>
+  </data>
+  <data name="NoPayment" xml:space="preserve">
+    <value>No Payment</value>
+  </data>
+  <data name="NoTicketHistory" xml:space="preserve">
+    <value>No ticket history</value>
+  </data>
+  <data name="Copyright" xml:space="preserve">
+    <value>Copyright</value>
+  </data>
+  <data name="AllRightsReserved" xml:space="preserve">
+    <value>All Rights Reserved</value>
+  </data>
 </root>

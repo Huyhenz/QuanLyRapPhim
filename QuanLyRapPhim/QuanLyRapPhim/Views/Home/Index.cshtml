@@ -43,24 +43,24 @@
 
                     <!-- NÚT VOUCHER (CHỨA TẤT CẢ VOUCHER CÓ SẴN) -->
                     <a href="@(User.Identity.IsAuthenticated ? "/Vouchers/Available" : "/Identity/Account/Login")"
-                       class="btn book-btn voucher-btn" title="Xem tất cả voucher">
-                        <i class="fas fa-gift"></i><br>Voucher
+                       class="btn book-btn voucher-btn" title="@Localizer["ViewAllVouchers"]">
+                        <i class="fas fa-gift"></i><br>@Localizer["Voucher"]
                     </a>
 
                     <!-- NÚT CHỨA VOUCHER (VOUCHER ĐÃ NHẬN CỦA USER) -->
                     @if (User.Identity.IsAuthenticated)
                     {
                         <a href="/Vouchers/MyVouchers"
-                           class="btn book-btn my-voucher-btn" title="Voucher của tôi">
-                            <i class="fas fa-ticket-alt"></i><br>My Voucher
+                           class="btn book-btn my-voucher-btn" title="@Localizer["MyVouchers"]">
+                            <i class="fas fa-ticket-alt"></i><br>@Localizer["MyVoucher"]
                         </a>
                     }
 
                     <!-- NÚT QUẢN LÝ VOUCHER (CHỈ ADMIN) -->
                     @if (User.IsInRole("Admin"))
                     {
-                        <a href="/Vouchers" class="btn book-btn voucher-btn" title="Quản lý Voucher">
-                            <i class="fas fa-gift"></i><br>Admin Voucher
+                        <a href="/Vouchers" class="btn book-btn voucher-btn" title="@Localizer["ManageVouchers"]">
+                            <i class="fas fa-gift"></i><br>@Localizer["AdminVoucher"]
                         </a>
                     }
 

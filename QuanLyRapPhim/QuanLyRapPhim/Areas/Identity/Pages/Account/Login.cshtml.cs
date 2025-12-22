@@ -129,16 +129,7 @@ namespace QuanLyRapPhim.Areas.Identity.Pages.Account
                 }
                 else
                 {
-                    // Kiểm tra xem có phải do email chưa được xác nhận không
-                    var user = await _signInManager.UserManager.FindByEmailAsync(Input.Email);
-                    if (user != null && !await _signInManager.UserManager.IsEmailConfirmedAsync(user))
-                    {
-                        ModelState.AddModelError(string.Empty, "Email chưa được xác nhận. Vui lòng kiểm tra email và xác nhận tài khoản, hoặc sử dụng tính năng quên mật khẩu để tự động xác nhận email.");
-                    }
-                    else
-                    {
-                        ModelState.AddModelError(string.Empty, "Email hoặc mật khẩu không đúng. Vui lòng thử lại.");
-                    }
+                    ModelState.AddModelError(string.Empty, "Invalid login attempt.");
                     return Page();
                 }
             }
