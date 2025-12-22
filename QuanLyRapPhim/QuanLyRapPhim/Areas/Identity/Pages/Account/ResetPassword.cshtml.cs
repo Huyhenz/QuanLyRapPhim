@@ -83,6 +83,22 @@ namespace QuanLyRapPhim.Areas.Identity.Pages.Account
             var result = await _userManager.ResetPasswordAsync(user, Input.Code, Input.NewPassword);
             if (result.Succeeded)
             {
+                // Tự động xác nhận email cho những tài khoản đã tồn tại trước đó (chưa xác nhận email)
+                // Để họ có thể đăng nhập sau khi reset password
+                if (!await _userManager.IsEmailConfirmedAsync(user))
+                {
+                    var emailConfirmationToken = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+                    var emailConfirmResult = await _userManager.ConfirmEmailAsync(user, emailConfirmationToken);
+                    if (emailConfirmResult.Succeeded)
+                    {
+                        _logger.LogInformation("Email automatically confirmed for user {Email} after password reset", Input.Email);
+                    }
+                    else
+                    {
+                        _logger.LogWarning("Failed to auto-confirm email for user {Email} after password reset", Input.Email);
+                    }
+                }
+
                 _logger.LogInformation("Password reset successful for user {Email}", Input.Email);
                 return RedirectToPage("./ResetPasswordConfirmation");
             }
