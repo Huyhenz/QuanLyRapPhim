@@ -174,4 +174,22 @@
   <data name="Screen4K" xml:space="preserve">
     <value>Màn hình 4k</value>
   </data>
+  <data name="Voucher" xml:space="preserve">
+    <value>Voucher</value>
+  </data>
+  <data name="MyVoucher" xml:space="preserve">
+    <value>Voucher của tôi</value>
+  </data>
+  <data name="AdminVoucher" xml:space="preserve">
+    <value>Quản lý Voucher</value>
+  </data>
+  <data name="ViewAllVouchers" xml:space="preserve">
+    <value>Xem tất cả voucher</value>
+  </data>
+  <data name="MyVouchers" xml:space="preserve">
+    <value>Voucher của tôi</value>
+  </data>
+  <data name="ManageVouchers" xml:space="preserve">
+    <value>Quản lý Voucher</value>
+  </data>
 </root>

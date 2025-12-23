@@ -269,6 +269,10 @@
     <value>Manage Bookings</value>
     <comment>Manage bookings menu item</comment>
   </data>
+  <data name="FailedBookings" xml:space="preserve">
+    <value>Failed Bookings</value>
+    <comment>Failed bookings menu item</comment>
+  </data>
   <data name="RevenueStatistics" xml:space="preserve">
     <value>Revenue Statistics</value>
     <comment>Revenue statistics menu item</comment>

@@ -100,4 +100,37 @@
     <value>Quay lại trang chủ</value>
     <comment>Back button text</comment>
   </data>
+	<data name="TicketHistory" xml:space="preserve">
+    <value>Lịch sử vé</value>
+  </data>
+	<data name="TicketHistorySubtitle" xml:space="preserve">
+    <value>Các đặt vé và mua hàng trước đây của bạn</value>
+  </data>
+	<data name="ID" xml:space="preserve">
+    <value>ID</value>
+  </data>
+	<data name="FoodDrinks" xml:space="preserve">
+    <value>Đồ ăn/Nước uống</value>
+  </data>
+	<data name="Amount" xml:space="preserve">
+    <value>Số tiền</value>
+  </data>
+	<data name="None" xml:space="preserve">
+    <value>Không có</value>
+  </data>
+	<data name="SavedFromVoucher" xml:space="preserve">
+    <value>(Đã tiết kiệm {0} VNĐ từ voucher)</value>
+  </data>
+	<data name="NoPayment" xml:space="preserve">
+    <value>Chưa thanh toán</value>
+  </data>
+	<data name="NoTicketHistory" xml:space="preserve">
+    <value>Chưa có lịch sử vé</value>
+  </data>
+	<data name="Copyright" xml:space="preserve">
+    <value>Copyright</value>
+  </data>
+	<data name="AllRightsReserved" xml:space="preserve">
+    <value>Tất cả quyền được bảo lưu</value>
+  </data>
 </root>

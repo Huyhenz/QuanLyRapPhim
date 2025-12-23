@@ -16,6 +16,8 @@ using Microsoft.EntityFrameworkCore.Storage;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Http;
 using System.Text.Json;
+using Microsoft.AspNetCore.Identity.UI.Services;
+using System.Globalization;
 
 namespace QuanLyRapPhim.Controllers
 {
@@ -26,14 +28,16 @@ namespace QuanLyRapPhim.Controllers
         private readonly DBContext _context;
         private readonly UserManager<User> _userManager;
         private readonly ILogger<PaymentsController> _logger;
+        private readonly IEmailSender _emailSender;
 
-        public PaymentsController(DBContext context, UserManager<User> userManager, IMomoService momoService, IVnPayService vnPayService, ILogger<PaymentsController> logger)
+        public PaymentsController(DBContext context, UserManager<User> userManager, IMomoService momoService, IVnPayService vnPayService, ILogger<PaymentsController> logger, IEmailSender emailSender)
         {
             _context = context;
             _userManager = userManager;
             _momoService = momoService;
             _vnPayService = vnPayService;
             _logger = logger;
+            _emailSender = emailSender;
         }
 
         [HttpGet]
@@ -222,7 +226,91 @@ namespace QuanLyRapPhim.Controllers
 
                 var failureReason = GetVnpayErrorMessage(response.VnPayResponseCode);
 
-                // Prepare model for View
+                // Lưu thông tin thanh toán thất bại vào DB (bảng PaymentFailed)
+                try
+                {
+                    var paymentFailed = new PaymentFailed
+                    {
+                        TransactionId = response.TransactionId ?? "N/A",
+                        OrderId = response.OrderId ?? "N/A",
+                        Email = user?.Email ?? "Unknown",
+                        UserId = userId,
+                        Amount = tempBooking.FinalAmount ?? tempBooking.TotalPrice,
+                        PaymentMethod = "VNPay",
+                        FailureReason = failureReason,
+                        VnPayResponseCode = response.VnPayResponseCode,
+                        FailedDate = DateTime.Now,
+                        ShowtimeId = tempBooking.ShowtimeId,
+                        VoucherUsed = tempBooking.VoucherUsed,
+                        TotalPrice = tempBooking.TotalPrice,
+                        FinalAmount = tempBooking.FinalAmount
+                    };
+
+                    // Load thông tin showtime, seats, foods để lưu đầy đủ
+                    if (tempBooking.ShowtimeId.HasValue)
+                    {
+                        var showtime = await _context.Showtimes
+                            .Include(s => s.Movie)
+                            .Include(s => s.Room)
+                            .AsNoTracking()
+                            .FirstOrDefaultAsync(s => s.ShowtimeId == tempBooking.ShowtimeId.Value);
+
+                        if (showtime != null)
+                        {
+                            paymentFailed.MovieTitle = showtime.Movie?.Title ?? "N/A";
+                            paymentFailed.RoomName = showtime.Room?.RoomName ?? "N/A";
+                            paymentFailed.ShowDate = showtime.Date;
+                            paymentFailed.ShowTime = showtime.StartTime;
+                        }
+
+                        // Load seat names
+                        if (tempBooking.SelectedSeatIds.Any())
+                        {
+                            var seats = await _context.Seats
+                                .Where(s => tempBooking.SelectedSeatIds.Contains(s.SeatId))
+                                .Select(s => s.SeatNumber)
+                                .AsNoTracking()
+                                .ToListAsync();
+                            paymentFailed.SelectedSeats = seats;
+                        }
+                    }
+
+                    // Load food items
+                    if (tempBooking.SelectedFoods.Any())
+                    {
+                        var foodItems = new List<FailedFoodItem>();
+                        foreach (var tf in tempBooking.SelectedFoods)
+                        {
+                            var food = await _context.FoodItems
+                                .AsNoTracking()
+                                .FirstOrDefaultAsync(f => f.FoodItemId == tf.FoodItemId);
+
+                            if (food != null)
+                            {
+                                foodItems.Add(new FailedFoodItem
+                                {
+                                    Name = food.Name,
+                                    Quantity = tf.Quantity,
+                                    UnitPrice = tf.UnitPrice
+                                });
+                            }
+                        }
+                        paymentFailed.SelectedFoods = foodItems;
+                    }
+
+                    _context.PaymentFaileds.Add(paymentFailed);
+                    await _context.SaveChangesAsync();
+
+                    _logger.LogInformation("Saved failed payment to PaymentFailed table. PaymentFailedId: {Id}, Email: {Email}", 
+                        paymentFailed.PaymentFailedId, paymentFailed.Email);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Error saving failed payment to PaymentFailed table");
+                    // Không throw để không làm gián đoạn flow
+                }
+
+                // Prepare model for View (đơn giản hóa)
                 var failedModel = new PaymentResponseModel
                 {
                     Success = false,
@@ -238,7 +326,7 @@ namespace QuanLyRapPhim.Controllers
                 ViewBag.PaymentId = 0; // No payment created
                 ViewBag.FailureReason = failureReason;
 
-                _logger.LogInformation("=== PaymentCallbackVnpay FAILED - No records saved, Reason: {Reason} ===", failureReason);
+                _logger.LogInformation("=== PaymentCallbackVnpay FAILED - Saved to PaymentFailed table, Reason: {Reason} ===", failureReason);
 
                 return View(failedModel);
             }
@@ -403,6 +491,20 @@ namespace QuanLyRapPhim.Controllers
 
                 HttpContext.Session.Remove("TempBooking");
                 TempData.Remove("TempBookingJson");
+
+                // Gửi email vé đặt thành công
+                if (user != null && !string.IsNullOrEmpty(user.Email))
+                {
+                    try
+                    {
+                        await SendBookingConfirmationEmailAsync(user, booking, payment, showtime);
+                    }
+                    catch (Exception emailEx)
+                    {
+                        _logger.LogError(emailEx, "Error sending booking confirmation email");
+                        // Không throw exception để không làm gián đoạn flow
+                    }
+                }
 
                 var viewModel = new PaymentResponseModel
                 {
@@ -714,6 +816,180 @@ namespace QuanLyRapPhim.Controllers
         private void SaveTempBookingToSession(TempBooking tempBooking)
         {
             HttpContext.Session.SetString("TempBooking", JsonSerializer.Serialize(tempBooking));
+        }
+
+        private async Task SendBookingConfirmationEmailAsync(User user, Booking booking, Payment payment, Showtime showtime)
+        {
+            // Load đầy đủ thông tin booking
+            var fullBooking = await _context.Bookings
+                .Include(b => b.Showtime)
+                    .ThenInclude(s => s.Movie)
+                .Include(b => b.Showtime)
+                    .ThenInclude(s => s.Room)
+                .Include(b => b.BookingDetails)
+                    .ThenInclude(bd => bd.Seat)
+                .Include(b => b.BookingFoods)
+                    .ThenInclude(bf => bf.FoodItem)
+                .Include(b => b.Voucher)
+                .FirstOrDefaultAsync(b => b.BookingId == booking.BookingId);
+
+            if (fullBooking == null || fullBooking.Showtime == null)
+            {
+                return;
+            }
+
+            var movie = fullBooking.Showtime.Movie;
+            var room = fullBooking.Showtime.Room;
+            var seats = fullBooking.BookingDetails?.Select(bd => bd.Seat?.SeatNumber).Where(s => !string.IsNullOrEmpty(s)).ToList() ?? new List<string>();
+            var foods = fullBooking.BookingFoods?.ToList() ?? new List<BookingFood>();
+
+            var culture = new CultureInfo("vi-VN");
+            var totalAmount = payment.Amount.ToString("#,##0", culture);
+            var bookingDate = fullBooking.BookingDate.ToString("dd/MM/yyyy HH:mm", culture);
+            var showtimeDate = fullBooking.Showtime.Date.ToString("dd/MM/yyyy", culture);
+            var showtimeTime = fullBooking.Showtime.StartTime.ToString(@"hh\:mm");
+
+            var emailBody = $@"
+<html>
+<head>
+    <style>
+        body {{ font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px; }}
+        .container {{ max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 10px; padding: 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }}
+        .header {{ background: linear-gradient(135deg, #e50914 0%, #b8070f 100%); color: #ffffff; padding: 20px; border-radius: 10px 10px 0 0; margin: -30px -30px 20px -30px; text-align: center; }}
+        .header h1 {{ margin: 0; font-size: 24px; }}
+        .success-icon {{ text-align: center; margin: 20px 0; }}
+        .success-icon i {{ font-size: 60px; color: #28a745; }}
+        .info-section {{ margin: 20px 0; padding: 15px; background-color: #f8f9fa; border-radius: 5px; }}
+        .info-row {{ display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #dee2e6; }}
+        .info-row:last-child {{ border-bottom: none; }}
+        .info-label {{ font-weight: bold; color: #333; }}
+        .info-value {{ color: #666; }}
+        .seats-list {{ display: flex; flex-wrap: wrap; gap: 5px; margin-top: 10px; }}
+        .seat-badge {{ background-color: #e50914; color: #ffffff; padding: 5px 10px; border-radius: 5px; font-weight: bold; }}
+        .food-item {{ padding: 8px 0; border-bottom: 1px solid #dee2e6; }}
+        .food-item:last-child {{ border-bottom: none; }}
+        .total-section {{ margin-top: 20px; padding: 15px; background-color: #e50914; color: #ffffff; border-radius: 5px; text-align: center; }}
+        .total-section .amount {{ font-size: 24px; font-weight: bold; margin-top: 10px; }}
+        .footer {{ margin-top: 30px; padding-top: 20px; border-top: 1px solid #dee2e6; text-align: center; color: #999; font-size: 12px; }}
+    </style>
+</head>
+<body>
+    <div class=""container"">
+        <div class=""header"">
+            <h1>🎬 Đặt Vé Thành Công!</h1>
+        </div>
+        
+        <div class=""success-icon"">
+            <i class=""fas fa-check-circle""></i>
+        </div>
+
+        <p style=""font-size: 16px; color: #333; text-align: center;"">
+            Cảm ơn bạn <strong>{user.FullName}</strong> đã đặt vé tại CinemaX!
+        </p>
+
+        <div class=""info-section"">
+            <h3 style=""color: #e50914; margin-top: 0;"">📽️ Thông Tin Phim</h3>
+            <div class=""info-row"">
+                <span class=""info-label"">Tên phim:</span>
+                <span class=""info-value"">{movie?.Title ?? "N/A"}</span>
+            </div>
+            <div class=""info-row"">
+                <span class=""info-label"">Phòng chiếu:</span>
+                <span class=""info-value"">{room?.RoomName ?? "N/A"}</span>
+            </div>
+            <div class=""info-row"">
+                <span class=""info-label"">Ngày chiếu:</span>
+                <span class=""info-value"">{showtimeDate}</span>
+            </div>
+            <div class=""info-row"">
+                <span class=""info-label"">Giờ chiếu:</span>
+                <span class=""info-value"">{showtimeTime}</span>
+            </div>
+        </div>
+
+        <div class=""info-section"">
+            <h3 style=""color: #e50914; margin-top: 0;"">🎫 Ghế Đã Đặt</h3>
+            <div class=""seats-list"">
+                {string.Join("", seats.Select(s => $"<span class=\"seat-badge\">{s}</span>"))}
+            </div>
+        </div>";
+
+            if (foods.Any())
+            {
+                emailBody += $@"
+        <div class=""info-section"">
+            <h3 style=""color: #e50914; margin-top: 0;"">🍿 Đồ Ăn & Nước Uống</h3>";
+                foreach (var food in foods)
+                {
+                    var foodName = food.FoodItem?.Name ?? "N/A";
+                    var quantity = food.Quantity;
+                    var unitPrice = food.UnitPrice.ToString("#,##0", culture);
+                    var totalPrice = (food.Quantity * food.UnitPrice).ToString("#,##0", culture);
+                    emailBody += $@"
+            <div class=""food-item"">
+                <div style=""display: flex; justify-content: space-between;"">
+                    <span><strong>{foodName}</strong> x {quantity}</span>
+                    <span>{totalPrice} VNĐ</span>
+                </div>
+            </div>";
+                }
+                emailBody += @"
+        </div>";
+            }
+
+            emailBody += $@"
+        <div class=""info-section"">
+            <h3 style=""color: #e50914; margin-top: 0;"">💰 Thông Tin Thanh Toán</h3>
+            <div class=""info-row"">
+                <span class=""info-label"">Mã đặt vé:</span>
+                <span class=""info-value"">#{fullBooking.BookingId}</span>
+            </div>
+            <div class=""info-row"">
+                <span class=""info-label"">Ngày đặt:</span>
+                <span class=""info-value"">{bookingDate}</span>
+            </div>
+            <div class=""info-row"">
+                <span class=""info-label"">Phương thức:</span>
+                <span class=""info-value"">{payment.PaymentMethod}</span>
+            </div>
+            <div class=""info-row"">
+                <span class=""info-label"">Mã giao dịch:</span>
+                <span class=""info-value"">{payment.PaymentId}</span>
+            </div>";
+
+            if (fullBooking.Voucher != null)
+            {
+                emailBody += $@"
+            <div class=""info-row"">
+                <span class=""info-label"">Mã giảm giá:</span>
+                <span class=""info-value"">{fullBooking.VoucherUsed}</span>
+            </div>";
+            }
+
+            emailBody += $@"
+        </div>
+
+        <div class=""total-section"">
+            <div>Tổng thanh toán</div>
+            <div class=""amount"">{totalAmount} VNĐ</div>
+        </div>
+
+        <div class=""info-section"" style=""background-color: #fff3cd; border-left: 4px solid #ffc107;"">
+            <p style=""margin: 0; color: #856404;"">
+                <strong>📌 Lưu ý:</strong> Vui lòng đến rạp trước giờ chiếu ít nhất 15 phút để nhận vé và đồ ăn. 
+                Mang theo email này hoặc mã đặt vé #{fullBooking.BookingId} để đổi vé tại quầy.
+            </p>
+        </div>
+
+        <div class=""footer"">
+            <p>© 2024 CinemaX. All rights reserved.</p>
+            <p>Email này được gửi tự động, vui lòng không trả lời.</p>
+        </div>
+    </div>
+</body>
+</html>";
+
+            await _emailSender.SendEmailAsync(user.Email, $"Xác nhận đặt vé thành công - Mã #{fullBooking.BookingId}", emailBody);
         }
     }
 }

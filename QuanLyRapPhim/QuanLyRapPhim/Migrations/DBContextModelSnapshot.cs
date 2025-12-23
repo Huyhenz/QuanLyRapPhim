@@ -360,6 +360,111 @@ namespace QuanLyRapPhim.Migrations
                     b.ToTable("Payments");
                 });
 
+            modelBuilder.Entity("QuanLyRapPhim.Models.PaymentFailed", b =>
+                {
+                    b.Property<int>("PaymentFailedId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PaymentFailedId"));
+
+                    b.Property<decimal>("Amount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("Email")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("FailedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("FailureReason")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal?>("FinalAmount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("MovieTitle")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("OrderId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PaymentMethod")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("RoomName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("SelectedFoodsJson")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("SelectedSeatsJson")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("ShowDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<TimeSpan?>("ShowTime")
+                        .HasColumnType("time");
+
+                    b.Property<int?>("ShowtimeId")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("TotalPrice")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("TransactionId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("VnPayResponseCode")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("VoucherUsed")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("PaymentFailedId");
+
+                    b.ToTable("PaymentFaileds");
+                });
+
+            modelBuilder.Entity("QuanLyRapPhim.Models.PendingUser", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("ConfirmationToken")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateOnly>("DateOfBirth")
+                        .HasColumnType("date");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("ExpiresAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("FullName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PasswordHash")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("PendingUsers");
+                });
+
             modelBuilder.Entity("QuanLyRapPhim.Models.Review", b =>
                 {
                     b.Property<int>("ReviewId")

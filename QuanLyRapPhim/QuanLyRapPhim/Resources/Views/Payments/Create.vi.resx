@@ -115,4 +115,28 @@
 	<data name="ConfirmCancelBooking" xml:space="preserve">
     <value>Bạn có chắc muốn hủy và chọn lại từ đầu không?</value>
   </data>
+	<data name="VoucherApplied" xml:space="preserve">
+    <value>Voucher đã áp dụng</value>
+  </data>
+	<data name="Discount" xml:space="preserve">
+    <value>Giảm giá</value>
+  </data>
+	<data name="FinalAmount" xml:space="preserve">
+    <value>Tổng thanh toán</value>
+  </data>
+	<data name="VND" xml:space="preserve">
+    <value>VNĐ</value>
+  </data>
+	<data name="ApplyVoucher" xml:space="preserve">
+    <value>Áp dụng Voucher</value>
+  </data>
+	<data name="EnterVoucherCode" xml:space="preserve">
+    <value>Nhập mã voucher</value>
+  </data>
+	<data name="Apply" xml:space="preserve">
+    <value>Áp dụng</value>
+  </data>
+	<data name="Cancel" xml:space="preserve">
+    <value>Hủy</value>
+  </data>
 </root>

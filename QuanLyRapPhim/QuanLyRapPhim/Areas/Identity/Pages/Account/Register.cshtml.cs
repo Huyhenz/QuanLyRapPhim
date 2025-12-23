@@ -19,6 +19,8 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
 using QuanLyRapPhim.Models;
+using QuanLyRapPhim.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace QuanLyRapPhim.Areas.Identity.Pages.Account
 {
@@ -30,13 +32,15 @@ namespace QuanLyRapPhim.Areas.Identity.Pages.Account
         private readonly IUserEmailStore<User> _emailStore;
         private readonly ILogger<RegisterModel> _logger;
         private readonly IEmailSender _emailSender;
+        private readonly DBContext _context;
 
         public RegisterModel(
             UserManager<User> userManager,
             IUserStore<User> userStore,
             SignInManager<User> signInManager,
             ILogger<RegisterModel> logger,
-            IEmailSender emailSender)
+            IEmailSender emailSender,
+            DBContext context)
         {
             _userManager = userManager;
             _userStore = userStore;
@@ -44,6 +48,7 @@ namespace QuanLyRapPhim.Areas.Identity.Pages.Account
             _signInManager = signInManager;
             _logger = logger;
             _emailSender = emailSender;
+            _context = context;
         }
 
         [BindProperty]
@@ -94,46 +99,82 @@ namespace QuanLyRapPhim.Areas.Identity.Pages.Account
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
             if (ModelState.IsValid)
             {
-                var user = CreateUser();
-
-                user.FullName = Input.Name;
-                user.DateOfBirth = DateOnly.FromDateTime(Input.DOB); // Convert DateTime to DateOnly
-
-                await _userStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
-                await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
-                var result = await _userManager.CreateAsync(user, Input.Password);
-
-                if (result.Succeeded)
+                // Kiểm tra email đã tồn tại chưa (trong User hoặc PendingUser)
+                var existingUser = await _userManager.FindByEmailAsync(Input.Email);
+                if (existingUser != null)
                 {
-                    await _userManager.AddToRoleAsync(user, "User");
-                    _logger.LogInformation("User created a new account with password.");
-
-                    var userId = await _userManager.GetUserIdAsync(user);
-                    var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-                    code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
-                    var callbackUrl = Url.Page(
-                        "/Account/ConfirmEmail",
-                        pageHandler: null,
-                        values: new { area = "Identity", userId = userId, code = code, returnUrl = returnUrl },
-                        protocol: Request.Scheme);
-
-                    await _emailSender.SendEmailAsync(Input.Email, "Confirm your email",
-                        $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
-
-                    if (_userManager.Options.SignIn.RequireConfirmedAccount)
-                    {
-                        return RedirectToPage("RegisterConfirmation", new { email = Input.Email, returnUrl = returnUrl });
-                    }
-                    else
-                    {
-                        await _signInManager.SignInAsync(user, isPersistent: false);
-                        return LocalRedirect(returnUrl);
-                    }
+                    ModelState.AddModelError(string.Empty, "Email này đã được sử dụng.");
+                    return Page();
                 }
-                foreach (var error in result.Errors)
+
+                var existingPendingUser = await _context.PendingUsers
+                    .FirstOrDefaultAsync(p => p.Email == Input.Email);
+                if (existingPendingUser != null)
                 {
-                    ModelState.AddModelError(string.Empty, error.Description);
+                    // Xóa pending user cũ nếu có
+                    _context.PendingUsers.Remove(existingPendingUser);
+                    await _context.SaveChangesAsync();
                 }
+
+                // Tạo user tạm để hash password
+                var tempUser = CreateUser();
+                await _userStore.SetUserNameAsync(tempUser, Input.Email, CancellationToken.None);
+                await _emailStore.SetEmailAsync(tempUser, Input.Email, CancellationToken.None);
+                
+                // Hash password
+                var passwordHasher = _userManager.PasswordHasher;
+                var hashedPassword = passwordHasher.HashPassword(tempUser, Input.Password);
+
+                // Tạo token xác nhận
+                var confirmationToken = Guid.NewGuid().ToString("N");
+
+                // Lưu vào PendingUser (chưa lưu vào DB Users)
+                var pendingUser = new PendingUser
+                {
+                    FullName = Input.Name,
+                    DateOfBirth = DateOnly.FromDateTime(Input.DOB),
+                    Email = Input.Email,
+                    PasswordHash = hashedPassword,
+                    ConfirmationToken = confirmationToken,
+                    CreatedAt = DateTime.Now,
+                    ExpiresAt = DateTime.Now.AddDays(1) // Token hết hạn sau 24 giờ
+                };
+
+                _context.PendingUsers.Add(pendingUser);
+                await _context.SaveChangesAsync();
+
+                _logger.LogInformation("Pending user created, waiting for email confirmation.");
+
+                // Tạo link xác nhận
+                var callbackUrl = Url.Page(
+                    "/Account/ConfirmEmail",
+                    pageHandler: null,
+                    values: new { area = "Identity", token = confirmationToken, returnUrl = returnUrl },
+                    protocol: Request.Scheme);
+
+                await _emailSender.SendEmailAsync(Input.Email, "Xác nhận email đăng ký - CinemaX",
+                    $@"
+                    <html>
+                    <body style='font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px;'>
+                        <div style='max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 10px; padding: 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);'>
+                            <h2 style='color: #e50914; text-align: center;'>Chào mừng đến với CinemaX!</h2>
+                            <p style='color: #333; font-size: 16px;'>Xin chào <strong>{Input.Name}</strong>,</p>
+                            <p style='color: #333; font-size: 16px;'>Cảm ơn bạn đã đăng ký tài khoản tại CinemaX. Để hoàn tất đăng ký, vui lòng xác nhận email của bạn bằng cách nhấp vào nút bên dưới:</p>
+                            <div style='text-align: center; margin: 30px 0;'>
+                                <a href='{HtmlEncoder.Default.Encode(callbackUrl)}' style='background-color: #e50914; color: #ffffff; padding: 15px 30px; text-decoration: none; border-radius: 5px; display: inline-block; font-weight: bold;'>Xác nhận email</a>
+                            </div>
+                            <p style='color: #666; font-size: 14px;'>Hoặc copy và dán link sau vào trình duyệt:</p>
+                            <p style='color: #666; font-size: 12px; word-break: break-all;'>{HtmlEncoder.Default.Encode(callbackUrl)}</p>
+                            <p style='color: #666; font-size: 14px; margin-top: 30px;'>Nếu bạn không đăng ký tài khoản này, vui lòng bỏ qua email này.</p>
+                            <p style='color: #ff9800; font-size: 12px; margin-top: 20px;'><strong>Lưu ý:</strong> Link xác nhận sẽ hết hạn sau 24 giờ.</p>
+                            <hr style='border: none; border-top: 1px solid #eee; margin: 30px 0;' />
+                            <p style='color: #999; font-size: 12px; text-align: center;'>© 2024 CinemaX. All rights reserved.</p>
+                        </div>
+                    </body>
+                    </html>");
+
+                // Luôn redirect đến trang xác nhận
+                return RedirectToPage("RegisterConfirmation", new { email = Input.Email, returnUrl = returnUrl });
             }
 
             // If we got this far, something failed, redisplay form

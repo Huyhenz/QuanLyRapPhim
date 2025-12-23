@@ -84,6 +84,9 @@
 	<data name="ManageBookings" xml:space="preserve">
     <value>Đặt vé</value>
   </data>
+	<data name="FailedBookings" xml:space="preserve">
+    <value>Đặt vé thất bại</value>
+  </data>
 	<data name="RevenueStatistics" xml:space="preserve">
     <value>Doanh thu</value>
   </data>

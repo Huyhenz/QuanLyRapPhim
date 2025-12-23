@@ -84,6 +84,9 @@
   <data name="ManageBookings" xml:space="preserve">
     <value>Manage Bookings</value>
   </data>
+  <data name="FailedBookings" xml:space="preserve">
+    <value>Failed Bookings</value>
+  </data>
   <data name="RevenueStatistics" xml:space="preserve">
     <value>Revenue Statistics</value>
   </data>

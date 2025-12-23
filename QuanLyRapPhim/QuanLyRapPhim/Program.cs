@@ -80,6 +80,13 @@ builder.Services.AddIdentity<User, IdentityRole>(options =>
     options.Password.RequireLowercase = true;
     options.Password.RequireUppercase = true;
     options.Password.RequireNonAlphanumeric = true;
+    
+    // Yêu cầu xác nhận email trước khi đăng nhập
+    options.SignIn.RequireConfirmedAccount = true;
+    options.SignIn.RequireConfirmedEmail = true;
+    
+    // Cấu hình token email
+    options.Tokens.EmailConfirmationTokenProvider = TokenOptions.DefaultEmailProvider;
 })
 .AddRoles<IdentityRole>()
 .AddDefaultTokenProviders()

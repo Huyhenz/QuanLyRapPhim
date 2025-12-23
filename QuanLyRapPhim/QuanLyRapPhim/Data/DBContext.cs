@@ -21,6 +21,8 @@ namespace QuanLyRapPhim.Data
 
         public DbSet<Voucher> Vouchers { get; set; }
         public DbSet<UserVoucher> UserVouchers { get; set; }
+        public DbSet<PendingUser> PendingUsers { get; set; }
+        public DbSet<PaymentFailed> PaymentFaileds { get; set; }
 
     }
 }

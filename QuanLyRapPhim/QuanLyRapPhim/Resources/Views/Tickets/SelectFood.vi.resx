@@ -63,4 +63,10 @@
 	<data name="NoItemsSelected" xml:space="preserve">
     <value>Chưa chọn món</value>
   </data>
+	<data name="BackToShowtimes" xml:space="preserve">
+    <value>Quay lại chọn suất chiếu</value>
+  </data>
+	<data name="NoItemsSelectedYet" xml:space="preserve">
+    <value>Chưa chọn món nào</value>
+  </data>
 </root>

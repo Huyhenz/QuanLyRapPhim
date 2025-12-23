@@ -60,6 +60,10 @@
     <value>Đặt vé</value>
     <comment>Sidebar: Manage Bookings</comment>
   </data>
+	<data name="FailedBookings" xml:space="preserve">
+    <value>Đặt vé thất bại</value>
+    <comment>Sidebar: Failed Bookings</comment>
+  </data>
 	<data name="RevenueStatistics" xml:space="preserve">
     <value>Doanh thu</value>
     <comment>Sidebar: Revenue Statistics</comment>
